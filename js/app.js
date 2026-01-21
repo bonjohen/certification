@@ -18,8 +18,10 @@ class QuizApp {
             loading: document.getElementById('loading'),
             error: document.getElementById('error'),
             errorText: document.getElementById('error-text'),
+            errorBackLink: document.getElementById('error-back-link'),
             questionCard: document.getElementById('question-card'),
             navigation: document.getElementById('navigation'),
+            backLink: document.getElementById('back-link'),
             examCode: document.getElementById('exam-code'),
             examTitle: document.getElementById('exam-title'),
             currentNum: document.getElementById('current-num'),
@@ -54,6 +56,10 @@ class QuizApp {
 
     async init() {
         const examId = this.getExamIdFromUrl();
+
+        // Set back links early based on exam ID (before loading exam data)
+        this.setBackLinks(examId);
+
         if (!examId) {
             this.showError('No exam specified. Please select an exam from the home page.');
             return;
@@ -155,6 +161,23 @@ class QuizApp {
         return params.get('exam');
     }
 
+    setBackLinks(examId) {
+        const provider = this.getProviderFromExam(examId, null);
+        const providerPages = {
+            azure: 'azure.html',
+            aws: 'aws.html',
+            gcp: 'gcp.html'
+        };
+        const backUrl = providerPages[provider] || 'index.html';
+
+        if (this.elements.backLink) {
+            this.elements.backLink.href = backUrl;
+        }
+        if (this.elements.errorBackLink) {
+            this.elements.errorBackLink.href = backUrl;
+        }
+    }
+
     showError(message) {
         this.elements.loading.hidden = true;
         this.elements.error.hidden = false;
@@ -173,7 +196,48 @@ class QuizApp {
         this.elements.examCode.textContent = meta.examCode;
         this.elements.examTitle.textContent = meta.examTitle;
         this.elements.totalNum.textContent = this.engine.totalQuestions;
-        document.title = `${meta.examCode} Quiz - Azure Certification Study`;
+
+        // Determine provider from exam code or metadata
+        const examId = this.getExamIdFromUrl();
+        const provider = this.getProviderFromExam(examId, meta.provider);
+        const providerPages = {
+            azure: 'azure.html',
+            aws: 'aws.html',
+            gcp: 'gcp.html'
+        };
+        const providerNames = {
+            azure: 'Azure',
+            aws: 'AWS',
+            gcp: 'Google Cloud'
+        };
+
+        this.elements.backLink.href = providerPages[provider] || 'index.html';
+        document.title = `${meta.examCode} Quiz - ${providerNames[provider] || 'Cloud'} Certification Study`;
+    }
+
+    getProviderFromExam(examId, metaProvider) {
+        // Check metadata provider first
+        if (metaProvider) {
+            const p = metaProvider.toLowerCase();
+            if (p.includes('azure') || p.includes('microsoft')) return 'azure';
+            if (p.includes('aws') || p.includes('amazon')) return 'aws';
+            if (p.includes('gcp') || p.includes('google')) return 'gcp';
+        }
+
+        // Fall back to exam ID prefix detection
+        if (examId) {
+            const id = examId.toLowerCase();
+            // Azure exams: az-*, dp-*, ai-*
+            if (id.startsWith('az-') || id.startsWith('dp-') || id.startsWith('ai-')) return 'azure';
+            // AWS exams: clf-*, saa-*, dva-*, soa-*, dea-*, mla-*, aif-*
+            if (id.startsWith('clf-') || id.startsWith('saa-') || id.startsWith('dva-') ||
+                id.startsWith('soa-') || id.startsWith('dea-') || id.startsWith('mla-') ||
+                id.startsWith('aif-')) return 'aws';
+            // GCP exams: gcp-*
+            if (id.startsWith('gcp-')) return 'gcp';
+        }
+
+        return 'azure'; // Default fallback
     }
 
     setupEventListeners() {

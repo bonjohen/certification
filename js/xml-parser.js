@@ -9,12 +9,50 @@ export class XMLParser {
     }
 
     async loadExam(examPath) {
+        // Try fetch first (works with http/https)
+        // Fall back to XMLHttpRequest for file:// protocol
+        try {
+            const xmlText = await this.fetchXML(examPath);
+            return this.parseExam(xmlText);
+        } catch (fetchError) {
+            // If fetch fails (e.g., CORS with file://), try XMLHttpRequest
+            if (window.location.protocol === 'file:') {
+                try {
+                    const xmlText = await this.loadXMLHttpRequest(examPath);
+                    return this.parseExam(xmlText);
+                } catch (xhrError) {
+                    throw new Error(
+                        'Cannot load exam files with file:// protocol. ' +
+                        'Please use a local server (e.g., "python -m http.server" or VS Code Live Server).'
+                    );
+                }
+            }
+            throw fetchError;
+        }
+    }
+
+    async fetchXML(examPath) {
         const response = await fetch(examPath);
         if (!response.ok) {
             throw new Error(`Failed to load exam: ${response.status} ${response.statusText}`);
         }
-        const xmlText = await response.text();
-        return this.parseExam(xmlText);
+        return response.text();
+    }
+
+    loadXMLHttpRequest(examPath) {
+        return new Promise((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', examPath, true);
+            xhr.onload = () => {
+                if (xhr.status === 200 || xhr.status === 0) {
+                    resolve(xhr.responseText);
+                } else {
+                    reject(new Error(`XHR failed: ${xhr.status}`));
+                }
+            };
+            xhr.onerror = () => reject(new Error('XHR network error'));
+            xhr.send();
+        });
     }
 
     parseExam(xmlText) {
@@ -68,10 +106,14 @@ export class XMLParser {
         const questionElements = doc.querySelectorAll('questions > question');
 
         questionElements.forEach(q => {
+            // Support both attribute and element formats for category-ref and difficulty
+            const categoryRef = q.getAttribute('category-ref') || this.getText(q, 'category-ref') || '';
+            const difficulty = q.getAttribute('difficulty') || this.getText(q, 'difficulty') || 'intermediate';
+
             questions.push({
                 id: parseInt(q.getAttribute('id')) || questions.length + 1,
-                categoryRef: q.getAttribute('category-ref') || '',
-                difficulty: q.getAttribute('difficulty') || 'intermediate',
+                categoryRef: categoryRef,
+                difficulty: difficulty,
                 title: this.getText(q, 'title'),
                 scenario: this.getInnerHTML(q, 'scenario'),
                 questionText: this.getInnerHTML(q, 'question-text'),
@@ -90,8 +132,10 @@ export class XMLParser {
         const choiceElements = questionElement.querySelectorAll('choices > choice');
 
         choiceElements.forEach(c => {
+            // Support both 'letter' attribute (preferred) and 'id' attribute (fallback)
+            const letter = c.getAttribute('letter') || c.getAttribute('id') || '';
             choices.push({
-                letter: c.getAttribute('letter') || '',
+                letter: letter,
                 text: c.textContent.trim()
             });
         });
@@ -107,10 +151,17 @@ export class XMLParser {
         const hintElements = questionElement.querySelectorAll('hints > hint');
 
         hintElements.forEach(h => {
+            // Support both <content> child element and direct text content
+            let content = this.getInnerHTML(h, 'content');
+            if (!content) {
+                // Fall back to direct text content of hint element
+                content = h.textContent.trim();
+            }
+
             hints.push({
                 level: parseInt(h.getAttribute('level')) || 1,
                 label: h.getAttribute('label') || `Level ${h.getAttribute('level')}`,
-                content: this.getInnerHTML(h, 'content')
+                content: content
             });
         });
 
