@@ -1,0 +1,1865 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<certification-exam xmlns="http://certification.study/schema/v1" version="1.0">
+  <metadata>
+    <exam-code>AZ-400</exam-code>
+    <exam-title>Designing and Implementing Microsoft DevOps Solutions</exam-title>
+    <provider>Microsoft</provider>
+    <description>Scenario-Based Study Companion for AZ-400 certification - validates expertise in designing and implementing DevOps practices for version control, compliance, infrastructure as code, configuration management, and continuous integration/delivery.</description>
+    <total-questions>50</total-questions>
+    <created-date>2026-01-20</created-date>
+    <last-modified>2026-01-20T00:00:00Z</last-modified>
+    <categories>
+      <category id="cat-source-control">Source Control and Collaboration</category>
+      <category id="cat-ci">Continuous Integration</category>
+      <category id="cat-cd">Continuous Delivery</category>
+      <category id="cat-security">Security and Compliance</category>
+      <category id="cat-iac">Infrastructure as Code</category>
+      <category id="cat-monitoring">Monitoring and Feedback</category>
+    </categories>
+  </metadata>
+
+  <questions>
+    <question id="1" category-ref="cat-source-control" difficulty="intermediate">
+      <title>Branching Strategy Selection</title>
+      <scenario>A development team of 20 developers works on a web application with bi-weekly releases. They need a branching strategy that supports feature isolation, code reviews, and stable releases.</scenario>
+      <question-text>Which branching strategy should you recommend?</question-text>
+      <choices>
+        <choice letter="A">GitHub Flow with feature branches and pull requests</choice>
+        <choice letter="B">Single main branch with direct commits</choice>
+        <choice letter="C">GitFlow with develop, release, and hotfix branches</choice>
+        <choice letter="D">Trunk-based development with no branches</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>GitHub Flow provides simplicity with feature branches while supporting code reviews via PRs.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>GitHub Flow uses short-lived feature branches merged to main via pull requests. It's simpler than GitFlow while providing isolation for features and mandatory code reviews. With bi-weekly releases, the lightweight approach is preferable to GitFlow's complexity.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>GitHub Flow: main + feature branches; deploy from main.</li>
+              <li>GitFlow: main, develop, feature, release, hotfix branches; more complex.</li>
+              <li>Trunk-based: very short branches or direct commits; requires mature CI/CD.</li>
+              <li>Choose based on release frequency and team maturity.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Branching Strategy</tag>
+        <tag>GitHub Flow</tag>
+        <tag>Source Control</tag>
+      </tags>
+    </question>
+
+    <question id="2" category-ref="cat-source-control" difficulty="intermediate">
+      <title>Pull Request Policies</title>
+      <scenario>Your team needs to enforce code quality standards before merging. Requirements: at least two reviewers must approve, builds must pass, and work items must be linked.</scenario>
+      <question-text>How should you configure the repository?</question-text>
+      <choices>
+        <choice letter="A">Branch policies with required reviewers, build validation, and work item linking</choice>
+        <choice letter="B">Rely on developers to follow guidelines manually</choice>
+        <choice letter="C">Post-merge code reviews</choice>
+        <choice letter="D">Disable direct pushes without any other controls</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Branch policies automate enforcement of code review and build requirements.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Azure DevOps branch policies enforce requirements before PR completion. Configure minimum reviewer count (2), require passing build validation, and require linked work items. This automates quality gates and ensures compliance without manual enforcement.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Branch policies can require specific reviewers for certain paths.</li>
+              <li>Build validation runs PR builds; can be required or optional.</li>
+              <li>Comment resolution can require all comments addressed before merge.</li>
+              <li>GitHub uses branch protection rules with similar capabilities.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Branch Policies</tag>
+        <tag>Pull Requests</tag>
+        <tag>Code Review</tag>
+      </tags>
+    </question>
+
+    <question id="3" category-ref="cat-source-control" difficulty="intermediate">
+      <title>Mono-repo vs Multi-repo</title>
+      <scenario>A platform team manages 15 microservices. Teams want independent release cycles but need to share common libraries. CI builds are becoming slow due to repository size.</scenario>
+      <question-text>What repository structure should you recommend?</question-text>
+      <choices>
+        <choice letter="A">Multi-repo with shared packages published to artifact feed</choice>
+        <choice letter="B">Single mono-repo for all services and libraries</choice>
+        <choice letter="C">Separate repos with copy-paste of shared code</choice>
+        <choice letter="D">One repo per developer</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Multi-repo provides independent release cycles; artifact feeds share common code as packages.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Use separate repositories per microservice for independent versioning and faster CI. Publish shared libraries as packages to Azure Artifacts or npm/NuGet feeds. Services depend on specific package versions, enabling controlled updates without repo coupling.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Mono-repo: single repo, atomic changes, but complex CI and scaling issues.</li>
+              <li>Multi-repo: independent repos, versioned dependencies, clearer ownership.</li>
+              <li>Semantic versioning for shared packages communicates breaking changes.</li>
+              <li>Consider mono-repo tooling (Nx, Bazel) if atomic cross-service changes are frequent.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Repository Strategy</tag>
+        <tag>Microservices</tag>
+        <tag>Artifact Feeds</tag>
+      </tags>
+    </question>
+
+    <question id="4" category-ref="cat-ci" difficulty="intermediate">
+      <title>CI Pipeline Design</title>
+      <scenario>A .NET application needs automated builds on every commit. Requirements: compile code, run unit tests, perform static code analysis, and publish artifacts for deployment.</scenario>
+      <question-text>What is the correct order of CI pipeline stages?</question-text>
+      <choices>
+        <choice letter="A">Restore dependencies, Build, Test, Analyze, Publish artifacts</choice>
+        <choice letter="B">Publish artifacts, Build, Test</choice>
+        <choice letter="C">Test, Build, Analyze</choice>
+        <choice letter="D">Build only, defer other steps to CD</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>CI follows: restore, build, test, analyze, then publish artifacts for downstream consumption.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>A proper CI pipeline: (1) Restore NuGet packages, (2) Build/compile code, (3) Run unit tests to catch bugs early, (4) Static code analysis for quality, (5) Publish build artifacts for CD pipelines. Fail fast: tests run before expensive analysis.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Fail fast: order steps by speed and likelihood of failure.</li>
+              <li>Parallelize independent tasks (unit tests, analysis) when possible.</li>
+              <li>Cache dependencies between builds to speed up restore.</li>
+              <li>Publish test results and code coverage for visibility.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>CI Pipeline</tag>
+        <tag>Build Automation</tag>
+        <tag>.NET</tag>
+      </tags>
+    </question>
+
+    <question id="5" category-ref="cat-ci" difficulty="intermediate">
+      <title>Build Agent Selection</title>
+      <scenario>Your organization has strict security requirements: builds must run in your network, access internal package feeds, and have consistent pre-installed tools.</scenario>
+      <question-text>Which build agent configuration should you use?</question-text>
+      <choices>
+        <choice letter="A">Self-hosted agents in your network with custom images</choice>
+        <choice letter="B">Microsoft-hosted agents only</choice>
+        <choice letter="C">Developer workstations as build agents</choice>
+        <choice letter="D">No agents; run builds manually</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Self-hosted agents provide network access, custom tools, and security control.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Self-hosted agents run in your infrastructure with access to internal resources. You control the agent image, pre-installed tools, and security configuration. Microsoft-hosted agents are internet-facing and reset after each job, limiting internal access.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Self-hosted: persistent, customizable, network access; you manage updates.</li>
+              <li>Microsoft-hosted: clean image each job, no maintenance, limited customization.</li>
+              <li>Scale set agents auto-scale self-hosted agents based on queue.</li>
+              <li>Container-based agents provide consistent, reproducible environments.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Build Agents</tag>
+        <tag>Self-hosted</tag>
+        <tag>Pipeline Infrastructure</tag>
+      </tags>
+    </question>
+
+    <question id="6" category-ref="cat-ci" difficulty="advanced">
+      <title>Pipeline as Code</title>
+      <scenario>Your team wants pipeline definitions version-controlled alongside application code, with reusable templates across multiple projects.</scenario>
+      <question-text>How should you implement pipeline as code?</question-text>
+      <choices>
+        <choice letter="A">YAML pipelines with templates in a shared repository</choice>
+        <choice letter="B">Classic UI-based pipelines only</choice>
+        <choice letter="C">PowerShell scripts without pipeline definitions</choice>
+        <choice letter="D">Manual build steps documented in wiki</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>YAML pipelines are version-controlled; templates enable reuse across projects.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>YAML pipelines store pipeline definitions as code in the repository, enabling version control, code review, and history. Templates in a shared repository provide reusable components (stages, jobs, steps) that multiple projects can reference, ensuring consistency.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Template types: step, job, stage, and variable templates.</li>
+              <li>Extends templates enforce organizational standards on all pipelines.</li>
+              <li>Template parameters enable customization while maintaining structure.</li>
+              <li>Store templates in a dedicated repo with versioned releases.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>YAML Pipelines</tag>
+        <tag>Pipeline Templates</tag>
+        <tag>Infrastructure as Code</tag>
+      </tags>
+    </question>
+
+    <question id="7" category-ref="cat-ci" difficulty="intermediate">
+      <title>Code Quality Gates</title>
+      <scenario>You need to fail builds when code coverage drops below 80% or when new code quality issues are introduced.</scenario>
+      <question-text>What tool integration should you implement?</question-text>
+      <choices>
+        <choice letter="A">SonarQube with quality gates integrated into the pipeline</choice>
+        <choice letter="B">Manual code review only</choice>
+        <choice letter="C">Compiler warnings treated as errors</choice>
+        <choice letter="D">Post-deployment quality checks</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>SonarQube analyzes code quality and enforces gates on coverage, bugs, and vulnerabilities.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>SonarQube (or SonarCloud) performs static code analysis, tracks code coverage, and enforces quality gates. Configure gates to fail when coverage drops below threshold or new issues exceed limits. Integrate as a pipeline task that blocks completion on gate failure.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Quality gates check: coverage, duplications, bugs, vulnerabilities, code smells.</li>
+              <li>"Leak period" focuses on new code quality, not legacy debt.</li>
+              <li>SonarCloud is SaaS; SonarQube is self-hosted.</li>
+              <li>Azure DevOps has built-in code coverage publishing; SonarQube adds deeper analysis.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>SonarQube</tag>
+        <tag>Code Quality</tag>
+        <tag>Static Analysis</tag>
+      </tags>
+    </question>
+
+    <question id="8" category-ref="cat-cd" difficulty="intermediate">
+      <title>Release Pipeline Strategy</title>
+      <scenario>Your application deploys to Dev, Test, and Production environments. Production deployments require manual approval and should only proceed after successful Test validation.</scenario>
+      <question-text>How should you structure the release pipeline?</question-text>
+      <choices>
+        <choice letter="A">Multi-stage pipeline with approval gates between Test and Production</choice>
+        <choice letter="B">Single stage deploying to all environments simultaneously</choice>
+        <choice letter="C">Separate pipelines per environment with no dependencies</choice>
+        <choice letter="D">Manual deployments to Production</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Multi-stage pipelines with approvals ensure orderly progression through environments.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Create stages for Dev, Test, and Production with sequential dependencies. Add approval checks before Production to require human sign-off. Conditions ensure Production only runs after Test succeeds. This provides traceability and control over production deployments.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Environments in Azure DevOps track deployment history and approvals.</li>
+              <li>Approval gates: manual approval, business hours, Azure Monitor alerts, REST API.</li>
+              <li>Use deployment jobs for environment-aware deployments.</li>
+              <li>YAML environments support checks, approvals, and locks.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Release Pipeline</tag>
+        <tag>Environments</tag>
+        <tag>Approvals</tag>
+      </tags>
+    </question>
+
+    <question id="9" category-ref="cat-cd" difficulty="advanced">
+      <title>Blue-Green Deployment</title>
+      <scenario>A customer-facing web application requires zero-downtime deployments with the ability to instantly rollback if issues are detected post-deployment.</scenario>
+      <question-text>Which deployment strategy should you implement?</question-text>
+      <choices>
+        <choice letter="A">Blue-green deployment with traffic switching</choice>
+        <choice letter="B">In-place deployment with maintenance window</choice>
+        <choice letter="C">Rolling deployment across all instances</choice>
+        <choice letter="D">Manual server-by-server updates</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Blue-green maintains two environments; traffic switches instantly between them for zero-downtime and quick rollback.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Blue-green deployment runs two identical production environments. Deploy to inactive environment (green), validate, then switch traffic from active (blue). Rollback is instant: switch traffic back to blue. Azure App Service deployment slots provide built-in blue-green capability.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>App Service slots: staging slot for green, production for blue; swap instantly.</li>
+              <li>Warm up the green slot before swap to avoid cold start issues.</li>
+              <li>Database migrations require backward compatibility for both versions.</li>
+              <li>Traffic Manager or Front Door can implement blue-green for VMs/AKS.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Blue-Green</tag>
+        <tag>Zero Downtime</tag>
+        <tag>Deployment Slots</tag>
+      </tags>
+    </question>
+
+    <question id="10" category-ref="cat-cd" difficulty="advanced">
+      <title>Canary Deployment</title>
+      <scenario>You want to reduce risk by deploying to a small percentage of users first, monitoring for errors, then gradually increasing traffic to the new version.</scenario>
+      <question-text>Which deployment strategy provides gradual rollout with traffic control?</question-text>
+      <choices>
+        <choice letter="A">Canary deployment with traffic splitting</choice>
+        <choice letter="B">Blue-green with full traffic switch</choice>
+        <choice letter="C">Rolling deployment to all instances</choice>
+        <choice letter="D">Feature flags without infrastructure changes</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Canary routes a small percentage of traffic to the new version for validation before full rollout.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Canary deployment gradually shifts traffic to the new version (e.g., 5% -> 25% -> 50% -> 100%). Monitor error rates and performance at each stage. If issues arise, traffic reverts to the stable version. App Service staging slots support traffic percentage routing.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>App Service slot traffic routing: configure percentage to staging slot.</li>
+              <li>AKS with service mesh (Istio) provides fine-grained traffic control.</li>
+              <li>Azure Front Door supports weighted routing for canary patterns.</li>
+              <li>Automate rollback based on Application Insights metrics thresholds.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Canary Deployment</tag>
+        <tag>Progressive Rollout</tag>
+        <tag>Traffic Splitting</tag>
+      </tags>
+    </question>
+
+    <question id="11" category-ref="cat-cd" difficulty="intermediate">
+      <title>Feature Flags</title>
+      <scenario>Product managers want to release features to specific users or regions without code deployments. Developers need to decouple deployment from feature release.</scenario>
+      <question-text>What solution enables feature release independent of deployment?</question-text>
+      <choices>
+        <choice letter="A">Azure App Configuration with feature flags</choice>
+        <choice letter="B">Compile-time feature toggles</choice>
+        <choice letter="C">Environment variables per deployment</choice>
+        <choice letter="D">Separate code branches per feature</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Azure App Configuration provides centralized feature flag management with targeting filters.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Azure App Configuration feature management enables toggling features without redeployment. Define flags with targeting filters (users, groups, percentages). Code checks flag state at runtime. This decouples deployment (code in production) from release (feature enabled).</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Targeting filters: percentage rollout, user/group targeting, time windows.</li>
+              <li>Feature flags should be short-lived; remove after full rollout.</li>
+              <li>LaunchDarkly is a popular third-party alternative with advanced targeting.</li>
+              <li>Technical debt: unused flags accumulate; track and clean up regularly.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Feature Flags</tag>
+        <tag>App Configuration</tag>
+        <tag>Release Management</tag>
+      </tags>
+    </question>
+
+    <question id="12" category-ref="cat-cd" difficulty="advanced">
+      <title>Database DevOps</title>
+      <scenario>Your application uses Azure SQL Database. You need to automate schema changes, ensure backward compatibility during deployments, and enable rollback of database changes.</scenario>
+      <question-text>How should you implement database DevOps?</question-text>
+      <choices>
+        <choice letter="A">State-based approach with SSDT and incremental deployments</choice>
+        <choice letter="B">Manual SQL scripts run by DBAs</choice>
+        <choice letter="C">Direct production database modifications</choice>
+        <choice letter="D">Full database replacement with each deployment</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>SSDT enables state-based database development with version-controlled schema and automated deployments.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>SQL Server Data Tools (SSDT) uses a state-based approach: define desired schema state, generate incremental migration scripts. Include database project in CI/CD pipeline. Use pre/post deployment scripts for data migrations. Design changes for backward compatibility (expand-contract pattern).</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>State-based (SSDT): define target state, auto-generate diff scripts.</li>
+              <li>Migration-based (EF Migrations, Flyway): explicit up/down migration scripts.</li>
+              <li>Expand-contract: add new column, migrate data, remove old column in separate releases.</li>
+              <li>Always test migrations against production-like data volumes.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Database DevOps</tag>
+        <tag>SSDT</tag>
+        <tag>Schema Migration</tag>
+      </tags>
+    </question>
+
+    <question id="13" category-ref="cat-security" difficulty="advanced">
+      <title>Secure Pipeline Secrets</title>
+      <scenario>Your pipelines need access to connection strings, API keys, and certificates. Secrets must not be visible in logs, should be rotated regularly, and access must be audited.</scenario>
+      <question-text>How should you manage pipeline secrets?</question-text>
+      <choices>
+        <choice letter="A">Azure Key Vault with variable group linking and managed identity access</choice>
+        <choice letter="B">Pipeline variables marked as secret</choice>
+        <choice letter="C">Secrets in source code configuration files</choice>
+        <choice letter="D">Shared passwords in team documentation</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Key Vault provides centralized secret management; variable groups link secrets to pipelines without exposure.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Store secrets in Azure Key Vault for centralized management, rotation, and auditing. Link Key Vault to Azure DevOps variable groups; secrets are fetched at runtime without exposure in pipeline definitions. Use managed identity for agent-to-Key Vault authentication.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Variable groups link to Key Vault; secrets sync automatically.</li>
+              <li>Secret variables are masked in logs (replaced with ***).</li>
+              <li>Service connections should use workload identity federation when possible.</li>
+              <li>Key Vault access policies or RBAC control who can read secrets.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Key Vault</tag>
+        <tag>Secrets Management</tag>
+        <tag>Pipeline Security</tag>
+      </tags>
+    </question>
+
+    <question id="14" category-ref="cat-security" difficulty="advanced">
+      <title>Dependency Scanning</title>
+      <scenario>Your application uses open-source packages. You need to detect vulnerable dependencies in the build pipeline and block deployments when critical vulnerabilities are found.</scenario>
+      <question-text>What should you implement?</question-text>
+      <choices>
+        <choice letter="A">Software Composition Analysis (SCA) with Dependabot or WhiteSource</choice>
+        <choice letter="B">Manual review of package versions</choice>
+        <choice letter="C">Only use packages from trusted publishers</choice>
+        <choice letter="D">Disable automatic package updates</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>SCA tools scan dependencies for known vulnerabilities and can fail builds on critical issues.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Software Composition Analysis tools (GitHub Dependabot, WhiteSource/Mend, Snyk) scan project dependencies against vulnerability databases. Integrate into CI pipeline to fail builds on critical CVEs. Dependabot can automatically create PRs to update vulnerable packages.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>OWASP Dependency-Check is an open-source alternative.</li>
+              <li>Configure severity thresholds: fail on critical/high, warn on medium.</li>
+              <li>Generate Software Bill of Materials (SBOM) for compliance.</li>
+              <li>GitHub Advanced Security includes dependency scanning and secret scanning.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Dependency Scanning</tag>
+        <tag>SCA</tag>
+        <tag>Vulnerability Management</tag>
+      </tags>
+    </question>
+
+    <question id="15" category-ref="cat-security" difficulty="advanced">
+      <title>Container Security</title>
+      <scenario>Your team deploys containerized applications to AKS. You need to ensure base images are secure, scan for vulnerabilities, and prevent deployment of non-compliant images.</scenario>
+      <question-text>What security measures should you implement?</question-text>
+      <choices>
+        <choice letter="A">Azure Container Registry with Microsoft Defender, image scanning, and admission control</choice>
+        <choice letter="B">Public Docker Hub images without scanning</choice>
+        <choice letter="C">Build images locally without registry</choice>
+        <choice letter="D">Disable image pulls to prevent vulnerabilities</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>ACR with Defender scans images; admission control prevents deploying vulnerable images to AKS.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Azure Container Registry stores images privately. Microsoft Defender for Containers scans images for vulnerabilities. Configure AKS admission control (Azure Policy/Gatekeeper) to block deployment of images with critical vulnerabilities or from untrusted registries.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Use minimal base images (Alpine, distroless) to reduce attack surface.</li>
+              <li>ACR Tasks can rebuild images when base images are updated.</li>
+              <li>Image signing with Notation ensures image integrity and provenance.</li>
+              <li>Quarantine pattern: images go to quarantine registry until scanned clean.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Container Security</tag>
+        <tag>ACR</tag>
+        <tag>Image Scanning</tag>
+      </tags>
+    </question>
+
+    <question id="16" category-ref="cat-security" difficulty="intermediate">
+      <title>Service Connection Security</title>
+      <scenario>Pipelines need to deploy to Azure subscriptions. You want to limit which pipelines can access production, use minimal permissions, and avoid long-lived credentials.</scenario>
+      <question-text>How should you configure service connections?</question-text>
+      <choices>
+        <choice letter="A">Workload identity federation with scoped RBAC and pipeline restrictions</choice>
+        <choice letter="B">Single service principal with Owner access for all pipelines</choice>
+        <choice letter="C">Personal Azure credentials in pipelines</choice>
+        <choice letter="D">Shared service principal password in variable group</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Workload identity federation eliminates secrets; RBAC scopes access; pipeline restrictions limit usage.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Use workload identity federation for service connections (no stored secrets). Grant minimal RBAC permissions (Contributor on specific resource groups, not subscription Owner). Restrict service connection usage to specific pipelines/environments to prevent unauthorized access to production.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Workload identity: Azure DevOps/GitHub tokens exchanged for Azure AD tokens.</li>
+              <li>Service connection approvals and checks add governance controls.</li>
+              <li>Separate service connections for production vs. non-production.</li>
+              <li>Service principal certificates are more secure than secrets if WIF unavailable.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Service Connections</tag>
+        <tag>Workload Identity</tag>
+        <tag>Least Privilege</tag>
+      </tags>
+    </question>
+
+    <question id="17" category-ref="cat-security" difficulty="advanced">
+      <title>Secure Development Lifecycle</title>
+      <scenario>Your organization needs to integrate security throughout the development lifecycle: threat modeling during design, security testing during development, and compliance verification before release.</scenario>
+      <question-text>What practice encompasses this security-first approach?</question-text>
+      <choices>
+        <choice letter="A">DevSecOps with shift-left security practices</choice>
+        <choice letter="B">Security review only before production</choice>
+        <choice letter="C">Separate security team post-deployment</choice>
+        <choice letter="D">Penetration testing annually</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>DevSecOps integrates security into every phase; shift-left moves security earlier in the lifecycle.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>DevSecOps integrates security practices into DevOps workflows. Shift-left security moves testing earlier: threat modeling in design, SAST in development, SCA for dependencies, DAST in test environments. Security becomes everyone's responsibility, not a final gate.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>SAST (Static Application Security Testing): analyze source code.</li>
+              <li>DAST (Dynamic Application Security Testing): test running applications.</li>
+              <li>IAST (Interactive): combines SAST and DAST during testing.</li>
+              <li>Microsoft Security Development Lifecycle (SDL) provides a framework.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>DevSecOps</tag>
+        <tag>Shift-Left</tag>
+        <tag>SDL</tag>
+      </tags>
+    </question>
+
+    <question id="18" category-ref="cat-iac" difficulty="intermediate">
+      <title>Infrastructure as Code Tools</title>
+      <scenario>Your team needs to provision Azure infrastructure reproducibly. They want declarative syntax, state management, and integration with Azure DevOps pipelines.</scenario>
+      <question-text>Which IaC approach should you recommend for Azure?</question-text>
+      <choices>
+        <choice letter="A">Bicep with Azure DevOps pipeline tasks</choice>
+        <choice letter="B">Manual Azure Portal configuration</choice>
+        <choice letter="C">Imperative PowerShell scripts</choice>
+        <choice letter="D">Azure CLI commands in documentation</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Bicep provides declarative Azure-native IaC with cleaner syntax than ARM templates.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Bicep is Azure's domain-specific language for infrastructure, compiling to ARM templates. It offers cleaner syntax, modules, and excellent tooling. Azure DevOps has native Bicep tasks for deployment. Terraform is a multi-cloud alternative with its own state management.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Bicep: Azure-native, no state file, idempotent, what-if previews.</li>
+              <li>Terraform: multi-cloud, state file required, larger ecosystem.</li>
+              <li>Bicep modules enable reusable, parameterized infrastructure components.</li>
+              <li>Deployment stacks provide lifecycle management for Bicep deployments.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Bicep</tag>
+        <tag>Infrastructure as Code</tag>
+        <tag>ARM</tag>
+      </tags>
+    </question>
+
+    <question id="19" category-ref="cat-iac" difficulty="advanced">
+      <title>Terraform State Management</title>
+      <scenario>Your team uses Terraform for multi-cloud infrastructure. Multiple team members need to collaborate, and state must be protected from corruption and unauthorized access.</scenario>
+      <question-text>How should you manage Terraform state?</question-text>
+      <choices>
+        <choice letter="A">Azure Storage backend with state locking and access controls</choice>
+        <choice letter="B">Local state files committed to Git</choice>
+        <choice letter="C">Shared network drive for state files</choice>
+        <choice letter="D">No state management; recreate infrastructure each time</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Remote state in Azure Storage with locking prevents concurrent modifications and corruption.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Store Terraform state in Azure Storage account with blob lease locking to prevent concurrent modifications. Enable versioning for state history. Use RBAC and network restrictions to control access. State contains sensitive data; treat it as a protected resource.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>State locking prevents "terraform apply" race conditions.</li>
+              <li>Enable storage account versioning for state recovery.</li>
+              <li>State may contain secrets; encrypt and restrict access.</li>
+              <li>Terraform Cloud/Enterprise provides managed state with additional features.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Terraform</tag>
+        <tag>State Management</tag>
+        <tag>Remote Backend</tag>
+      </tags>
+    </question>
+
+    <question id="20" category-ref="cat-iac" difficulty="intermediate">
+      <title>Configuration Management</title>
+      <scenario>VMs provisioned by IaC need consistent software installation, configuration files, and ongoing drift detection to maintain compliance.</scenario>
+      <question-text>What tool provides desired state configuration for VMs?</question-text>
+      <choices>
+        <choice letter="A">Azure Automanage with machine configuration (formerly Guest Configuration)</choice>
+        <choice letter="B">Manual RDP sessions for each VM</choice>
+        <choice letter="C">Custom startup scripts only</choice>
+        <choice letter="D">Golden images with no post-deployment configuration</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Azure Automanage machine configuration audits and enforces desired state on VM configurations.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Azure Automanage machine configuration (formerly Azure Policy Guest Configuration) uses PowerShell DSC to define desired state. It audits VMs for compliance and can remediate drift. Integrate with Azure Policy for governance at scale across all VMs.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Machine configuration packages contain DSC resources and assignments.</li>
+              <li>Audit mode reports compliance; enforce mode remediates drift.</li>
+              <li>Ansible, Chef, Puppet are cross-platform alternatives.</li>
+              <li>Combine with VM extensions for initial configuration during provisioning.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Configuration Management</tag>
+        <tag>DSC</tag>
+        <tag>Machine Configuration</tag>
+      </tags>
+    </question>
+
+    <question id="21" category-ref="cat-iac" difficulty="advanced">
+      <title>GitOps for Kubernetes</title>
+      <scenario>Your AKS cluster configurations should be version-controlled, with automatic synchronization from Git to the cluster. Changes should be auditable and reversible.</scenario>
+      <question-text>What approach should you implement?</question-text>
+      <choices>
+        <choice letter="A">GitOps with Flux or Argo CD</choice>
+        <choice letter="B">Manual kubectl apply from developer machines</choice>
+        <choice letter="C">Azure DevOps pipelines with kubectl in every deployment</choice>
+        <choice letter="D">Azure Portal configuration only</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>GitOps uses Git as the source of truth; operators like Flux automatically sync cluster state.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>GitOps treats Git as the single source of truth for cluster configuration. Operators like Flux (built into AKS as an extension) continuously reconcile cluster state with Git repository. Changes are made via Git commits, providing audit trail and easy rollback via git revert.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Flux v2 is the CNCF GitOps toolkit; native AKS extension available.</li>
+              <li>Argo CD provides UI and advanced deployment strategies.</li>
+              <li>GitOps: pull-based (operator pulls from Git); traditional CI/CD: push-based.</li>
+              <li>Separate repos for app code and cluster config (config repo pattern).</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>GitOps</tag>
+        <tag>Flux</tag>
+        <tag>Kubernetes</tag>
+      </tags>
+    </question>
+
+    <question id="22" category-ref="cat-monitoring" difficulty="intermediate">
+      <title>Application Performance Monitoring</title>
+      <scenario>Your web application needs end-to-end monitoring: request tracing, dependency tracking, exception logging, and performance metrics with alerting.</scenario>
+      <question-text>Which Azure service provides comprehensive APM capabilities?</question-text>
+      <choices>
+        <choice letter="A">Application Insights with distributed tracing</choice>
+        <choice letter="B">Azure Monitor metrics only</choice>
+        <choice letter="C">Custom logging to blob storage</choice>
+        <choice letter="D">Windows Event Logs</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Application Insights provides full APM: requests, dependencies, exceptions, and distributed tracing.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Application Insights is Azure's APM solution. It automatically tracks requests, dependencies (SQL, HTTP calls), exceptions, and custom metrics. Distributed tracing follows requests across services. Smart detection alerts on anomalies. Live metrics show real-time performance.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Auto-instrumentation available for .NET, Java, Node.js, Python.</li>
+              <li>OpenTelemetry is becoming the standard; App Insights supports OTLP.</li>
+              <li>Application Map visualizes service dependencies and health.</li>
+              <li>Workspace-based App Insights uses Log Analytics for unified querying.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Application Insights</tag>
+        <tag>APM</tag>
+        <tag>Distributed Tracing</tag>
+      </tags>
+    </question>
+
+    <question id="23" category-ref="cat-monitoring" difficulty="intermediate">
+      <title>Deployment Monitoring</title>
+      <scenario>After each deployment, you need to automatically verify the application is healthy. If errors exceed thresholds, the deployment should automatically roll back.</scenario>
+      <question-text>What should you implement?</question-text>
+      <choices>
+        <choice letter="A">Deployment gates with Azure Monitor alerts and automatic rollback</choice>
+        <choice letter="B">Manual verification after each deployment</choice>
+        <choice letter="C">No post-deployment validation</choice>
+        <choice letter="D">User-reported issues for rollback decisions</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Deployment gates query Azure Monitor; automatic rollback triggers on alert conditions.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Configure post-deployment gates that query Azure Monitor alerts or Application Insights metrics. If error rates or latency exceed thresholds, gates fail. Combine with Azure DevOps or GitHub Actions deployment protection rules to automatically trigger rollback to the previous version.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Azure Monitor alerts can be gate conditions in release pipelines.</li>
+              <li>REST API gates can query custom health endpoints.</li>
+              <li>App Service auto-heal can rollback individual instances based on request failures.</li>
+              <li>Implement health check endpoints following Azure Load Balancer patterns.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Deployment Gates</tag>
+        <tag>Health Monitoring</tag>
+        <tag>Auto-Rollback</tag>
+      </tags>
+    </question>
+
+    <question id="24" category-ref="cat-monitoring" difficulty="advanced">
+      <title>Feedback Loops</title>
+      <scenario>You want to close the DevOps loop by automatically creating work items from production issues and feeding user feedback into the development process.</scenario>
+      <question-text>What integration should you implement?</question-text>
+      <choices>
+        <choice letter="A">Application Insights work item integration and user feedback widgets</choice>
+        <choice letter="B">Manual bug triage from email reports</choice>
+        <choice letter="C">No connection between operations and development</choice>
+        <choice letter="D">Separate systems for dev and ops</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>App Insights can create Azure DevOps work items directly from exceptions and failures.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Application Insights integrates with Azure DevOps to create work items from detected issues, including exception details and diagnostic context. Feedback widgets in applications capture user-reported issues. This closes the feedback loop between production and development.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Smart detection automatically identifies anomalies and can create alerts.</li>
+              <li>Work item templates include App Insights data for context.</li>
+              <li>Release annotations mark deployments in App Insights for correlation.</li>
+              <li>Implement feature flags to quickly disable problematic features.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Feedback Loops</tag>
+        <tag>Work Items</tag>
+        <tag>Continuous Improvement</tag>
+      </tags>
+    </question>
+
+    <question id="25" category-ref="cat-monitoring" difficulty="intermediate">
+      <title>Log Aggregation</title>
+      <scenario>Your microservices application needs centralized logging across all services. Developers need to search and correlate logs from multiple services to troubleshoot issues.</scenario>
+      <question-text>What logging architecture should you implement?</question-text>
+      <choices>
+        <choice letter="A">Structured logging to Log Analytics workspace with correlation IDs</choice>
+        <choice letter="B">Local log files on each container</choice>
+        <choice letter="C">Console output without persistence</choice>
+        <choice letter="D">Separate logging systems per service</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Centralized Log Analytics with structured logs and correlation IDs enables cross-service troubleshooting.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Send structured logs (JSON format) from all services to a centralized Log Analytics workspace. Include correlation IDs (trace ID, span ID) in every log entry to trace requests across services. Use Kusto Query Language (KQL) to search, filter, and correlate logs.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>OpenTelemetry provides standard correlation headers (W3C Trace Context).</li>
+              <li>Structured logging enables field-based queries vs. text parsing.</li>
+              <li>Container Insights collects stdout/stderr from AKS containers.</li>
+              <li>Log retention policies balance cost and compliance requirements.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Logging</tag>
+        <tag>Log Analytics</tag>
+        <tag>Correlation</tag>
+      </tags>
+    </question>
+
+    <question id="26" category-ref="cat-ci" difficulty="intermediate">
+      <title>Test Automation Strategy</title>
+      <scenario>Your pipeline needs multiple test types: unit tests for fast feedback, integration tests for component interaction, and UI tests for end-to-end validation.</scenario>
+      <question-text>How should you organize tests in the pipeline?</question-text>
+      <choices>
+        <choice letter="A">Test pyramid: many unit tests, fewer integration tests, minimal UI tests</choice>
+        <choice letter="B">Only UI tests for complete coverage</choice>
+        <choice letter="C">Skip tests to speed up deployment</choice>
+        <choice letter="D">Manual testing only</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>The test pyramid optimizes for fast feedback with unit tests and reduces slow, brittle UI tests.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>The test pyramid recommends: many fast unit tests (base), moderate integration tests (middle), few slow UI/E2E tests (top). Unit tests run in CI for fast feedback. Integration tests validate component interactions. UI tests verify critical user journeys. This balances coverage with speed.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Unit tests: isolated, fast, run on every commit.</li>
+              <li>Integration tests: test contracts between services, can use test containers.</li>
+              <li>E2E tests: slow, brittle; reserve for critical paths.</li>
+              <li>Parallelize test execution to reduce pipeline duration.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Test Pyramid</tag>
+        <tag>Test Strategy</tag>
+        <tag>Automation</tag>
+      </tags>
+    </question>
+
+    <question id="27" category-ref="cat-cd" difficulty="advanced">
+      <title>Kubernetes Deployment Strategy</title>
+      <scenario>Your AKS application needs zero-downtime deployments with the ability to quickly rollback. Pods should be updated gradually with health checks.</scenario>
+      <question-text>Which Kubernetes deployment strategy should you configure?</question-text>
+      <choices>
+        <choice letter="A">Rolling update with readiness probes and rollback capability</choice>
+        <choice letter="B">Recreate strategy (stop all, then start new)</choice>
+        <choice letter="C">Manual pod deletion and recreation</choice>
+        <choice letter="D">Single replica with downtime during updates</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Rolling updates gradually replace pods; readiness probes ensure traffic only goes to healthy pods.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Kubernetes rolling update strategy updates pods incrementally. Configure maxSurge (extra pods during update) and maxUnavailable (pods that can be down). Readiness probes determine when new pods are ready for traffic. kubectl rollout undo enables quick rollback to previous revision.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Readiness probes: determine if pod should receive traffic.</li>
+              <li>Liveness probes: determine if pod should be restarted.</li>
+              <li>Startup probes: for slow-starting containers.</li>
+              <li>Blue-green and canary require service mesh or ingress controller support.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Kubernetes</tag>
+        <tag>Rolling Update</tag>
+        <tag>Health Probes</tag>
+      </tags>
+    </question>
+
+    <question id="28" category-ref="cat-source-control" difficulty="intermediate">
+      <title>Git Hooks</title>
+      <scenario>You want to enforce code formatting and run linting before commits are created, preventing poorly formatted code from entering the repository.</scenario>
+      <question-text>What should you implement?</question-text>
+      <choices>
+        <choice letter="A">Pre-commit hooks with formatters and linters (using Husky or similar)</choice>
+        <choice letter="B">Post-merge formatting by CI</choice>
+        <choice letter="C">Manual code review for formatting only</choice>
+        <choice letter="D">No formatting enforcement</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Pre-commit hooks run locally before commits, catching issues at the earliest point.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Git pre-commit hooks run scripts before commit creation. Tools like Husky (Node.js) or pre-commit (Python) manage hooks. Configure to run formatters (Prettier, Black) and linters (ESLint, Pylint). Issues are caught locally, reducing CI failures and code review friction.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>lint-staged runs linters only on staged files for speed.</li>
+              <li>Pre-commit hooks can be bypassed with --no-verify; CI provides backup.</li>
+              <li>Commit message hooks can enforce conventional commits format.</li>
+              <li>EditorConfig ensures consistent settings across IDEs.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Git Hooks</tag>
+        <tag>Pre-commit</tag>
+        <tag>Code Quality</tag>
+      </tags>
+    </question>
+
+    <question id="29" category-ref="cat-ci" difficulty="advanced">
+      <title>Build Caching</title>
+      <scenario>Your CI builds take 15 minutes due to dependency downloads and compilation. You need to reduce build times while maintaining build correctness.</scenario>
+      <question-text>What optimization should you implement?</question-text>
+      <choices>
+        <choice letter="A">Pipeline caching for dependencies and build outputs</choice>
+        <choice letter="B">Skip dependency restoration on each build</choice>
+        <choice letter="C">Reduce test coverage to speed up builds</choice>
+        <choice letter="D">Longer build timeouts without optimization</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Pipeline caching stores and restores dependencies between builds, skipping redundant downloads.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Azure DevOps and GitHub Actions support pipeline caching. Cache package manager directories (node_modules, .nuget, .gradle) keyed by lock file hash. Cache build outputs for incremental compilation. This dramatically reduces build time while ensuring correctness through cache key invalidation.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Cache key: hash of lock file ensures cache invalidates on dependency changes.</li>
+              <li>Docker layer caching speeds up container builds.</li>
+              <li>GitHub Actions: actions/cache; Azure DevOps: Cache task.</li>
+              <li>Self-hosted agents can use persistent caches for even faster builds.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Build Caching</tag>
+        <tag>Performance</tag>
+        <tag>Pipeline Optimization</tag>
+      </tags>
+    </question>
+
+    <question id="30" category-ref="cat-cd" difficulty="intermediate">
+      <title>Artifact Management</title>
+      <scenario>Your organization produces npm packages, NuGet libraries, and container images. Teams need to share packages internally and control which external packages are allowed.</scenario>
+      <question-text>What should you implement?</question-text>
+      <choices>
+        <choice letter="A">Azure Artifacts with upstream sources and package policies</choice>
+        <choice letter="B">Direct downloads from public registries only</choice>
+        <choice letter="C">File shares for package distribution</choice>
+        <choice letter="D">Email package files between teams</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Azure Artifacts provides universal package management with upstream caching and access controls.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Azure Artifacts hosts npm, NuGet, Maven, Python, and universal packages. Upstream sources cache packages from public registries, providing availability and security scanning. Feed permissions control who can publish and consume. Views (like @release) control package promotion.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Upstream sources: cache external packages; block if removed from public.</li>
+              <li>Views: promote packages through quality stages (@prerelease, @release).</li>
+              <li>ACR (Azure Container Registry) for container images; separate from Artifacts.</li>
+              <li>Retention policies manage storage costs for old package versions.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Azure Artifacts</tag>
+        <tag>Package Management</tag>
+        <tag>Dependency Management</tag>
+      </tags>
+    </question>
+
+    <question id="31" category-ref="cat-security" difficulty="advanced">
+      <title>SAST Integration</title>
+      <scenario>Your security team requires static code analysis to detect security vulnerabilities like SQL injection and XSS before code reaches production.</scenario>
+      <question-text>What should you integrate into your pipeline?</question-text>
+      <choices>
+        <choice letter="A">SAST tools (GitHub Advanced Security, SonarQube, or Checkmarx) in CI</choice>
+        <choice letter="B">Manual security code review only</choice>
+        <choice letter="C">Security testing in production</choice>
+        <choice letter="D">Penetration testing replacing code analysis</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>SAST analyzes source code for security vulnerabilities during the build phase.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Static Application Security Testing (SAST) tools analyze source code without execution. They detect patterns like SQL injection, XSS, and insecure deserialization. Integrate into CI pipeline to fail builds on critical findings. GitHub Advanced Security CodeQL, SonarQube, and Checkmarx are common options.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>SAST complements SCA (dependencies) and DAST (runtime).</li>
+              <li>False positives require tuning; focus on high-confidence findings.</li>
+              <li>GitHub CodeQL supports custom queries for organization-specific rules.</li>
+              <li>Incremental analysis scans only changed code for faster feedback.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>SAST</tag>
+        <tag>Security Testing</tag>
+        <tag>CodeQL</tag>
+      </tags>
+    </question>
+
+    <question id="32" category-ref="cat-iac" difficulty="intermediate">
+      <title>Environment Consistency</title>
+      <scenario>Developers complain that code works locally but fails in test environments. You need to ensure consistency between development, test, and production environments.</scenario>
+      <question-text>What approach ensures environment consistency?</question-text>
+      <choices>
+        <choice letter="A">Containerization with identical images across all environments</choice>
+        <choice letter="B">Manual environment configuration documentation</choice>
+        <choice letter="C">Different configurations per environment without tracking</choice>
+        <choice letter="D">Virtual machines with ad-hoc installations</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Containers package application and dependencies together, ensuring identical runtime across environments.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Containerization (Docker) packages application code, runtime, and dependencies into an immutable image. The same image runs in development (Docker Desktop), test (AKS/ACI), and production (AKS). Environment differences are limited to configuration (environment variables, secrets), not the application itself.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Docker Compose enables local development with multi-container setups.</li>
+              <li>Dev Containers (VS Code) provide consistent developer environments.</li>
+              <li>External configuration (environment variables, mounted configs) varies by environment.</li>
+              <li>Image promotion: same image through dev -> test -> prod; never rebuild.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Containers</tag>
+        <tag>Environment Consistency</tag>
+        <tag>Docker</tag>
+      </tags>
+    </question>
+
+    <question id="33" category-ref="cat-cd" difficulty="advanced">
+      <title>Deployment Rings</title>
+      <scenario>Your application serves millions of users globally. You want to minimize blast radius by deploying to progressively larger user groups, validating health at each stage.</scenario>
+      <question-text>What deployment pattern should you implement?</question-text>
+      <choices>
+        <choice letter="A">Ring-based deployment with progressive exposure</choice>
+        <choice letter="B">Simultaneous deployment to all users</choice>
+        <choice letter="C">Geographic deployment without validation</choice>
+        <choice letter="D">A/B testing without deployment stages</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Rings progressively expand deployment from internal users to canary to full production.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Ring-based deployment defines concentric deployment stages: Ring 0 (internal/dogfood), Ring 1 (canary users), Ring 2 (early adopters), Ring 3 (all users). Each ring validates stability before expanding. This limits blast radius and enables early detection of issues before they affect all users.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Microsoft uses rings internally for Windows and Azure deployments.</li>
+              <li>Ring criteria: internal employees, beta users, percentage rollout.</li>
+              <li>Bake time: wait period at each ring to observe metrics.</li>
+              <li>Feature flags can implement logical rings without infrastructure changes.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Deployment Rings</tag>
+        <tag>Progressive Exposure</tag>
+        <tag>Safe Deployment</tag>
+      </tags>
+    </question>
+
+    <question id="34" category-ref="cat-source-control" difficulty="intermediate">
+      <title>Inner Source</title>
+      <scenario>Your organization has multiple teams that could benefit from sharing and contributing to internal projects. You want to enable cross-team collaboration while maintaining code ownership.</scenario>
+      <question-text>What practice should you adopt?</question-text>
+      <choices>
+        <choice letter="A">Inner source with discoverable repositories and contribution guidelines</choice>
+        <choice letter="B">Strict team silos with no code sharing</choice>
+        <choice letter="C">Copy code between repositories</choice>
+        <choice letter="D">All code in a single team's ownership</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Inner source applies open-source practices (discoverability, PRs, guidelines) to internal projects.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Inner source adopts open-source collaboration practices internally. Make repositories discoverable, document contribution guidelines (CONTRIBUTING.md), accept pull requests from other teams, and maintain clear ownership (CODEOWNERS). This enables reuse and collective improvement while preserving accountability.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>CODEOWNERS file defines required reviewers for specific paths.</li>
+              <li>README, CONTRIBUTING, and LICENSE files set expectations.</li>
+              <li>Trusted committers are non-owners with merge permissions.</li>
+              <li>GitHub/GitLab enterprise features support inner source patterns.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Inner Source</tag>
+        <tag>Collaboration</tag>
+        <tag>Code Sharing</tag>
+      </tags>
+    </question>
+
+    <question id="35" category-ref="cat-monitoring" difficulty="advanced">
+      <title>SLIs, SLOs, and SLAs</title>
+      <scenario>Your team needs to define measurable service reliability targets, track them, and alert when the service degrades below acceptable thresholds.</scenario>
+      <question-text>What framework should you implement?</question-text>
+      <choices>
+        <choice letter="A">Define SLIs (metrics), set SLOs (targets), track error budgets</choice>
+        <choice letter="B">Arbitrary uptime targets without measurement</choice>
+        <choice letter="C">React to outages without proactive monitoring</choice>
+        <choice letter="D">100% availability target for all services</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>SLIs measure reliability; SLOs set targets; error budgets balance reliability and velocity.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Service Level Indicators (SLIs) are specific metrics (latency, error rate, availability). Service Level Objectives (SLOs) are target values for SLIs (99.9% availability). Error budget is the allowed unreliability (0.1%). When error budget depletes, slow down releases to focus on reliability.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>SLI examples: request latency p99, error rate, throughput.</li>
+              <li>SLO: internal target; SLA: contractual commitment with consequences.</li>
+              <li>Error budget policy defines actions when budget is consumed.</li>
+              <li>Site Reliability Engineering (SRE) principles guide this framework.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>SLI</tag>
+        <tag>SLO</tag>
+        <tag>Error Budget</tag>
+      </tags>
+    </question>
+
+    <question id="36" category-ref="cat-ci" difficulty="intermediate">
+      <title>Multi-Stage Docker Builds</title>
+      <scenario>Your Docker images are large because they include build tools and source code. You need smaller production images with only runtime dependencies.</scenario>
+      <question-text>What technique should you use?</question-text>
+      <choices>
+        <choice letter="A">Multi-stage Docker builds with separate build and runtime stages</choice>
+        <choice letter="B">Single Dockerfile with all dependencies</choice>
+        <choice letter="C">Manual cleanup of build artifacts</choice>
+        <choice letter="D">Larger base images with everything pre-installed</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Multi-stage builds use one stage for compilation and copy only artifacts to a minimal runtime image.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Multi-stage Dockerfile has separate stages: build stage with SDK/compilers produces artifacts, then a runtime stage with minimal base image copies only the compiled output. Final image contains only runtime dependencies, reducing size, attack surface, and pull time.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Example: build with mcr.microsoft.com/dotnet/sdk, runtime with dotnet/aspnet.</li>
+              <li>Distroless images contain only the application; no shell or package manager.</li>
+              <li>Layer ordering matters: put infrequently changing layers first for caching.</li>
+              <li>BuildKit enables parallel stage building and better caching.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Docker</tag>
+        <tag>Multi-stage Builds</tag>
+        <tag>Image Optimization</tag>
+      </tags>
+    </question>
+
+    <question id="37" category-ref="cat-security" difficulty="intermediate">
+      <title>Secret Scanning</title>
+      <scenario>Developers occasionally commit secrets like API keys or passwords to Git. You need to detect and alert on secrets in code before they're exposed.</scenario>
+      <question-text>What should you implement?</question-text>
+      <choices>
+        <choice letter="A">Secret scanning in CI and pre-commit hooks (GitHub Secret Scanning, gitleaks)</choice>
+        <choice letter="B">Trust developers to never commit secrets</choice>
+        <choice letter="C">Review all commits manually for secrets</choice>
+        <choice letter="D">Rotate all credentials after each release</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Secret scanning tools detect credentials in code using pattern matching and entropy analysis.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Secret scanning tools (GitHub Secret Scanning, GitLeaks, TruffleHog) detect patterns matching API keys, tokens, and passwords. Run in pre-commit hooks for immediate feedback and in CI as a safety net. GitHub Advanced Security provides push protection to block secrets before they're pushed.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>GitHub Secret Scanning: native integration, partner alerts notify providers.</li>
+              <li>Push protection blocks the push if secrets are detected.</li>
+              <li>Git history contains deleted secrets; use BFG or git-filter-repo to purge.</li>
+              <li>Rotate any credential that was ever committed, even if removed.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Secret Scanning</tag>
+        <tag>Credential Detection</tag>
+        <tag>Security</tag>
+      </tags>
+    </question>
+
+    <question id="38" category-ref="cat-cd" difficulty="advanced">
+      <title>Immutable Infrastructure</title>
+      <scenario>Your team frequently patches production servers, leading to configuration drift and "works on my machine" issues. You want consistent, reproducible infrastructure.</scenario>
+      <question-text>What approach should you adopt?</question-text>
+      <choices>
+        <choice letter="A">Immutable infrastructure with image-based deployments</choice>
+        <choice letter="B">Long-running servers with cumulative patches</choice>
+        <choice letter="C">Manual server configuration from documentation</choice>
+        <choice letter="D">Ignore drift and fix in next major release</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Immutable infrastructure replaces servers rather than modifying them, eliminating drift.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Immutable infrastructure treats servers as disposable. Instead of patching running servers, build new images (VM images, containers) with updates and replace the old infrastructure. This eliminates configuration drift, ensures reproducibility, and simplifies rollback (deploy previous image).</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Containers are inherently immutable; new version = new container.</li>
+              <li>VM images: use Packer to build golden images from code.</li>
+              <li>Blue-green deployment complements immutable infrastructure.</li>
+              <li>State (databases, storage) must be external to immutable compute.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Immutable Infrastructure</tag>
+        <tag>Configuration Drift</tag>
+        <tag>Golden Images</tag>
+      </tags>
+    </question>
+
+    <question id="39" category-ref="cat-monitoring" difficulty="intermediate">
+      <title>Dashboards and Visualization</title>
+      <scenario>Stakeholders need visibility into deployment frequency, lead time, failure rate, and mean time to recovery. Development teams need operational dashboards.</scenario>
+      <question-text>What metrics and visualizations should you provide?</question-text>
+      <choices>
+        <choice letter="A">DORA metrics dashboards with Azure DevOps analytics and Grafana</choice>
+        <choice letter="B">No metrics tracking</choice>
+        <choice letter="C">Manual spreadsheet reporting</choice>
+        <choice letter="D">Only production incident counts</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>DORA metrics measure DevOps performance: deployment frequency, lead time, change failure rate, MTTR.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>DORA (DevOps Research and Assessment) metrics: Deployment Frequency, Lead Time for Changes, Change Failure Rate, Mean Time to Recovery. Azure DevOps Analytics and Power BI can visualize pipeline metrics. Grafana dashboards combine infrastructure and application metrics for operational visibility.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>DORA research identifies these four metrics as predictors of software delivery performance.</li>
+              <li>Elite performers: multiple deploys/day, &lt;1 hour lead time, &lt;15% failure rate, &lt;1 hour MTTR.</li>
+              <li>Azure DevOps has built-in Analytics with OData queries.</li>
+              <li>GitHub Insights provides similar repository and workflow metrics.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>DORA Metrics</tag>
+        <tag>Dashboards</tag>
+        <tag>DevOps Performance</tag>
+      </tags>
+    </question>
+
+    <question id="40" category-ref="cat-ci" difficulty="advanced">
+      <title>Matrix Builds</title>
+      <scenario>Your library needs to be tested against multiple versions of Node.js (16, 18, 20) and multiple operating systems (Windows, Linux, macOS).</scenario>
+      <question-text>How should you configure the CI pipeline?</question-text>
+      <choices>
+        <choice letter="A">Matrix strategy with version and OS combinations</choice>
+        <choice letter="B">Separate pipelines for each combination</choice>
+        <choice letter="C">Test only on one configuration</choice>
+        <choice letter="D">Manual testing on each environment</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Matrix builds run jobs across combinations of variables (versions, OSes) in parallel.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Matrix strategy defines variables (node: [16, 18, 20], os: [ubuntu, windows, macos]) and runs jobs for each combination. This provides comprehensive coverage without duplicating pipeline code. Jobs run in parallel for fast feedback. Exclude specific combinations if needed.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>GitHub Actions: strategy.matrix; Azure DevOps: matrix in job strategy.</li>
+              <li>Use fail-fast: false to continue other matrix jobs if one fails.</li>
+              <li>Exclude specific combinations that aren't needed.</li>
+              <li>Include additional variables for specific matrix entries.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Matrix Builds</tag>
+        <tag>CI Strategy</tag>
+        <tag>Cross-platform Testing</tag>
+      </tags>
+    </question>
+
+    <question id="41" category-ref="cat-cd" difficulty="intermediate">
+      <title>Release Notes Automation</title>
+      <scenario>Product management wants automated release notes generated from commits and work items for each release.</scenario>
+      <question-text>How should you automate release notes?</question-text>
+      <choices>
+        <choice letter="A">Conventional commits with automated changelog generation</choice>
+        <choice letter="B">Manual release notes written before each release</choice>
+        <choice letter="C">No release notes</choice>
+        <choice letter="D">Copy commit messages verbatim</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Conventional commits follow a standard format enabling automated changelog generation.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Conventional Commits format (feat:, fix:, docs:) enables tools to parse commit messages and generate changelogs. Tools like semantic-release, standard-version, or release-drafter automate version bumping and release notes. Link commits to work items for traceability.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Format: type(scope): description. Types: feat, fix, docs, chore, etc.</li>
+              <li>Breaking changes: BREAKING CHANGE: footer or ! after type.</li>
+              <li>Semantic versioning: feat = minor, fix = patch, BREAKING = major.</li>
+              <li>GitHub releases and Azure DevOps release notes can be auto-generated.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Conventional Commits</tag>
+        <tag>Release Notes</tag>
+        <tag>Automation</tag>
+      </tags>
+    </question>
+
+    <question id="42" category-ref="cat-iac" difficulty="advanced">
+      <title>Policy as Code</title>
+      <scenario>Your organization needs to enforce infrastructure compliance: all storage accounts must have encryption, all VMs must be in specific regions, and all resources must have required tags.</scenario>
+      <question-text>What should you implement?</question-text>
+      <choices>
+        <choice letter="A">Azure Policy with deny effects and compliance reporting</choice>
+        <choice letter="B">Manual review of all deployments</choice>
+        <choice letter="C">Post-deployment compliance scripts</choice>
+        <choice letter="D">Documentation of requirements only</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Azure Policy enforces compliance rules and blocks non-compliant deployments.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Azure Policy defines compliance rules as code. Policies with deny effect block non-compliant resources at deployment time. Audit effect reports non-compliance without blocking. Assign policies at management group level for organization-wide enforcement. Compliance dashboard shows status across subscriptions.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Built-in policies cover common scenarios; custom policies use JSON definitions.</li>
+              <li>Policy initiatives bundle related policies for assignment.</li>
+              <li>DeployIfNotExists can auto-remediate (e.g., enable diagnostics).</li>
+              <li>Version-control policy definitions alongside infrastructure code.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Azure Policy</tag>
+        <tag>Policy as Code</tag>
+        <tag>Compliance</tag>
+      </tags>
+    </question>
+
+    <question id="43" category-ref="cat-security" difficulty="intermediate">
+      <title>Pipeline Permissions</title>
+      <scenario>You need to control which pipelines can access sensitive service connections, environments, and variable groups.</scenario>
+      <question-text>How should you configure pipeline security?</question-text>
+      <choices>
+        <choice letter="A">Resource restrictions and approval checks on protected resources</choice>
+        <choice letter="B">All pipelines access all resources</choice>
+        <choice letter="C">Security through obscurity</choice>
+        <choice letter="D">Single shared service account for all pipelines</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Restrict resource access to specific pipelines and add approval checks for sensitive resources.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Azure DevOps allows restricting service connections, variable groups, and environments to specific pipelines. Add approval checks on environments requiring sign-off before deployment. This prevents unauthorized pipelines from accessing production resources or secrets.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Pipeline permissions: Open (any pipeline) or Restricted (specific pipelines).</li>
+              <li>Environment checks: approvals, business hours, branch control.</li>
+              <li>Variable groups can require approval before use.</li>
+              <li>Secure files require explicit pipeline authorization.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Pipeline Security</tag>
+        <tag>Resource Permissions</tag>
+        <tag>Access Control</tag>
+      </tags>
+    </question>
+
+    <question id="44" category-ref="cat-monitoring" difficulty="advanced">
+      <title>Chaos Engineering</title>
+      <scenario>You want to proactively test your system's resilience by introducing controlled failures in production to discover weaknesses before they cause outages.</scenario>
+      <question-text>What practice should you implement?</question-text>
+      <choices>
+        <choice letter="A">Chaos engineering with Azure Chaos Studio experiments</choice>
+        <choice letter="B">Wait for production failures to test resilience</choice>
+        <choice letter="C">Never test in production</choice>
+        <choice letter="D">Disable redundancy to test recovery</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Chaos engineering deliberately introduces failures to verify system resilience under controlled conditions.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Chaos engineering intentionally injects failures (pod kills, network latency, VM shutdown) to test resilience. Azure Chaos Studio provides managed chaos experiments with safety controls. Start with non-production, then carefully extend to production with blast radius limits. Validates that failover, retry logic, and alerts work correctly.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Chaos Studio experiments: define faults, targets, duration, and safety stops.</li>
+              <li>Common faults: CPU pressure, network disconnect, service kill, DNS failure.</li>
+              <li>GameDay: scheduled chaos exercises with team observation.</li>
+              <li>Principles: start small, minimize blast radius, have a hypothesis.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Chaos Engineering</tag>
+        <tag>Resilience Testing</tag>
+        <tag>Chaos Studio</tag>
+      </tags>
+    </question>
+
+    <question id="45" category-ref="cat-cd" difficulty="intermediate">
+      <title>Infrastructure Deployment Pipeline</title>
+      <scenario>Your IaC code needs the same rigor as application code: validation, testing, approval for production, and change tracking.</scenario>
+      <question-text>How should you deploy infrastructure changes?</question-text>
+      <choices>
+        <choice letter="A">PR-based workflow with validation, what-if preview, and staged deployment</choice>
+        <choice letter="B">Direct deployment from developer machines</choice>
+        <choice letter="C">Azure Portal changes with manual documentation</choice>
+        <choice letter="D">Single branch with immediate production deployment</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>IaC pipelines should include validation, preview (what-if), and staged deployment with approvals.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Treat infrastructure code like application code. PRs trigger validation (syntax, linting). What-if/plan shows proposed changes without applying. Deploy to lower environments first, then production with approval. This provides change review, safe deployment, and audit trail.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Bicep/ARM what-if: preview changes without deployment.</li>
+              <li>Terraform plan: show proposed changes; apply requires approval.</li>
+              <li>Policy compliance check as pipeline gate before deployment.</li>
+              <li>Drift detection: compare deployed state to code regularly.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>IaC Pipeline</tag>
+        <tag>What-if</tag>
+        <tag>Change Management</tag>
+      </tags>
+    </question>
+
+    <question id="46" category-ref="cat-source-control" difficulty="intermediate">
+      <title>Code Review Best Practices</title>
+      <scenario>Code reviews are becoming bottlenecks with long review times and inconsistent feedback. You need to improve review efficiency and quality.</scenario>
+      <question-text>What practices should you implement?</question-text>
+      <choices>
+        <choice letter="A">Small PRs, automated checks, review guidelines, and CODEOWNERS</choice>
+        <choice letter="B">Large PRs reviewed by many people</choice>
+        <choice letter="C">Skip reviews for urgent changes</choice>
+        <choice letter="D">Only senior developers review code</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Small PRs are faster to review; automation catches style issues; guidelines ensure consistency.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Keep PRs small and focused (< 400 lines). Automate style/lint checks so reviewers focus on logic. Document review guidelines (what to look for, response time expectations). CODEOWNERS automatically assigns appropriate reviewers. Use PR templates to ensure context is provided.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Research shows review quality drops significantly after 400 lines.</li>
+              <li>Stacked PRs: chain of dependent PRs for large changes.</li>
+              <li>Review time SLO: set expectations (e.g., first response within 24 hours).</li>
+              <li>Use suggestion feature for minor changes instead of comments.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Code Review</tag>
+        <tag>Pull Requests</tag>
+        <tag>Best Practices</tag>
+      </tags>
+    </question>
+
+    <question id="47" category-ref="cat-ci" difficulty="advanced">
+      <title>Monorepo CI Optimization</title>
+      <scenario>Your monorepo contains 20 services. Currently, all services build on every commit, causing long CI times. You want to build only affected services.</scenario>
+      <question-text>What optimization should you implement?</question-text>
+      <choices>
+        <choice letter="A">Path-based triggers and affected project detection</choice>
+        <choice letter="B">Build all services regardless of changes</choice>
+        <choice letter="C">Random selection of services to build</choice>
+        <choice letter="D">Disable CI for faster development</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Path filters trigger builds only when relevant files change; affected detection builds dependent projects.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Configure path-based triggers so pipelines run only when their service's files change. Use monorepo tools (Nx, Turborepo, Bazel) to detect affected projects including dependencies. This dramatically reduces CI time by building only what changed and what depends on it.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Azure DevOps: trigger paths include/exclude patterns.</li>
+              <li>Nx/Turborepo: affected command detects changed projects and dependencies.</li>
+              <li>Distributed caching: share build outputs across CI runs and developers.</li>
+              <li>Task orchestration: parallel execution respecting dependency graph.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Monorepo</tag>
+        <tag>Path Triggers</tag>
+        <tag>Affected Detection</tag>
+      </tags>
+    </question>
+
+    <question id="48" category-ref="cat-security" difficulty="advanced">
+      <title>Supply Chain Security</title>
+      <scenario>You need to ensure the integrity of your software supply chain: verify that artifacts haven't been tampered with and that dependencies come from trusted sources.</scenario>
+      <question-text>What should you implement?</question-text>
+      <choices>
+        <choice letter="A">SBOM generation, artifact signing, and dependency verification</choice>
+        <choice letter="B">Trust all public packages</choice>
+        <choice letter="C">Manual artifact inspection</choice>
+        <choice letter="D">Disable dependency updates</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>SBOM documents components; signing proves integrity; verification ensures trusted sources.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Generate Software Bill of Materials (SBOM) listing all dependencies. Sign build artifacts (containers with Notation, binaries with code signing) to prove integrity and origin. Verify dependency signatures and checksums. Use private feeds with upstream caching to control package sources.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>SBOM formats: SPDX, CycloneDX; required by some regulations.</li>
+              <li>SLSA framework defines supply chain security levels.</li>
+              <li>Sigstore provides keyless signing for open source.</li>
+              <li>Package lock files ensure reproducible builds with exact versions.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Supply Chain Security</tag>
+        <tag>SBOM</tag>
+        <tag>Artifact Signing</tag>
+      </tags>
+    </question>
+
+    <question id="49" category-ref="cat-monitoring" difficulty="intermediate">
+      <title>Incident Management</title>
+      <scenario>When production incidents occur, your team needs clear escalation paths, communication channels, and post-incident learning processes.</scenario>
+      <question-text>What should you implement?</question-text>
+      <choices>
+        <choice letter="A">On-call rotation, incident response runbooks, and blameless postmortems</choice>
+        <choice letter="B">Ad-hoc response by whoever is available</choice>
+        <choice letter="C">Management handles all incidents</choice>
+        <choice letter="D">Ignore incidents until customers complain</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Structured incident management includes defined roles, runbooks, and learning from incidents.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Establish on-call rotation with clear escalation paths. Create runbooks documenting common incident responses. During incidents, use defined roles (incident commander, communications). After resolution, conduct blameless postmortems focusing on systemic improvements, not individual blame.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>PagerDuty, OpsGenie integrate with Azure Monitor for alerting.</li>
+              <li>Incident severity levels define response urgency and communication.</li>
+              <li>Postmortem template: timeline, impact, root cause, action items.</li>
+              <li>Track action items to completion; incidents repeat without fixes.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Incident Management</tag>
+        <tag>On-Call</tag>
+        <tag>Postmortems</tag>
+      </tags>
+    </question>
+
+    <question id="50" category-ref="cat-cd" difficulty="advanced">
+      <title>Multi-Cloud Deployment</title>
+      <scenario>Your organization deploys applications to both Azure and AWS. You need consistent deployment practices and shared pipeline components across both clouds.</scenario>
+      <question-text>How should you design the deployment architecture?</question-text>
+      <choices>
+        <choice letter="A">Common pipeline templates with cloud-specific deployment stages</choice>
+        <choice letter="B">Completely separate teams and pipelines per cloud</choice>
+        <choice letter="C">Single cloud only, ignore multi-cloud requirement</choice>
+        <choice letter="D">Manual deployments to each cloud</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Shared pipeline templates enforce consistency; cloud-specific stages handle deployment differences.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Create reusable pipeline templates for common steps (build, test, scan). Cloud-specific deployment stages handle Azure vs AWS differences. Use Terraform for multi-cloud IaC with provider-specific modules. Store cloud credentials as separate service connections with appropriate access controls.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Terraform: single language, multiple providers for multi-cloud IaC.</li>
+              <li>Kubernetes (AKS, EKS): consistent workload deployment across clouds.</li>
+              <li>Abstract cloud-specific details behind common interfaces.</li>
+              <li>GitHub Actions/Azure DevOps work with both Azure and AWS.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Multi-Cloud</tag>
+        <tag>Pipeline Templates</tag>
+        <tag>Terraform</tag>
+      </tags>
+    </question>
+  </questions>
+
+  <glossary>
+    <term id="gl-ci" category="Practices">
+      <name>Continuous Integration (CI)</name>
+      <definition>Practice of frequently merging code changes into a shared repository, with automated builds and tests validating each change.</definition>
+      <exam-note>CI catches integration issues early; key metrics include build frequency and failure rate.</exam-note>
+    </term>
+    <term id="gl-cd" category="Practices">
+      <name>Continuous Delivery/Deployment (CD)</name>
+      <definition>Continuous Delivery ensures code is always deployable; Continuous Deployment automatically deploys every passing change to production.</definition>
+      <exam-note>Delivery requires manual approval for production; Deployment is fully automated.</exam-note>
+    </term>
+    <term id="gl-dora" category="Metrics">
+      <name>DORA Metrics</name>
+      <definition>Four key metrics predicting software delivery performance: Deployment Frequency, Lead Time, Change Failure Rate, Mean Time to Recovery.</definition>
+      <exam-note>Elite performers deploy multiple times daily with less than 15% failure rate.</exam-note>
+    </term>
+    <term id="gl-gitops" category="Practices">
+      <name>GitOps</name>
+      <definition>Operational model using Git as the single source of truth for declarative infrastructure and applications, with automated synchronization.</definition>
+      <exam-note>Flux and Argo CD are common GitOps operators for Kubernetes.</exam-note>
+    </term>
+    <term id="gl-shift-left" category="Security">
+      <name>Shift-Left Security</name>
+      <definition>Practice of moving security testing earlier in the development lifecycle, integrating into development and CI rather than waiting for pre-production.</definition>
+      <exam-note>SAST, SCA, and secret scanning are shift-left practices.</exam-note>
+    </term>
+    <term id="gl-blue-green" category="Deployment">
+      <name>Blue-Green Deployment</name>
+      <definition>Deployment strategy maintaining two identical environments, switching traffic between them for zero-downtime deployments and instant rollback.</definition>
+      <exam-note>App Service deployment slots provide built-in blue-green capability.</exam-note>
+    </term>
+    <term id="gl-canary" category="Deployment">
+      <name>Canary Deployment</name>
+      <definition>Deployment strategy gradually routing increasing percentages of traffic to a new version while monitoring for issues.</definition>
+      <exam-note>Reduces blast radius by exposing new versions to small user groups first.</exam-note>
+    </term>
+    <term id="gl-iac" category="Infrastructure">
+      <name>Infrastructure as Code (IaC)</name>
+      <definition>Managing and provisioning infrastructure through machine-readable definition files rather than manual configuration.</definition>
+      <exam-note>Bicep is Azure-native; Terraform is multi-cloud.</exam-note>
+    </term>
+  </glossary>
+</certification-exam>
