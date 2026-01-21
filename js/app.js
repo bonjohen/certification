@@ -66,7 +66,8 @@ class QuizApp {
         }
 
         try {
-            const examPath = `data/${examId}/exam.xml`;
+            const provider = this.getProviderFromExam(examId, null);
+            const examPath = `data/${provider}/${examId}.xml`;
             const examData = await this.parser.loadExam(examPath);
 
             this.categories = examData.metadata.categories || {};
