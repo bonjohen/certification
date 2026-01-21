@@ -1,0 +1,1833 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<certification-exam xmlns="http://certification.study/schema/v1" version="1.0">
+  <metadata>
+    <exam-code>AZ-104</exam-code>
+    <exam-title>Microsoft Azure Administrator</exam-title>
+    <provider>Microsoft</provider>
+    <description>Scenario-Based Study Companion for AZ-104 certification - validates practical skills for implementing, managing, and monitoring core Azure services.</description>
+    <total-questions>50</total-questions>
+    <created-date>2026-01-20</created-date>
+    <last-modified>2026-01-20T00:00:00Z</last-modified>
+    <categories>
+      <category id="cat-identity">Identity and Access</category>
+      <category id="cat-governance">Governance and Compliance</category>
+      <category id="cat-storage">Storage</category>
+      <category id="cat-compute">Compute</category>
+      <category id="cat-networking">Networking</category>
+      <category id="cat-monitoring">Monitoring and Backup</category>
+    </categories>
+  </metadata>
+
+  <questions>
+    <question id="1" category-ref="cat-identity" difficulty="intermediate">
+      <title>RBAC Scope Selection</title>
+      <scenario>You must allow a support team to restart VMs and read VM metrics, but only in the Prod-App1 resource group. They must not manage networking or IAM anywhere else.</scenario>
+      <question-text>Where and how should you assign permissions?</question-text>
+      <choices>
+        <choice letter="A">Assign the Global Administrator role at the tenant level</choice>
+        <choice letter="B">Assign an Azure RBAC role at the Prod-App1 resource group scope</choice>
+        <choice letter="C">Assign the Contributor role at the subscription level</choice>
+        <choice letter="D">Create a custom role with permissions on all resource groups</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Assign an Azure RBAC role at the resource group scope to limit the blast radius to only that resource group.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Assign permissions at the resource group scope (not subscription) to constrain blast radius. Use a built-in role that covers VM operations (e.g., VM Contributor) plus monitoring-read access if needed. Prefer assigning the role to an Entra ID group, not individual users.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Scope inheritance means subscription-level assignments leak privileges to all RGs; avoid it unless required.</li>
+              <li>"Contributor" is often too broad; choose the narrowest built-in role(s).</li>
+              <li>If they need metrics/logs, ensure they also have access to the target Log Analytics workspace (workspace permissions are separate from resource permissions).</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>RBAC</tag>
+        <tag>Resource Groups</tag>
+        <tag>Least Privilege</tag>
+      </tags>
+    </question>
+
+    <question id="2" category-ref="cat-governance" difficulty="intermediate">
+      <title>Management Groups vs Subscriptions</title>
+      <scenario>Your org has 12 subscriptions (prod/non-prod across business units). You need a single place to apply baseline policies (tag requirements, region restrictions) and standard RBAC.</scenario>
+      <question-text>What Azure construct should you use?</question-text>
+      <choices>
+        <choice letter="A">Management groups</choice>
+        <choice letter="B">Resource groups with shared policies</choice>
+        <choice letter="C">A single subscription with multiple resource groups</choice>
+        <choice letter="D">Azure Blueprints without management groups</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Management groups.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Use management groups to organize subscriptions and apply Azure Policy and RBAC at a higher scope so they inherit. Build a hierarchy like Root -> Platform -> (Prod, NonProd) -> BU.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Policies assigned at a management group inherit to child subscriptions unless excluded.</li>
+              <li>Use initiatives for baseline policy sets (landing zone style).</li>
+              <li>Watch out for "exception sprawl": manage exemptions intentionally and track them.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Management Groups</tag>
+        <tag>Azure Policy</tag>
+        <tag>Governance</tag>
+      </tags>
+    </question>
+
+    <question id="3" category-ref="cat-governance" difficulty="intermediate">
+      <title>Policy: Enforce Tags</title>
+      <scenario>Finance requires every resource to have tags: CostCenter, Owner, Env. Noncompliant deployments must fail in prod, but only be reported in dev.</scenario>
+      <question-text>How do you implement this?</question-text>
+      <choices>
+        <choice letter="A">Azure Policy with deny effect in prod and audit effect in dev</choice>
+        <choice letter="B">RBAC roles that prevent resource creation without tags</choice>
+        <choice letter="C">Resource locks on all resources without tags</choice>
+        <choice letter="D">Azure Blueprints with automatic tag assignment</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Azure Policy with deny in prod and audit in dev.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Create a policy/initiative requiring tags; assign deny to the prod management group/subscriptions and audit to dev. Use separate assignments for prod vs dev.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>"Append/modify" effects vary by resource type; don't assume auto-tagging works everywhere (verify per resource).</li>
+              <li>Policy failures surface as deployment failures; administrators must recognize policy as the root cause.</li>
+              <li>Use policy exemptions sparingly with documented rationale.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Azure Policy</tag>
+        <tag>Tags</tag>
+        <tag>Governance</tag>
+      </tags>
+    </question>
+
+    <question id="4" category-ref="cat-governance" difficulty="intermediate">
+      <title>RBAC vs Azure Policy (Common Confusion)</title>
+      <scenario>A team wants to "prevent users from creating public IPs." Another team wants to "prevent users from deleting VNets."</scenario>
+      <question-text>Which tool fits each requirement?</question-text>
+      <choices>
+        <choice letter="A">Use Azure Policy for both requirements</choice>
+        <choice letter="B">Use RBAC for both requirements</choice>
+        <choice letter="C">Use Azure Policy for preventing public IP creation; use RBAC for restricting VNet deletion</choice>
+        <choice letter="D">Use resource locks for both requirements</choice>
+      </choices>
+      <correct-answer>C</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Use Azure Policy for preventing resource creation patterns; use RBAC for restricting delete actions.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Azure Policy is best for enforcing configuration/allowed SKUs/regions ("no public IP resource"). RBAC controls actions like delete; deny deletion by not granting delete permissions (and/or use resource locks for safety).</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Policy blocks creation even if RBAC would allow it.</li>
+              <li>Resource locks help prevent accidental deletion but are not a governance substitute for RBAC.</li>
+              <li>Don't misuse policy for permissioning; don't misuse RBAC for configuration compliance.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Azure Policy</tag>
+        <tag>RBAC</tag>
+        <tag>Governance</tag>
+      </tags>
+    </question>
+
+    <question id="5" category-ref="cat-identity" difficulty="intermediate">
+      <title>Break-Glass Access Design</title>
+      <scenario>You need an emergency access path if Entra Conditional Access is misconfigured and admins are locked out.</scenario>
+      <question-text>What is the standard Azure approach?</question-text>
+      <choices>
+        <choice letter="A">Create break-glass accounts excluded from Conditional Access policies</choice>
+        <choice letter="B">Disable Conditional Access during emergencies</choice>
+        <choice letter="C">Use Azure Support to reset admin passwords</choice>
+        <choice letter="D">Store admin credentials in a shared document</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Create break-glass accounts and protect them appropriately.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Maintain one or two break-glass Entra accounts with strong credentials stored securely, excluded from risky Conditional Access policies, and monitored with alerts.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Break-glass accounts should be rarely used and heavily monitored (sign-in alerts).</li>
+              <li>Avoid assigning broad roles permanently; consider just-in-time/PIM if in scope (verify exam coverage).</li>
+              <li>Ensure recovery procedures are documented and tested.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Identity</tag>
+        <tag>Conditional Access</tag>
+        <tag>Security</tag>
+      </tags>
+    </question>
+
+    <question id="6" category-ref="cat-storage" difficulty="intermediate">
+      <title>Storage: Keys vs SAS vs Entra ID</title>
+      <scenario>A vendor needs upload access to a single blob container for 24 hours. You must be able to revoke access.</scenario>
+      <question-text>What do you use?</question-text>
+      <choices>
+        <choice letter="A">Share the storage account access keys with the vendor</choice>
+        <choice letter="B">Create a SAS token with a stored access policy</choice>
+        <choice letter="C">Add the vendor as a Contributor on the storage account</choice>
+        <choice letter="D">Create a new storage account for the vendor</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>SAS (preferably governed with a stored access policy).</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Use a SAS scoped to the container with write-only permissions and short expiry; use a stored access policy (if suitable) to allow revocation without rotating account keys. Avoid sharing storage account keys.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Storage account keys grant full control; treat as high-risk secrets.</li>
+              <li>SAS is time-bound and can be permission-scoped; still treat as a credential.</li>
+              <li>If using Private Endpoint, ensure the vendor can reach it (or use public endpoint with network restrictions).</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Storage</tag>
+        <tag>SAS</tag>
+        <tag>Security</tag>
+      </tags>
+    </question>
+
+    <question id="7" category-ref="cat-storage" difficulty="intermediate">
+      <title>Storage Networking: Public Endpoint Lockdown</title>
+      <scenario>A storage account must be accessible only from a specific VNet. No public internet access is allowed.</scenario>
+      <question-text>What configuration do you apply?</question-text>
+      <choices>
+        <choice letter="A">Configure service endpoints only</choice>
+        <choice letter="B">Private Endpoint with private DNS and disable public network access</choice>
+        <choice letter="C">Storage firewall rules allowing all Azure services</choice>
+        <choice letter="D">Enable anonymous blob access with IP restrictions</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Private Endpoint + disable public network access (or restrict via firewall rules), plus DNS.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Use Private Endpoint for the storage account (Blob, File, etc.) and restrict/disable public network access. Configure Private DNS so clients resolve the storage FQDN to the private IP.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>DNS is the trap: if name resolution still returns the public endpoint, traffic won't be private.</li>
+              <li>Network rules alone don't make it private; Private Endpoint changes routing.</li>
+              <li>Verify service-specific settings for "public network access" toggles and required DNS zones.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Storage</tag>
+        <tag>Private Endpoint</tag>
+        <tag>Networking</tag>
+      </tags>
+    </question>
+
+    <question id="8" category-ref="cat-storage" difficulty="intermediate">
+      <title>Storage Replication Choice</title>
+      <scenario>A workload needs higher availability within a region, but compliance prohibits data leaving the region.</scenario>
+      <question-text>What replication option is usually appropriate?</question-text>
+      <choices>
+        <choice letter="A">Locally-redundant storage (LRS)</choice>
+        <choice letter="B">Zone-redundant storage (ZRS)</choice>
+        <choice letter="C">Geo-redundant storage (GRS)</choice>
+        <choice letter="D">Geo-zone-redundant storage (GZRS)</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Zone-redundant storage (ZRS), region-dependent.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Choose ZRS for intra-region zone redundancy (if supported in that region/account kind). Avoid GRS/GZRS because they replicate to a paired region (data leaves region boundary).</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Replication support varies by region and account type - verify availability.</li>
+              <li>Understand tradeoffs: cost vs durability/availability vs read-access patterns.</li>
+              <li>For DR requirements across regions, compliance constraints must explicitly allow it.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Storage</tag>
+        <tag>Replication</tag>
+        <tag>Compliance</tag>
+      </tags>
+    </question>
+
+    <question id="9" category-ref="cat-storage" difficulty="basic">
+      <title>Blob Lifecycle Management</title>
+      <scenario>You store logs in Blob. After 30 days, they should move to cooler storage; after 180 days, delete.</scenario>
+      <question-text>How do you implement this?</question-text>
+      <choices>
+        <choice letter="A">Blob lifecycle management rules</choice>
+        <choice letter="B">Azure Logic Apps with scheduled triggers</choice>
+        <choice letter="C">Manual monthly cleanup by administrators</choice>
+        <choice letter="D">Azure Functions with timer triggers</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Blob lifecycle management rules.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Configure lifecycle management on the storage account/container to tier blobs after 30 days and delete after 180 days.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Ensure rules match blob types (block/page/append) and prefixes/tags.</li>
+              <li>Tiering behavior and costs differ by access tier; verify if rehydration latency matters.</li>
+              <li>If using immutability/legal hold, lifecycle deletion may be blocked.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Storage</tag>
+        <tag>Lifecycle Management</tag>
+        <tag>Cost Optimization</tag>
+      </tags>
+    </question>
+
+    <question id="10" category-ref="cat-storage" difficulty="intermediate">
+      <title>Azure Files Identity Access</title>
+      <scenario>A Windows fleet must mount a file share using identity-based auth (no keys embedded).</scenario>
+      <question-text>What's the Azure-native approach?</question-text>
+      <choices>
+        <choice letter="A">Azure Files with identity integration (Entra ID / AD DS-based)</choice>
+        <choice letter="B">Store storage account keys in each VM's registry</choice>
+        <choice letter="C">Use Azure Blob storage instead of Files</choice>
+        <choice letter="D">Create individual SAS tokens for each VM</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Azure Files with identity integration (Entra ID / AD DS-based), depending on environment.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Use Azure Files with an identity-based model (options depend on your directory integration). Configure the appropriate identity provider and assign permissions so clients authenticate without storage keys.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>The exact identity integration path depends on whether you use Entra Kerberos / AD DS / AAD DS; verify current supported modes.</li>
+              <li>NTFS ACLs and share-level permissions can both apply; understand where enforcement occurs.</li>
+              <li>Network path (private endpoint vs public) affects client connectivity.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Storage</tag>
+        <tag>Azure Files</tag>
+        <tag>Identity</tag>
+      </tags>
+    </question>
+
+    <question id="11" category-ref="cat-compute" difficulty="intermediate">
+      <title>VM Availability Decision</title>
+      <scenario>A business-critical VM must remain available during planned maintenance and reduce single-datacenter risk.</scenario>
+      <question-text>What deployment pattern should you choose?</question-text>
+      <choices>
+        <choice letter="A">Deploy the VM without any availability configuration</choice>
+        <choice letter="B">Use Availability Zones (if region supports)</choice>
+        <choice letter="C">Use a single Availability Set</choice>
+        <choice letter="D">Deploy multiple VMs in the same fault domain</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Use Availability Zones (if region supports); otherwise use Availability Set.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Prefer Availability Zones for higher resilience across datacenters. If zones aren't available, use an Availability Set for fault/update domain separation.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Zone support is regional; verify per region.</li>
+              <li>Availability Sets reduce rack-level correlated failure but not datacenter-level outages.</li>
+              <li>For multi-VM apps, place dependencies (LB, disks, IPs) in compatible zone patterns.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Compute</tag>
+        <tag>Availability Zones</tag>
+        <tag>High Availability</tag>
+      </tags>
+    </question>
+
+    <question id="12" category-ref="cat-compute" difficulty="basic">
+      <title>VM Sizing Under Constraints</title>
+      <scenario>A VM hits CPU saturation at peak. Budget allows minimal spend increase.</scenario>
+      <question-text>What are the two primary scaling options, and what's the usual "first move"?</question-text>
+      <choices>
+        <choice letter="A">Scale up (bigger size) for a single VM is usually quickest</choice>
+        <choice letter="B">Always scale out with more instances first</choice>
+        <choice letter="C">Migrate to a different Azure region</choice>
+        <choice letter="D">Reduce the application workload</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Scale up (bigger size) or scale out (more instances). First move often scale up for a single VM.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>For a single VM app, scale up (resize SKU) is usually quickest. For horizontally scalable apps, scale out using multiple instances behind a load balancer (often VMSS).</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Scale up can require reboot/downtime depending on SKU change constraints (verify).</li>
+              <li>Scale out requires statelessness or externalized state.</li>
+              <li>Watch quotas/region capacity constraints.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Compute</tag>
+        <tag>Scaling</tag>
+        <tag>Performance</tag>
+      </tags>
+    </question>
+
+    <question id="13" category-ref="cat-compute" difficulty="intermediate">
+      <title>VMSS vs Multiple Standalone VMs</title>
+      <scenario>You need 20 identical web servers with autoscaling and uniform configuration.</scenario>
+      <question-text>Should you deploy individual VMs or a VM Scale Set?</question-text>
+      <choices>
+        <choice letter="A">Deploy 20 individual VMs with manual configuration</choice>
+        <choice letter="B">VM Scale Set</choice>
+        <choice letter="C">Azure Container Instances</choice>
+        <choice letter="D">Azure App Service</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>VM Scale Set.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Use VMSS to manage a fleet: uniform config, autoscale rules, health-based instance repair, and easier rolling upgrades.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>VMSS is best for stateless tiers; stateful workloads complicate scaling.</li>
+              <li>Rolling upgrades and instance reimage patterns differ from standalone VMs; understand operational model.</li>
+              <li>Verify any per-orchestration-mode limits/behaviors.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Compute</tag>
+        <tag>VMSS</tag>
+        <tag>Autoscaling</tag>
+      </tags>
+    </question>
+
+    <question id="14" category-ref="cat-compute" difficulty="intermediate">
+      <title>VM Disk Choice: Performance Issue</title>
+      <scenario>A VM shows high disk latency and queue depth. You suspect the disk tier is too low.</scenario>
+      <question-text>What Azure changes are typically relevant?</question-text>
+      <choices>
+        <choice letter="A">Increase VM memory only</choice>
+        <choice letter="B">Upgrade disk tier/SKU, consider striping, and confirm caching settings</choice>
+        <choice letter="C">Add more NICs to the VM</choice>
+        <choice letter="D">Change the VM's availability zone</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Upgrade disk tier/SKU, consider striping, and confirm caching settings.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Evaluate managed disk performance tier (e.g., Standard vs Premium), ensure the VM size supports required IOPS/throughput, and review disk caching configuration where applicable. Consider multiple data disks with striping if needed.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>VM size caps storage throughput; changing disk alone may not fix it.</li>
+              <li>OS disk vs data disk patterns differ; don't put heavy data on OS disk by accident.</li>
+              <li>Exact IOPS/throughput numbers are SKU-specific - verify in official docs.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Compute</tag>
+        <tag>Disks</tag>
+        <tag>Performance</tag>
+      </tags>
+    </question>
+
+    <question id="15" category-ref="cat-compute" difficulty="basic">
+      <title>VM Extension for Configuration</title>
+      <scenario>You must run a one-time bootstrap script on 100 VMs after deployment.</scenario>
+      <question-text>What feature is commonly used?</question-text>
+      <choices>
+        <choice letter="A">Custom Script Extension</choice>
+        <choice letter="B">Manually RDP to each VM</choice>
+        <choice letter="C">Azure Bastion</choice>
+        <choice letter="D">Azure Monitor</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Custom Script Extension.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Use the Custom Script Extension (or equivalent automation mechanism) to execute scripts post-deployment at scale; in VMSS, apply extension as part of the model.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Handle idempotency: extension retries can rerun scripts.</li>
+              <li>Store scripts securely (e.g., storage with SAS, or repo) and restrict access.</li>
+              <li>Verify extension timeout/retry behavior in official docs.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Compute</tag>
+        <tag>Extensions</tag>
+        <tag>Automation</tag>
+      </tags>
+    </question>
+
+    <question id="16" category-ref="cat-monitoring" difficulty="intermediate">
+      <title>VM Backup Requirement</title>
+      <scenario>You must backup VMs nightly and retain 30 days.</scenario>
+      <question-text>What service do you use and where do you configure policy?</question-text>
+      <choices>
+        <choice letter="A">Azure Site Recovery only</choice>
+        <choice letter="B">Azure Backup with a Recovery Services vault and backup policy</choice>
+        <choice letter="C">Manual VM snapshots using Azure CLI</choice>
+        <choice letter="D">Export VMs to Azure Blob storage</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Azure Backup with a Recovery Services vault; set a backup policy.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Use Azure Backup via a Recovery Services vault, create a backup policy for nightly backups and 30-day retention, and enable protection on target VMs.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Understand soft delete and deletion protection behaviors (operational recovery implications).</li>
+              <li>Verify retention granularity and supported schedules per workload type.</li>
+              <li>RBAC to vault and backup operations is separate from VM permissions.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Backup</tag>
+        <tag>Recovery Services</tag>
+        <tag>Data Protection</tag>
+      </tags>
+    </question>
+
+    <question id="17" category-ref="cat-networking" difficulty="intermediate">
+      <title>Network Segmentation with Subnets</title>
+      <scenario>You have a VNet with web, app, data tiers. You need to restrict web -> data directly but allow web -> app -> data.</scenario>
+      <question-text>How do you enforce this?</question-text>
+      <choices>
+        <choice letter="A">Use a single NSG for all subnets</choice>
+        <choice letter="B">NSGs applied to subnets with explicit allow/deny rules for required flows</choice>
+        <choice letter="C">Route tables without NSGs</choice>
+        <choice letter="D">Azure Firewall only</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>NSGs applied to subnets (and/or NICs), allowing required flows only.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Apply NSGs to the web, app, and data subnets with explicit allow rules for required ports between tiers and denies for disallowed direct traffic.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>NSGs are evaluated by priority; "first match wins."</li>
+              <li>Default rules allow VNet traffic unless overridden; you must add explicit denies/controls.</li>
+              <li>Use Application Security Groups (ASGs) to avoid IP-based rule sprawl (verify exam depth).</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Networking</tag>
+        <tag>NSG</tag>
+        <tag>Segmentation</tag>
+      </tags>
+    </question>
+
+    <question id="18" category-ref="cat-networking" difficulty="intermediate">
+      <title>NSG Troubleshooting</title>
+      <scenario>A VM cannot be reached on TCP/443 from the internet. Public IP exists.</scenario>
+      <question-text>What's your systematic check order?</question-text>
+      <choices>
+        <choice letter="A">Check only the OS firewall</choice>
+        <choice letter="B">NSG inbound rules, effective security rules, NIC/subnet association, then route and OS firewall</choice>
+        <choice letter="C">Restart the VM first</choice>
+        <choice letter="D">Delete and recreate the public IP</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>NSG inbound rules, effective security rules, NIC/subnet association, then route and OS firewall.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Check effective NSG rules (subnet + NIC), confirm inbound 443 is allowed, verify no higher-priority deny, confirm VM is listening and OS firewall allows 443, and ensure routing/NAT is correct.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Many failures are "shadowed" rules (broad deny with higher priority).</li>
+              <li>Subnet NSG and NIC NSG both apply; most restrictive outcome wins.</li>
+              <li>Don't forget app-level listener configuration and health probes if behind a load balancer.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Networking</tag>
+        <tag>NSG</tag>
+        <tag>Troubleshooting</tag>
+      </tags>
+    </question>
+
+    <question id="19" category-ref="cat-networking" difficulty="intermediate">
+      <title>UDR Forced Tunneling</title>
+      <scenario>Security requires all outbound internet traffic from a subnet to go through a network appliance.</scenario>
+      <question-text>How do you implement this?</question-text>
+      <choices>
+        <choice letter="A">Configure NSG outbound rules only</choice>
+        <choice letter="B">User-defined routes (UDR) with NVA as next hop</choice>
+        <choice letter="C">Enable IP forwarding on VMs only</choice>
+        <choice letter="D">Use Azure DNS</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>User-defined routes (UDR) to an NVA as next hop.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Create a route table with a default route (0.0.0.0/0) pointing to the virtual appliance next hop, associate it with the subnet, and ensure the NVA can forward traffic.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Asymmetric routing can break flows; ensure return path matches.</li>
+              <li>Verify NVA IP forwarding settings and any required SNAT/NAT configuration.</li>
+              <li>Confirm no conflicting routes (system vs UDR) override expected behavior.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Networking</tag>
+        <tag>UDR</tag>
+        <tag>Security</tag>
+      </tags>
+    </question>
+
+    <question id="20" category-ref="cat-networking" difficulty="basic">
+      <title>VNet Peering Use Case</title>
+      <scenario>Two VNets in the same region must communicate privately with low latency. No encryption requirement.</scenario>
+      <question-text>What is the default best-fit?</question-text>
+      <choices>
+        <choice letter="A">VPN Gateway</choice>
+        <choice letter="B">VNet peering</choice>
+        <choice letter="C">ExpressRoute</choice>
+        <choice letter="D">Azure Traffic Manager</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>VNet peering.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Use VNet peering for private connectivity over the Microsoft backbone with minimal latency and no gateway overhead.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Don't assume transitive routing across multiple peerings; design explicitly.</li>
+              <li>For hub/spoke, evaluate gateway transit and "use remote gateway" settings (verify details).</li>
+              <li>Verify peering limits and address space overlap constraints.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Networking</tag>
+        <tag>VNet Peering</tag>
+        <tag>Connectivity</tag>
+      </tags>
+    </question>
+
+    <question id="21" category-ref="cat-networking" difficulty="advanced">
+      <title>Hub/Spoke DNS Trap</title>
+      <scenario>You deploy Private Endpoints in a spoke VNet but name resolution from workloads still returns public IPs.</scenario>
+      <question-text>What's the likely missing piece?</question-text>
+      <choices>
+        <choice letter="A">The Private Endpoint was not created correctly</choice>
+        <choice letter="B">Private DNS zone linkage/forwarding is missing</choice>
+        <choice letter="C">The spoke VNet needs more subnets</choice>
+        <choice letter="D">Public IP addresses need to be removed</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Private DNS zone linkage/forwarding.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>You likely need Private DNS zones linked to the spoke VNets (or DNS forwarding from hub) so the service FQDN resolves to the private endpoint address.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Private Endpoint without correct DNS often behaves "public" from the client perspective.</li>
+              <li>Central DNS in hub requires conditional forwarders or resolver patterns (verify).</li>
+              <li>Validate with nslookup/resolver checks from the workload subnet.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Networking</tag>
+        <tag>DNS</tag>
+        <tag>Private Endpoint</tag>
+      </tags>
+    </question>
+
+    <question id="22" category-ref="cat-networking" difficulty="intermediate">
+      <title>Load Balancer vs Application Gateway</title>
+      <scenario>You need TLS termination, path-based routing, and WAF for multiple web apps.</scenario>
+      <question-text>Which service?</question-text>
+      <choices>
+        <choice letter="A">Azure Load Balancer</choice>
+        <choice letter="B">Azure Traffic Manager</choice>
+        <choice letter="C">Application Gateway with WAF</choice>
+        <choice letter="D">Azure Front Door only</choice>
+      </choices>
+      <correct-answer>C</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Application Gateway (WAF).</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Choose Application Gateway with WAF for L7 HTTP/S routing, TLS termination, and security features.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Azure Load Balancer is L4 and won't do URL routing or WAF.</li>
+              <li>Health probe differences can cause "all backends down" surprises.</li>
+              <li>Verify SKU/feature support (v2 vs older) in official docs.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Networking</tag>
+        <tag>Application Gateway</tag>
+        <tag>Load Balancing</tag>
+      </tags>
+    </question>
+
+    <question id="23" category-ref="cat-networking" difficulty="intermediate">
+      <title>NAT for Outbound Stability</title>
+      <scenario>A web app hosted on VMs must call an external API that whitelists your source IP. Current outbound IP changes unpredictably when scaling.</scenario>
+      <question-text>What's the typical fix?</question-text>
+      <choices>
+        <choice letter="A">Assign public IPs to each VM</choice>
+        <choice letter="B">NAT Gateway on the subnet</choice>
+        <choice letter="C">Use Azure DNS</choice>
+        <choice letter="D">Configure NSG outbound rules</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>NAT Gateway (or a controlled egress pattern).</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Use a NAT Gateway on the subnet (or another controlled egress design) to provide stable outbound IPs for the VMs, especially when scaling.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Stable outbound requires controlling the SNAT path; don't assume public IP on VM equals outbound IP.</li>
+              <li>Ensure route tables don't divert traffic around your NAT path.</li>
+              <li>Verify any SNAT port exhaustion patterns for high connection rates.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Networking</tag>
+        <tag>NAT Gateway</tag>
+        <tag>Egress</tag>
+      </tags>
+    </question>
+
+    <question id="24" category-ref="cat-networking" difficulty="intermediate">
+      <title>VPN Gateway vs ExpressRoute (Conceptual)</title>
+      <scenario>You need private connectivity from on-prem to Azure with predictable performance and higher throughput requirements.</scenario>
+      <question-text>Which is typically preferred?</question-text>
+      <choices>
+        <choice letter="A">Site-to-site VPN Gateway</choice>
+        <choice letter="B">ExpressRoute</choice>
+        <choice letter="C">Azure Bastion</choice>
+        <choice letter="D">VNet peering</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>ExpressRoute.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Use ExpressRoute for private, dedicated connectivity; use VPN Gateway when internet-based encrypted tunnels are sufficient and quicker/cheaper.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>ExpressRoute introduces provider/circuit operational dependencies.</li>
+              <li>VPN is easier but performance varies with internet conditions.</li>
+              <li>Verify SKU constraints and routing (BGP) requirements.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Networking</tag>
+        <tag>ExpressRoute</tag>
+        <tag>Hybrid Connectivity</tag>
+      </tags>
+    </question>
+
+    <question id="25" category-ref="cat-monitoring" difficulty="basic">
+      <title>Monitoring: Metrics vs Logs</title>
+      <scenario>You need near-real-time alerting when VM CPU > 90% for 10 minutes.</scenario>
+      <question-text>Should you use logs or metrics?</question-text>
+      <choices>
+        <choice letter="A">Log-based alerts with KQL queries</choice>
+        <choice letter="B">Metrics alert</choice>
+        <choice letter="C">Activity Log alerts</choice>
+        <choice letter="D">Azure Advisor recommendations</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Metrics alert.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Use an Azure Monitor metric alert for CPU; metrics are purpose-built for threshold alerting with low latency.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Logs are better for deep diagnostics and query-based detections.</li>
+              <li>Ensure correct aggregation (avg/max) and evaluation window.</li>
+              <li>Verify minimum metric granularity for the resource type.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Monitoring</tag>
+        <tag>Metrics</tag>
+        <tag>Alerts</tag>
+      </tags>
+    </question>
+
+    <question id="26" category-ref="cat-monitoring" difficulty="intermediate">
+      <title>Monitoring: Centralized Troubleshooting</title>
+      <scenario>A production incident requires correlating NSG flow failures, VM events, and platform incidents.</scenario>
+      <question-text>What Azure services/features should be in place?</question-text>
+      <choices>
+        <choice letter="A">Azure Monitor only</choice>
+        <choice letter="B">Azure Monitor + Log Analytics + diagnostic settings + Service Health</choice>
+        <choice letter="C">Azure Advisor only</choice>
+        <choice letter="D">Activity Log without Log Analytics</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Azure Monitor + Log Analytics + diagnostic settings + Service Health.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Route logs via diagnostic settings to Log Analytics, use Azure Monitor for alerts and dashboards, and check Service Health/Resource Health during incidents.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Without diagnostic settings, many resource logs won't be collected.</li>
+              <li>Separate platform incidents from resource misconfiguration quickly.</li>
+              <li>Retention and cost controls depend on table plans - verify in official docs.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Monitoring</tag>
+        <tag>Log Analytics</tag>
+        <tag>Troubleshooting</tag>
+      </tags>
+    </question>
+
+    <question id="27" category-ref="cat-monitoring" difficulty="intermediate">
+      <title>Alert Noise Control</title>
+      <scenario>Your alert triggers every minute and spams on-call during sustained high CPU.</scenario>
+      <question-text>What change reduces noise while staying responsive?</question-text>
+      <choices>
+        <choice letter="A">Disable the alert</choice>
+        <choice letter="B">Use stateful alerting and adjust frequency/suppression</choice>
+        <choice letter="C">Increase the CPU threshold to 100%</choice>
+        <choice letter="D">Remove the action group</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Use stateful alerting / adjust frequency and suppression.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Configure the alert to be stateful (fires once until resolved), and tune evaluation frequency and window to match the signal.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Alert tuning is as important as the threshold; poorly tuned alerts create operational failure.</li>
+              <li>Use action groups with appropriate routing (email/SMS/webhook) and escalation.</li>
+              <li>Verify alert rule type-specific behavior (metric vs log vs activity).</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Monitoring</tag>
+        <tag>Alerts</tag>
+        <tag>Operations</tag>
+      </tags>
+    </question>
+
+    <question id="28" category-ref="cat-monitoring" difficulty="intermediate">
+      <title>Activity Log Alerting (Control-Plane Changes)</title>
+      <scenario>Security wants alerts when someone creates role assignments or modifies NSGs.</scenario>
+      <question-text>Where do you detect this?</question-text>
+      <choices>
+        <choice letter="A">Metrics alerts</choice>
+        <choice letter="B">Activity Log alerts</choice>
+        <choice letter="C">Azure Advisor</choice>
+        <choice letter="D">Resource Health alerts</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Activity Log alerts.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Use Activity Log-based alerts for control-plane operations (role assignment changes, resource write/delete actions).</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Activity Log is subscription-scoped; ensure coverage across subscriptions.</li>
+              <li>For deeper change context, route Activity Log to Log Analytics for queries.</li>
+              <li>Don't confuse with data-plane logs (different sources).</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Monitoring</tag>
+        <tag>Activity Log</tag>
+        <tag>Security</tag>
+      </tags>
+    </question>
+
+    <question id="29" category-ref="cat-governance" difficulty="basic">
+      <title>Resource Locks</title>
+      <scenario>A team keeps accidentally deleting a critical VNet. You need a quick safety mechanism without redesigning IAM immediately.</scenario>
+      <question-text>What do you apply?</question-text>
+      <choices>
+        <choice letter="A">Azure Policy with deny effect</choice>
+        <choice letter="B">Resource lock (CanNotDelete)</choice>
+        <choice letter="C">Remove all permissions from users</choice>
+        <choice letter="D">Move the VNet to a different subscription</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Resource lock (CanNotDelete).</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Apply a CanNotDelete lock to the VNet (or RG) to prevent deletion unless the lock is removed by someone authorized.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Locks are not a replacement for RBAC; they're a guardrail.</li>
+              <li>Locks can block automation/deployments that expect delete/replace operations.</li>
+              <li>Ensure only a small set of admins can remove locks.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Governance</tag>
+        <tag>Resource Locks</tag>
+        <tag>Safety</tag>
+      </tags>
+    </question>
+
+    <question id="30" category-ref="cat-governance" difficulty="intermediate">
+      <title>Cost Management Guardrails</title>
+      <scenario>A subscription's spend is spiking unexpectedly. You need an automated notification at 80% of monthly budget and hard stop is not allowed.</scenario>
+      <question-text>What do you configure?</question-text>
+      <choices>
+        <choice letter="A">Azure Policy to block all deployments</choice>
+        <choice letter="B">Budgets with alert thresholds</choice>
+        <choice letter="C">Resource locks on expensive resources</choice>
+        <choice letter="D">Delete unused resources manually</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Budgets with alerts.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Use Azure Budgets to set thresholds (e.g., 80%) and notify via action groups/email; also use cost analysis to identify drivers.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Budgets alert; they typically don't stop resource creation by themselves (use policy for enforcement).</li>
+              <li>Tag governance enables cost attribution; enforce tags.</li>
+              <li>Consider anomaly detection features if available (verify).</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Cost Management</tag>
+        <tag>Budgets</tag>
+        <tag>Governance</tag>
+      </tags>
+    </question>
+
+    <question id="31" category-ref="cat-governance" difficulty="intermediate">
+      <title>Tag Strategy for Chargeback</title>
+      <scenario>Finance needs chargeback per department and environment.</scenario>
+      <question-text>What's the practical Azure approach?</question-text>
+      <choices>
+        <choice letter="A">Separate subscriptions for each department</choice>
+        <choice letter="B">Tagging + policy enforcement + cost reporting</choice>
+        <choice letter="C">Manual spreadsheet tracking</choice>
+        <choice letter="D">Azure Advisor recommendations</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Tagging + policy enforcement + cost reporting.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Implement a standard tag schema (Dept, Env, App, Owner, CostCenter), enforce with Azure Policy, and use Cost Management views grouped by tags.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Missing tags break chargeback reports; enforce early at landing zone stage.</li>
+              <li>Some resources may not support tag inheritance the way you expect - verify.</li>
+              <li>Use management group hierarchy to align reporting boundaries.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Tags</tag>
+        <tag>Cost Management</tag>
+        <tag>Governance</tag>
+      </tags>
+    </question>
+
+    <question id="32" category-ref="cat-governance" difficulty="intermediate">
+      <title>Subscription Design</title>
+      <scenario>You must separate dev/test from prod to reduce blast radius and meet compliance.</scenario>
+      <question-text>What's the usual Azure design decision?</question-text>
+      <choices>
+        <choice letter="A">Use a single subscription with resource groups</choice>
+        <choice letter="B">Separate subscriptions for prod and non-prod</choice>
+        <choice letter="C">Use Azure regions for separation</choice>
+        <choice letter="D">Use VNet peering for isolation</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Separate subscriptions.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Use separate subscriptions for prod and non-prod (and possibly separate by business unit) so RBAC, policy, budgets, and quotas isolate environments.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Subscriptions are strong boundaries for access and billing; RGs are lifecycle boundaries.</li>
+              <li>Policy inheritance via management groups keeps controls consistent.</li>
+              <li>Quotas and provider registrations can differ per subscription - plan accordingly.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Subscriptions</tag>
+        <tag>Governance</tag>
+        <tag>Architecture</tag>
+      </tags>
+    </question>
+
+    <question id="33" category-ref="cat-governance" difficulty="advanced">
+      <title>Diagnosing "Deployment Failed"</title>
+      <scenario>An ARM deployment fails with a generic authorization error. The principal has Contributor on the RG.</scenario>
+      <question-text>What's a common hidden cause?</question-text>
+      <choices>
+        <choice letter="A">The resource group doesn't exist</choice>
+        <choice letter="B">Policy deny or missing permissions on dependent resources</choice>
+        <choice letter="C">The subscription is disabled</choice>
+        <choice letter="D">Azure is experiencing an outage</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Policy deny or missing permissions on dependent resources (e.g., network, workspace).</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Check whether Azure Policy denied the operation or whether the deployment needs permissions on a different scope/resource (e.g., subnet in shared VNet, Log Analytics workspace, key vault).</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Many deployments touch resources outside the target RG (shared network, managed identities).</li>
+              <li>Policy denies present as deployment failures; review policy compliance and activity logs.</li>
+              <li>Least privilege assignments can require multiple targeted role grants across scopes.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Troubleshooting</tag>
+        <tag>ARM</tag>
+        <tag>Azure Policy</tag>
+      </tags>
+    </question>
+
+    <question id="34" category-ref="cat-identity" difficulty="intermediate">
+      <title>Key Vault Integration for Secrets</title>
+      <scenario>Apps running on VMs need to retrieve secrets without storing credentials on disk.</scenario>
+      <question-text>What identity pattern is preferred?</question-text>
+      <choices>
+        <choice letter="A">Store secrets in environment variables</choice>
+        <choice letter="B">Managed identity + Key Vault access</choice>
+        <choice letter="C">Embed secrets in application code</choice>
+        <choice letter="D">Use storage account keys</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Managed identity + Key Vault access.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Enable a managed identity on the VM/VMSS and grant it appropriate Key Vault access (RBAC or access policies depending on configuration) so the app can fetch secrets without embedded credentials.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>"Identity exists" doesn't mean "has permission"; you must grant Key Vault authorization.</li>
+              <li>Network restrictions on Key Vault can block access; ensure private endpoint/DNS if locked down.</li>
+              <li>Verify whether the exam expects RBAC vs access policy model for Key Vault in your version.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Key Vault</tag>
+        <tag>Managed Identity</tag>
+        <tag>Security</tag>
+      </tags>
+    </question>
+
+    <question id="35" category-ref="cat-storage" difficulty="intermediate">
+      <title>Storage + Key Vault Pattern</title>
+      <scenario>You must eliminate storage account keys from application configuration while still accessing blobs.</scenario>
+      <question-text>What approach is preferred?</question-text>
+      <choices>
+        <choice letter="A">Share storage account keys via email</choice>
+        <choice letter="B">Use Entra ID-based access (RBAC) instead of shared key</choice>
+        <choice letter="C">Create SAS tokens with no expiry</choice>
+        <choice letter="D">Disable storage account access entirely</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Use Entra ID-based access (RBAC) instead of shared key.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Use Entra ID authentication for Blob access with appropriate RBAC roles; avoid shared key entirely. If any secrets remain (e.g., SAS), store them in Key Vault.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Entra ID access requires correct role assignment at the storage scope and compatible SDK/auth flows.</li>
+              <li>SAS is still a credential; prefer identity-based access when possible.</li>
+              <li>Verify the exact role needed (Blob Data Contributor/Reader, etc.).</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Storage</tag>
+        <tag>Key Vault</tag>
+        <tag>Identity</tag>
+      </tags>
+    </question>
+
+    <question id="36" category-ref="cat-compute" difficulty="intermediate">
+      <title>VM Patch Management Concept</title>
+      <scenario>You need a consistent patching approach across many VMs with reporting.</scenario>
+      <question-text>What Azure-native option is commonly used?</question-text>
+      <choices>
+        <choice letter="A">Manual patching via RDP/SSH</choice>
+        <choice letter="B">Azure Update Management / Update Manager</choice>
+        <choice letter="C">Reinstall VMs monthly</choice>
+        <choice letter="D">Use only marketplace images</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Azure Update Management / Update Manager (verify current product naming).</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Use Azure's VM update/patch management capability (often integrated with Azure Monitor/automation) to schedule patches and report compliance.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Product names and feature sets evolve; verify the current "official" service and workflow.</li>
+              <li>Patching differs for Windows vs Linux; confirm prerequisites (agents/extensions).</li>
+              <li>Coordinate with maintenance windows and app availability requirements.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Compute</tag>
+        <tag>Patching</tag>
+        <tag>Operations</tag>
+      </tags>
+    </question>
+
+    <question id="37" category-ref="cat-storage" difficulty="intermediate">
+      <title>Storage Immutability Requirement</title>
+      <scenario>Legal requires retention of certain blobs for 7 years with WORM semantics.</scenario>
+      <question-text>What feature do you configure?</question-text>
+      <choices>
+        <choice letter="A">Blob soft delete</choice>
+        <choice letter="B">Immutable blob storage policy</choice>
+        <choice letter="C">Lifecycle management rules</choice>
+        <choice letter="D">Storage account versioning</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Immutable blob storage policy.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Configure immutability (time-based retention and/or legal hold) on the container to enforce WORM retention.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Immutability can block deletions and lifecycle rules.</li>
+              <li>Ensure operational processes understand "cannot delete" behavior.</li>
+              <li>Verify exact retention limits and lock states in official docs.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Storage</tag>
+        <tag>Immutability</tag>
+        <tag>Compliance</tag>
+      </tags>
+    </question>
+
+    <question id="38" category-ref="cat-monitoring" difficulty="intermediate">
+      <title>Restore vs Recreate (Disaster Recovery Thinking)</title>
+      <scenario>A VM is corrupted after a bad change. You have backups.</scenario>
+      <question-text>What's the fastest likely recovery path?</question-text>
+      <choices>
+        <choice letter="A">Rebuild the VM from scratch</choice>
+        <choice letter="B">Restore from backup (or restore disks) and redeploy</choice>
+        <choice letter="C">Contact Azure Support</choice>
+        <choice letter="D">Wait for the VM to self-heal</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Restore from backup (or restore disks) and redeploy.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Use Azure Backup to restore the VM (or restore disks) to a known good point-in-time, then validate network and dependencies.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Restore method choice depends on whether you need the whole VM or just data disks.</li>
+              <li>Ensure you can restore into a quarantine network if security incident suspected.</li>
+              <li>Verify recovery time depends on size, region, and storage performance.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Backup</tag>
+        <tag>Disaster Recovery</tag>
+        <tag>Operations</tag>
+      </tags>
+    </question>
+
+    <question id="39" category-ref="cat-storage" difficulty="advanced">
+      <title>Diagnose Storage Access Denied</title>
+      <scenario>An app gets "403 Forbidden" accessing a blob. It uses Entra ID auth.</scenario>
+      <question-text>What are the top likely causes?</question-text>
+      <choices>
+        <choice letter="A">The blob doesn't exist</choice>
+        <choice letter="B">Missing RBAC role, wrong scope, or token/audience mismatch</choice>
+        <choice letter="C">The storage account is deleted</choice>
+        <choice letter="D">Azure Storage is down globally</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Missing RBAC role, wrong scope, or token/audience mismatch.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Confirm the principal has the correct Blob Data role at the right scope (container/account), confirm the app is requesting tokens for the correct resource audience, and confirm no network restriction blocks access.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Control-plane roles (Contributor) do not grant data-plane access; you need data roles.</li>
+              <li>Private endpoint without DNS can cause unexpected pathing failures.</li>
+              <li>If using SAS, validate expiry/permissions; if using keys, ensure correct key and rotation.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Storage</tag>
+        <tag>Troubleshooting</tag>
+        <tag>RBAC</tag>
+      </tags>
+    </question>
+
+    <question id="40" category-ref="cat-networking" difficulty="intermediate">
+      <title>"I Can Ping But Not Connect"</title>
+      <scenario>Two VMs in same VNet can ping but cannot connect on TCP/1433.</scenario>
+      <question-text>What's the most likely Azure control?</question-text>
+      <choices>
+        <choice letter="A">VNet peering issue</choice>
+        <choice letter="B">NSG rules blocking TCP/1433</choice>
+        <choice letter="C">DNS resolution failure</choice>
+        <choice letter="D">Storage account firewall</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>NSG rules.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>ICMP ping success doesn't prove TCP is allowed. Check NSG inbound/outbound rules for the subnets/NICs, and confirm OS firewall allows 1433.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>NSGs are L3/L4; protocol/port matters.</li>
+              <li>Effective security rules view is faster than reading multiple NSGs manually.</li>
+              <li>UDR/NVA can also affect flows; check effective routes if NSGs look correct.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Networking</tag>
+        <tag>NSG</tag>
+        <tag>Troubleshooting</tag>
+      </tags>
+    </question>
+
+    <question id="41" category-ref="cat-networking" difficulty="intermediate">
+      <title>Private Endpoint vs Service Endpoint</title>
+      <scenario>You need private connectivity to a PaaS service and want the service to have a private IP in your VNet.</scenario>
+      <question-text>Which do you choose?</question-text>
+      <choices>
+        <choice letter="A">Service Endpoint</choice>
+        <choice letter="B">Private Endpoint</choice>
+        <choice letter="C">VPN Gateway</choice>
+        <choice letter="D">ExpressRoute</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Private Endpoint.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Choose Private Endpoint if you need a private IP in your VNet for the service. Service endpoints keep traffic on Microsoft backbone but do not give the service a private IP in your VNet.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Private Endpoint requires DNS alignment; service endpoints have different DNS implications.</li>
+              <li>Network security posture differs; ensure you meet "no public endpoint" requirements.</li>
+              <li>Verify service endpoint support by service type.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Networking</tag>
+        <tag>Private Endpoint</tag>
+        <tag>Service Endpoint</tag>
+      </tags>
+    </question>
+
+    <question id="42" category-ref="cat-monitoring" difficulty="intermediate">
+      <title>Log Analytics Workspace Access</title>
+      <scenario>A user can view VM resources but cannot query logs in Log Analytics.</scenario>
+      <question-text>Why, and what do you change?</question-text>
+      <choices>
+        <choice letter="A">The VM doesn't generate logs</choice>
+        <choice letter="B">Workspace permissions are separate; grant workspace access</choice>
+        <choice letter="C">Azure Monitor is disabled</choice>
+        <choice letter="D">The user needs Global Administrator role</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Workspace permissions are separate; grant workspace access.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Grant the user appropriate permissions on the Log Analytics workspace (RBAC roles for Log Analytics) in addition to resource permissions.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Resource-level RBAC doesn't automatically grant workspace query permission.</li>
+              <li>Central workspaces often live in shared subscriptions; scope matters.</li>
+              <li>Ensure least privilege: reader vs contributor vs analytics-specific roles (verify).</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Monitoring</tag>
+        <tag>Log Analytics</tag>
+        <tag>RBAC</tag>
+      </tags>
+    </question>
+
+    <question id="43" category-ref="cat-monitoring" difficulty="intermediate">
+      <title>Diagnostic Settings Coverage Gap</title>
+      <scenario>You have a Log Analytics workspace but see no NSG flow logs or storage logs.</scenario>
+      <question-text>What's the likely missing configuration?</question-text>
+      <choices>
+        <choice letter="A">Log Analytics workspace is full</choice>
+        <choice letter="B">Diagnostic settings not enabled on resources</choice>
+        <choice letter="C">Azure Monitor is disabled globally</choice>
+        <choice letter="D">The subscription is in a different region</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Diagnostic settings.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Enable diagnostic settings (and any required flow log features) on the target resources to send logs/metrics to the workspace.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Not all logs are enabled by default.</li>
+              <li>Destination choice (workspace vs storage vs event hub) affects queryability and cost.</li>
+              <li>Verify resource-specific log categories and prerequisites.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Monitoring</tag>
+        <tag>Diagnostic Settings</tag>
+        <tag>Log Analytics</tag>
+      </tags>
+    </question>
+
+    <question id="44" category-ref="cat-monitoring" difficulty="basic">
+      <title>"I Need to See Who Changed This"</title>
+      <scenario>You must identify who modified an NSG rule yesterday.</scenario>
+      <question-text>Where do you look?</question-text>
+      <choices>
+        <choice letter="A">Azure Advisor</choice>
+        <choice letter="B">Activity Log</choice>
+        <choice letter="C">Resource Health</choice>
+        <choice letter="D">Azure Cost Management</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Activity Log.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Use the Activity Log (subscription-level) to find the write operation for the NSG and identify the caller and timestamp.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>For longer retention and querying, export Activity Log to Log Analytics.</li>
+              <li>Data-plane logs won't show control-plane NSG changes.</li>
+              <li>Ensure the relevant subscription's Activity Log is checked (multi-subscription environments).</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Monitoring</tag>
+        <tag>Activity Log</tag>
+        <tag>Auditing</tag>
+      </tags>
+    </question>
+
+    <question id="45" category-ref="cat-governance" difficulty="intermediate">
+      <title>Resource Move: RG vs Subscription</title>
+      <scenario>You must move a set of resources to a new subscription for billing separation.</scenario>
+      <question-text>What are the two key prechecks?</question-text>
+      <choices>
+        <choice letter="A">Check if resources are running and stop them</choice>
+        <choice letter="B">Validate move support and ensure dependencies/permissions across scopes</choice>
+        <choice letter="C">Delete the resources and recreate them</choice>
+        <choice letter="D">Contact Azure Support first</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Validate move support and ensure dependencies/permissions across scopes.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Confirm the resource types support move across subscriptions, ensure all dependent resources can be moved together (or refactored), and ensure you have required permissions in both source and destination.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Some resources have move constraints (resource provider-specific); verify official docs.</li>
+              <li>RBAC assignments and managed identities may need revalidation after move.</li>
+              <li>Policy differences in destination subscription can block resources post-move.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Governance</tag>
+        <tag>Resource Move</tag>
+        <tag>Subscriptions</tag>
+      </tags>
+    </question>
+
+    <question id="46" category-ref="cat-governance" difficulty="intermediate">
+      <title>"Policy vs Lock" for Deletion Prevention</title>
+      <scenario>You need to prevent accidental deletion of a resource group, but admins still must be able to deploy within it.</scenario>
+      <question-text>What's the simplest control?</question-text>
+      <choices>
+        <choice letter="A">Azure Policy with deny delete</choice>
+        <choice letter="B">CanNotDelete lock on the RG</choice>
+        <choice letter="C">Remove Contributor permissions</choice>
+        <choice letter="D">Move to a protected subscription</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>CanNotDelete lock on the RG.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Apply a CanNotDelete lock at the resource group scope; it prevents deletion while allowing normal operations.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Lock removal requires appropriate permissions; restrict who can remove it.</li>
+              <li>Locks can block IaC that replaces resources via delete/recreate.</li>
+              <li>Locks do not prevent destructive actions that don't require delete (e.g., misconfig changes).</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Governance</tag>
+        <tag>Resource Locks</tag>
+        <tag>Azure Policy</tag>
+      </tags>
+    </question>
+
+    <question id="47" category-ref="cat-identity" difficulty="intermediate">
+      <title>Identity: Group-Based Access</title>
+      <scenario>You onboard 50 contractors for 3 months. They need Reader access to a subscription.</scenario>
+      <question-text>What's the operationally correct approach?</question-text>
+      <choices>
+        <choice letter="A">Assign Reader role to each contractor individually</choice>
+        <choice letter="B">Use an Entra ID group assigned to Reader role at subscription scope</choice>
+        <choice letter="C">Give contractors Owner access temporarily</choice>
+        <choice letter="D">Create guest accounts without any role assignment</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Use an Entra ID group assigned to Reader role at subscription scope.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Create an Entra ID group (e.g., Contractors-SubA-Readers) and assign Reader role at the subscription scope; add/remove users from the group as contractors change.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Group-based assignments reduce churn and audit complexity.</li>
+              <li>Time-bound access can be handled via access reviews/PIM if used (verify exam expectations).</li>
+              <li>Ensure contractors don't get implicit access from other group memberships.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Identity</tag>
+        <tag>RBAC</tag>
+        <tag>Groups</tag>
+      </tags>
+    </question>
+
+    <question id="48" category-ref="cat-storage" difficulty="intermediate">
+      <title>Storage "Delete Protection" Mix-Up</title>
+      <scenario>A team believes enabling blob soft delete meets a strict WORM compliance requirement.</scenario>
+      <question-text>Is that correct? What do you use instead?</question-text>
+      <choices>
+        <choice letter="A">Yes, soft delete is sufficient for WORM</choice>
+        <choice letter="B">No; use immutability for WORM</choice>
+        <choice letter="C">Yes, with versioning enabled</choice>
+        <choice letter="D">No; use lifecycle management instead</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>No; use immutability for WORM.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Soft delete enables recovery from deletes/overwrites but does not enforce WORM. For compliance WORM, configure immutable storage policies (time-based retention/legal hold).</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Soft delete retention is a window, not a compliance lock.</li>
+              <li>Immutability changes operational behavior (no delete until retention ends).</li>
+              <li>Verify legal hold vs time-based retention semantics for your compliance scenario.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Storage</tag>
+        <tag>Compliance</tag>
+        <tag>Immutability</tag>
+      </tags>
+    </question>
+
+    <question id="49" category-ref="cat-networking" difficulty="intermediate">
+      <title>VM Access: Just Enough Exposure</title>
+      <scenario>Security forbids direct public RDP/SSH to VMs. Admins still need remote access.</scenario>
+      <question-text>What's the typical Azure approach?</question-text>
+      <choices>
+        <choice letter="A">Assign public IPs to all VMs</choice>
+        <choice letter="B">Use Azure Bastion or a jump host pattern</choice>
+        <choice letter="C">Open NSG rules for RDP/SSH from any source</choice>
+        <choice letter="D">Use Azure DNS for VM access</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Use a jump/bastion pattern (Azure Bastion or private access).</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Use Azure Bastion (or a jump host in a protected subnet) so VMs have no public RDP/SSH exposure while admins connect through a controlled entry point.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Bastion changes the access path; NSG rules and subnet placement matter.</li>
+              <li>Audit and conditional access can be applied at the access gateway layer.</li>
+              <li>Verify Bastion SKU/features for required session types and scale.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Networking</tag>
+        <tag>Azure Bastion</tag>
+        <tag>Security</tag>
+      </tags>
+    </question>
+
+    <question id="50" category-ref="cat-governance" difficulty="advanced">
+      <title>End-to-End Scenario: Secure, Governed Landing Zone Slice</title>
+      <scenario>You're asked to onboard a new application into Azure with: (1) enforced tags, (2) no public endpoints for storage, (3) least-privilege admin, (4) centralized logging, (5) budget alerts.</scenario>
+      <question-text>Outline your default implementation choices.</question-text>
+      <choices>
+        <choice letter="A">Use default settings without any additional configuration</choice>
+        <choice letter="B">Management group policy + private endpoint + RBAC groups + Log Analytics + budgets</choice>
+        <choice letter="C">Single subscription with all resources in one resource group</choice>
+        <choice letter="D">Rely on Azure Advisor recommendations only</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Management group policy + private endpoint + RBAC groups + Log Analytics + budgets.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>
+            <ul>
+              <li>Governance: Management group + policy initiative enforcing tags and region/SKU constraints.</li>
+              <li>Storage: Private Endpoint + private DNS; disable or restrict public network access.</li>
+              <li>Access: Entra groups with RBAC at RG scope (network RG vs app RG separation).</li>
+              <li>Monitoring: Diagnostic settings to centralized Log Analytics; alerts via action groups.</li>
+              <li>Cost: Budget thresholds + tag-based reporting.</li>
+            </ul>
+          </content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Biggest traps: DNS for Private Endpoints, policy denials breaking deployments, workspace permissions separate from resource RBAC.</li>
+              <li>Ensure dependencies (shared VNet, shared workspace) don't force broad permissions.</li>
+              <li>Any numeric limits/retention defaults should be treated as "verify in official docs" unless you've confirmed for your tenant/exam version.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Landing Zone</tag>
+        <tag>Governance</tag>
+        <tag>Architecture</tag>
+      </tags>
+    </question>
+  </questions>
+
+  <glossary>
+    <term id="term-rbac" category="Identity">
+      <name>Azure RBAC</name>
+      <definition>Authorization system for Azure resource actions using roles assigned at scopes.</definition>
+      <exam-note>Controls what actions identities can perform on Azure resources.</exam-note>
+    </term>
+    <term id="term-management-group" category="Governance">
+      <name>Management Group</name>
+      <definition>Hierarchy layer above subscriptions for consistent policy/RBAC inheritance.</definition>
+      <exam-note>Use for organizing subscriptions and applying consistent controls.</exam-note>
+    </term>
+    <term id="term-azure-policy" category="Governance">
+      <name>Azure Policy</name>
+      <definition>Governance engine that audits/enforces resource configuration using policy definitions/initiatives.</definition>
+      <exam-note>Use deny effect to block noncompliant deployments, audit to report only.</exam-note>
+    </term>
+    <term id="term-nsg" category="Networking">
+      <name>Network Security Group (NSG)</name>
+      <definition>Layer 3/4 ACL applied at subnet/NIC for traffic filtering.</definition>
+      <exam-note>Priority ordering matters - first match wins.</exam-note>
+    </term>
+    <term id="term-private-endpoint" category="Networking">
+      <name>Private Endpoint</name>
+      <definition>Private IP interface in a VNet that maps to a PaaS resource; enables private access path.</definition>
+      <exam-note>Requires correct DNS configuration to function properly.</exam-note>
+    </term>
+    <term id="term-managed-identity" category="Identity">
+      <name>Managed Identity</name>
+      <definition>Azure-managed identity for workloads; avoids storing credentials.</definition>
+      <exam-note>Preferred pattern for VM-to-Azure-service authentication.</exam-note>
+    </term>
+    <term id="term-key-vault" category="Security">
+      <name>Key Vault</name>
+      <definition>Service for secrets/keys/certificates; commonly used with managed identity.</definition>
+      <exam-note>Network restrictions can block access; ensure private endpoint/DNS if locked down.</exam-note>
+    </term>
+    <term id="term-log-analytics" category="Monitoring">
+      <name>Log Analytics Workspace</name>
+      <definition>Central store for logs queried via KQL.</definition>
+      <exam-note>Requires separate access permissions from resource RBAC.</exam-note>
+    </term>
+    <term id="term-availability-zone" category="Compute">
+      <name>Availability Zone</name>
+      <definition>Physically separate zone within a region; improves resilience against datacenter failures.</definition>
+      <exam-note>Zone support is regional; verify per region.</exam-note>
+    </term>
+    <term id="term-vmss" category="Compute">
+      <name>VM Scale Set (VMSS)</name>
+      <definition>Managed fleet of identical VMs supporting autoscale and uniform updates.</definition>
+      <exam-note>Best for stateless tiers; stateful workloads complicate scaling.</exam-note>
+    </term>
+  </glossary>
+</certification-exam>

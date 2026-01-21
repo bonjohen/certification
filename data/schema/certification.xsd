@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           targetNamespace="http://certification.study/schema/v1"
+           xmlns:cert="http://certification.study/schema/v1"
+           elementFormDefault="qualified">
+
+  <!-- Root Element -->
+  <xs:element name="certification-exam" type="cert:CertificationExamType"/>
+
+  <!-- Main Exam Type -->
+  <xs:complexType name="CertificationExamType">
+    <xs:sequence>
+      <xs:element name="metadata" type="cert:MetadataType"/>
+      <xs:element name="questions" type="cert:QuestionsType"/>
+      <xs:element name="glossary" type="cert:GlossaryType" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="version" type="xs:string" use="required"/>
+  </xs:complexType>
+
+  <!-- Metadata Type -->
+  <xs:complexType name="MetadataType">
+    <xs:sequence>
+      <xs:element name="exam-code" type="xs:string"/>
+      <xs:element name="exam-title" type="xs:string"/>
+      <xs:element name="provider" type="xs:string"/>
+      <xs:element name="description" type="xs:string" minOccurs="0"/>
+      <xs:element name="total-questions" type="xs:positiveInteger"/>
+      <xs:element name="created-date" type="xs:date"/>
+      <xs:element name="last-modified" type="xs:dateTime"/>
+      <xs:element name="categories" type="cert:CategoriesType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- Categories for organizing questions -->
+  <xs:complexType name="CategoriesType">
+    <xs:sequence>
+      <xs:element name="category" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:simpleContent>
+            <xs:extension base="xs:string">
+              <xs:attribute name="id" type="xs:ID" use="required"/>
+            </xs:extension>
+          </xs:simpleContent>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- Questions Container -->
+  <xs:complexType name="QuestionsType">
+    <xs:sequence>
+      <xs:element name="question" type="cert:QuestionType"
+                  minOccurs="1" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- Individual Question Type -->
+  <xs:complexType name="QuestionType">
+    <xs:sequence>
+      <xs:element name="title" type="xs:string"/>
+      <xs:element name="scenario" type="cert:FormattedTextType" minOccurs="0"/>
+      <xs:element name="question-text" type="cert:FormattedTextType"/>
+      <xs:element name="choices" type="cert:ChoicesType"/>
+      <xs:element name="correct-answer" type="cert:AnswerLetterType"/>
+      <xs:element name="hints" type="cert:HintsType"/>
+      <xs:element name="tags" type="cert:TagsType" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:positiveInteger" use="required"/>
+    <xs:attribute name="category-ref" type="xs:IDREF" use="optional"/>
+    <xs:attribute name="difficulty" type="cert:DifficultyType" use="optional"/>
+  </xs:complexType>
+
+  <!-- Multiple Choice Options (exactly 4) -->
+  <xs:complexType name="ChoicesType">
+    <xs:sequence>
+      <xs:element name="choice" type="cert:ChoiceType"
+                  minOccurs="4" maxOccurs="4"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="ChoiceType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute name="letter" type="cert:AnswerLetterType" use="required"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <!-- Answer Letter Restriction (A, B, C, or D) -->
+  <xs:simpleType name="AnswerLetterType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="A"/>
+      <xs:enumeration value="B"/>
+      <xs:enumeration value="C"/>
+      <xs:enumeration value="D"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- Progressive Hints (exactly 3 levels) -->
+  <xs:complexType name="HintsType">
+    <xs:sequence>
+      <xs:element name="hint" type="cert:HintType"
+                  minOccurs="3" maxOccurs="3"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="HintType">
+    <xs:sequence>
+      <xs:element name="content" type="cert:FormattedTextType"/>
+    </xs:sequence>
+    <xs:attribute name="level" type="cert:HintLevelType" use="required"/>
+    <xs:attribute name="label" type="xs:string" use="optional"/>
+  </xs:complexType>
+
+  <xs:simpleType name="HintLevelType">
+    <xs:restriction base="xs:positiveInteger">
+      <xs:minInclusive value="1"/>
+      <xs:maxInclusive value="3"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- Formatted Text with optional HTML-like markup -->
+  <xs:complexType name="FormattedTextType" mixed="true">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="p" type="cert:FormattedTextType"/>
+      <xs:element name="strong" type="xs:string"/>
+      <xs:element name="em" type="xs:string"/>
+      <xs:element name="code" type="xs:string"/>
+      <xs:element name="ul" type="cert:UnorderedListType"/>
+      <xs:element name="ol" type="cert:OrderedListType"/>
+    </xs:choice>
+  </xs:complexType>
+
+  <!-- List Types -->
+  <xs:complexType name="UnorderedListType">
+    <xs:sequence>
+      <xs:element name="li" type="cert:FormattedTextType" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="OrderedListType">
+    <xs:sequence>
+      <xs:element name="li" type="cert:FormattedTextType" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- Tags for filtering/categorization -->
+  <xs:complexType name="TagsType">
+    <xs:sequence>
+      <xs:element name="tag" type="xs:string" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- Difficulty Level -->
+  <xs:simpleType name="DifficultyType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="basic"/>
+      <xs:enumeration value="intermediate"/>
+      <xs:enumeration value="advanced"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- Glossary Section -->
+  <xs:complexType name="GlossaryType">
+    <xs:sequence>
+      <xs:element name="term" type="cert:GlossaryTermType"
+                  maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="GlossaryTermType">
+    <xs:sequence>
+      <xs:element name="name" type="xs:string"/>
+      <xs:element name="definition" type="cert:FormattedTextType"/>
+      <xs:element name="exam-note" type="xs:string" minOccurs="0"/>
+      <xs:element name="related-terms" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="term-ref" type="xs:string" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:ID" use="required"/>
+    <xs:attribute name="category" type="xs:string" use="optional"/>
+  </xs:complexType>
+
+</xs:schema>

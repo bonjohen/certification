@@ -1,0 +1,1825 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<certification-exam xmlns="http://certification.study/schema/v1" version="1.0">
+  <metadata>
+    <exam-code>AZ-204</exam-code>
+    <exam-title>Developing Solutions for Microsoft Azure</exam-title>
+    <provider>Microsoft</provider>
+    <description>Scenario-Based Study Guide for AZ-204 certification - validates skills for designing, building, testing, deploying, and maintaining cloud-native applications on Microsoft Azure.</description>
+    <total-questions>50</total-questions>
+    <created-date>2026-01-20</created-date>
+    <last-modified>2026-01-20T00:00:00Z</last-modified>
+    <categories>
+      <category id="cat-compute">Compute Solutions</category>
+      <category id="cat-storage">Storage and Data</category>
+      <category id="cat-security">Security and Identity</category>
+      <category id="cat-messaging">Messaging and Events</category>
+      <category id="cat-monitoring">Monitoring and Optimization</category>
+      <category id="cat-integration">API and Integration</category>
+    </categories>
+  </metadata>
+
+  <questions>
+    <question id="1" category-ref="cat-compute" difficulty="intermediate">
+      <title>Container Deployment Choice</title>
+      <scenario>You need to deploy a new containerized web application on Azure. The app consists of a single container running a stateless web service. The team is small and has limited Kubernetes expertise. They require a quick deployment with minimal management overhead, but the solution must still scale to handle increasing traffic.</scenario>
+      <question-text>Given a choice between running the container on Azure App Service (Web App for Containers) or on a fully managed Azure Kubernetes Service (AKS) cluster, which should you choose?</question-text>
+      <choices>
+        <choice letter="A">Azure App Service (Web App for Containers)</choice>
+        <choice letter="B">Azure Kubernetes Service (AKS)</choice>
+        <choice letter="C">Azure Container Instances (ACI)</choice>
+        <choice letter="D">Azure Virtual Machines with Docker</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Use Azure App Service (Web App for Containers) to run the container. It provides an easy, fully managed way to deploy a single container without managing Kubernetes clusters.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Choose Azure App Service's Web App for Containers for this single-container scenario. App Service lets you deploy the container in a PaaS environment with minimal management overhead - you don't need to run or maintain any Kubernetes control plane. AKS would be overkill since no multi-container orchestration or custom Kubernetes features are needed. Web App for Containers allows the team to focus on the app, not infrastructure.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Azure App Service for Containers gives you a dedicated container hosting environment with support for deployment slots, auto-scaling, and easy SSL/TLS integration.</li>
+              <li>It abstracts the entire cluster, so there's no Kubernetes API exposure or control - which is fine for a single container app.</li>
+              <li>This choice trades off some low-level control for simplicity: AKS would allow more complex scenarios but introduces operational complexity.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Containers</tag>
+        <tag>App Service</tag>
+        <tag>Compute</tag>
+      </tags>
+    </question>
+
+    <question id="2" category-ref="cat-compute" difficulty="intermediate">
+      <title>Choosing a Compute Service for a Web App</title>
+      <scenario>A company is migrating a monolithic ASP.NET web application from on-premises to Azure. The app will serve HTTP requests and has stateful sessions managed in-memory. They want to minimize infrastructure management.</scenario>
+      <question-text>Should they deploy the application to Azure App Service or break it into Azure Functions?</question-text>
+      <choices>
+        <choice letter="A">Azure App Service</choice>
+        <choice letter="B">Azure Functions</choice>
+        <choice letter="C">Azure Container Instances</choice>
+        <choice letter="D">Azure Virtual Machines</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Deploy the application to Azure App Service. It's a better fit for hosting a traditional stateful web app with minimal changes.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Use Azure App Service (Web App) for this migration. App Service is designed to host web applications (including ASP.NET apps) with minimal modification - you can lift-and-shift the entire app into a managed web environment. Azure Functions is a Functions-as-a-Service model meant for discrete, stateless units of code that run on triggers - converting a monolithic web app into functions would require significant refactoring.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Azure App Service provides features like auto-scaling, staging slots, and integrated logging that support the monolithic app in production.</li>
+              <li>App Service can run in a stateful mode if the app uses session affinity or external session storage like Azure Cache for Redis.</li>
+              <li>By choosing App Service, you avoid the cold start and timeout limitations that a consumption-plan Function might impose.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>App Service</tag>
+        <tag>Migration</tag>
+        <tag>Compute</tag>
+      </tags>
+    </question>
+
+    <question id="3" category-ref="cat-compute" difficulty="advanced">
+      <title>Serverless Workflow Orchestration</title>
+      <scenario>You are implementing an order processing workflow composed of multiple steps: receive order, charge payment, update inventory, and send confirmation. Each step is implemented as a separate function. You need each step to execute in sequence with state maintained between steps.</scenario>
+      <question-text>Which Azure service or pattern should you use to orchestrate these serverless functions?</question-text>
+      <choices>
+        <choice letter="A">Azure Durable Functions</choice>
+        <choice letter="B">Azure Logic Apps</choice>
+        <choice letter="C">Standard Azure Functions with queue triggers</choice>
+        <choice letter="D">Azure Service Bus with manual orchestration</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Use Azure Durable Functions (an extension of Azure Functions) to orchestrate the workflow. Durable Functions let you maintain state across function calls and execute each step in order.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Leverage Azure Durable Functions, which enables stateful orchestration on top of Azure Functions. With Durable Functions, you can define an orchestrator function that calls each step (activity functions) in sequence, ensuring the workflow follows the required order. The platform automatically checkpoints progress to durable storage, so if a step fails or the process restarts, it can resume from the last checkpoint.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Durable Functions use an event-sourcing approach: the orchestrator function's progress is snapshotted to Azure Storage, and it replays the function to rebuild state when new events arrive.</li>
+              <li>The workflow can wait for human interaction or a timer using Durable function's waiting mechanics without consuming resources.</li>
+              <li>Durable Functions guarantee at-least-once execution for each activity - design idempotent activities or use built-in retry policies.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Durable Functions</tag>
+        <tag>Orchestration</tag>
+        <tag>Serverless</tag>
+      </tags>
+    </question>
+
+    <question id="4" category-ref="cat-storage" difficulty="intermediate">
+      <title>Globally Distributed Data Store</title>
+      <scenario>An online game needs to store player profile data. Requirements are low latency reads and writes for players around the world, automatic scaling to handle spikes, and flexible schema as profiles may evolve over time.</scenario>
+      <question-text>Which backend should they choose for this scenario - Azure SQL Database or Azure Cosmos DB?</question-text>
+      <choices>
+        <choice letter="A">Azure SQL Database</choice>
+        <choice letter="B">Azure Cosmos DB</choice>
+        <choice letter="C">Azure Table Storage</choice>
+        <choice letter="D">Azure Blob Storage with metadata</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Azure Cosmos DB is the better choice. It's a globally-distributed NoSQL database that offers low-latency access worldwide, automatic scaling, and a flexible schema.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Use Azure Cosmos DB for storing player profiles. Cosmos DB is designed for low latency and high throughput on a global scale. You can replicate data to multiple regions so players' reads/writes go to their nearest region. It supports multi-region writes, automatic scaling of throughput, and schema-less (NoSQL) nature allows evolving profile data without rigid schemas.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Cosmos DB offers multi-master replication with conflict resolution, meaning writes can occur in any region.</li>
+              <li>Performance is priced in Request Units (RUs) allowing elastic throughput scaling - use autoscale mode to handle sudden surges.</li>
+              <li>Choose a consistency level (perhaps Session consistency) for each player session to ensure a player's own writes are immediately visible to them.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Cosmos DB</tag>
+        <tag>Global Distribution</tag>
+        <tag>NoSQL</tag>
+      </tags>
+    </question>
+
+    <question id="5" category-ref="cat-storage" difficulty="intermediate">
+      <title>Event-Driven Data Processing</title>
+      <scenario>A retail application uses an Azure Cosmos DB container to store orders. They want to automatically trigger downstream processing whenever a new order is added, without constantly polling the database.</scenario>
+      <question-text>What Azure feature can enable this reactive pattern?</question-text>
+      <choices>
+        <choice letter="A">Azure Cosmos DB Change Feed</choice>
+        <choice letter="B">Azure Event Grid</choice>
+        <choice letter="C">Azure Service Bus</choice>
+        <choice letter="D">Timer-triggered Azure Functions</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Enable the Azure Cosmos DB Change Feed feature. The change feed provides a continuous, ordered log of changes in the container.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Use Azure Cosmos DB's Change Feed to react to new orders. The change feed lists all changes (inserts and updates) to documents in the order they occur. By using an Azure Function with a Cosmos DB Trigger bound to the change feed, each new order document will automatically invoke the function shortly after it's written.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>The Cosmos DB change feed ensures ordering within a partition key, so changes for a given partition come out in sequence.</li>
+              <li>It's effectively an append-only log of changes - you can attach multiple independent consumers for different purposes.</li>
+              <li>The change feed provides at-least-once delivery semantics - duplicates are possible; design idempotent handlers.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Cosmos DB</tag>
+        <tag>Change Feed</tag>
+        <tag>Event-Driven</tag>
+      </tags>
+    </question>
+
+    <question id="6" category-ref="cat-security" difficulty="intermediate">
+      <title>Secure Client File Uploads</title>
+      <scenario>You are developing a web application where users can upload images and documents stored in Azure Blob Storage. For security, the application server should not expose storage account keys or handle file data directly.</scenario>
+      <question-text>What is a secure way to allow clients to upload and download files using Azure Blob Storage?</question-text>
+      <choices>
+        <choice letter="A">Share storage account keys with clients</choice>
+        <choice letter="B">Use Shared Access Signature (SAS) tokens</choice>
+        <choice letter="C">Make containers public</choice>
+        <choice letter="D">Proxy all uploads through the web server</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Use a Shared Access Signature (SAS) for Blob Storage. The application can generate a SAS token scoped to the specific blob with write/read permission for a short time.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>The secure pattern is to use Azure Blob Storage SAS tokens to delegate limited access to clients. The application creates a Shared Access Signature URL for the specific blob or container. This SAS token grants time-bound and permission-bound access. The client can then PUT the file to Blob Storage directly using this URL without needing account keys.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Use User Delegation SAS when possible - this leverages Azure AD credentials to create the SAS, removing the need to use the storage account key at all.</li>
+              <li>Enforce HTTPS on SAS URLs and keep their lifetime short to reduce risk.</li>
+              <li>SAS aligns with least privilege principle: each SAS grants exactly the access needed and nothing more.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Storage</tag>
+        <tag>SAS</tag>
+        <tag>Security</tag>
+      </tags>
+    </question>
+
+    <question id="7" category-ref="cat-messaging" difficulty="intermediate">
+      <title>Message Queue for Order Processing</title>
+      <scenario>An e-commerce platform needs to decouple order submission from order fulfillment. Requirements include guaranteed at-least-once delivery, ability to detect and avoid duplicate order messages, and processing in roughly the order received.</scenario>
+      <question-text>Should you use Azure Service Bus queues or Azure Storage queues for this scenario?</question-text>
+      <choices>
+        <choice letter="A">Azure Storage queues</choice>
+        <choice letter="B">Azure Service Bus queues</choice>
+        <choice letter="C">Azure Event Hubs</choice>
+        <choice letter="D">Azure Event Grid</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Azure Service Bus is the right choice. It's an enterprise-grade message broker supporting FIFO (with sessions), duplicate detection, and transactional receives.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Use Azure Service Bus Queues for the order messages. Service Bus is designed for enterprise messaging scenarios that require guaranteed delivery, ordering, and near exactly-once broker-side handling. It has built-in duplicate detection and supports ordered delivery using sessions. Azure Storage Queue is simpler but doesn't guarantee FIFO order and has no built-in duplicate detection.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Azure Service Bus queues support AMQP protocol, enabling features like long polling and push-style delivery to listeners.</li>
+              <li>With Sessions, you can achieve FIFO by grouping related messages - use session IDs to segregate and preserve sequence.</li>
+              <li>Duplicate detection (when enabled with message ID) can transparently ignore duplicate copies within a dedup window.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Service Bus</tag>
+        <tag>Messaging</tag>
+        <tag>Queues</tag>
+      </tags>
+    </question>
+
+    <question id="8" category-ref="cat-messaging" difficulty="intermediate">
+      <title>Telemetry Ingestion at Scale</title>
+      <scenario>A smart sensor network sends telemetry data from 100,000+ devices concurrently. The data needs to be ingested by a cloud gateway and processed in near real-time for anomalies.</scenario>
+      <question-text>Which Azure service is best suited to ingest a high volume of events per second - Azure Event Hubs or Azure Event Grid?</question-text>
+      <choices>
+        <choice letter="A">Azure Event Grid</choice>
+        <choice letter="B">Azure Event Hubs</choice>
+        <choice letter="C">Azure Service Bus</choice>
+        <choice letter="D">Azure Storage Queues</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Azure Event Hubs is the best choice for high-volume telemetry. Event Hubs is built to ingest millions of events per second with low latency.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Use Azure Event Hubs for ingesting the sensor telemetry. Event Hubs is a big data streaming platform that can intake huge volumes of events and is designed for high-throughput, sequential event processing. It supports batching, temporal buffering, and the ability to replay or catch up on streams. Azure Event Grid is optimized for reactive discrete events, not continuous telemetry streams.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Event Hubs uses partitions - partition by device ID so processing can be parallelized but also logically grouped for order.</li>
+              <li>Event Hubs supports capture to Azure Blob Storage or Data Lake for automatic archival.</li>
+              <li>It supports both AMQP and Kafka protocols, so existing Kafka-based producers/consumers can talk to Event Hubs with minimal changes.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Event Hubs</tag>
+        <tag>IoT</tag>
+        <tag>Streaming</tag>
+      </tags>
+    </question>
+
+    <question id="9" category-ref="cat-messaging" difficulty="intermediate">
+      <title>Reactive Notifications for Blob Events</title>
+      <scenario>A media processing workflow stores raw videos in Blob Storage. Whenever a new video blob is uploaded to a specific container, the system should automatically trigger an Azure Function to start encoding.</scenario>
+      <question-text>What Azure service or mechanism should you use to react to the blob upload event?</question-text>
+      <choices>
+        <choice letter="A">Azure Blob trigger (polling-based)</choice>
+        <choice letter="B">Azure Event Grid with Blob Storage events</choice>
+        <choice letter="C">Timer-triggered Azure Function</choice>
+        <choice letter="D">Azure Service Bus</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Use Azure Event Grid with a Blob Storage event subscription. Event Grid can publish an event when a blob is created and subscribe an Azure Function to react immediately.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Set up Azure Event Grid on the Blob Storage account for blob creation events. Azure Blob Storage is natively integrated with Event Grid - when a new blob is uploaded, Event Grid generates a BlobCreated event. You can subscribe an Azure Function to those events. This is completely serverless, push-based, and reacts quickly (usually within seconds).</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Event Grid guarantees at-least-once delivery of events and can use advanced filters to only trigger for relevant events.</li>
+              <li>The Blob Storage to Event Grid integration is much more immediate than legacy blob triggers which use polling.</li>
+              <li>You can chain events - Blob Created -> Event Grid -> Service Bus or Logic App if the process needs orchestration.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Event Grid</tag>
+        <tag>Blob Storage</tag>
+        <tag>Event-Driven</tag>
+      </tags>
+    </question>
+
+    <question id="10" category-ref="cat-security" difficulty="intermediate">
+      <title>Securing Application Secrets</title>
+      <scenario>You are developing an Azure App Service web application that needs to connect to an Azure SQL Database and a third-party API. These require sensitive credentials. You want to avoid storing secrets in config files or code.</scenario>
+      <question-text>How should the application securely store and access these secrets in Azure?</question-text>
+      <choices>
+        <choice letter="A">Store secrets in appsettings.json</choice>
+        <choice letter="B">Store secrets in Azure Key Vault</choice>
+        <choice letter="C">Store secrets as environment variables</choice>
+        <choice letter="D">Store secrets in Azure Blob Storage</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Store the secrets in Azure Key Vault and retrieve them from the app at runtime. Key Vault securely holds credentials and the app can fetch them when needed.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Use Azure Key Vault to store all sensitive credentials. Key Vault is a secure, central repository for keys/secrets/certificates. Configure your Azure App Service to integrate with Key Vault, either using a Managed Identity to fetch secrets or using the Key Vault references feature in Azure App Service configuration. The actual secret values are never in plain text in application settings or code.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Use a Managed Identity for the App Service to access Key Vault - this eliminates the need to use any credentials even for Key Vault access.</li>
+              <li>Key Vault provides secret rotation and integration - update secrets in Key Vault once without redeploying the app.</li>
+              <li>Key Vault secrets are encrypted with HSMs and only accessible to authorized identities.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Key Vault</tag>
+        <tag>Security</tag>
+        <tag>Secrets</tag>
+      </tags>
+    </question>
+
+    <question id="11" category-ref="cat-security" difficulty="intermediate">
+      <title>Accessing Azure Resources Without Credentials</title>
+      <scenario>A new Azure Function app needs to read from an Azure Storage account and write to an Azure Cosmos DB, but you want no hard-coded keys or passwords in your function code or configuration.</scenario>
+      <question-text>What Azure feature can you use to give the function app authenticated access to these resources?</question-text>
+      <choices>
+        <choice letter="A">Store connection strings in app settings</choice>
+        <choice letter="B">Use Managed Identity</choice>
+        <choice letter="C">Use service account passwords</choice>
+        <choice letter="D">Embed keys in source code</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Use a Managed Identity for the Function app. The function can directly request tokens from Azure AD for the Storage account and Cosmos DB without handling keys.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Enable a Managed Identity on the Azure Function and use Azure AD-based access control for the other resources. With a managed identity, the function gets an identity in Azure AD automatically. Assign this identity appropriate access roles (e.g., Storage Blob Data Reader/Writer, Cosmos DB Data Contributor). Inside the function code, use Azure SDKs that leverage the Managed Identity to obtain OAuth tokens silently.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>The function can request a token by calling the local Azure Instance Metadata Service (IMDS) endpoint - no human or code ever sees a password.</li>
+              <li>Microsoft takes care of rotating the underlying credentials of the identity, eliminating secret management overhead.</li>
+              <li>Managed identities can be system-assigned (one per resource) or user-assigned (a standalone identity attached to many resources).</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Managed Identity</tag>
+        <tag>Security</tag>
+        <tag>Azure AD</tag>
+      </tags>
+    </question>
+
+    <question id="12" category-ref="cat-security" difficulty="intermediate">
+      <title>User Authentication for a Web Application</title>
+      <scenario>You are building a multi-tier web application with a frontend SPA and backend API hosted on Azure. Only employees from your organization should access this app. You want to implement single sign-on using Microsoft 365 identities.</scenario>
+      <question-text>What is the recommended approach to authenticate users and secure the API on Azure?</question-text>
+      <choices>
+        <choice letter="A">Build custom authentication with username/password</choice>
+        <choice letter="B">Use Microsoft Entra ID (Azure AD) with OAuth/OIDC</choice>
+        <choice letter="C">Use API keys for each user</choice>
+        <choice letter="D">Use Azure Storage access control</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Use Azure AD (Microsoft Entra ID) for authentication. Register the app in Entra ID and use OAuth/OpenID Connect to sign in users.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Leverage the Microsoft Entra ID (Azure AD) identity platform for both user sign-in and securing the API. Register apps in Entra ID for front-end and back-end. The SPA uses OAuth 2.0/OIDC flow to sign in users with organizational credentials. Upon success, the front-end receives ID and access tokens. The backend API validates JWT bearer tokens to ensure only authorized calls are allowed.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Azure AD supports Role-Based Access Control through app roles or groups in tokens - the API can check token claims for roles.</li>
+              <li>Enable advanced security like Conditional Access and MFA without changing the app - configured in Azure AD.</li>
+              <li>For SPAs, use authorization code flow with PKCE (which MSAL.js supports) rather than implicit flow.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Azure AD</tag>
+        <tag>Authentication</tag>
+        <tag>OAuth</tag>
+      </tags>
+    </question>
+
+    <question id="13" category-ref="cat-integration" difficulty="intermediate">
+      <title>Exposing APIs to Partners Securely</title>
+      <scenario>Your company has internal REST APIs running on Azure App Service and Azure Functions that will be consumed by external business partners. Requirements include rate limiting, API key validation, and a developer portal for partner onboarding.</scenario>
+      <question-text>What Azure service should you put in front of these APIs?</question-text>
+      <choices>
+        <choice letter="A">Azure Application Gateway</choice>
+        <choice letter="B">Azure API Management</choice>
+        <choice letter="C">Azure Front Door</choice>
+        <choice letter="D">Azure Load Balancer</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Use Azure API Management (APIM) as a facade in front of the internal APIs. APIM enforces authentication, rate limiting, and provides a developer portal.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Introduce Azure API Management to publish and manage the APIs. API Management acts as a secure API gateway between your backend services and consumers. With APIM, you can secure APIs with subscription keys or JWT tokens, apply rate limiting and quotas, perform transformations, and provide a built-in developer portal for partner onboarding.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>APIM policies let you check for valid OAuth tokens, rewrite URLs, add caching, and set quotas - all without changing application code.</li>
+              <li>APIM can integrate with Azure AD B2B/B2C or other IdPs for partner identities.</li>
+              <li>It's multi-region capable in Premium tier for global performance and supports mTLS certificate authentication.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>API Management</tag>
+        <tag>Integration</tag>
+        <tag>Security</tag>
+      </tags>
+    </question>
+
+    <question id="14" category-ref="cat-monitoring" difficulty="intermediate">
+      <title>Monitoring and Diagnostics</title>
+      <scenario>An Azure-based inventory application is experiencing intermittent slowdowns and errors in production. The development team needs to collect insights into request execution times, failure rates, and trace logs to identify bottlenecks.</scenario>
+      <question-text>What Azure service should you use to instrument and monitor the application?</question-text>
+      <choices>
+        <choice letter="A">Azure Monitor metrics only</choice>
+        <choice letter="B">Azure Application Insights</choice>
+        <choice letter="C">Azure Log Analytics only</choice>
+        <choice letter="D">Azure Advisor</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Enable Azure Application Insights for the application. Application Insights captures request logs, performance metrics, exceptions, and custom traces with minimal code changes.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Use Azure Monitor Application Insights to instrument and monitor the app. Application Insights is a developer-focused APM service that automatically collects telemetry: HTTP request durations, response codes, exceptions, dependency calls, and custom events. It provides Application Map, Failures view, Performance analysis, and the ability to query logs using Log Analytics.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Application Insights can do distributed tracing across services - track a transaction across components and see where time is spent.</li>
+              <li>Smart detection and anomaly analysis automatically detect anomalies in usage or performance and notify you.</li>
+              <li>It integrates with Visual Studio and can be used during local debugging with the SDK to see live metrics.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Application Insights</tag>
+        <tag>Monitoring</tag>
+        <tag>APM</tag>
+      </tags>
+    </question>
+
+    <question id="15" category-ref="cat-monitoring" difficulty="intermediate">
+      <title>Improving Read Performance with Caching</title>
+      <scenario>A news website hosted on Azure App Service is experiencing high load on its database because each page request fetches the latest headlines. Headlines change only every few minutes.</scenario>
+      <question-text>How can you improve performance and reduce database load?</question-text>
+      <choices>
+        <choice letter="A">Add more database replicas</choice>
+        <choice letter="B">Use Azure Cache for Redis</choice>
+        <choice letter="C">Increase App Service plan size</choice>
+        <choice letter="D">Use Azure CDN only</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Introduce an Azure Cache for Redis in front of the database. Store the latest headlines in the Redis in-memory cache for fast retrieval.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Implement a caching layer using Azure Cache for Redis to store the news headlines. Load headlines from the database once, store them in Redis (an in-memory data store), and have the web app read from cache on subsequent requests. Azure Cache for Redis responds in sub-millisecond times. Use a cache-aside pattern with TTL for periodic refresh.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Choose an eviction policy and expiration - time-based expiration or use pub/sub for cache invalidation when new headlines are published.</li>
+              <li>Handle cache failures gracefully - if Redis is unavailable, fallback to DB reads.</li>
+              <li>Redis is a distributed cache - multiple app server instances share the same cache and get consistent data.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Redis Cache</tag>
+        <tag>Performance</tag>
+        <tag>Caching</tag>
+      </tags>
+    </question>
+
+    <question id="16" category-ref="cat-compute" difficulty="intermediate">
+      <title>Zero-Downtime Deployment</title>
+      <scenario>You have an Azure App Service hosting a critical web API. Updates are deployed weekly. You want to avoid any downtime during deployments and test a new release in production environment before switching traffic.</scenario>
+      <question-text>What App Service feature should you use?</question-text>
+      <choices>
+        <choice letter="A">Direct deployment to production</choice>
+        <choice letter="B">Deployment Slots with swap</choice>
+        <choice letter="C">Blue-green deployment with VMs</choice>
+        <choice letter="D">Stop the app during deployment</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Use Deployment Slots on Azure App Service. Create a staging slot, deploy the new version there, verify it, then swap the staging slot with production.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Azure App Service Deployment Slots allow parallel deployments (staging and production). Deploy the new API version to the staging slot while production continues serving the old version. Test in staging, then perform a Swap - this exchanges the environments atomically with near-zero downtime. If issues arise, swap back quickly for rollback.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>When you swap, Azure swaps the Virtual IP addresses of the two slots - traffic doesn't hit the new slot until it's warmed up.</li>
+              <li>You can specify certain settings as "slot sticky" that shouldn't swap between environments.</li>
+              <li>For canary releases, use the traffic redirection feature to direct a small percentage of traffic to the new slot first.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Deployment Slots</tag>
+        <tag>CI/CD</tag>
+        <tag>App Service</tag>
+      </tags>
+    </question>
+
+    <question id="17" category-ref="cat-messaging" difficulty="intermediate">
+      <title>Selecting a Messaging Pattern (Queue vs Topic)</title>
+      <scenario>An order processing system must send order events to multiple downstream systems: billing, shipping, analytics, and customer notifications. Each system must receive every order event but process it independently.</scenario>
+      <question-text>Which Azure messaging service and pattern should you use?</question-text>
+      <choices>
+        <choice letter="A">Azure Service Bus Queue</choice>
+        <choice letter="B">Azure Service Bus Topic with Subscriptions</choice>
+        <choice letter="C">Azure Storage Queue</choice>
+        <choice letter="D">Azure Event Grid</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Use Azure Service Bus Topics + Subscriptions so each downstream system receives every order event independently.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Publish order events to a Service Bus Topic and create one Subscription per consumer (billing/shipping/analytics/notifications). Each subscription gets a copy of every message (fan-out), consumers can scale independently, and the producer stays decoupled from consumer count. Use filters/rules if some consumers only need subsets.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Service Bus topics support subscription rules (SQL filters/correlation) to route subsets without changing publishers.</li>
+              <li>DLQ is per subscription, isolating failures.</li>
+              <li>For strict ordering per key, use Sessions with SessionId (e.g., OrderId). Design consumers as idempotent because delivery is at-least-once.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Service Bus</tag>
+        <tag>Topics</tag>
+        <tag>Fan-out</tag>
+      </tags>
+    </question>
+
+    <question id="18" category-ref="cat-messaging" difficulty="advanced">
+      <title>Handling Duplicate Messages</title>
+      <scenario>A backend service consumes messages from an Azure Service Bus queue. Due to retries and transient failures, the same message may occasionally be delivered more than once. Financial transactions are involved.</scenario>
+      <question-text>What techniques should be used to ensure idempotent processing?</question-text>
+      <choices>
+        <choice letter="A">Ignore the issue and process all messages</choice>
+        <choice letter="B">Make processing idempotent and enable duplicate detection</choice>
+        <choice letter="C">Delete messages immediately upon receipt</choice>
+        <choice letter="D">Use a single consumer only</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Make processing idempotent and/or enable duplicate detection in Service Bus.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Ensure idempotency by storing a processed-message marker keyed by MessageId (or business key like OrderId) in a durable store and skipping repeats. Also enable Service Bus Duplicate Detection (set MessageId consistently and configure the detection window) to drop duplicates at the broker. Use transactions where applicable.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Duplicate detection is time-window-based and depends on stable MessageId; it complements but does not replace idempotent handlers.</li>
+              <li>Use an outbox pattern at the producer to prevent duplicates when DB+publish isn't atomic.</li>
+              <li>Treat 'exactly once' as 'effectively once' via idempotency + dedupe.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Idempotency</tag>
+        <tag>Service Bus</tag>
+        <tag>Reliability</tag>
+      </tags>
+    </question>
+
+    <question id="19" category-ref="cat-messaging" difficulty="intermediate">
+      <title>Choosing Between Event Grid and Service Bus</title>
+      <scenario>You need to notify several internal systems when a user profile is updated. Notifications must be delivered quickly, but if a consumer is temporarily offline, the update should still be processed later.</scenario>
+      <question-text>Compare Azure Event Grid and Azure Service Bus for this use case - which is better?</question-text>
+      <choices>
+        <choice letter="A">Azure Event Grid</choice>
+        <choice letter="B">Azure Service Bus</choice>
+        <choice letter="C">Azure Storage Queues</choice>
+        <choice letter="D">Azure Event Hubs</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Choose Service Bus when subscribers might be offline and you need durable buffering and controlled consumption.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Use Service Bus if you need durable, pull-based processing with back-pressure, retries, DLQ, and consumer independence when subscribers are offline. Event Grid is best for lightweight event notifications with fast push delivery, but is less suited for consumers that need durable queues and deferred processing.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Event Grid is an event router with retries/DLQ, not a full message broker - it's optimized for 'react now'.</li>
+              <li>Service Bus adds lock renewal, sessions, and transactions for reliable processing.</li>
+              <li>If ordering per user matters, sessions fit naturally. For massive streams, Event Hubs is the correct primitive.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Event Grid</tag>
+        <tag>Service Bus</tag>
+        <tag>Architecture</tag>
+      </tags>
+    </question>
+
+    <question id="20" category-ref="cat-compute" difficulty="intermediate">
+      <title>Function Execution Model</title>
+      <scenario>A function processes files uploaded to Blob Storage. Some files are large and processing can take several minutes.</scenario>
+      <question-text>What considerations must you make regarding Azure Functions execution limits, and which hosting plan should you choose?</question-text>
+      <choices>
+        <choice letter="A">Consumption plan with default timeout</choice>
+        <choice letter="B">Premium plan or Dedicated plan for longer execution</choice>
+        <choice letter="C">Use Azure Logic Apps instead</choice>
+        <choice letter="D">Process files synchronously in App Service</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>For long-running file processing, use Premium plan or Dedicated (App Service) plan to avoid timeout limits of the Consumption plan.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>The Consumption plan has a default timeout of 5 minutes (configurable up to 10 minutes). For functions that process large files taking several minutes, use the Premium plan (which allows longer timeouts up to unbounded with configuration) or a Dedicated (App Service) plan. Premium also provides pre-warmed instances to avoid cold starts.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Premium plan supports VNET integration, larger instance sizes, and no cold start due to always-warm instances.</li>
+              <li>For truly long-running work, consider Durable Functions which checkpoint progress.</li>
+              <li>Monitor execution time and consider breaking work into smaller chunks if possible.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Azure Functions</tag>
+        <tag>Hosting Plans</tag>
+        <tag>Execution Limits</tag>
+      </tags>
+    </question>
+
+    <question id="21" category-ref="cat-compute" difficulty="basic">
+      <title>Scaling Azure Functions</title>
+      <scenario>An HTTP-triggered Azure Function experiences sudden spikes in traffic during business hours.</scenario>
+      <question-text>How does Azure Functions automatically scale on the Consumption plan, and what factors influence the number of instances?</question-text>
+      <choices>
+        <choice letter="A">Manual scaling only</choice>
+        <choice letter="B">Automatic scale-out based on incoming event rate and queue length</choice>
+        <choice letter="C">Fixed number of instances</choice>
+        <choice letter="D">Scale based on time of day only</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>On Consumption plan, Azure Functions automatically scales out based on the rate of incoming events (HTTP requests, queue messages, etc.).</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Azure Functions on Consumption plan uses a scale controller that monitors the rate of events and determines when to add or remove instances. For HTTP triggers, it scales based on request rate. For queue triggers, it considers queue length and message age. Scale-out is automatic and can happen rapidly during traffic spikes.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>The scale controller is trigger-specific - each trigger type has its own scaling logic.</li>
+              <li>There's a maximum instance limit (default 200 for Consumption, configurable).</li>
+              <li>Cold starts can occur when scaling out; Premium plan mitigates this with pre-warmed instances.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Azure Functions</tag>
+        <tag>Scaling</tag>
+        <tag>Serverless</tag>
+      </tags>
+    </question>
+
+    <question id="22" category-ref="cat-compute" difficulty="intermediate">
+      <title>Cold Start Mitigation</title>
+      <scenario>Users report that the first request to a serverless API is sometimes slow after periods of inactivity.</scenario>
+      <question-text>What causes this behavior in Azure Functions, and what options can mitigate it?</question-text>
+      <choices>
+        <choice letter="A">Network latency</choice>
+        <choice letter="B">Cold start - use Premium plan with always-ready instances</choice>
+        <choice letter="C">Database connection issues</choice>
+        <choice letter="D">Application code bugs</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>This is called "cold start" - when a function instance is spun up from scratch after being idle. Use Premium plan with always-ready instances to mitigate.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Cold start occurs when Azure needs to allocate a new instance for your function after it has scaled to zero (Consumption plan) or when scaling out. The Premium plan offers pre-warmed instances that are always ready to receive requests. Alternative mitigations include keeping functions warm with scheduled pings or using Dedicated (App Service) plan.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Cold start duration depends on runtime, dependencies, and initialization code - minimize startup work.</li>
+              <li>Premium plan allows configuring minimum instances that stay warm.</li>
+              <li>Consider using Azure App Service for latency-sensitive HTTP APIs if cold starts are unacceptable.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Cold Start</tag>
+        <tag>Azure Functions</tag>
+        <tag>Performance</tag>
+      </tags>
+    </question>
+
+    <question id="23" category-ref="cat-security" difficulty="intermediate">
+      <title>Securing Outbound API Calls</title>
+      <scenario>Your Azure Function must call an external SaaS API that requires OAuth 2.0 client credentials.</scenario>
+      <question-text>Where should the client secret be stored, and how should it be accessed securely at runtime?</question-text>
+      <choices>
+        <choice letter="A">In the function code as a constant</choice>
+        <choice letter="B">In Azure Key Vault, retrieved at runtime</choice>
+        <choice letter="C">In the function.json file</choice>
+        <choice letter="D">As a URL parameter</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Store the client secret in Azure Key Vault and retrieve it securely at runtime using Managed Identity.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Store OAuth client credentials in Azure Key Vault. Enable Managed Identity on the Function App and grant it access to read secrets from Key Vault. At runtime, use Key Vault SDK or Key Vault references in app settings to retrieve the secret. This keeps secrets out of source control and provides audit trails.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Key Vault references allow you to reference a Key Vault secret directly in app settings - the platform resolves it at startup.</li>
+              <li>Cache retrieved secrets in memory to avoid hitting Key Vault on every request (respect rate limits).</li>
+              <li>Use separate Key Vaults for different environments (dev/staging/prod).</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Key Vault</tag>
+        <tag>Security</tag>
+        <tag>OAuth</tag>
+      </tags>
+    </question>
+
+    <question id="24" category-ref="cat-integration" difficulty="intermediate">
+      <title>API Versioning Strategy</title>
+      <scenario>You are exposing a REST API through Azure API Management. Existing clients must continue working while new clients adopt breaking changes.</scenario>
+      <question-text>What versioning strategies are supported by APIM?</question-text>
+      <choices>
+        <choice letter="A">No versioning support</choice>
+        <choice letter="B">URL path, query string, and header-based versioning</choice>
+        <choice letter="C">Only URL path versioning</choice>
+        <choice letter="D">Client-side versioning only</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Azure API Management supports multiple versioning schemes: URL path (/v1/), query string (?version=1), and HTTP header versioning.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>APIM natively supports API versioning through URL path segment (/api/v1/resource), query string parameter (?api-version=2024-01-01), or custom HTTP header (api-version: 1.0). You can run multiple versions simultaneously, with each version potentially routing to different backend implementations. Recommend URL path versioning for clarity.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Use API revisions for non-breaking changes within a version; use versions for breaking changes.</li>
+              <li>Configure deprecation policies to warn clients when using old versions.</li>
+              <li>Version sets in APIM group related API versions together for management.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>API Management</tag>
+        <tag>Versioning</tag>
+        <tag>REST API</tag>
+      </tags>
+    </question>
+
+    <question id="25" category-ref="cat-integration" difficulty="intermediate">
+      <title>Protecting APIs from Abuse</title>
+      <scenario>An externally exposed API is experiencing excessive traffic from a small number of consumers, impacting overall performance.</scenario>
+      <question-text>How can Azure API Management be configured to protect the backend services?</question-text>
+      <choices>
+        <choice letter="A">Increase backend capacity only</choice>
+        <choice letter="B">Apply rate limiting and throttling policies in APIM</choice>
+        <choice letter="C">Block all external traffic</choice>
+        <choice letter="D">Move to a different region</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Apply rate limiting and throttling policies in Azure API Management to limit calls per consumer or subscription.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Use APIM policies like rate-limit-by-key and quota-by-key to limit requests per consumer (by subscription key, JWT claim, or IP address). Configure different limits for different subscription tiers. APIM returns 429 Too Many Requests when limits are exceeded, protecting backends without code changes.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Rate limits are typically short-term (requests per second), quotas are longer-term (calls per month).</li>
+              <li>Use the rate-limit-by-key policy with expressions to identify callers by custom attributes.</li>
+              <li>Combine with caching policies to reduce backend load for frequently requested data.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>API Management</tag>
+        <tag>Rate Limiting</tag>
+        <tag>Throttling</tag>
+      </tags>
+    </question>
+
+    <question id="26" category-ref="cat-compute" difficulty="intermediate">
+      <title>Retry and Transient Fault Handling</title>
+      <scenario>A web app hosted on Azure App Service occasionally fails when calling a downstream Azure SQL Database due to transient connectivity issues.</scenario>
+      <question-text>How should the application be designed to handle these failures gracefully?</question-text>
+      <choices>
+        <choice letter="A">Fail immediately and show error to user</choice>
+        <choice letter="B">Implement retry logic with exponential backoff</choice>
+        <choice letter="C">Ignore errors and continue</choice>
+        <choice letter="D">Increase connection timeout only</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Implement retry logic with exponential backoff. Many Azure SDKs have built-in retry policies for transient faults.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Use retry logic with exponential backoff for transient failures. Azure SDKs and libraries like Polly (.NET) provide built-in retry mechanisms. Azure SQL supports Connection Retry through SqlClient configuration. Implement the pattern: detect transient errors, wait with exponential delay, retry up to a maximum count, then fail gracefully.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>SqlClient has built-in connection resiliency - enable ConnectRetryCount and ConnectRetryInterval in connection string.</li>
+              <li>Use circuit breaker pattern for repeated failures to avoid overwhelming a degraded service.</li>
+              <li>Log retries for monitoring and set alerts on retry rates.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Resiliency</tag>
+        <tag>Retry</tag>
+        <tag>Transient Faults</tag>
+      </tags>
+    </question>
+
+    <question id="27" category-ref="cat-compute" difficulty="advanced">
+      <title>Designing for High Availability</title>
+      <scenario>A mission-critical web API must remain available even if a single Azure region experiences an outage.</scenario>
+      <question-text>What Azure deployment strategies should be used to achieve regional resilience?</question-text>
+      <choices>
+        <choice letter="A">Single region with multiple instances</choice>
+        <choice letter="B">Multi-region deployment with global load balancing</choice>
+        <choice letter="C">Availability zones only</choice>
+        <choice letter="D">Manual failover procedures</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Deploy to multiple Azure regions with global load balancing (Azure Front Door or Traffic Manager) for automatic failover.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Deploy the API to multiple Azure regions and use Azure Front Door or Traffic Manager for global load balancing and automatic failover. Configure health probes to detect regional failures. Use geo-replicated data stores (Cosmos DB multi-region, Azure SQL geo-replication) to ensure data availability across regions.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Azure Front Door provides global HTTP load balancing with sub-second failover and WAF capabilities.</li>
+              <li>Consider active-active vs active-passive patterns based on consistency requirements.</li>
+              <li>Test failover scenarios regularly and monitor RTO/RPO metrics.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>High Availability</tag>
+        <tag>Multi-Region</tag>
+        <tag>Disaster Recovery</tag>
+      </tags>
+    </question>
+
+    <question id="28" category-ref="cat-compute" difficulty="intermediate">
+      <title>Load Balancing HTTP Traffic</title>
+      <scenario>You deploy the same web application to two different Azure regions. Users are distributed globally.</scenario>
+      <question-text>What Azure service should be used to route user requests to the closest healthy region?</question-text>
+      <choices>
+        <choice letter="A">Azure Load Balancer</choice>
+        <choice letter="B">Azure Application Gateway</choice>
+        <choice letter="C">Azure Front Door or Traffic Manager</choice>
+        <choice letter="D">Azure VPN Gateway</choice>
+      </choices>
+      <correct-answer>C</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Use Azure Front Door or Azure Traffic Manager for global DNS-based or anycast routing to the closest healthy region.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Azure Front Door provides global HTTP load balancing with anycast routing to the closest POP, then routes to the healthiest backend. Traffic Manager uses DNS-based routing with performance, priority, or weighted methods. Both support health probes for automatic failover. Front Door is preferred for HTTP workloads due to its edge features.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Front Door operates at Layer 7 with features like URL rewriting, SSL offload, and WAF.</li>
+              <li>Traffic Manager operates at DNS level and works with any protocol.</li>
+              <li>Azure Load Balancer and Application Gateway are regional services, not global.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Front Door</tag>
+        <tag>Traffic Manager</tag>
+        <tag>Global Load Balancing</tag>
+      </tags>
+    </question>
+
+    <question id="29" category-ref="cat-compute" difficulty="basic">
+      <title>Configuring Application Settings</title>
+      <scenario>An application requires different configuration values for development, staging, and production environments.</scenario>
+      <question-text>How should these values be managed in Azure to avoid code changes between environments?</question-text>
+      <choices>
+        <choice letter="A">Hardcode values in source code</choice>
+        <choice letter="B">Use Azure App Service Application Settings and deployment slots</choice>
+        <choice letter="C">Use different code branches per environment</choice>
+        <choice letter="D">Use configuration files committed to source control</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Use Azure App Service Application Settings which are environment variables injected at runtime. Use slot-specific settings for staging vs production.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Configure application settings in Azure App Service (or Function App) for each environment. These settings become environment variables at runtime. Use deployment slots for staging with slot-specific (sticky) settings that don't swap with code. This separates configuration from code and allows the same deployment package across environments.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>For complex configuration, use Azure App Configuration service with feature flags and dynamic refresh.</li>
+              <li>Store secrets in Key Vault and reference them in app settings using Key Vault references.</li>
+              <li>CI/CD pipelines can deploy configuration alongside code using ARM templates or Bicep.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>App Settings</tag>
+        <tag>Configuration</tag>
+        <tag>DevOps</tag>
+      </tags>
+    </question>
+
+    <question id="30" category-ref="cat-compute" difficulty="intermediate">
+      <title>Feature Flag Management</title>
+      <scenario>You want to enable or disable application features at runtime without redeploying the application. Gradual rollout is required.</scenario>
+      <question-text>Which Azure service supports this pattern?</question-text>
+      <choices>
+        <choice letter="A">Azure Key Vault</choice>
+        <choice letter="B">Azure App Configuration with Feature Flags</choice>
+        <choice letter="C">Azure DevOps</choice>
+        <choice letter="D">Azure Blob Storage</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Use Azure App Configuration with Feature Flags. It provides centralized feature management with targeting and gradual rollout capabilities.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Azure App Configuration's Feature Manager supports feature flags with targeting filters (percentage rollout, user groups, time windows). Applications integrate via SDK to check feature state at runtime. Changes take effect without redeployment. Combine with A/B testing and user targeting for controlled releases.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Feature filters enable complex targeting: percentage-based, time-window, targeting specific users/groups.</li>
+              <li>SDK supports dynamic refresh - app can poll or use push notifications for flag changes.</li>
+              <li>Integrate with Application Insights for feature-specific telemetry and impact analysis.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>App Configuration</tag>
+        <tag>Feature Flags</tag>
+        <tag>Gradual Rollout</tag>
+      </tags>
+    </question>
+
+    <question id="31" category-ref="cat-monitoring" difficulty="intermediate">
+      <title>Storing Application Logs</title>
+      <scenario>An Azure Function generates structured logs that need to be retained for compliance and queried later for investigations.</scenario>
+      <question-text>Where should these logs be stored, and how can they be queried efficiently?</question-text>
+      <choices>
+        <choice letter="A">Console output only</choice>
+        <choice letter="B">Azure Monitor Log Analytics workspace</choice>
+        <choice letter="C">Local file system</choice>
+        <choice letter="D">Azure Queue Storage</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Send logs to Azure Monitor Log Analytics workspace. Use KQL (Kusto Query Language) for powerful querying and analysis.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Configure Azure Functions to send logs to a Log Analytics workspace (via Application Insights or directly). Log Analytics provides long-term retention (configurable), powerful querying with KQL, alerts, and dashboards. For compliance, set appropriate retention periods and export to storage if needed for archival.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Use ILogger in your function code for structured logging - properties become queryable fields.</li>
+              <li>Set up log-based alerts for critical patterns (errors, security events).</li>
+              <li>Export logs to Azure Storage or Event Hubs for long-term archival beyond Log Analytics retention limits.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Log Analytics</tag>
+        <tag>Logging</tag>
+        <tag>Compliance</tag>
+      </tags>
+    </question>
+
+    <question id="32" category-ref="cat-monitoring" difficulty="intermediate">
+      <title>Distributed Tracing Across Services</title>
+      <scenario>A request flows through an Azure App Service, an Azure Function, and a downstream API. You need to trace a single request end-to-end.</scenario>
+      <question-text>How can you trace a single request across these components?</question-text>
+      <choices>
+        <choice letter="A">Manual correlation IDs in each service</choice>
+        <choice letter="B">Application Insights distributed tracing with correlation</choice>
+        <choice letter="C">Separate logs per service</choice>
+        <choice letter="D">Network packet capture</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Use Application Insights distributed tracing. It automatically correlates requests across services using operation IDs propagated in HTTP headers.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Configure all services to use the same Application Insights resource (or connect multiple instances). Application Insights automatically propagates correlation IDs (operation_Id, parent_Id) in HTTP headers across service calls. The Application Map and End-to-End Transaction views show the complete request flow with timing at each hop.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Use W3C Trace Context headers for cross-service correlation - supported by default in modern SDKs.</li>
+              <li>Custom telemetry can be added with TelemetryClient to enrich traces with business context.</li>
+              <li>Enable sampling carefully to balance data volume with trace completeness for debugging.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Distributed Tracing</tag>
+        <tag>Application Insights</tag>
+        <tag>Observability</tag>
+      </tags>
+    </question>
+
+    <question id="33" category-ref="cat-integration" difficulty="intermediate">
+      <title>Asynchronous vs Synchronous APIs</title>
+      <scenario>A long-running background operation is currently implemented as a synchronous HTTP API call, causing timeouts for clients.</scenario>
+      <question-text>How should the API be redesigned using Azure services to improve reliability?</question-text>
+      <choices>
+        <choice letter="A">Increase timeout values</choice>
+        <choice letter="B">Use async request-reply pattern with queues and status polling</choice>
+        <choice letter="C">Use larger compute instances</choice>
+        <choice letter="D">Cache all results</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Implement async request-reply pattern: accept the request, return a job ID immediately, process in background, and provide a status endpoint for polling.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Redesign to async pattern: API accepts request and immediately returns HTTP 202 Accepted with a Location header pointing to a status endpoint. Enqueue work to Azure Service Bus or Storage Queue. Background worker (Function or WebJob) processes the job. Client polls the status endpoint or registers a webhook callback for completion notification.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Durable Functions provide built-in HTTP async pattern with status query endpoints.</li>
+              <li>Consider Azure SignalR for real-time push notifications instead of polling.</li>
+              <li>Store job status in durable storage (Table Storage, Cosmos DB) for reliability across worker restarts.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Async Pattern</tag>
+        <tag>API Design</tag>
+        <tag>Reliability</tag>
+      </tags>
+    </question>
+
+    <question id="34" category-ref="cat-integration" difficulty="intermediate">
+      <title>Designing a Callback Pattern</title>
+      <scenario>An external system submits jobs to your API and needs to be notified when processing completes.</scenario>
+      <question-text>What Azure-native approach can be used to implement callbacks securely and reliably?</question-text>
+      <choices>
+        <choice letter="A">Synchronous response only</choice>
+        <choice letter="B">Webhooks with Azure Event Grid or Service Bus</choice>
+        <choice letter="C">Email notifications</choice>
+        <choice letter="D">Client-side polling only</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Use webhooks: when job completes, call back to the client's registered HTTPS endpoint. Azure Event Grid provides reliable webhook delivery with retries.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Implement webhook callbacks: clients register their callback URL when submitting jobs. On completion, publish an event to Azure Event Grid which delivers to the webhook endpoint with retry logic. Alternatively, use Azure Logic Apps or direct HTTP calls with Polly for retry. Validate callback URLs and use secrets/signatures for security.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Event Grid validates webhook endpoints during subscription using validation handshake.</li>
+              <li>Use CloudEvents schema for interoperability.</li>
+              <li>Implement dead-letter handling for failed deliveries and notify operators.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Webhooks</tag>
+        <tag>Event Grid</tag>
+        <tag>Integration</tag>
+      </tags>
+    </question>
+
+    <question id="35" category-ref="cat-compute" difficulty="intermediate">
+      <title>Using Durable Timers</title>
+      <scenario>A workflow requires waiting exactly 24 hours before executing a follow-up action, even if the app restarts.</scenario>
+      <question-text>How can this be implemented in a serverless, reliable way?</question-text>
+      <choices>
+        <choice letter="A">Thread.Sleep in Azure Function</choice>
+        <choice letter="B">Durable Functions with CreateTimer</choice>
+        <choice letter="C">Azure Scheduler (deprecated)</choice>
+        <choice letter="D">Timer trigger with state in memory</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Use Azure Durable Functions with CreateTimer. The orchestrator can wait for a durable timer that persists across restarts.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Durable Functions provides CreateTimer API in orchestrator functions. The timer is durable - the orchestrator checkpoints its state and resumes after the timer fires, even if the function app restarts. The orchestrator consumes no resources while waiting. Combine with external events for timeout patterns.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Durable timers use Azure Storage for state - they survive restarts and scale events.</li>
+              <li>Timers can be canceled using CancellationToken for timeout patterns.</li>
+              <li>For recurring schedules, use timer triggers; for workflow waits, use durable timers.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Durable Functions</tag>
+        <tag>Timers</tag>
+        <tag>Workflows</tag>
+      </tags>
+    </question>
+
+    <question id="36" category-ref="cat-messaging" difficulty="intermediate">
+      <title>Handling Poison Messages</title>
+      <scenario>A message repeatedly fails processing and is retried multiple times in Azure Service Bus.</scenario>
+      <question-text>How does Azure Service Bus handle such messages, and how should your application respond?</question-text>
+      <choices>
+        <choice letter="A">Messages are deleted after first failure</choice>
+        <choice letter="B">Messages are moved to dead-letter queue (DLQ) after max delivery attempts</choice>
+        <choice letter="C">Messages stay in queue forever</choice>
+        <choice letter="D">Messages are automatically fixed</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>After exceeding MaxDeliveryCount, Service Bus moves messages to the dead-letter queue (DLQ). Monitor and process DLQ for operational visibility.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Service Bus moves messages to the dead-letter queue after exceeding MaxDeliveryCount (default 10). Your application should: set appropriate MaxDeliveryCount, monitor DLQ depth with alerts, and implement a DLQ processor to inspect, fix, and resubmit or archive failed messages. Dead-lettered messages include reason codes for diagnosis.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>DLQ messages include DeadLetterReason and DeadLetterErrorDescription properties.</li>
+              <li>DLQ has its own entity path: queue/$deadletterqueue or topic/subscription/$deadletterqueue.</li>
+              <li>Set up alerts on DLQ message count and implement automated or manual remediation workflows.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Dead Letter Queue</tag>
+        <tag>Service Bus</tag>
+        <tag>Error Handling</tag>
+      </tags>
+    </question>
+
+    <question id="37" category-ref="cat-storage" difficulty="intermediate">
+      <title>Database Connection Management</title>
+      <scenario>An App Service scales out under load, but database connections are exhausted.</scenario>
+      <question-text>What design practices should be applied to prevent this issue?</question-text>
+      <choices>
+        <choice letter="A">Create new connection for each request</choice>
+        <choice letter="B">Use connection pooling and limit pool size</choice>
+        <choice letter="C">Increase database tier only</choice>
+        <choice letter="D">Disable auto-scaling</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Use connection pooling and configure appropriate pool sizes. Ensure connections are properly disposed/returned to pool after use.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Use connection pooling (built into ADO.NET by default) and configure Max Pool Size appropriately across all instances. Ensure using statements or proper disposal return connections to pool. Consider Azure SQL elastic pools for workload variability. Monitor connection usage and set alerts.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Calculate max connections = (App Service instances) × (Pool size per instance) and ensure DB can handle it.</li>
+              <li>Use async database operations to avoid blocking connections during I/O wait.</li>
+              <li>Consider adding a caching layer (Redis) to reduce database load and connection pressure.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Connection Pooling</tag>
+        <tag>Database</tag>
+        <tag>Scaling</tag>
+      </tags>
+    </question>
+
+    <question id="38" category-ref="cat-storage" difficulty="basic">
+      <title>Choosing Storage Tiers</title>
+      <scenario>A Blob Storage account contains frequently accessed images, infrequently accessed reports, and long-term archives.</scenario>
+      <question-text>How should storage tiers be selected to minimize cost?</question-text>
+      <choices>
+        <choice letter="A">Use Hot tier for everything</choice>
+        <choice letter="B">Use Hot for images, Cool for reports, Archive for archives</choice>
+        <choice letter="C">Use Archive tier for everything</choice>
+        <choice letter="D">Use Premium tier for everything</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Use Hot tier for frequently accessed data, Cool for infrequent access, and Archive for long-term storage. Set lifecycle policies to automate tiering.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Match access patterns to tiers: Hot (lowest access cost, higher storage cost), Cool (lower storage cost, higher access cost, 30-day minimum), Archive (lowest storage cost, highest retrieval cost, hours to rehydrate). Use lifecycle management rules to automatically move blobs between tiers based on age or last access time.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Archive tier requires rehydration (Standard: 15 hours, High-priority: 1 hour) before reading.</li>
+              <li>Lifecycle rules can transition or delete blobs automatically based on filters (prefix, blob type, age).</li>
+              <li>Enable access time tracking for more granular lifecycle decisions (requires additional cost).</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Storage Tiers</tag>
+        <tag>Cost Optimization</tag>
+        <tag>Lifecycle Management</tag>
+      </tags>
+    </question>
+
+    <question id="39" category-ref="cat-security" difficulty="intermediate">
+      <title>Data Encryption Requirements</title>
+      <scenario>Sensitive customer data is stored in Azure Storage and Azure SQL Database. Regulatory compliance requires encryption.</scenario>
+      <question-text>What encryption mechanisms does Azure provide by default?</question-text>
+      <choices>
+        <choice letter="A">No encryption by default</choice>
+        <choice letter="B">Encryption at rest by default; TLS in transit</choice>
+        <choice letter="C">Encryption only for premium tiers</choice>
+        <choice letter="D">Client-side encryption only</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Azure Storage and SQL Database encrypt data at rest by default using Microsoft-managed keys. Data in transit is protected with TLS.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Azure provides encryption at rest by default for Storage (SSE) and SQL Database (TDE) using Microsoft-managed keys. All data in transit uses TLS 1.2+. For additional control, use customer-managed keys (CMK) stored in Key Vault. SQL Database also supports Always Encrypted for sensitive columns.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>CMK with Key Vault gives you control over key rotation and can meet compliance requirements.</li>
+              <li>SQL Always Encrypted protects data even from DBAs - only client with key can decrypt.</li>
+              <li>For defense in depth, combine encryption at rest, in transit, and client-side encryption where needed.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Encryption</tag>
+        <tag>Security</tag>
+        <tag>Compliance</tag>
+      </tags>
+    </question>
+
+    <question id="40" category-ref="cat-security" difficulty="intermediate">
+      <title>Managed Identity Scope</title>
+      <scenario>A single managed identity is used by multiple applications to access Azure resources.</scenario>
+      <question-text>What are the tradeoffs between using a system-assigned versus a user-assigned managed identity in this scenario?</question-text>
+      <choices>
+        <choice letter="A">No difference between them</choice>
+        <choice letter="B">User-assigned is better for sharing across multiple resources; system-assigned is tied to one resource</choice>
+        <choice letter="C">System-assigned is always preferred</choice>
+        <choice letter="D">User-assigned requires manual credential management</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>User-assigned identity can be shared across multiple resources with consistent permissions. System-assigned is tied to one resource lifecycle and deleted with it.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>System-assigned identity is created for and tied to a single Azure resource - deleted when the resource is deleted. User-assigned identity is a standalone Azure resource that can be attached to multiple applications. For least privilege, user-assigned allows centralized permission management for a group of apps with similar access needs.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>User-assigned identities persist independently - useful for blue-green deployments or resource recreation.</li>
+              <li>A resource can have both system-assigned and multiple user-assigned identities.</li>
+              <li>For single-use resources, system-assigned is simpler; for shared access patterns, user-assigned provides better management.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Managed Identity</tag>
+        <tag>Least Privilege</tag>
+        <tag>Security</tag>
+      </tags>
+    </question>
+
+    <question id="41" category-ref="cat-storage" difficulty="intermediate">
+      <title>Securing Storage Access</title>
+      <scenario>An application must allow read-only access to certain blobs for anonymous users, while keeping other blobs private.</scenario>
+      <question-text>How can this be achieved securely in Azure Blob Storage?</question-text>
+      <choices>
+        <choice letter="A">Make entire storage account public</choice>
+        <choice letter="B">Use container-level access policies or SAS for specific blobs</choice>
+        <choice letter="C">Share storage account keys</choice>
+        <choice letter="D">Disable all security</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Use separate containers with different access levels, or generate read-only SAS tokens for specific blobs that need public access.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Create separate containers: one with public read access (container or blob level), another private. Alternatively, keep all containers private and generate short-lived SAS tokens for blobs that need temporary public access. For CDN scenarios, use Azure CDN with private origin and token authentication.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Container public access can be disabled at the storage account level for compliance.</li>
+              <li>Use stored access policies with SAS for centralized revocation capability.</li>
+              <li>Azure CDN with private link origin provides caching without exposing storage directly.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Blob Storage</tag>
+        <tag>Access Control</tag>
+        <tag>Security</tag>
+      </tags>
+    </question>
+
+    <question id="42" category-ref="cat-compute" difficulty="intermediate">
+      <title>Choosing Between Logic Apps and Functions</title>
+      <scenario>A business workflow integrates multiple SaaS systems, requires visual monitoring, and includes conditional logic and retries.</scenario>
+      <question-text>Should you use Azure Logic Apps or Azure Functions?</question-text>
+      <choices>
+        <choice letter="A">Azure Functions for all scenarios</choice>
+        <choice letter="B">Azure Logic Apps for visual workflow with connectors</choice>
+        <choice letter="C">Azure Batch</choice>
+        <choice letter="D">Azure Data Factory</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Use Azure Logic Apps for visual workflow design with built-in connectors to SaaS systems. Logic Apps provides declarative workflow with retry policies and monitoring.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Logic Apps excels at integration workflows: 400+ built-in connectors for SaaS/enterprise systems, visual designer, built-in retry and error handling, run history for monitoring. Use Functions when you need custom code, high-performance compute, or granular control. Logic Apps can call Functions for complex processing steps.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Logic Apps Standard offers single-tenant deployment with VS Code development experience.</li>
+              <li>Non-developers can view and understand Logic Apps workflows through the visual designer.</li>
+              <li>Logic Apps pricing is per action execution; Functions is per execution + GB-seconds - compare for your workload.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Logic Apps</tag>
+        <tag>Azure Functions</tag>
+        <tag>Integration</tag>
+      </tags>
+    </question>
+
+    <question id="43" category-ref="cat-compute" difficulty="intermediate">
+      <title>Handling Configuration Refresh</title>
+      <scenario>Configuration values stored centrally are updated while the application is running. The application needs to pick up changes without restarting.</scenario>
+      <question-text>How can the application pick up configuration changes dynamically?</question-text>
+      <choices>
+        <choice letter="A">Restart application after each change</choice>
+        <choice letter="B">Use Azure App Configuration with dynamic refresh</choice>
+        <choice letter="C">Redeploy application with new config</choice>
+        <choice letter="D">Hardcode configuration</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Use Azure App Configuration with dynamic refresh capability. Configure the SDK to poll for changes or use push notifications via Event Grid.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Azure App Configuration SDK supports dynamic refresh: configure a sentinel key that triggers refresh when changed, or use Event Grid integration for push-based refresh. The application polls App Configuration periodically and updates configuration without restart. Use caching intervals to balance freshness with performance.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Use a sentinel key pattern: change one key to signal all clients to refresh their full configuration.</li>
+              <li>Event Grid integration enables near real-time push updates instead of polling.</li>
+              <li>Combine with IOptionsSnapshot or IOptionsMonitor patterns in .NET for automatic config refresh.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>App Configuration</tag>
+        <tag>Dynamic Refresh</tag>
+        <tag>Configuration</tag>
+      </tags>
+    </question>
+
+    <question id="44" category-ref="cat-compute" difficulty="basic">
+      <title>Designing for Cost Optimization</title>
+      <scenario>An Azure Function processes messages sporadically, with long idle periods.</scenario>
+      <question-text>Which hosting plan minimizes cost?</question-text>
+      <choices>
+        <choice letter="A">Premium plan</choice>
+        <choice letter="B">Consumption plan</choice>
+        <choice letter="C">Dedicated (App Service) plan</choice>
+        <choice letter="D">Azure Container Instances</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Consumption plan is most cost-effective for sporadic workloads. You pay only for execution time and resources consumed during processing.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Consumption plan charges only for actual executions (per GB-second and execution count). During idle periods, no charges accrue. Premium and Dedicated plans charge for always-on capacity. Tradeoff: Consumption has cold starts and timeout limits, which may not suit all workloads.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Consumption plan includes a free grant: 400,000 GB-s and 1 million executions per month.</li>
+              <li>For unpredictable but latency-sensitive loads, Premium with minimum instances may balance cost/performance.</li>
+              <li>Monitor execution patterns to validate the right plan choice over time.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Azure Functions</tag>
+        <tag>Cost Optimization</tag>
+        <tag>Consumption Plan</tag>
+      </tags>
+    </question>
+
+    <question id="45" category-ref="cat-integration" difficulty="intermediate">
+      <title>Throttling Downstream Dependencies</title>
+      <scenario>A backend API depends on a third-party service with strict rate limits.</scenario>
+      <question-text>How can Azure services help prevent exceeding those limits?</question-text>
+      <choices>
+        <choice letter="A">Make unlimited calls and handle errors</choice>
+        <choice letter="B">Use queues with controlled consumption rate and circuit breaker patterns</choice>
+        <choice letter="C">Cache all responses indefinitely</choice>
+        <choice letter="D">Duplicate the third-party service</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Use queues to buffer requests and control consumption rate. Implement circuit breaker pattern to stop calling when limits are hit.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Queue requests to Azure Service Bus/Storage Queue and process at controlled rate using maxConcurrentCalls or manual throttling. Implement circuit breaker (via Polly or similar) to back off when rate limit errors occur. Cache responses where possible to reduce API calls. Use APIM policies for outbound rate limiting.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Parse rate limit headers (X-RateLimit-Remaining, Retry-After) to adaptively throttle.</li>
+              <li>Use token bucket or leaky bucket algorithm for smooth rate limiting.</li>
+              <li>Consider request coalescing or batching where the API supports it.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Rate Limiting</tag>
+        <tag>Circuit Breaker</tag>
+        <tag>Resiliency</tag>
+      </tags>
+    </question>
+
+    <question id="46" category-ref="cat-compute" difficulty="intermediate">
+      <title>Implementing Health Checks</title>
+      <scenario>A load balancer must know whether an application instance is healthy before routing traffic to it.</scenario>
+      <question-text>How are health checks implemented in Azure App Service?</question-text>
+      <choices>
+        <choice letter="A">No health check support</choice>
+        <choice letter="B">Configure Health Check path in App Service settings</choice>
+        <choice letter="C">External monitoring only</choice>
+        <choice letter="D">Manual health reporting</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Configure the Health Check feature in App Service settings with a path (e.g., /health). Azure will probe this endpoint and remove unhealthy instances from load balancer rotation.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Enable Health Check in App Service configuration, specifying a path to your health endpoint. Azure probes this endpoint periodically; if it fails multiple times, the instance is removed from load balancer and optionally replaced. Your /health endpoint should check critical dependencies (database, external services) and return appropriate HTTP status.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Health check endpoint should be fast, lightweight, and test real dependencies.</li>
+              <li>Return 200 for healthy, 500+ for unhealthy. Consider liveness vs readiness semantics.</li>
+              <li>Combine with Application Insights availability tests for external monitoring.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Health Checks</tag>
+        <tag>App Service</tag>
+        <tag>Load Balancing</tag>
+      </tags>
+    </question>
+
+    <question id="47" category-ref="cat-security" difficulty="advanced">
+      <title>Secure File Processing Pipeline</title>
+      <scenario>Uploaded files must be virus-scanned before being made available for download.</scenario>
+      <question-text>How can this be implemented using Azure services in an event-driven manner?</question-text>
+      <choices>
+        <choice letter="A">Scan files client-side only</choice>
+        <choice letter="B">Event Grid triggers function to scan, move clean files to approved container</choice>
+        <choice letter="C">Skip virus scanning</choice>
+        <choice letter="D">Scan files manually</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Upload to a quarantine container, use Event Grid to trigger a scanning function, then move clean files to an approved container.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Pattern: Upload files to a quarantine/incoming container. Event Grid triggers Azure Function on blob creation. Function calls Microsoft Defender for Storage API or third-party antivirus. Clean files are moved to an approved container; infected files are deleted or quarantined. Only the approved container is accessible for downloads.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Microsoft Defender for Storage provides built-in malware scanning with events published to Event Grid.</li>
+              <li>For custom scanning, use ClamAV in a container or third-party APIs.</li>
+              <li>Implement dead-letter handling for scan failures and alert on suspicious activity patterns.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Security</tag>
+        <tag>File Processing</tag>
+        <tag>Event-Driven</tag>
+      </tags>
+    </question>
+
+    <question id="48" category-ref="cat-monitoring" difficulty="intermediate">
+      <title>Designing for Observability</title>
+      <scenario>Beyond logging errors, you need to understand application behavior under load.</scenario>
+      <question-text>What additional telemetry should be collected?</question-text>
+      <choices>
+        <choice letter="A">Error logs only</choice>
+        <choice letter="B">Metrics, traces, custom events, and dependency tracking</choice>
+        <choice letter="C">Deployment logs only</choice>
+        <choice letter="D">User feedback only</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Collect metrics (request rate, latency, errors), distributed traces, custom business events, and dependency call telemetry for full observability.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Full observability requires: Metrics (RED: Rate, Errors, Duration), distributed traces showing request flow across services, logs with structured context, custom events for business milestones, and dependency tracking for external calls. Use Application Insights for unified collection and correlation.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Follow the three pillars of observability: metrics, logs, and traces.</li>
+              <li>Add custom dimensions to telemetry for business context (tenant ID, feature flag state, etc.).</li>
+              <li>Create dashboards combining technical and business metrics for holistic visibility.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Observability</tag>
+        <tag>Telemetry</tag>
+        <tag>Monitoring</tag>
+      </tags>
+    </question>
+
+    <question id="49" category-ref="cat-storage" difficulty="intermediate">
+      <title>Choosing Between SQL and NoSQL</title>
+      <scenario>An application stores both transactional order data and large volumes of semi-structured event data.</scenario>
+      <question-text>How should data storage be split across Azure services?</question-text>
+      <choices>
+        <choice letter="A">Store everything in Azure SQL</choice>
+        <choice letter="B">Use Azure SQL for orders, Cosmos DB or Table Storage for events</choice>
+        <choice letter="C">Store everything in Blob Storage</choice>
+        <choice letter="D">Use only Cosmos DB</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Use Azure SQL for transactional order data with ACID requirements. Use Cosmos DB or Table Storage for high-volume, semi-structured event data.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Match storage to access patterns: Azure SQL for relational order data with transactions, referential integrity, and complex queries. Cosmos DB for globally distributed, high-throughput event data with flexible schema. Table Storage for simpler, cost-effective event storage if global distribution isn't needed. Consider Event Hubs for ingestion before storage.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Polyglot persistence: use the right database for each workload.</li>
+              <li>For analytics on events, consider landing in Data Lake Storage and querying with Synapse.</li>
+              <li>Use change data capture (CDC) or events to keep systems synchronized if needed.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>SQL</tag>
+        <tag>NoSQL</tag>
+        <tag>Data Architecture</tag>
+      </tags>
+    </question>
+
+    <question id="50" category-ref="cat-compute" difficulty="intermediate">
+      <title>Graceful Shutdown Handling</title>
+      <scenario>An App Service instance is being scaled down while processing requests. You need to ensure in-flight work is completed.</scenario>
+      <question-text>How should the application be designed to shut down gracefully?</question-text>
+      <choices>
+        <choice letter="A">Ignore shutdown signals</choice>
+        <choice letter="B">Handle application stopping events and complete in-flight work</choice>
+        <choice letter="C">Force immediate termination</choice>
+        <choice letter="D">Disable auto-scaling</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Handle the application stopping event (IHostApplicationLifetime in .NET), stop accepting new work, and complete in-flight operations within the grace period.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Implement graceful shutdown: listen for shutdown signals (SIGTERM, IHostApplicationLifetime.ApplicationStopping), stop accepting new requests, complete in-flight operations, and flush any buffered data. App Service provides a configurable shutdown timeout (default 90 seconds for Windows). For long-running operations, consider checkpointing progress to resume elsewhere.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Use CancellationToken propagation to signal in-flight operations to complete quickly.</li>
+              <li>For message processing, don't complete/delete messages until processing is truly done.</li>
+              <li>Consider using Durable Functions for long-running work that can checkpoint and resume on any instance.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Graceful Shutdown</tag>
+        <tag>App Service</tag>
+        <tag>Resiliency</tag>
+      </tags>
+    </question>
+  </questions>
+
+  <glossary>
+    <term id="term-durable-functions" category="Compute">
+      <name>Durable Functions</name>
+      <definition>Azure Functions extension enabling stateful orchestrations with automatic checkpointing and replay.</definition>
+      <exam-note>Use for multi-step workflows, fan-out/fan-in, and human interaction patterns.</exam-note>
+    </term>
+    <term id="term-cosmos-db" category="Storage">
+      <name>Azure Cosmos DB</name>
+      <definition>Globally distributed, multi-model NoSQL database with tunable consistency and automatic scaling.</definition>
+      <exam-note>Best for global distribution, flexible schema, and low-latency requirements.</exam-note>
+    </term>
+    <term id="term-event-grid" category="Messaging">
+      <name>Azure Event Grid</name>
+      <definition>Fully managed event routing service for reactive, event-driven architectures.</definition>
+      <exam-note>Use for Azure service events and lightweight push notifications, not for durable queuing.</exam-note>
+    </term>
+    <term id="term-event-hubs" category="Messaging">
+      <name>Azure Event Hubs</name>
+      <definition>Big data streaming platform for high-throughput event ingestion (millions of events/second).</definition>
+      <exam-note>Use for telemetry, IoT data ingestion, and stream processing scenarios.</exam-note>
+    </term>
+    <term id="term-service-bus" category="Messaging">
+      <name>Azure Service Bus</name>
+      <definition>Enterprise message broker with queues and topics supporting transactions, sessions, and dead-lettering.</definition>
+      <exam-note>Use for reliable messaging, ordering, and enterprise integration patterns.</exam-note>
+    </term>
+    <term id="term-apim" category="Integration">
+      <name>Azure API Management</name>
+      <definition>API gateway service for publishing, securing, and managing APIs with policies and developer portal.</definition>
+      <exam-note>Use for rate limiting, authentication, versioning, and partner API exposure.</exam-note>
+    </term>
+    <term id="term-app-insights" category="Monitoring">
+      <name>Application Insights</name>
+      <definition>APM service for monitoring live applications with automatic telemetry collection and distributed tracing.</definition>
+      <exam-note>Enable for request tracking, dependency monitoring, and performance diagnostics.</exam-note>
+    </term>
+    <term id="term-managed-identity" category="Security">
+      <name>Managed Identity</name>
+      <definition>Azure AD identity automatically managed for Azure resources, eliminating credential management.</definition>
+      <exam-note>Prefer managed identity over connection strings for Azure-to-Azure authentication.</exam-note>
+    </term>
+    <term id="term-key-vault" category="Security">
+      <name>Azure Key Vault</name>
+      <definition>Secure secret, key, and certificate management service with HSM backing and access control.</definition>
+      <exam-note>Store all secrets here, access via managed identity and Key Vault references.</exam-note>
+    </term>
+    <term id="term-deployment-slots" category="Compute">
+      <name>Deployment Slots</name>
+      <definition>App Service feature enabling blue-green deployments with zero-downtime swaps.</definition>
+      <exam-note>Use for staging, testing in production environment, and instant rollback.</exam-note>
+    </term>
+  </glossary>
+</certification-exam>
