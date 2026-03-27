@@ -1,41 +1,10 @@
 /**
  * QuizApp Unit Tests
- * Tests for provider detection and utility functions
+ * Tests for provider detection, HTML sanitization, and utility functions
  */
 
 import { describe, it, expect } from 'vitest';
-
-// Since QuizApp is a class that initializes immediately and requires DOM,
-// we test the provider detection logic separately by extracting the algorithm.
-
-/**
- * Extracted provider detection logic from QuizApp.getProviderFromExam
- * This matches the implementation in js/app.js lines 218-241
- */
-function getProviderFromExam(examId, metaProvider) {
-    // Check metadata provider first
-    if (metaProvider) {
-        const p = metaProvider.toLowerCase();
-        if (p.includes('azure') || p.includes('microsoft')) return 'azure';
-        if (p.includes('aws') || p.includes('amazon')) return 'aws';
-        if (p.includes('gcp') || p.includes('google')) return 'gcp';
-    }
-
-    // Fall back to exam ID prefix detection
-    if (examId) {
-        const id = examId.toLowerCase();
-        // Azure exams: az-*, dp-*, ai-*
-        if (id.startsWith('az-') || id.startsWith('dp-') || id.startsWith('ai-')) return 'azure';
-        // AWS exams: clf-*, saa-*, dva-*, soa-*, dea-*, mla-*, aif-*
-        if (id.startsWith('clf-') || id.startsWith('saa-') || id.startsWith('dva-') ||
-            id.startsWith('soa-') || id.startsWith('dea-') || id.startsWith('mla-') ||
-            id.startsWith('aif-')) return 'aws';
-        // GCP exams: gcp-*
-        if (id.startsWith('gcp-')) return 'gcp';
-    }
-
-    return 'azure'; // Default fallback
-}
+import { getProviderFromExam, sanitizeHTML } from '../../js/app.js';
 
 describe('getProviderFromExam', () => {
     describe('provider detection from metadata', () => {
@@ -58,6 +27,12 @@ describe('getProviderFromExam', () => {
             expect(getProviderFromExam('any-exam', 'GCP')).toBe('gcp');
             expect(getProviderFromExam('any-exam', 'gcp')).toBe('gcp');
             expect(getProviderFromExam('any-exam', 'Google')).toBe('gcp');
+        });
+
+        it('should detect Anthropic from metadata provider', () => {
+            expect(getProviderFromExam('any-exam', 'Anthropic')).toBe('anthropic');
+            expect(getProviderFromExam('any-exam', 'ANTHROPIC')).toBe('anthropic');
+            expect(getProviderFromExam('any-exam', 'anthropic')).toBe('anthropic');
         });
 
         it('should prioritize metadata over exam ID', () => {
@@ -137,6 +112,14 @@ describe('getProviderFromExam', () => {
                 expect(getProviderFromExam('GCP-DATA-ENG-ML', null)).toBe('gcp');
             });
         });
+
+        describe('Anthropic exam IDs', () => {
+            it('should detect CCA-* exams as Anthropic', () => {
+                expect(getProviderFromExam('cca-f', null)).toBe('anthropic');
+                expect(getProviderFromExam('CCA-F', null)).toBe('anthropic');
+                expect(getProviderFromExam('cca-advanced', null)).toBe('anthropic');
+            });
+        });
     });
 
     describe('fallback behavior', () => {
@@ -164,13 +147,61 @@ describe('getProviderFromExam', () => {
             expect(getProviderFromExam('Az-900', null)).toBe('azure');
             expect(getProviderFromExam('Clf-C02', null)).toBe('aws');
             expect(getProviderFromExam('Gcp-Fund-Core', null)).toBe('gcp');
+            expect(getProviderFromExam('Cca-F', null)).toBe('anthropic');
         });
 
         it('should handle mixed case provider strings', () => {
             expect(getProviderFromExam('test', 'MICROSOFT AZURE')).toBe('azure');
             expect(getProviderFromExam('test', 'Amazon Web Services')).toBe('aws');
             expect(getProviderFromExam('test', 'GOOGLE cloud platform')).toBe('gcp');
+            expect(getProviderFromExam('test', 'Anthropic')).toBe('anthropic');
         });
+    });
+});
+
+describe('sanitizeHTML', () => {
+    it('should strip script tags', () => {
+        const result = sanitizeHTML('<script>alert("xss")</script>');
+        expect(result).not.toContain('<script');
+        expect(result).not.toContain('alert');
+    });
+
+    it('should strip event handler attributes', () => {
+        const result = sanitizeHTML('<img onerror="alert(\'xss\')" src="x">');
+        expect(result).not.toContain('onerror');
+    });
+
+    it('should pass through safe content', () => {
+        const result = sanitizeHTML('<p>safe content</p>');
+        expect(result).toBe('<p>safe content</p>');
+    });
+
+    it('should strip style tags', () => {
+        const result = sanitizeHTML('<style>body{display:none}</style><p>ok</p>');
+        expect(result).not.toContain('<style');
+        expect(result).toContain('<p>ok</p>');
+    });
+
+    it('should strip iframes', () => {
+        const result = sanitizeHTML('<iframe src="evil.html"></iframe>');
+        expect(result).not.toContain('<iframe');
+    });
+
+    it('should strip javascript: hrefs', () => {
+        const result = sanitizeHTML('<a href="javascript:alert(1)">click</a>');
+        expect(result).not.toContain('javascript:');
+    });
+
+    it('should return empty string for falsy input', () => {
+        expect(sanitizeHTML('')).toBe('');
+        expect(sanitizeHTML(null)).toBe('');
+        expect(sanitizeHTML(undefined)).toBe('');
+    });
+
+    it('should handle nested dangerous elements', () => {
+        const result = sanitizeHTML('<div><script>bad</script><p>good</p></div>');
+        expect(result).not.toContain('<script');
+        expect(result).toContain('<p>good</p>');
     });
 });
 

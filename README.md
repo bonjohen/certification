@@ -1,10 +1,10 @@
-# Cloud Certification Study
+# Certification Study
 
-A scenario-based quiz application for studying cloud certification exams. Supports Microsoft Azure, Amazon Web Services (AWS), and Google Cloud Platform (GCP) certifications.
+A scenario-based quiz application for studying technology certification exams. Supports Microsoft Azure, Amazon Web Services (AWS), Google Cloud Platform (GCP), and Anthropic certifications.
 
 ## Features
 
-- **Multi-provider support** - Study for Azure, AWS, and GCP certifications
+- **Multi-provider support** - Study for Azure, AWS, GCP, and Anthropic certifications
 - **Scenario-based questions** - Real-world scenarios to reinforce practical knowledge
 - **Progressive hint system** - Three levels of hints to guide learning without giving away answers
 - **Progress tracking** - Auto-saves progress to localStorage; resume where you left off
@@ -49,6 +49,11 @@ A scenario-based quiz application for studying cloud certification exams. Suppor
 | GCP-DB-STOR | GCP: Database and Storage | Intermediate |
 | GCP-DATA-ENG-ML | Data Engineering, Big Data, and Machine Learning | Advanced |
 | GCP-DB-DEVOPS | Database, Big Data, and DevOps Services | Advanced |
+
+### Anthropic (1 exam)
+| Code | Title | Level |
+|------|-------|-------|
+| CCA-F | Claude Certified Architect, Foundations | Foundational |
 
 ## Getting Started
 
@@ -95,6 +100,7 @@ certification/
 ├── azure.html          # Azure exam selection
 ├── aws.html            # AWS exam selection
 ├── gcp.html            # GCP exam selection
+├── anthropic.html      # Anthropic exam selection
 ├── quiz.html           # Quiz interface
 ├── css/
 │   └── styles.css      # Application styles
@@ -107,6 +113,7 @@ certification/
 │   ├── azure/          # Azure exam XML files
 │   ├── aws/            # AWS exam XML files
 │   ├── gcp/            # GCP exam XML files
+│   ├── anthropic/      # Anthropic exam XML files
 │   └── schema/         # XML schema definitions
 └── tests/              # Unit tests
 ```
@@ -131,7 +138,7 @@ npm run test:coverage
 
 ### Adding New Exams
 
-1. Create a new XML file in the appropriate provider folder (`data/azure/`, `data/aws/`, or `data/gcp/`)
+1. Create a new XML file in the appropriate provider folder (`data/azure/`, `data/aws/`, `data/gcp/`, or `data/anthropic/`)
 2. Follow the existing XML schema (see `data/schema/certification.xsd`)
 3. Add an exam card to the corresponding provider HTML file
 4. The quiz will automatically load based on the `?exam=` URL parameter
@@ -172,7 +179,7 @@ npm run test:coverage
 
 ## License
 
-This project is for educational purposes. Exam content is inspired by official certification objectives but is not affiliated with or endorsed by Microsoft, Amazon, or Google.
+This project is for educational purposes. Exam content is inspired by official certification objectives but is not affiliated with or endorsed by Microsoft, Amazon, Google, or Anthropic.
 
 ## Disclaimer
 
@@ -180,3 +187,4 @@ These study guides are supplementary materials. Always refer to official documen
 - [Microsoft Learn](https://learn.microsoft.com/)
 - [AWS Training](https://aws.amazon.com/training/)
 - [Google Cloud Training](https://cloud.google.com/training)
+- [Anthropic Documentation](https://docs.anthropic.com/)

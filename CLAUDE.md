@@ -7,6 +7,7 @@ This is a multi-provider certification exam study site. It serves browser-based 
 - **AWS** — 7 exams (`data/aws/*.xml`)
 - **Azure** — 8 exams (`data/azure/*.xml`)
 - **GCP** — 10 exams (`data/gcp/*.xml`)
+- **Anthropic** — 1 exam (`data/anthropic/cca-f.xml`) — CCA-F: Claude Certified Architect, Foundations (50 questions)
 
 ### Architecture Conventions
 
@@ -14,17 +15,16 @@ This is a multi-provider certification exam study site. It serves browser-based 
 - Each provider has a landing page (`{provider}.html`) listing its exam cards
 - Quizzes are served by `quiz.html?exam={exam-code}`
 - All exams reuse the shared quiz engine (`js/quiz-engine.js`), XML parser (`js/xml-parser.js`), progress tracker (`js/progress-tracker.js`), and app controller (`js/app.js`)
+- Provider routing is in `js/app.js` — `getProviderFromExam()` maps exam-code prefixes to providers, `setBackLinks()`/`updateExamInfo()` hold provider page and name maps
 - New providers must not introduce provider-specific rendering, storage, or navigation logic
 
-### Naming Rules
+### Adding a New Provider
 
-When referencing the Anthropic certification feature, use these names consistently everywhere (UI text, metadata, XML, routing, filenames, code references):
-
-| Field      | Value                                      |
-|------------|--------------------------------------------|
-| Provider   | Anthropic                                  |
-| Exam code  | CCA-F                                      |
-| Exam title | Claude Certified Architect, Foundations    |
+1. Create `{provider}.html` (copy an existing provider page, update branding/colors)
+2. Add provider card to `index.html` with CSS rules for brand color
+3. Register in `js/app.js`: add to `getProviderFromExam()`, `setBackLinks()`, and `updateExamInfo()`
+4. Create `data/{provider}/` with XML exam files following the schema in existing exams
+5. Run `scripts/randomize_answers.py` or targeted randomization on new XML files
 
 ---
 

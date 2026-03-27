@@ -154,6 +154,25 @@ describe('QuizEngine', () => {
             expect(answer.timestamp).toBeDefined();
         });
 
+        it('should preserve first answer on re-submission attempt', () => {
+            const result1 = engine.submitAnswer('A'); // Incorrect (correct is B)
+            expect(result1.isCorrect).toBe(false);
+            expect(result1.selectedAnswer).toBe('A');
+
+            const result2 = engine.submitAnswer('B'); // Try to change to correct
+            expect(result2.isCorrect).toBe(false); // Still returns first answer's result
+            expect(result2.selectedAnswer).toBe('A'); // Still the original selection
+
+            // Score should not change
+            expect(engine.score).toBe(0);
+            expect(engine.attemptedCount).toBe(1);
+
+            // Stored answer should be the first one
+            const answer = engine.getAnswer(1);
+            expect(answer.selected).toBe('A');
+            expect(answer.isCorrect).toBe(false);
+        });
+
         it('should track hints used at time of submission', () => {
             engine.revealHint(1, 1);
             engine.revealHint(1, 2);

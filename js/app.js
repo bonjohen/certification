@@ -7,6 +7,68 @@ import { XMLParser } from './xml-parser.js';
 import { QuizEngine } from './quiz-engine.js';
 import { ProgressTracker } from './progress-tracker.js';
 
+/**
+ * Detect provider key from exam ID prefix or metadata provider string.
+ * Extracted as a standalone function so it can be imported by tests
+ * without instantiating QuizApp (which requires the DOM).
+ *
+ * @param {string|null} examId   - e.g. "az-900", "cca-f"
+ * @param {string|null} metaProvider - e.g. "Microsoft Azure", "Anthropic"
+ * @returns {string} provider key: 'azure' | 'aws' | 'gcp' | 'anthropic'
+ */
+export function getProviderFromExam(examId, metaProvider) {
+    // Check metadata provider first
+    if (metaProvider) {
+        const p = metaProvider.toLowerCase();
+        if (p.includes('azure') || p.includes('microsoft')) return 'azure';
+        if (p.includes('aws') || p.includes('amazon')) return 'aws';
+        if (p.includes('gcp') || p.includes('google')) return 'gcp';
+        if (p.includes('anthropic')) return 'anthropic';
+    }
+
+    // Fall back to exam ID prefix detection
+    if (examId) {
+        const id = examId.toLowerCase();
+        // Azure exams: az-*, dp-*, ai-*
+        if (id.startsWith('az-') || id.startsWith('dp-') || id.startsWith('ai-')) return 'azure';
+        // AWS exams: clf-*, saa-*, dva-*, soa-*, dea-*, mla-*, aif-*
+        if (id.startsWith('clf-') || id.startsWith('saa-') || id.startsWith('dva-') ||
+            id.startsWith('soa-') || id.startsWith('dea-') || id.startsWith('mla-') ||
+            id.startsWith('aif-')) return 'aws';
+        // GCP exams: gcp-*
+        if (id.startsWith('gcp-')) return 'gcp';
+        // Anthropic exams: cca-*
+        if (id.startsWith('cca-')) return 'anthropic';
+    }
+
+    return 'azure'; // Default fallback
+}
+
+/**
+ * Sanitize an HTML string by removing dangerous elements and attributes.
+ * Uses the DOM to parse and clean the markup — no external dependencies.
+ *
+ * @param {string} html - untrusted HTML (e.g. from XML question banks)
+ * @returns {string} sanitized HTML safe for innerHTML assignment
+ */
+export function sanitizeHTML(html) {
+    if (!html) return '';
+    const div = document.createElement('div');
+    div.innerHTML = html;
+    // Remove dangerous elements
+    div.querySelectorAll('script, style, iframe, object, embed, form').forEach(el => el.remove());
+    // Remove event-handler attributes and javascript: hrefs from all elements
+    div.querySelectorAll('*').forEach(el => {
+        for (const attr of Array.from(el.attributes)) {
+            if (attr.name.startsWith('on') ||
+                (attr.name === 'href' && attr.value.trim().toLowerCase().startsWith('javascript:'))) {
+                el.removeAttribute(attr.name);
+            }
+        }
+    });
+    return div.innerHTML;
+}
+
 class QuizApp {
     constructor() {
         this.parser = new XMLParser();
@@ -46,7 +108,9 @@ class QuizApp {
             hintBtn2: document.getElementById('hint-btn-2'),
             hintBtn3: document.getElementById('hint-btn-3'),
             prevQuestion: document.getElementById('prev-question'),
-            nextQuestion: document.getElementById('next-question')
+            nextQuestion: document.getElementById('next-question'),
+            correctAnswerDisplay: document.getElementById('correct-answer-display'),
+            correctAnswerLetter: document.getElementById('correct-answer-letter')
         };
 
         this.selectedAnswer = null; // Track currently selected answer for toggle behavior
@@ -220,31 +284,7 @@ class QuizApp {
     }
 
     getProviderFromExam(examId, metaProvider) {
-        // Check metadata provider first
-        if (metaProvider) {
-            const p = metaProvider.toLowerCase();
-            if (p.includes('azure') || p.includes('microsoft')) return 'azure';
-            if (p.includes('aws') || p.includes('amazon')) return 'aws';
-            if (p.includes('gcp') || p.includes('google')) return 'gcp';
-            if (p.includes('anthropic')) return 'anthropic';
-        }
-
-        // Fall back to exam ID prefix detection
-        if (examId) {
-            const id = examId.toLowerCase();
-            // Azure exams: az-*, dp-*, ai-*
-            if (id.startsWith('az-') || id.startsWith('dp-') || id.startsWith('ai-')) return 'azure';
-            // AWS exams: clf-*, saa-*, dva-*, soa-*, dea-*, mla-*, aif-*
-            if (id.startsWith('clf-') || id.startsWith('saa-') || id.startsWith('dva-') ||
-                id.startsWith('soa-') || id.startsWith('dea-') || id.startsWith('mla-') ||
-                id.startsWith('aif-')) return 'aws';
-            // GCP exams: gcp-*
-            if (id.startsWith('gcp-')) return 'gcp';
-            // Anthropic exams: cca-*
-            if (id.startsWith('cca-')) return 'anthropic';
-        }
-
-        return 'azure'; // Default fallback
+        return getProviderFromExam(examId, metaProvider);
     }
 
     setupEventListeners() {
@@ -273,6 +313,10 @@ class QuizApp {
         this.elements.qNum.textContent = this.engine.currentQuestionNumber;
         this.elements.questionTitle.textContent = question.title;
 
+        // Correct answer letter
+        this.elements.correctAnswerLetter.textContent = question.correctAnswer;
+        this.elements.correctAnswerDisplay.hidden = false;
+
         // Category
         const categoryName = this.categories[question.categoryRef] || question.categoryRef || '';
         this.elements.questionCategory.textContent = categoryName;
@@ -280,13 +324,13 @@ class QuizApp {
         // Scenario
         if (question.scenario) {
             this.elements.scenarioSection.hidden = false;
-            this.elements.scenarioText.innerHTML = question.scenario;
+            this.elements.scenarioText.innerHTML = sanitizeHTML(question.scenario);
         } else {
             this.elements.scenarioSection.hidden = true;
         }
 
         // Question text
-        this.elements.questionContent.innerHTML = question.questionText;
+        this.elements.questionContent.innerHTML = sanitizeHTML(question.questionText);
 
         // Choices
         this.renderChoices(question, answer, isAnswered);
@@ -410,7 +454,7 @@ class QuizApp {
         const icon = answer.isCorrect ? '✓' : '✗';
         const text = answer.isCorrect
             ? 'Correct!'
-            : `Incorrect. The correct answer is ${this.engine.currentQuestion.correctAnswer}.`;
+            : `Incorrect. The correct answer is ${sanitizeHTML(this.engine.currentQuestion.correctAnswer)}.`;
 
         this.elements.feedbackResult.innerHTML = `
             <span class="feedback-icon">${icon}</span>
@@ -440,8 +484,8 @@ class QuizApp {
                 div.dataset.level = hint.level;
 
                 div.innerHTML = `
-                    <div class="hint-label">${hint.label}</div>
-                    <div class="hint-content">${hint.content}</div>
+                    <div class="hint-label">${sanitizeHTML(hint.label)}</div>
+                    <div class="hint-content">${sanitizeHTML(hint.content)}</div>
                 `;
 
                 this.elements.hintsContent.appendChild(div);
@@ -506,9 +550,14 @@ class QuizApp {
 
 }
 
-// Initialize app when DOM is ready
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => new QuizApp());
-} else {
-    new QuizApp();
+// Initialize app when DOM is ready.
+// Guard: only auto-init when the quiz page DOM is present (avoids errors
+// when this module is imported solely for its exported utility functions,
+// e.g. in unit tests running under jsdom).
+if (typeof document !== 'undefined' && document.getElementById('question-card')) {
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => new QuizApp());
+    } else {
+        new QuizApp();
+    }
 }

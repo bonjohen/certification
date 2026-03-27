@@ -53,6 +53,17 @@ export class QuizEngine {
 
     submitAnswer(selectedLetter) {
         const question = this.currentQuestion;
+
+        // Guard against re-submission — preserve the first answer
+        if (this.hasAnswered(question.id)) {
+            const existing = this.getAnswer(question.id);
+            return {
+                isCorrect: existing.isCorrect,
+                correctAnswer: question.correctAnswer,
+                selectedAnswer: existing.selected
+            };
+        }
+
         const isCorrect = selectedLetter === question.correctAnswer;
 
         this.answers.set(question.id, {
