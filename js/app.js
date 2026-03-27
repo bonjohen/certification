@@ -69,14 +69,20 @@ export function sanitizeHTML(html) {
     return div.innerHTML;
 }
 
-class QuizApp {
-    constructor() {
-        this.parser = new XMLParser();
+export class QuizApp {
+    /**
+     * @param {object} [options]
+     * @param {object} [options.elements] - Pre-built DOM element map (for testing)
+     * @param {XMLParser} [options.parser] - Custom XML parser instance
+     * @param {boolean} [options.autoInit=true] - Whether to call init() automatically
+     */
+    constructor(options = {}) {
+        this.parser = options.parser || new XMLParser();
         this.engine = null;
         this.tracker = null;
         this.categories = {};
 
-        this.elements = {
+        this.elements = options.elements || {
             loading: document.getElementById('loading'),
             error: document.getElementById('error'),
             errorText: document.getElementById('error-text'),
@@ -115,7 +121,9 @@ class QuizApp {
 
         this.selectedAnswer = null; // Track currently selected answer for toggle behavior
 
-        this.init();
+        if (options.autoInit !== false) {
+            this.init();
+        }
     }
 
     async init() {

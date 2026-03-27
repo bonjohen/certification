@@ -55,13 +55,13 @@ Source review: Mode A Whole Codebase Review, approved with non-blocking comments
 
 | #   | Task                                                                                                                         | Finding | Status | Started | Completed |
 |-----|------------------------------------------------------------------------------------------------------------------------------|---------|--------|---------|-----------|
-| 3.1 | Refactor `QuizApp` constructor to accept DOM element references via dependency injection (enable jsdom testing)               | F-05    | [ ]    |         |           |
-| 3.2 | Add jsdom-based integration tests for `QuizApp`: load XML → render question → select answer → submit → verify feedback       | F-05/F-06 | [ ]  |         |           |
-| 3.3 | Add integration test: wire `XMLParser` + `QuizEngine` with `tests/fixtures/sample-exam.xml`, verify full data flow           | F-06    | [ ]    |         |           |
-| 3.4 | Achieve at least 50% line coverage for `app.js` via `npm run test:coverage`                                                  | F-05    | [ ]    |         |           |
-| 3.5 | Create Node script to validate all `data/**/*.xml` against `data/schema/certification.xsd`                                   | Missing | [ ]    |         |           |
-| 3.6 | Add keyboard navigation test for arrow key handlers in quiz                                                                  | Missing | [ ]    |         |           |
-| 3.7 | Ensure `package-lock.json` is committed for reproducible installs                                                            | Missing | [ ]    |         |           |
+| 3.1 | Refactor `QuizApp` constructor to accept DOM element references via dependency injection (enable jsdom testing)               | F-05    | [X]    | 2026-03-27 | 2026-03-27 |
+| 3.2 | Add jsdom-based integration tests for `QuizApp`: load XML → render question → select answer → submit → verify feedback       | F-05/F-06 | [X]  | 2026-03-27 | 2026-03-27 |
+| 3.3 | Add integration test: wire `XMLParser` + `QuizEngine` with `tests/fixtures/sample-exam.xml`, verify full data flow           | F-06    | [X]    | 2026-03-27 | 2026-03-27 |
+| 3.4 | Achieve at least 50% line coverage for `app.js` via `npm run test:coverage`                                                  | F-05    | [X]    | 2026-03-27 | 2026-03-27 |
+| 3.5 | Create Node script to validate all `data/**/*.xml` against `data/schema/certification.xsd`                                   | Missing | [X]    | 2026-03-27 | 2026-03-27 |
+| 3.6 | Add keyboard navigation test for arrow key handlers in quiz                                                                  | Missing | [X]    | 2026-03-27 | 2026-03-27 |
+| 3.7 | Ensure `package-lock.json` is committed for reproducible installs                                                            | Missing | [X]    | 2026-03-27 | 2026-03-27 |
 
 ---
 
