@@ -120,6 +120,7 @@ export class QuizApp {
         };
 
         this.selectedAnswer = null; // Track currently selected answer for toggle behavior
+        this.quizActive = false; // True only after startQuiz() — guards keyboard nav
 
         if (options.autoInit !== false) {
             this.init();
@@ -227,6 +228,7 @@ export class QuizApp {
         this.updateHeader();
         this.renderQuestion();
         this.showQuiz();
+        this.quizActive = true;
     }
 
     getExamIdFromUrl() {
@@ -304,8 +306,9 @@ export class QuizApp {
         this.elements.hintBtn2.addEventListener('click', () => this.toggleHint(2));
         this.elements.hintBtn3.addEventListener('click', () => this.toggleHint(3));
 
-        // Keyboard navigation
+        // Keyboard navigation — only when quiz is active
         document.addEventListener('keydown', (e) => {
+            if (!this.quizActive) return;
             if (e.key === 'ArrowLeft') this.navigatePrevious();
             if (e.key === 'ArrowRight') this.navigateNext();
         });
