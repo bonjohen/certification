@@ -1,0 +1,124 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<certification-exam xmlns="http://certification.study/schema/v1" version="1.0">
+  <metadata>
+    <exam-code>CCA-F</exam-code>
+    <exam-title>Claude Certified Architect, Foundations</exam-title>
+    <provider>Anthropic</provider>
+    <description>Scenario-based study companion for the CCA-F certification — covers agentic architecture, Claude API patterns, tool design, MCP integration, prompt engineering, and operational best practices.</description>
+    <total-questions>3</total-questions>
+    <created-date>2026-03-26</created-date>
+    <last-modified>2026-03-26T00:00:00Z</last-modified>
+    <categories>
+      <category id="cat-agentic-arch">Agentic Architecture</category>
+      <category id="cat-api-patterns">Claude API Patterns</category>
+      <category id="cat-prompt-eng">Prompt Engineering</category>
+    </categories>
+  </metadata>
+
+  <questions>
+    <question id="1" category-ref="cat-agentic-arch" difficulty="basic">
+      <title>Agentic Loop Design</title>
+      <scenario>A development team is building an agent that uses Claude to autonomously complete multi-step coding tasks. The agent needs to decide when to call tools, when to ask for clarification, and when to return a final result. The architect is choosing between a single-pass prompt and an agentic loop.</scenario>
+      <question-text>Which architectural pattern allows an AI agent to iteratively use tools and refine its approach across multiple turns before delivering a final answer?</question-text>
+      <choices>
+        <choice letter="A">Single-shot prompt with all instructions included upfront</choice>
+        <choice letter="B">Agentic loop with tool calls, observation, and reasoning steps</choice>
+        <choice letter="C">Batch processing pipeline with no intermediate feedback</choice>
+        <choice letter="D">Static template expansion with variable substitution</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>An agentic loop lets the model call tools, observe results, and decide next steps iteratively.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>An agentic loop is a pattern where the AI model repeatedly cycles through reasoning, tool use, and observation. At each step, Claude decides whether to call a tool, interpret a result, or deliver a final answer. This is more powerful than single-shot prompting because it allows the agent to adapt its strategy based on intermediate results, handle errors, and break complex tasks into manageable steps.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Agentic loops typically follow the pattern: Think → Act (tool call) → Observe (tool result) → Repeat or Return.</li>
+              <li>Claude's tool-use capability enables structured tool calls with JSON schemas, letting the orchestrator execute actions and feed results back.</li>
+              <li>Key design considerations include setting maximum iteration limits, implementing graceful degradation, and defining clear stop conditions to prevent infinite loops.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Agentic Architecture</tag>
+        <tag>Tool Use</tag>
+        <tag>Orchestration</tag>
+      </tags>
+    </question>
+
+    <question id="2" category-ref="cat-api-patterns" difficulty="basic">
+      <title>Claude API Message Structure</title>
+      <scenario>A backend engineer is integrating Claude into a customer support application. They need to send a conversation history to the Claude API and receive a response. They are reviewing the API documentation to understand how to structure the request.</scenario>
+      <question-text>In the Claude Messages API, which role is used to provide instructions that guide Claude's behavior across the entire conversation?</question-text>
+      <choices>
+        <choice letter="A">The "user" role in the messages array</choice>
+        <choice letter="B">The "system" parameter at the top level of the request</choice>
+        <choice letter="C">The "admin" role in the messages array</choice>
+        <choice letter="D">The "config" parameter in the model settings</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>The system prompt is a top-level parameter, not a message role.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>In the Claude Messages API, the system prompt is specified as a top-level "system" parameter in the request body, separate from the messages array. It provides persistent instructions that guide Claude's behavior throughout the conversation. The messages array contains alternating "user" and "assistant" roles representing the conversation turns. There is no "admin" or "config" role in the API.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>The system prompt is processed before the conversation messages and has strong influence on Claude's behavior, tone, and constraints.</li>
+              <li>Best practices include putting role definitions, output format requirements, and safety guidelines in the system prompt.</li>
+              <li>The system parameter accepts either a string or an array of content blocks, allowing mixed text and cache-control directives for prompt caching.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Claude API</tag>
+        <tag>Messages API</tag>
+        <tag>System Prompt</tag>
+      </tags>
+    </question>
+
+    <question id="3" category-ref="cat-prompt-eng" difficulty="basic">
+      <title>Prompt Engineering for Reliable Output</title>
+      <scenario>A data team wants Claude to extract structured information from unstructured customer feedback emails. They need the output in a consistent JSON format every time, but initial attempts produce inconsistent formatting and occasionally include extra commentary outside the JSON.</scenario>
+      <question-text>Which prompt engineering technique is MOST effective at ensuring Claude returns only valid JSON without extra commentary?</question-text>
+      <choices>
+        <choice letter="A">Ask Claude to "try its best" to output JSON</choice>
+        <choice letter="B">Provide a few-shot example of the exact JSON schema and instruct Claude to output only the JSON object with no additional text</choice>
+        <choice letter="C">Increase the temperature parameter to encourage creativity in formatting</choice>
+        <choice letter="D">Send multiple requests and pick the one that looks most like JSON</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Showing Claude the exact output format you expect is more reliable than vague instructions.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Providing few-shot examples of the desired JSON schema, combined with explicit instructions to output only the JSON object with no surrounding text, is the most reliable technique. This gives Claude a concrete template to follow and a clear constraint on what to include. Vague instructions ("try your best") lead to inconsistent results, higher temperature increases randomness, and retry-based approaches are wasteful and unreliable.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>For maximum reliability, combine few-shot examples with prefilling the assistant response (starting with an opening brace) so Claude continues the JSON directly.</li>
+              <li>Using lower temperature values (e.g., 0.0) further reduces variability in structured output tasks.</li>
+              <li>Claude also supports tool-use responses with JSON schemas, which can enforce structured output at the API level rather than relying solely on prompt engineering.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Prompt Engineering</tag>
+        <tag>Structured Output</tag>
+        <tag>JSON</tag>
+      </tags>
+    </question>
+  </questions>
+</certification-exam>

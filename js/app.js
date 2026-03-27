@@ -167,7 +167,8 @@ class QuizApp {
         const providerPages = {
             azure: 'azure.html',
             aws: 'aws.html',
-            gcp: 'gcp.html'
+            gcp: 'gcp.html',
+            anthropic: 'anthropic.html'
         };
         const backUrl = providerPages[provider] || 'index.html';
 
@@ -204,12 +205,14 @@ class QuizApp {
         const providerPages = {
             azure: 'azure.html',
             aws: 'aws.html',
-            gcp: 'gcp.html'
+            gcp: 'gcp.html',
+            anthropic: 'anthropic.html'
         };
         const providerNames = {
             azure: 'Azure',
             aws: 'AWS',
-            gcp: 'Google Cloud'
+            gcp: 'Google Cloud',
+            anthropic: 'Anthropic'
         };
 
         this.elements.backLink.href = providerPages[provider] || 'index.html';
@@ -223,6 +226,7 @@ class QuizApp {
             if (p.includes('azure') || p.includes('microsoft')) return 'azure';
             if (p.includes('aws') || p.includes('amazon')) return 'aws';
             if (p.includes('gcp') || p.includes('google')) return 'gcp';
+            if (p.includes('anthropic')) return 'anthropic';
         }
 
         // Fall back to exam ID prefix detection
@@ -236,6 +240,8 @@ class QuizApp {
                 id.startsWith('aif-')) return 'aws';
             // GCP exams: gcp-*
             if (id.startsWith('gcp-')) return 'gcp';
+            // Anthropic exams: cca-*
+            if (id.startsWith('cca-')) return 'anthropic';
         }
 
         return 'azure'; // Default fallback

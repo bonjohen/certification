@@ -23,12 +23,12 @@ Design spec: `docs/add_anthropic_claude_design.md` (sections 9–20)
 
 | #   | Task                                                                                              | Status | Started | Completed |
 |-----|---------------------------------------------------------------------------------------------------|--------|---------|-----------|
-| 1.1 | Gather official Anthropic certification facts (exam name, purpose, public resources, availability) | [ ]    |         |           |
-| 1.2 | Gather community-reported observations (themes, scenario patterns, recurring public claims)         | [ ]    |         |           |
-| 1.3 | Survey public question ecosystems (repos, forums, prep courses, blogs, sample-question pages)      | [ ]    |         |           |
-| 1.4 | Define authoring guidance for generating original practice questions from research                  | [ ]    |         |           |
-| 1.5 | Assemble research document at `docs/anthropic-cca-f-research.md` (4 sections per design spec)      | [ ]    |         |           |
-| 1.6 | Define topic-to-question allocation plan (50 questions across 12 topic areas, balanced)             | [ ]    |         |           |
+| 1.1 | Gather official Anthropic certification facts (exam name, purpose, public resources, availability) | [X]    | 2026-03-26 14:00 PST | 2026-03-26 14:00 PST |
+| 1.2 | Gather community-reported observations (themes, scenario patterns, recurring public claims)         | [X]    | 2026-03-26 14:00 PST | 2026-03-26 14:00 PST |
+| 1.3 | Survey public question ecosystems (repos, forums, prep courses, blogs, sample-question pages)      | [X]    | 2026-03-26 14:00 PST | 2026-03-26 14:00 PST |
+| 1.4 | Define authoring guidance for generating original practice questions from research                  | [X]    | 2026-03-26 14:00 PST | 2026-03-26 14:00 PST |
+| 1.5 | Assemble research document at `docs/anthropic-cca-f-research.md` (4 sections per design spec)      | [X]    | 2026-03-26 14:00 PST | 2026-03-26 14:00 PST |
+| 1.6 | Define topic-to-question allocation plan (50 questions across 12 topic areas, balanced)             | [X]    | 2026-03-26 14:00 PST | 2026-03-26 14:00 PST |
 
 ---
 
@@ -38,13 +38,13 @@ Design spec: `docs/add_anthropic_claude_design.md` (sections 9–20)
 
 | #   | Task                                                                                                         | Status | Started | Completed |
 |-----|--------------------------------------------------------------------------------------------------------------|--------|---------|-----------|
-| 2.1 | Add Anthropic provider card to `index.html` home page (logo/SVG, name, description, badge "1 Exam", link)    | [ ]    |         |           |
-| 2.2 | Add Anthropic CSS rules to `index.html` (hover border color, provider-name color, badge color)               | [ ]    |         |           |
-| 2.3 | Create `anthropic.html` provider page with CCA-F exam card (follow `aws.html` pattern)                       | [ ]    |         |           |
-| 2.4 | Register Anthropic in `js/app.js` — `getProviderFromExam()`: recognize `cca-` prefix → `'anthropic'`         | [ ]    |         |           |
-| 2.5 | Register Anthropic in `js/app.js` — `setBackLinks()`: add `anthropic: 'anthropic.html'` to `providerPages`   | [ ]    |         |           |
-| 2.6 | Register Anthropic in `js/app.js` — `updateExamInfo()`: add `anthropic` to `providerPages` and `providerNames` | [ ]    |         |           |
-| 2.7 | Create `data/anthropic/` directory and a stub `cca-f.xml` with 3 valid placeholder questions                  | [ ]    |         |           |
+| 2.1 | Add Anthropic provider card to `index.html` home page (logo/SVG, name, description, badge "1 Exam", link)    | [X]   | 2026-03-26 09:00 PST | 2026-03-26 09:00 PST |
+| 2.2 | Add Anthropic CSS rules to `index.html` (hover border color, provider-name color, badge color)               | [X]   | 2026-03-26 09:00 PST | 2026-03-26 09:00 PST |
+| 2.3 | Create `anthropic.html` provider page with CCA-F exam card (follow `aws.html` pattern)                       | [X]   | 2026-03-26 09:00 PST | 2026-03-26 09:00 PST |
+| 2.4 | Register Anthropic in `js/app.js` — `getProviderFromExam()`: recognize `cca-` prefix → `'anthropic'`         | [X]   | 2026-03-26 09:00 PST | 2026-03-26 09:00 PST |
+| 2.5 | Register Anthropic in `js/app.js` — `setBackLinks()`: add `anthropic: 'anthropic.html'` to `providerPages`   | [X]   | 2026-03-26 09:00 PST | 2026-03-26 09:00 PST |
+| 2.6 | Register Anthropic in `js/app.js` — `updateExamInfo()`: add `anthropic` to `providerPages` and `providerNames` | [X]   | 2026-03-26 09:00 PST | 2026-03-26 09:00 PST |
+| 2.7 | Create `data/anthropic/` directory and a stub `cca-f.xml` with 3 valid placeholder questions                  | [X]   | 2026-03-26 09:00 PST | 2026-03-26 09:00 PST |
 | 2.8 | Verify `quiz.html?exam=cca-f` loads and renders the stub questions without errors                             | [ ]    |         |           |
 | 2.9 | Verify full navigation path: home → `anthropic.html` → quiz → back-link returns to `anthropic.html`          | [ ]    |         |           |
 
