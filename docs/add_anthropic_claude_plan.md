@@ -78,12 +78,12 @@ Design spec: `docs/add_anthropic_claude_design.md` (sections 9–20)
 
 | #   | Task                                                                                                 | Status | Started | Completed |
 |-----|------------------------------------------------------------------------------------------------------|--------|---------|-----------|
-| 4.1 | Assemble all 50 questions into `data/anthropic/cca-f.xml` following the existing XML schema          | [ ]    |         |           |
-| 4.2 | Validate XML metadata (exam-code: CCA-F, provider: Anthropic, total-questions: 50, categories)       | [ ]    |         |           |
-| 4.3 | Validate every question has: title, stem, 4 choices (A–D), correct-answer, explanation, 3 hints      | [ ]    |         |           |
-| 4.4 | Run answer randomization script (`scripts/randomize_answers.py`) on `data/anthropic/cca-f.xml`       | [ ]    |         |           |
-| 4.5 | Verify XML loads without parser errors via `XMLParser.loadExam()`                                    | [ ]    |         |           |
-| 4.6 | Remove stub XML from Phase 2 if still present (replace with production file)                         | [ ]    |         |           |
+| 4.1 | Assemble all 50 questions into `data/anthropic/cca-f.xml` following the existing XML schema          | [X]   | 2026-03-26 09:35 PST | 2026-03-26 09:35 PST |
+| 4.2 | Validate XML metadata (exam-code: CCA-F, provider: Anthropic, total-questions: 50, categories)       | [X]   | 2026-03-26 09:35 PST | 2026-03-26 09:36 PST |
+| 4.3 | Validate every question has: title, stem, 4 choices (A–D), correct-answer, explanation, 3 hints      | [X]   | 2026-03-26 09:35 PST | 2026-03-26 09:36 PST |
+| 4.4 | Run answer randomization script (`scripts/randomize_answers.py`) on `data/anthropic/cca-f.xml`       | [X]   | 2026-03-26 09:36 PST | 2026-03-26 09:37 PST |
+| 4.5 | Verify XML loads without parser errors via `XMLParser.loadExam()`                                    | [X]   | 2026-03-26 09:37 PST | 2026-03-26 09:37 PST |
+| 4.6 | Remove stub XML from Phase 2 if still present (replace with production file)                         | [X]   | 2026-03-26 09:35 PST | 2026-03-26 09:35 PST |
 ---
 
 ## Phase 5: Integration Testing & Acceptance
