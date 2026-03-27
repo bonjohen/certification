@@ -47,6 +47,7 @@ Design spec: `docs/add_anthropic_claude_design.md` (sections 9–20)
 | 2.7 | Create `data/anthropic/` directory and a stub `cca-f.xml` with 3 valid placeholder questions                  | [X]   | 2026-03-26 09:00 PST | 2026-03-26 09:00 PST |
 | 2.8 | Verify `quiz.html?exam=cca-f` loads and renders the stub questions without errors                             | [ ]    |         |           |
 | 2.9 | Verify full navigation path: home → `anthropic.html` → quiz → back-link returns to `anthropic.html`          | [ ]    |         |           |
+| 2.10 | When [Submit Anser] is pressed add behavior to expand hints to full for that question.                       | [ ]    |         |           |
 
 ---
 
@@ -56,18 +57,18 @@ Design spec: `docs/add_anthropic_claude_design.md` (sections 9–20)
 
 | #    | Task                                                                         | Status | Started | Completed |
 |------|------------------------------------------------------------------------------|--------|---------|-----------|
-| 3.1  | Author questions: Agentic architecture & orchestration                       | [ ]    |         |           |
-| 3.2  | Author questions: Claude API usage patterns                                  | [ ]    |         |           |
-| 3.3  | Author questions: Tool design and tool calling                               | [ ]    |         |           |
-| 3.4  | Author questions: MCP-oriented integration thinking                          | [ ]    |         |           |
-| 3.5  | Author questions: Claude Code workflows & configuration patterns             | [ ]    |         |           |
-| 3.6  | Author questions: Prompt engineering for reliable behavior                    | [ ]    |         |           |
-| 3.7  | Author questions: Structured output & validation                             | [ ]    |         |           |
-| 3.8  | Author questions: Context management & context-window tradeoffs              | [ ]    |         |           |
-| 3.9  | Author questions: Guardrails & safe escalation patterns                      | [ ]    |         |           |
-| 3.10 | Author questions: Retry, recovery & error-handling design                    | [ ]    |         |           |
-| 3.11 | Author questions: Human-in-the-loop workflow decisions                       | [ ]    |         |           |
-| 3.12 | Author questions: Long-document & multi-step workflow strategies             | [ ]    |         |           |
+| 3.1  | Author questions: Agentic architecture & orchestration                       | [X]   | 2026-03-26 09:15 PST | 2026-03-26 09:30 PST |
+| 3.2  | Author questions: Claude API usage patterns                                  | [X]   | 2026-03-26 09:15 PST | 2026-03-26 09:30 PST |
+| 3.3  | Author questions: Tool design and tool calling                               | [X]   | 2026-03-26 09:15 PST | 2026-03-26 09:30 PST |
+| 3.4  | Author questions: MCP-oriented integration thinking                          | [X]   | 2026-03-26 09:15 PST | 2026-03-26 09:30 PST |
+| 3.5  | Author questions: Claude Code workflows & configuration patterns             | [X]   | 2026-03-26 09:15 PST | 2026-03-26 09:30 PST |
+| 3.6  | Author questions: Prompt engineering for reliable behavior                    | [X]   | 2026-03-26 09:15 PST | 2026-03-26 09:30 PST |
+| 3.7  | Author questions: Structured output & validation                             | [X]   | 2026-03-26 09:15 PST | 2026-03-26 09:30 PST |
+| 3.8  | Author questions: Context management & context-window tradeoffs              | [X]   | 2026-03-26 09:15 PST | 2026-03-26 09:30 PST |
+| 3.9  | Author questions: Guardrails & safe escalation patterns                      | [X]   | 2026-03-26 09:15 PST | 2026-03-26 09:30 PST |
+| 3.10 | Author questions: Retry, recovery & error-handling design                    | [X]   | 2026-03-26 09:15 PST | 2026-03-26 09:30 PST |
+| 3.11 | Author questions: Human-in-the-loop workflow decisions                       | [X]   | 2026-03-26 09:15 PST | 2026-03-26 09:30 PST |
+| 3.12 | Author questions: Long-document & multi-step workflow strategies             | [X]   | 2026-03-26 09:15 PST | 2026-03-26 09:30 PST |
 
 ---
 
@@ -83,7 +84,6 @@ Design spec: `docs/add_anthropic_claude_design.md` (sections 9–20)
 | 4.4 | Run answer randomization script (`scripts/randomize_answers.py`) on `data/anthropic/cca-f.xml`       | [ ]    |         |           |
 | 4.5 | Verify XML loads without parser errors via `XMLParser.loadExam()`                                    | [ ]    |         |           |
 | 4.6 | Remove stub XML from Phase 2 if still present (replace with production file)                         | [ ]    |         |           |
-
 ---
 
 ## Phase 5: Integration Testing & Acceptance

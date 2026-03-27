@@ -1,0 +1,612 @@
+<questions>
+    <question id="19" category-ref="cat-claude-code" difficulty="basic">
+      <title>CLAUDE.md Configuration Scope</title>
+      <scenario>A developer joins a team that uses Claude Code across several repositories. They notice inconsistent behavior: Claude follows certain coding conventions in one repo but not in another. The team lead asks them to set up a configuration hierarchy so that organization-wide rules always apply, while individual repos can add project-specific instructions.</scenario>
+      <question-text>How should the developer configure CLAUDE.md files to establish organization-wide defaults that are augmented by project-specific instructions?</question-text>
+      <choices>
+        <choice letter="A">Place all rules in a single CLAUDE.md at the repository root and duplicate it across every project</choice>
+        <choice letter="B">Use the user-level ~/.claude/CLAUDE.md for organization-wide rules and a project-level CLAUDE.md for project-specific instructions, since Claude Code merges instructions from all levels</choice>
+        <choice letter="C">Create a shared npm package that injects CLAUDE.md content at build time</choice>
+        <choice letter="D">Define all rules in environment variables that Claude Code reads at startup</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Claude Code loads CLAUDE.md files from multiple locations and merges them together.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Claude Code supports a hierarchy of CLAUDE.md files: user-level (~/.claude/CLAUDE.md), project-level (repository root), and even directory-level within a project. All applicable CLAUDE.md files are merged, with more specific files augmenting broader ones. This design lets organizations define universal standards in the user-level file while projects add their own conventions without duplication. Duplicating files across repos creates maintenance burden, and Claude Code does not read configuration from environment variables or npm packages.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>The CLAUDE.md hierarchy mirrors how tools like .gitconfig work: user-level, project-level, and local-level, with all layers combined at runtime.</li>
+              <li>CLAUDE.md files checked into the repo are shared with the whole team, while ~/.claude/CLAUDE.md is personal and can hold individual preferences or organization-specific credentials guidance.</li>
+              <li>Subdirectory CLAUDE.md files are only included when Claude Code is working on files within that subdirectory, enabling context-specific instructions for monorepo subprojects.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Claude Code</tag>
+        <tag>CLAUDE.md</tag>
+        <tag>Configuration</tag>
+      </tags>
+    </question>
+
+    <question id="20" category-ref="cat-claude-code" difficulty="intermediate">
+      <title>Hooks for CI/CD Enforcement</title>
+      <scenario>A platform team wants Claude Code to automatically run their company's linter after every file edit, and to block commits that fail security scanning. They need this enforcement to be automatic and not dependent on the developer remembering to ask Claude to lint. The team is evaluating how to use Claude Code's hooks system for this.</scenario>
+      <question-text>Which approach correctly uses Claude Code hooks to enforce automatic linting after edits and block insecure commits?</question-text>
+      <choices>
+        <choice letter="A">Add instructions to CLAUDE.md telling Claude to always run the linter manually after editing files</choice>
+        <choice letter="B">Use MCP servers to intercept file writes and inject linting as a tool call</choice>
+        <choice letter="C">Write a shell wrapper script that runs Claude Code and pipes all output through the linter</choice>
+        <choice letter="D">Configure an afterEdit hook that runs the linter and a preCommit hook that runs the security scanner, both defined in the project's .claude/hooks configuration</choice>
+      </choices>
+      <correct-answer>D</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Claude Code hooks allow you to run custom scripts at specific lifecycle points like after edits or before commits.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Claude Code's hooks system provides lifecycle events such as afterEdit and preCommit where you can configure scripts to run automatically. An afterEdit hook fires after any file modification, making it ideal for automatic linting. A preCommit hook runs before a commit is finalized and can block the commit if it returns a non-zero exit code, making it perfect for security scanning. This is deterministic and doesn't rely on Claude remembering instructions. CLAUDE.md instructions are best-effort guidance, not enforcement. Shell wrappers and MCP interception are fragile workarounds that don't integrate with Claude Code's lifecycle.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Hooks are defined in .claude/hooks.json (or the settings configuration) and support multiple lifecycle events including preToolUse, postToolUse, afterEdit, and preCommit.</li>
+              <li>Hook scripts receive context about the action (e.g., which files were edited) via environment variables or stdin, allowing targeted validation rather than whole-project scans.</li>
+              <li>Hooks run synchronously and block the Claude Code workflow until they complete, so long-running hooks should be optimized or scoped narrowly to avoid degrading the interactive experience.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Claude Code</tag>
+        <tag>Hooks</tag>
+        <tag>CI/CD</tag>
+        <tag>Automation</tag>
+      </tags>
+    </question>
+
+    <question id="21" category-ref="cat-claude-code" difficulty="advanced">
+      <title>Permission Modes for Autonomous Agents</title>
+      <scenario>A team is deploying Claude Code in two contexts: (1) an interactive developer workstation where engineers pair-program with Claude, and (2) a headless CI pipeline where Claude Code autonomously generates and tests migration scripts. In the CI context, there is no human to approve tool calls, but the team needs guardrails to prevent destructive operations like dropping production tables.</scenario>
+      <question-text>What is the most appropriate permission configuration for the headless CI pipeline use case?</question-text>
+      <choices>
+        <choice letter="A">Run Claude Code in default interactive mode and pre-approve all prompts with a "yes" pipe</choice>
+        <choice letter="B">Use the permissive "dangerously skip permissions" flag to bypass all permission checks since CI has no interactive user</choice>
+        <choice letter="C">Use an allowlist-based permission configuration that pre-authorizes specific safe tools (file read, file write to migration directory, test runner) while blocking destructive operations, combined with the non-interactive flag</choice>
+        <choice letter="D">Disable all tool use and have Claude Code only generate code as text output that a separate script executes</choice>
+      </choices>
+      <correct-answer>C</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Headless CI environments need non-interactive mode with scoped permissions — not blanket approval or blanket denial.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>The correct approach combines non-interactive mode (so Claude Code doesn't block waiting for human input) with an allowlist of permitted tools scoped to the specific CI task. This provides autonomous operation while maintaining guardrails. Piping "yes" to approve everything is dangerous and could allow destructive actions. The "dangerously skip permissions" flag removes all safety checks, which violates the team's guardrail requirement. Disabling all tool use defeats the purpose of using Claude Code as an autonomous agent and pushes execution complexity into a separate, less controlled script.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Claude Code's permission system supports granular tool-level allowlists, including path-scoped file permissions (e.g., allow writes only to /migrations/) that constrain the blast radius of autonomous operations.</li>
+              <li>In CI environments, the --allowedTools flag or settings-based permission profiles let teams define exactly which tools Claude Code can use without prompting, making the security posture explicit and auditable.</li>
+              <li>Defense in depth is critical for autonomous AI: even with permission allowlists, CI pipelines should run Claude Code in sandboxed environments (containers, restricted IAM roles) so that permission misconfigurations don't lead to catastrophic outcomes.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Claude Code</tag>
+        <tag>Permissions</tag>
+        <tag>CI/CD</tag>
+        <tag>Autonomous Agents</tag>
+      </tags>
+    </question>
+
+    <question id="22" category-ref="cat-claude-code" difficulty="intermediate">
+      <title>MCP Server Configuration for Database Access</title>
+      <scenario>A developer is building a data analysis workflow where Claude Code needs to query a PostgreSQL database to explore schemas and run read-only analytics queries. They want Claude to be able to discover tables and run SELECT queries, but never execute DDL or DML statements. They are considering how to expose database access via MCP in Claude Code.</scenario>
+      <question-text>What is the recommended approach for giving Claude Code read-only database access through MCP?</question-text>
+      <choices>
+        <choice letter="A">Configure an MCP server that exposes specific read-only tools (list_tables, describe_table, run_select_query) with the database connection handled server-side and no DDL/DML capabilities exposed</choice>
+        <choice letter="B">Give Claude the database connection string in CLAUDE.md and let it use Bash to run psql commands directly</choice>
+        <choice letter="C">Install a PostgreSQL extension that exposes an HTTP API and have Claude call it via curl</choice>
+        <choice letter="D">Export the entire database to CSV files and let Claude read them as local files</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>MCP servers act as controlled interfaces that expose only the capabilities you choose to make available.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>An MCP server designed for read-only database access encapsulates the connection details server-side and exposes only specific, safe tools like listing tables, describing schemas, and running SELECT queries. This provides a clean security boundary: Claude never sees connection credentials, and the MCP server can enforce read-only access regardless of what Claude requests. Giving Claude raw psql access via Bash is dangerous because it could craft DROP or DELETE statements. CSV exports lose the ability to run ad-hoc queries and become stale. HTTP APIs via PostgreSQL extensions introduce unnecessary infrastructure complexity.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>MCP servers are configured in Claude Code's settings (project-level or user-level) and launched as subprocess or remote connections, making them portable across team members.</li>
+              <li>A well-designed database MCP server can include query validation (rejecting non-SELECT statements), result size limits (to prevent overwhelming the context window), and query timeout enforcement.</li>
+              <li>The MCP protocol supports tool schemas with parameter definitions, allowing the MCP server to declare that run_select_query accepts a SQL string and returns tabular results, giving Claude type-safe interaction with the database.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Claude Code</tag>
+        <tag>MCP</tag>
+        <tag>Database</tag>
+        <tag>Security</tag>
+      </tags>
+    </question>
+
+    <question id="23" category-ref="cat-claude-code" difficulty="advanced">
+      <title>Worktree Isolation for Parallel Tasks</title>
+      <scenario>A senior engineer uses Claude Code to work on three features simultaneously in a large monorepo. They find that switching branches between tasks causes Claude to lose context and mix up changes from different features. They want each task to have its own isolated file state while sharing the same Git history. The engineer is evaluating worktree-based isolation versus other approaches.</scenario>
+      <question-text>Why is git worktree-based isolation the preferred approach for running parallel Claude Code tasks on the same repository?</question-text>
+      <choices>
+        <choice letter="A">Worktrees are faster than cloning because they copy only the files Claude has modified</choice>
+        <choice letter="B">Worktrees provide separate working directories with independent file state and branch checkouts while sharing the same .git object store, preventing cross-task file contamination without duplicating repository data</choice>
+        <choice letter="C">Worktrees allow Claude Code to merge changes from multiple features automatically without conflicts</choice>
+        <choice letter="D">Worktrees enable Claude Code to run in a different programming language context per task</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Git worktrees give you multiple working directories backed by one repository — each with its own branch and file state.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Git worktrees create separate working directory checkouts that share the same underlying .git object store. Each worktree can be on a different branch with its own file state, so changes in one task don't affect another. This is ideal for parallel Claude Code sessions because each session operates in its own directory with no risk of cross-contamination. Unlike full clones, worktrees don't duplicate the object store, saving disk space and setup time. They don't automatically merge changes or change language contexts — those are unrelated capabilities. The key benefit is isolation without duplication.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Each Claude Code session launched in a worktree directory gets its own CLAUDE.md context (if the worktree contains one), enabling task-specific instructions for each parallel feature.</li>
+              <li>Worktree isolation is particularly valuable in CI/CD scenarios where multiple Claude Code agents process different tasks concurrently — each agent gets a clean filesystem view without race conditions on file modifications.</li>
+              <li>When combining worktrees with Claude Code's /compact or conversation management, each worktree session maintains its own conversation history, preventing context bleed between unrelated features.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Claude Code</tag>
+        <tag>Git Worktree</tag>
+        <tag>Parallel Tasks</tag>
+        <tag>Isolation</tag>
+      </tags>
+    </question>
+
+    <question id="24" category-ref="cat-prompt-eng" difficulty="basic">
+      <title>System Prompt Design for Role Assignment</title>
+      <scenario>A startup is building a customer support chatbot powered by Claude. The chatbot must always identify itself as "Aria from TechCorp," never reveal it is an AI when asked indirectly, stay on topic about TechCorp products, and escalate billing disputes to human agents. The engineering team is deciding where to place these behavioral constraints.</scenario>
+      <question-text>Where should the team place the identity, scope, and escalation rules to maximize their reliability?</question-text>
+      <choices>
+        <choice letter="A">In the first user message of every conversation</choice>
+        <choice letter="B">In the system prompt, since system-level instructions take precedence over user messages and persist across all turns</choice>
+        <choice letter="C">In a fine-tuned model that has the identity baked into its weights</choice>
+        <choice letter="D">In a separate API call that configures the model before the conversation starts</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>The system prompt is the highest-priority instruction channel in the Claude API message hierarchy.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>The system prompt is the correct location for identity, behavioral constraints, and escalation rules because it occupies the highest position in Claude's instruction hierarchy (system > user > assistant). Instructions in the system prompt persist across all conversation turns and are harder for user messages to override. Placing rules in the first user message makes them lower priority and susceptible to being overridden by subsequent user messages. Fine-tuning Claude is not available as a standard API feature, and there is no separate configuration API call — the system prompt is the mechanism for this.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Claude's instruction hierarchy (system > user) means that when a user message conflicts with a system prompt instruction, Claude prioritizes the system prompt, providing a defense against prompt injection attempts.</li>
+              <li>System prompts should include both positive instructions (what the bot should do) and negative constraints (what it must avoid), as Claude follows explicit boundaries more reliably than implied ones.</li>
+              <li>For production chatbots, system prompts should also include fallback behaviors (e.g., "If you are unsure whether a topic is in scope, politely redirect to TechCorp support") to handle edge cases gracefully.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Prompt Engineering</tag>
+        <tag>System Prompt</tag>
+        <tag>Role Assignment</tag>
+        <tag>Customer Support</tag>
+      </tags>
+    </question>
+
+    <question id="25" category-ref="cat-prompt-eng" difficulty="intermediate">
+      <title>Prefilling Assistant Responses</title>
+      <scenario>An engineering team is building a code review tool that uses Claude to analyze pull requests and output a structured JSON report with fields for severity, category, file, line, and description. Despite clear instructions in the system prompt, Claude occasionally wraps the JSON in markdown code fences or includes a preamble like "Here is the analysis:". The team needs 100% machine-parseable output without post-processing hacks.</scenario>
+      <question-text>Which technique will most reliably ensure Claude's response starts directly with valid JSON and includes no extraneous text?</question-text>
+      <choices>
+        <choice letter="A">Add "IMPORTANT: Output ONLY JSON" in capital letters to the system prompt</choice>
+        <choice letter="B">Set temperature to 0 to eliminate all variability in output format</choice>
+        <choice letter="C">Parse the output with a regex that strips everything before the first "{" character</choice>
+        <choice letter="D">Prefill the assistant response with the opening brace "{" so Claude continues generating the JSON object directly</choice>
+      </choices>
+      <correct-answer>D</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>You can pre-populate the beginning of Claude's response to steer the output format from the first token.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Prefilling the assistant response is the most reliable technique for ensuring Claude outputs a specific format. By including an assistant message that starts with "{", you constrain Claude to continue generating valid JSON from that point — there is no opportunity to insert preamble text or code fences because the response has already started. Capitalized instructions improve compliance but are not foolproof. Temperature 0 reduces randomness but doesn't prevent format variations. Regex stripping is a fragile post-processing workaround that doesn't solve the root cause and can break on nested braces.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Prefilling works by adding an assistant message with the desired prefix to the messages array — the API treats it as the start of Claude's response, and Claude continues from there.</li>
+              <li>For even stronger guarantees, combine prefilling with tool-use mode: define a tool whose input schema matches your desired JSON structure, and Claude will produce schema-conformant output validated by the API.</li>
+              <li>Prefilling can be extended beyond a single character — you can prefill with partial JSON like '{"results": [' to steer both format and structure, though you must ensure the prefill is valid partial JSON that Claude can coherently complete.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Prompt Engineering</tag>
+        <tag>Prefilling</tag>
+        <tag>Structured Output</tag>
+        <tag>Code Review</tag>
+      </tags>
+    </question>
+
+    <question id="26" category-ref="cat-prompt-eng" difficulty="advanced">
+      <title>Chain-of-Thought for Complex Reasoning</title>
+      <scenario>A legal tech company uses Claude to analyze contracts and identify clauses that conflict with a set of regulatory requirements. Early testing shows that Claude sometimes misses subtle conflicts or flags non-issues. The team observes that when they ask Claude to "think step by step" it catches more genuine conflicts but the response is much longer. They need high accuracy for production use and are evaluating how to deploy chain-of-thought effectively.</scenario>
+      <question-text>What is the best strategy for using chain-of-thought prompting to maximize accuracy while keeping the final output clean and structured?</question-text>
+      <choices>
+        <choice letter="A">Enable extended thinking (budget tokens for internal reasoning) so Claude reasons thoroughly in a separate thinking block, then outputs only the clean structured result in the response</choice>
+        <choice letter="B">Ask Claude to think step by step and then use regex to strip the reasoning from the output</choice>
+        <choice letter="C">Skip chain-of-thought entirely and increase temperature to encourage broader exploration of possible conflicts</choice>
+        <choice letter="D">Run the analysis twice — once with chain-of-thought for accuracy and once without for clean output — and use the second response</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Extended thinking gives Claude a dedicated space to reason without polluting the output.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Extended thinking (enabled via the API's thinking parameter with a budget_tokens allocation) gives Claude a dedicated internal reasoning space — a thinking block — where it can work through complex analysis step by step. The final response contains only the clean output. This separates the reasoning process (which improves accuracy) from the deliverable (which must be structured and clean). Regex stripping is fragile and can corrupt output. Higher temperature increases randomness, not analytical depth. Running the analysis twice doubles cost and latency without guaranteeing the second run's clean output matches the first run's accurate analysis.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Extended thinking budget_tokens controls how much reasoning Claude can perform; for complex multi-clause contract analysis, a generous budget (e.g., 10,000+ tokens) allows thorough step-by-step evaluation of each clause against each regulation.</li>
+              <li>The thinking block content is returned in the API response (as a thinking content block) and can be logged for audit purposes, which is valuable in regulated industries like legal tech where you need to show the reasoning behind AI-assisted decisions.</li>
+              <li>Extended thinking and temperature have constraints: when extended thinking is enabled, temperature must be set to 1, so you cannot combine extended thinking with temperature 0 — the reasoning budget itself provides the consistency benefit.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Prompt Engineering</tag>
+        <tag>Chain-of-Thought</tag>
+        <tag>Extended Thinking</tag>
+        <tag>Legal Tech</tag>
+      </tags>
+    </question>
+
+    <question id="27" category-ref="cat-prompt-eng" difficulty="intermediate">
+      <title>Reducing Hallucination in Retrieval-Augmented Systems</title>
+      <scenario>A medical information company uses Claude with RAG to answer healthcare provider questions based on a curated drug database. During testing, they discover that when the retrieved documents don't contain the answer, Claude sometimes generates plausible-sounding but fabricated drug interaction information instead of admitting the information is not available. This is a patient safety risk.</scenario>
+      <question-text>Which combination of prompt engineering techniques is most effective at reducing hallucination when retrieved context is insufficient?</question-text>
+      <choices>
+        <choice letter="A">Increase the number of retrieved documents to 50 per query so Claude always has enough context</choice>
+        <choice letter="B">Set temperature to 0 and increase max_tokens so Claude has more space to be thorough</choice>
+        <choice letter="C">Fine-tune Claude on the drug database so it doesn't need to rely on retrieved documents</choice>
+        <choice letter="D">Instruct Claude in the system prompt to answer only based on the provided documents, quote source passages to support claims, and respond with a specific "information not found" message when the documents don't contain sufficient information</choice>
+      </choices>
+      <correct-answer>D</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Grounding instructions that constrain Claude to provided context and define a clear fallback behavior address hallucination at its source.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>The most effective anti-hallucination strategy combines three techniques in the system prompt: (1) explicitly constrain Claude to answer only from the provided documents, (2) require citation of specific passages so claims are traceable, and (3) define a clear fallback response for when information is absent. This addresses hallucination at its source — Claude's tendency to generate plausible text when uncertain. Retrieving more documents risks adding noise and doesn't prevent hallucination when the answer truly isn't in the corpus. Temperature 0 reduces randomness but doesn't prevent confident fabrication. Fine-tuning Claude is not a standard API offering and wouldn't solve the core grounding problem.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Citation requirements serve double duty: they reduce hallucination (Claude must find a supporting passage or admit it can't) and they enable automated verification (downstream systems can check that cited passages actually exist in the retrieved documents).</li>
+              <li>The "information not found" fallback should be a specific, structured response (not just "I don't know") so downstream systems can detect it programmatically and route the query to a human expert.</li>
+              <li>In safety-critical domains, combining prompt-level grounding with a post-processing validation step — checking that every claim in the response maps to a retrieved passage — provides defense in depth against residual hallucination.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Prompt Engineering</tag>
+        <tag>Hallucination</tag>
+        <tag>RAG</tag>
+        <tag>Healthcare</tag>
+      </tags>
+    </question>
+
+    <question id="28" category-ref="cat-structured-output" difficulty="basic">
+      <title>JSON Mode vs Tool Use for Structured Output</title>
+      <scenario>An e-commerce company needs Claude to extract product attributes (name, price, category, dimensions) from supplier catalogs in various formats (PDFs, emails, web pages). The extracted data must conform to a strict database schema. The team is debating between using prompt-based JSON output and tool-use based structured output.</scenario>
+      <question-text>When strict schema conformance is required for production data pipelines, which approach provides the strongest output validation guarantees?</question-text>
+      <choices>
+        <choice letter="A">Prompt-based JSON output with few-shot examples, since examples teach Claude the exact structure</choice>
+        <choice letter="B">Tool-use based structured output, where the tool's input_schema defines the expected structure and the API validates the response against it</choice>
+        <choice letter="C">Ask Claude to output XML instead of JSON since XML schemas provide built-in validation</choice>
+        <choice letter="D">Use a text-based output format with custom delimiters and parse it with a regex</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Tool-use mode lets you define a JSON schema that the API enforces structurally on the output.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Tool-use based structured output provides the strongest schema guarantees because you define the expected structure as a JSON schema in the tool's input_schema, and the API constrains Claude's output to conform to it. This means the response is guaranteed to have the required fields with the correct types. Prompt-based JSON with few-shot examples improves compliance but cannot guarantee schema conformance — Claude may still omit fields or use wrong types. XML output from Claude has no built-in schema enforcement since Claude isn't validating against an XSD. Custom delimiter formats are fragile and error-prone to parse.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Tool-use structured output works by defining a "tool" that Claude "calls" with the extracted data as arguments — the tool never actually executes; it's a mechanism to force schema-conformant JSON output from the model.</li>
+              <li>For production pipelines, combine tool-use schema enforcement with application-level validation (e.g., checking that price is positive, category is from an allowed enum) since JSON schema covers structure but not all business rules.</li>
+              <li>When you need multiple structured objects (e.g., extracting many products from one catalog), you can define the tool schema with an array property, or use multiple tool calls in a single response to get individually validated objects.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Structured Output</tag>
+        <tag>Tool Use</tag>
+        <tag>JSON Schema</tag>
+        <tag>Data Extraction</tag>
+      </tags>
+    </question>
+
+    <question id="29" category-ref="cat-structured-output" difficulty="intermediate">
+      <title>Output Validation Loop Design</title>
+      <scenario>A financial services company uses Claude to generate compliance reports from transaction data. The report must include specific required sections, each with calculated totals that must reconcile. In testing, Claude occasionally produces reports with arithmetic errors or missing sections. The team needs an automated approach that detects and corrects these issues without human intervention.</scenario>
+      <question-text>What is the most robust architecture for automatically detecting and correcting structured output errors from Claude?</question-text>
+      <choices>
+        <choice letter="A">Implement a validation loop: parse Claude's output, run programmatic checks (schema validation, arithmetic verification), and if validation fails, send the output back to Claude with the specific error messages for correction, repeating until valid or a retry limit is reached</choice>
+        <choice letter="B">Increase the model size and temperature to reduce errors at generation time</choice>
+        <choice letter="C">Generate three reports in parallel and use majority voting to select the correct values</choice>
+        <choice letter="D">Pre-calculate all totals in application code and inject them into the prompt so Claude doesn't need to compute anything</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>A validation loop combines programmatic checks with targeted LLM self-correction, catching errors that pure generation can't prevent.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>A validation loop is the most robust approach because it combines the strengths of deterministic programmatic validation (checking schema conformance, verifying arithmetic) with Claude's ability to understand and correct its own errors when given specific feedback. The loop: (1) generates output, (2) validates programmatically, (3) if invalid, sends Claude the output plus specific error messages, (4) Claude produces a corrected version, (5) repeat until valid or max retries exceeded. Majority voting is expensive (3x cost) and doesn't guarantee correctness. Pre-calculating totals works for simple cases but doesn't scale to complex narrative reports. Larger models still make errors — validation is a separate concern from generation quality.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Effective validation loops include specific, actionable error messages (e.g., "Section 3 total is $45,230 but the line items sum to $44,780 — difference of $450") rather than generic "try again" feedback, which dramatically improves correction accuracy.</li>
+              <li>The retry limit (typically 2-3 attempts) is critical to prevent infinite loops and cost blowups; if the output still fails after max retries, the system should escalate to human review rather than returning invalid data.</li>
+              <li>For maximum efficiency, validation checks should be ordered from cheapest to most expensive (schema check first, then field-level validation, then cross-field arithmetic) and the loop should short-circuit on the first failure to minimize wasted validation work.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Structured Output</tag>
+        <tag>Validation</tag>
+        <tag>Error Correction</tag>
+        <tag>Financial Services</tag>
+      </tags>
+    </question>
+
+    <question id="30" category-ref="cat-structured-output" difficulty="advanced">
+      <title>Handling Partial and Malformed Output</title>
+      <scenario>A real-time data extraction pipeline uses Claude to process streaming news articles and extract structured event records. The pipeline uses streaming API responses so it can begin processing before Claude finishes generating. Occasionally, network interruptions or max_tokens limits cause truncated responses. The team needs a resilient parsing strategy that handles partial output gracefully.</scenario>
+      <question-text>What is the best strategy for handling truncated or partial structured output from Claude's streaming API in a production pipeline?</question-text>
+      <choices>
+        <choice letter="A">Buffer the entire streamed response before parsing so truncation is never an issue</choice>
+        <choice letter="B">Use a streaming JSON parser that processes tokens incrementally, detect truncation via the stop_reason field (checking for "end_turn" vs "max_tokens"), and for truncated responses either salvage complete records from the partial output or trigger a continuation request</choice>
+        <choice letter="C">Set max_tokens to a very large value so truncation never happens</choice>
+        <choice letter="D">Switch from JSON to CSV output since CSV rows are independently parseable even if the stream is cut off</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>The stop_reason field tells you whether Claude finished naturally or was cut off, and streaming parsers can extract value from partial output.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>A resilient streaming pipeline should: (1) use an incremental JSON parser that can extract complete objects from a partial stream, (2) check the stop_reason field to distinguish between natural completion ("end_turn") and truncation ("max_tokens"), and (3) for truncated responses, either salvage fully-formed records from the partial output or send a continuation request asking Claude to resume from where it was cut off. Buffering the entire response defeats the purpose of streaming. Setting very large max_tokens doesn't prevent network interruptions and wastes token budget. CSV seems simpler but loses the hierarchical structure that JSON provides and introduces its own escaping and quoting complexities.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>When designing for continuation, include the partial output in the next request's assistant prefill so Claude can seamlessly continue the JSON structure from the exact point of truncation — this avoids duplicate records or structural breaks.</li>
+              <li>A streaming JSON parser like jsonstream or ijson can emit complete objects as they are parsed from the stream, allowing the pipeline to process finished records (e.g., the first 8 of 10 events) even if the final records are truncated.</li>
+              <li>For critical pipelines, implement a "completeness check" that verifies the expected number of records against a count field emitted early in the output (e.g., "total_events": 10 as the first field), so the system knows when truncation caused data loss versus when all records were delivered.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Structured Output</tag>
+        <tag>Streaming</tag>
+        <tag>Error Handling</tag>
+        <tag>Resilience</tag>
+      </tags>
+    </question>
+
+    <question id="31" category-ref="cat-structured-output" difficulty="intermediate">
+      <title>XML vs JSON Output Pattern Selection</title>
+      <scenario>A content management team uses Claude for two distinct tasks: (1) extracting metadata fields (title, author, date, tags) from blog posts into a database, and (2) generating editorial markup where sections of text need annotations like "needs citation," "tone too informal," or "factual claim — verify." The team is debating whether to standardize on JSON for both tasks or use different output formats.</scenario>
+      <question-text>Which output format strategy best fits the two distinct use cases described?</question-text>
+      <choices>
+        <choice letter="A">Use JSON for both tasks since it's the universal data interchange format</choice>
+        <choice letter="B">Use XML for both tasks since it supports both structured data and inline annotations</choice>
+        <choice letter="C">Use JSON (via tool-use) for the metadata extraction task where you need typed fields conforming to a database schema, and use XML for the editorial markup task where annotations need to be interleaved within the source text</choice>
+        <choice letter="D">Use YAML for both tasks since it's the most human-readable structured format</choice>
+      </choices>
+      <correct-answer>C</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>JSON excels at flat/nested data structures; XML excels at annotating content inline where markup wraps around text.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>The two tasks have fundamentally different output structure needs. Metadata extraction produces flat or nested key-value data that maps perfectly to JSON, and using tool-use provides schema enforcement for the database. Editorial markup, however, requires annotations to be embedded within flowing text — wrapping phrases with tags like &lt;annotation type="needs-citation"&gt;some claim&lt;/annotation&gt; — which is XML's native strength. JSON is awkward for inline text annotation because you'd need to split text into fragments and wrap each in objects. Standardizing on one format forces an unnatural fit for one of the two tasks. YAML adds parsing complexity without meaningful benefits over JSON for these use cases.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Claude is naturally skilled at producing XML-style inline annotations because its training data includes extensive HTML and XML markup, making it reliable at opening and closing tags around relevant text spans.</li>
+              <li>For the JSON metadata task, tool-use schemas can enforce enum constraints (e.g., tags must come from an allowed list) and required fields, providing validation that prompt-based XML cannot match.</li>
+              <li>A practical pattern for the annotation task is to ask Claude to return the original text with XML annotation tags inserted, then use an XML parser to extract both the annotations and their positions — this preserves the original text while adding a structured annotation layer.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Structured Output</tag>
+        <tag>XML</tag>
+        <tag>JSON</tag>
+        <tag>Content Management</tag>
+      </tags>
+    </question>
+
+    <question id="32" category-ref="cat-context-mgmt" difficulty="basic">
+      <title>Context Window Limits and Token Budgeting</title>
+      <scenario>A developer is building a document Q&amp;A system that ingests long research papers (up to 80 pages) and answers questions about them. They plan to include the full document in every API request along with the conversation history. Using Claude with a 200K token context window, they notice that as conversations grow longer, responses slow down and costs increase significantly.</scenario>
+      <question-text>What is the primary reason costs increase as the conversation grows, and what is the most effective mitigation?</question-text>
+      <choices>
+        <choice letter="A">Costs increase because longer conversations use a more expensive model tier; mitigate by switching to a smaller model mid-conversation</choice>
+        <choice letter="B">Costs increase because Claude's per-token price goes up as the context fills; mitigate by truncating older messages</choice>
+        <choice letter="C">Costs increase due to network bandwidth; mitigate by compressing the document with gzip before sending</choice>
+        <choice letter="D">Costs increase because the API charges per input token and the full document is re-sent with every turn; mitigate by using prompt caching to avoid re-processing the unchanged document prefix across turns</choice>
+      </choices>
+      <correct-answer>D</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Every API call sends the full message history including the document, and you pay per input token each time.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>The Claude API is stateless — every request must include the full conversation context, including the document and all prior turns. Since pricing is per input token, re-sending the same 80-page document with each turn means paying for those tokens repeatedly. Prompt caching is the most effective mitigation: it tells the API to cache the static document prefix so subsequent requests that include the same prefix pay a reduced rate (typically a significant discount) for the cached portion. The per-token price does not increase based on context fullness. The API handles text, not compressed binary. Model tiers don't change mid-conversation based on length.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Prompt caching works by adding a cache_control breakpoint after the static content (the document); content before the breakpoint is cached and subsequent requests that match the cached prefix pay roughly 10% of the normal input token price after a small cache write premium.</li>
+              <li>To maximize cache hits, structure your messages so the stable content (system prompt, document) comes first in the message array and the varying content (conversation turns) comes last — any change before the cache breakpoint invalidates the cache.</li>
+              <li>For very long conversations, combine prompt caching (for the document) with conversation summarization (for older turns) to keep total token count manageable while preserving both document access and conversation context.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Context Management</tag>
+        <tag>Token Budgeting</tag>
+        <tag>Prompt Caching</tag>
+        <tag>Cost Optimization</tag>
+      </tags>
+    </question>
+
+    <question id="33" category-ref="cat-context-mgmt" difficulty="intermediate">
+      <title>Conversation Summarization Strategy</title>
+      <scenario>A multi-agent research system uses Claude to conduct deep-dive investigations that span 50+ turns of conversation. Each turn may involve tool calls, analysis, and intermediate conclusions. By turn 40, the context window is nearly full, and the system needs to continue the investigation without losing critical findings from earlier turns. The architect must decide how to manage the growing conversation.</scenario>
+      <question-text>What is the most effective strategy for continuing a long investigation when the context window approaches its limit?</question-text>
+      <choices>
+        <choice letter="A">Summarize the conversation so far — capturing key findings, decisions, open questions, and relevant data — and start a new conversation with the summary as context, preserving continuity while freeing token budget</choice>
+        <choice letter="B">Drop the oldest half of the conversation turns to make room, keeping only recent messages</choice>
+        <choice letter="C">Start a completely fresh conversation and re-ask the original question, relying on Claude's memory across conversations</choice>
+        <choice letter="D">Switch to a model with a larger context window so the conversation never hits the limit</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Summarization compresses the essential information from many turns into a fraction of the tokens, preserving continuity.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Conversation summarization is the most effective strategy because it preserves the intellectual progress of the investigation (findings, decisions, open questions) while dramatically reducing token usage. The summary becomes the foundation of a new conversation that can continue the investigation with full awareness of prior work. Starting fresh loses all context since Claude has no cross-conversation memory. Dropping old messages arbitrarily may discard critical early findings that inform later analysis. Switching to a larger model is not always possible, defers the problem rather than solving it, and larger contexts still have limits.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Effective summarization for research agents should be structured (e.g., sections for "confirmed findings," "hypotheses under investigation," "data collected," "next steps") rather than narrative, making it easy for the next conversation to pick up exactly where the previous one left off.</li>
+              <li>The summarization itself should be done by Claude as a dedicated step before the context runs out — asking Claude to "summarize the investigation state for handoff" produces a more useful summary than an automated truncation approach.</li>
+              <li>A sliding window variation — summarize the oldest N turns while keeping recent turns verbatim — preserves both the long-term context (via summary) and short-term working memory (via recent turns), giving the best balance of compression and fidelity.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Context Management</tag>
+        <tag>Summarization</tag>
+        <tag>Multi-Agent</tag>
+        <tag>Research</tag>
+      </tags>
+    </question>
+
+    <question id="34" category-ref="cat-context-mgmt" difficulty="advanced">
+      <title>Long-Context vs RAG Tradeoffs</title>
+      <scenario>A law firm is building a contract analysis system that needs to answer questions across a corpus of 10,000 contracts (averaging 15 pages each). Some questions require comparing clauses across multiple contracts, while others ask about specific provisions in a single contract. The firm has access to Claude with a 200K token context window and is deciding between a RAG architecture (embedding + retrieval + generation) and a long-context approach (loading full documents into the context).</scenario>
+      <question-text>Which architecture should the firm choose, and why?</question-text>
+      <choices>
+        <choice letter="A">Long-context only: load all 10,000 contracts into a single request since Claude's 200K context can handle it</choice>
+        <choice letter="B">RAG only: embed all contracts, retrieve relevant chunks for every query, and generate answers from the retrieved chunks</choice>
+        <choice letter="C">RAG for corpus-level retrieval to identify relevant contracts, then long-context for loading full retrieved contracts into the prompt for detailed analysis — combining retrieval precision with full-document reasoning</choice>
+        <choice letter="D">Pre-process all contracts into a structured database and use SQL queries instead of Claude</choice>
+      </choices>
+      <correct-answer>C</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Neither pure long-context nor pure RAG handles both corpus search and deep document analysis well on their own.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>The hybrid RAG + long-context approach is optimal for this use case. Pure long-context fails because 10,000 contracts (~150,000 pages) far exceeds any context window. Pure RAG retrieves small chunks, which loses the full-document context needed for nuanced clause analysis and cross-section reasoning within a contract. The hybrid approach uses RAG to solve the needle-in-a-haystack problem (finding the 3-5 relevant contracts from 10,000) and then uses long-context to load those full contracts into Claude's 200K window for deep analysis. This combines retrieval precision at corpus scale with full-document reasoning at analysis time. A SQL-only approach cannot handle the semantic reasoning required for legal clause interpretation.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>The hybrid architecture also optimizes cost: RAG retrieval is cheap (embedding lookups), and long-context API calls are expensive — by using RAG to narrow the document set first, you minimize the tokens sent to Claude while maximizing analytical depth on the relevant documents.</li>
+              <li>For cross-contract comparison queries, the RAG layer retrieves candidate contracts from both sides of the comparison, and Claude's long context window allows side-by-side analysis of full contract texts, which chunk-based RAG would fragment into incoherent snippets.</li>
+              <li>This pattern generalizes to many enterprise use cases: use retrieval for discovery over large corpora, long-context for deep reasoning over retrieved documents, and prompt caching to amortize the cost when multiple questions are asked about the same retrieved document set.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Context Management</tag>
+        <tag>RAG</tag>
+        <tag>Long Context</tag>
+        <tag>Legal Tech</tag>
+      </tags>
+    </question>
+
+    <question id="35" category-ref="cat-context-mgmt" difficulty="intermediate">
+      <title>Context Compression for Agentic Workflows</title>
+      <scenario>A developer productivity tool uses Claude as an agentic coding assistant that reads files, runs tests, edits code, and iterates. After 20 tool calls, the conversation includes thousands of lines of file contents, test outputs, and error traces — most of which are from earlier iterations that have since been resolved. The context is 80% full and the agent still has work to do. The architect needs to free context space without losing the agent's understanding of the current task state.</scenario>
+      <question-text>What is the most effective technique for compressing the agent's context in this situation?</question-text>
+      <choices>
+        <choice letter="A">Delete all tool call results from the conversation history since Claude already processed them</choice>
+        <choice letter="B">Replace resolved tool call sequences (file reads, failed tests, fixes) with concise summaries of what was done and what the outcome was, while keeping recent and unresolved tool interactions intact</choice>
+        <choice letter="C">Restart the agent from scratch with only the original task description and let it re-discover the current code state</choice>
+        <choice letter="D">Truncate all tool results to their first 10 lines to reduce token count uniformly</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Selectively compressing resolved work while preserving active context gives the best ratio of information retention to token savings.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>The most effective technique is selective summarization: replace completed work sequences (e.g., "read file X, found bug on line 45, edited to fix null check, tests now pass") with concise summaries, while keeping recent unresolved interactions in full fidelity. This preserves the agent's understanding of what has been accomplished and what remains, without wasting tokens on obsolete error traces or superseded file contents. Deleting all tool results removes context Claude may need to understand the current state. Restarting wastes all accumulated progress. Uniform truncation may cut critical information from some results while keeping irrelevant content from others.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Claude Code's /compact command implements a version of this pattern — it summarizes the conversation to free context space while preserving the essential task state, allowing the agent to continue working without starting over.</li>
+              <li>For programmatic agents, the compression step itself should be a Claude API call: send the conversation history and ask Claude to produce a structured summary of completed actions, current state, and remaining work — this summary becomes the new conversation prefix.</li>
+              <li>A tiered retention strategy works well: keep the last 3-5 tool interactions verbatim (high fidelity), summarize the previous 10-15 interactions (medium fidelity), and reduce everything before that to a brief progress summary (low fidelity) — this mimics how human memory naturally prioritizes recent events.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Context Management</tag>
+        <tag>Compression</tag>
+        <tag>Agentic Workflows</tag>
+        <tag>Developer Productivity</tag>
+      </tags>
+    </question>
+</questions>
