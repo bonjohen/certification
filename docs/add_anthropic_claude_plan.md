@@ -45,8 +45,8 @@ Design spec: `docs/add_anthropic_claude_design.md` (sections 9–20)
 | 2.5 | Register Anthropic in `js/app.js` — `setBackLinks()`: add `anthropic: 'anthropic.html'` to `providerPages`   | [X]   | 2026-03-26 09:00 PST | 2026-03-26 09:00 PST |
 | 2.6 | Register Anthropic in `js/app.js` — `updateExamInfo()`: add `anthropic` to `providerPages` and `providerNames` | [X]   | 2026-03-26 09:00 PST | 2026-03-26 09:00 PST |
 | 2.7 | Create `data/anthropic/` directory and a stub `cca-f.xml` with 3 valid placeholder questions                  | [X]   | 2026-03-26 09:00 PST | 2026-03-26 09:00 PST |
-| 2.8 | Verify `quiz.html?exam=cca-f` loads and renders the stub questions without errors                             | [ ]    |         |           |
-| 2.9 | Verify full navigation path: home → `anthropic.html` → quiz → back-link returns to `anthropic.html`          | [ ]    |         |           |
+| 2.8 | Verify `quiz.html?exam=cca-f` loads and renders the stub questions without errors                             | [X]   | 2026-03-26 09:40 PST | 2026-03-26 09:40 PST |
+| 2.9 | Verify full navigation path: home → `anthropic.html` → quiz → back-link returns to `anthropic.html`          | [X]   | 2026-03-26 09:40 PST | 2026-03-26 09:40 PST |
 | 2.10 | When [Submit Anser] is pressed add behavior to expand hints to full for that question.                       | [ ]    |         |           |
 
 ---
@@ -92,25 +92,25 @@ Design spec: `docs/add_anthropic_claude_design.md` (sections 9–20)
 
 | #    | Task                                                                                                       | Status | Started | Completed |
 |------|------------------------------------------------------------------------------------------------------------|--------|---------|-----------|
-| 5.1  | Home page visibly shows Anthropic as a fourth provider card                                                | [ ]    |         |           |
-| 5.2  | Selecting Anthropic provider card opens `anthropic.html`                                                   | [ ]    |         |           |
-| 5.3  | Anthropic provider page contains exactly one exam card for CCA-F                                           | [ ]    |         |           |
-| 5.4  | Exam card indicates 50 questions                                                                           | [ ]    |         |           |
-| 5.5  | Selecting exam card opens `quiz.html?exam=cca-f`                                                           | [ ]    |         |           |
-| 5.6  | Fresh session begins at Question 1 of 50                                                                   | [ ]    |         |           |
-| 5.7  | Quiz header correctly identifies Anthropic and CCA-F                                                       | [ ]    |         |           |
-| 5.8  | Quiz back-link returns to `anthropic.html`                                                                 | [ ]    |         |           |
-| 5.9  | All 50 questions load from `data/anthropic/cca-f.xml`                                                      | [ ]    |         |           |
-| 5.10 | Every question renders: 4 choices, 1 correct answer, 1 explanation, 3 progressive hints                    | [ ]    |         |           |
-| 5.11 | Submit behavior, correctness feedback, and score display work correctly                                    | [ ]    |         |           |
-| 5.12 | Previous/next navigation and keyboard arrow navigation work                                                | [ ]    |         |           |
-| 5.13 | Progressive hint reveal works (3 levels per question)                                                      | [ ]    |         |           |
-| 5.14 | Local storage persistence saves and restores session (answers, hints, progress, completion)                 | [ ]    |         |           |
-| 5.15 | Returning user receives continue-or-start-fresh prompt                                                     | [ ]    |         |           |
-| 5.16 | Completion display works at end of exam                                                                    | [ ]    |         |           |
-| 5.17 | UI copy distinguishes official certification info from local study content                                  | [ ]    |         |           |
-| 5.18 | Naming consistency verified: "Anthropic", "CCA-F", "Claude Certified Architect, Foundations" used everywhere | [ ]    |         |           |
-| 5.19 | Full acceptance criteria walkthrough (design spec section 19) — all criteria pass                            | [ ]    |         |           |
+| 5.1  | Home page visibly shows Anthropic as a fourth provider card                                                | [X]   | 2026-03-26 09:40 PST | 2026-03-26 09:40 PST |
+| 5.2  | Selecting Anthropic provider card opens `anthropic.html`                                                   | [X]   | 2026-03-26 09:40 PST | 2026-03-26 09:40 PST |
+| 5.3  | Anthropic provider page contains exactly one exam card for CCA-F                                           | [X]   | 2026-03-26 09:40 PST | 2026-03-26 09:40 PST |
+| 5.4  | Exam card indicates 50 questions                                                                           | [X]   | 2026-03-26 09:40 PST | 2026-03-26 09:40 PST |
+| 5.5  | Selecting exam card opens `quiz.html?exam=cca-f`                                                           | [X]   | 2026-03-26 09:40 PST | 2026-03-26 09:40 PST |
+| 5.6  | Fresh session begins at Question 1 of 50                                                                   | [X]   | 2026-03-26 09:40 PST | 2026-03-26 09:41 PST |
+| 5.7  | Quiz header correctly identifies Anthropic and CCA-F                                                       | [X]   | 2026-03-26 09:40 PST | 2026-03-26 09:41 PST |
+| 5.8  | Quiz back-link returns to `anthropic.html`                                                                 | [X]   | 2026-03-26 09:41 PST | 2026-03-26 09:41 PST |
+| 5.9  | All 50 questions load from `data/anthropic/cca-f.xml`                                                      | [X]   | 2026-03-26 09:41 PST | 2026-03-26 09:41 PST |
+| 5.10 | Every question renders: 4 choices, 1 correct answer, 1 explanation, 3 progressive hints                    | [X]   | 2026-03-26 09:41 PST | 2026-03-26 09:41 PST |
+| 5.11 | Submit behavior, correctness feedback, and score display work correctly                                    | [X]   | 2026-03-26 09:41 PST | 2026-03-26 09:41 PST |
+| 5.12 | Previous/next navigation and keyboard arrow navigation work                                                | [X]   | 2026-03-26 09:41 PST | 2026-03-26 09:41 PST |
+| 5.13 | Progressive hint reveal works (3 levels per question)                                                      | [X]   | 2026-03-26 09:41 PST | 2026-03-26 09:41 PST |
+| 5.14 | Local storage persistence saves and restores session (answers, hints, progress, completion)                 | [X]   | 2026-03-26 09:41 PST | 2026-03-26 09:41 PST |
+| 5.15 | Returning user receives continue-or-start-fresh prompt                                                     | [X]   | 2026-03-26 09:41 PST | 2026-03-26 09:41 PST |
+| 5.16 | Completion display works at end of exam                                                                    | [X]   | 2026-03-26 09:41 PST | 2026-03-26 09:41 PST |
+| 5.17 | UI copy distinguishes official certification info from local study content                                  | [X]   | 2026-03-26 09:42 PST | 2026-03-26 09:42 PST |
+| 5.18 | Naming consistency verified: "Anthropic", "CCA-F", "Claude Certified Architect, Foundations" used everywhere | [X]   | 2026-03-26 09:42 PST | 2026-03-26 09:42 PST |
+| 5.19 | Full acceptance criteria walkthrough (design spec section 19) — all criteria pass                            | [X]   | 2026-03-26 09:40 PST | 2026-03-26 09:42 PST |
 
 ---
 
