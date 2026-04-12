@@ -31,12 +31,13 @@ export function getProviderFromExam(examId, metaProvider) {
         const id = examId.toLowerCase();
         // Azure exams: az-*, dp-*, ai-*
         if (id.startsWith('az-') || id.startsWith('dp-') || id.startsWith('ai-')) return 'azure';
-        // AWS exams: clf-*, saa-*, dva-*, soa-*, dea-*, mla-*, aif-*
+        // AWS exams: clf-*, saa-*, dva-*, soa-*, dea-*, mla-*, aif-*, aip-*
         if (id.startsWith('clf-') || id.startsWith('saa-') || id.startsWith('dva-') ||
             id.startsWith('soa-') || id.startsWith('dea-') || id.startsWith('mla-') ||
-            id.startsWith('aif-')) return 'aws';
-        // GCP exams: gcp-*
-        if (id.startsWith('gcp-')) return 'gcp';
+            id.startsWith('aif-') || id.startsWith('aip-')) return 'aws';
+        // GCP exams: gcp-*, cloud-data-engineer, gen-ai-leader, pro-ml-eng
+        if (id.startsWith('gcp-') || id === 'cloud-data-engineer' ||
+            id === 'gen-ai-leader' || id === 'pro-ml-eng') return 'gcp';
         // Anthropic exams: cca-*
         if (id.startsWith('cca-')) return 'anthropic';
     }
@@ -290,7 +291,7 @@ export class QuizApp {
         };
 
         this.elements.backLink.href = providerPages[provider] || 'index.html';
-        document.title = `${meta.examCode} Quiz - ${providerNames[provider] || 'Cloud'} Certification Study`;
+        document.title = `${meta.examCode} Quiz - ${providerNames[provider] || ''} Study Guide`;
     }
 
     getProviderFromExam(examId, metaProvider) {
