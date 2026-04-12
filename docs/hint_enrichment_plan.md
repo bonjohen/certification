@@ -131,14 +131,15 @@ These files have real hint content but fall short on at least one metric. The pr
 
 | Task | Status | Started (PST) | Completed (PST) | Description |
 |------|--------|---------------|------------------|-------------|
-| 3.1 | Open | | | Enrich all hints in `data/azure/az-104.xml` (H1=49→100+, H2=162→300+) |
-| 3.2 | Open | | | Enrich all hints in `data/azure/az-900.xml` (H1=68→100+, H2=217→300+) |
-| 3.3 | Open | | | Validate both files against XSD |
-| 3.4 | Open | | | Run `npx vitest run` |
-| 3.5 | Open | | | Stage and commit Phase 3 |
+| 3.1 | Completed | 2026-04-12 07:25 AM (PST) | 2026-04-12 01:53 PM (PST) | Enrich all hints in `data/azure/az-104.xml` (H1=49→147, H2=162→701) |
+| 3.2 | Completed | 2026-04-12 07:25 AM (PST) | 2026-04-12 01:53 PM (PST) | Enrich all hints in `data/azure/az-900.xml` (H1=68→198, H2=217→746) |
+| 3.3 | Completed | 2026-04-12 01:53 PM (PST) | 2026-04-12 01:53 PM (PST) | Validate both files against XSD |
+| 3.4 | Completed | 2026-04-12 01:53 PM (PST) | 2026-04-12 01:53 PM (PST) | Run `npx vitest run` |
+| 3.5 | Completed | 2026-04-12 01:54 PM (PST) | 2026-04-12 01:54 PM (PST) | Stage and commit Phase 3 |
 
 ### Phase 3 Summary
-- **Changes:** TBD
+- **Changes:** az-104: H1=147, H2=701, H3=1077. az-900: H1=198, H2=746, H3=1286. All XSD valid, 172 tests passing.
+- **Changes hosted at:** TBD
 - **Commit:** `Enrich hints for Azure az-104, az-900 to reference quality`
 
 ---
