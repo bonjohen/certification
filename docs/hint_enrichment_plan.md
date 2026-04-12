@@ -150,16 +150,17 @@ These files have real hint content but fall short on at least one metric. The pr
 
 | Task | Status | Started (PST) | Completed (PST) | Description |
 |------|--------|---------------|------------------|-------------|
-| 4.1 | Open | | | Enrich all hints in `data/gcp/gcp-cloud-arch.xml` (H1=64→100+) |
-| 4.2 | Open | | | Enrich all hints in `data/gcp/gcp-db-stor.xml` (H1=78→100+) |
-| 4.3 | Open | | | Enrich all hints in `data/gcp/gcp-fund-core.xml` (H1=68→100+) |
-| 4.4 | Open | | | Enrich all hints in `data/gcp/gcp-cloud-eng.xml` (H1=65→100+) |
-| 4.5 | Open | | | Validate all 4 files against XSD |
-| 4.6 | Open | | | Run `npx vitest run` |
-| 4.7 | Open | | | Stage and commit Phase 4 |
+| 4.1 | Completed | 2026-04-12 07:27 AM (PST) | 2026-04-12 01:53 PM (PST) | Enrich all hints in `data/gcp/gcp-cloud-arch.xml` (H1=64→174) |
+| 4.2 | Completed | 2026-04-12 07:27 AM (PST) | 2026-04-12 01:53 PM (PST) | Enrich all hints in `data/gcp/gcp-db-stor.xml` (H1=78→174) |
+| 4.3 | Completed | 2026-04-12 07:27 AM (PST) | 2026-04-12 01:53 PM (PST) | Enrich all hints in `data/gcp/gcp-fund-core.xml` (H1=68→189) |
+| 4.4 | Completed | 2026-04-12 07:27 AM (PST) | 2026-04-12 01:53 PM (PST) | Enrich all hints in `data/gcp/gcp-cloud-eng.xml` (H1=65→184) |
+| 4.5 | Completed | 2026-04-12 01:53 PM (PST) | 2026-04-12 01:53 PM (PST) | Validate all 4 files against XSD |
+| 4.6 | Completed | 2026-04-12 01:53 PM (PST) | 2026-04-12 01:53 PM (PST) | Run `npx vitest run` |
+| 4.7 | Completed | 2026-04-12 01:55 PM (PST) | 2026-04-12 01:55 PM (PST) | Stage and commit Phase 4 |
 
 ### Phase 4 Summary
-- **Changes:** TBD
+- **Changes:** cloud-arch: H1=174, H2=658, H3=863. db-stor: H1=174, H2=560, H3=776. fund-core: H1=189, H2=767, H3=1161. cloud-eng: H1=184, H2=670, H3=1012. All XSD valid.
+- **Changes hosted at:** TBD
 - **Commit:** `Enrich hints for GCP cloud-arch, db-stor, fund-core, cloud-eng to reference quality`
 
 ---
