@@ -30,7 +30,7 @@
       <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Lambda handlers receive an event object containing trigger data and a context object with runtime information.</content>
+          <content>Think about what information a function needs from its caller and what metadata the runtime itself can provide.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>Lambda function handlers receive two arguments: event and context. The event object contains data from the trigger source (API Gateway request details, S3 event info, SQS messages, etc.). The context object provides runtime information including the function name, memory limit, remaining execution time (context.get_remaining_time_in_millis()), and request ID for logging.</content>
@@ -65,7 +65,7 @@
       <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Lambda environment variables allow storing configuration separate from code, accessible via standard language mechanisms.</content>
+          <content>Consider the twelve-factor app principle of separating configuration from code using key-value pairs set outside the function.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>Lambda environment variables are key-value pairs configured outside the function code. They're accessible in code using standard mechanisms (os.environ in Python, process.env in Node.js). Environment variables can be encrypted using KMS for sensitive data. This follows the twelve-factor app methodology of separating configuration from code.</content>
@@ -100,7 +100,7 @@
       <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>A composite key with userId as partition key groups user's orders together; orderId as sort key enables individual order retrieval.</content>
+          <content>Think about which field groups items for efficient queries and which field uniquely identifies items within that group.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>A composite primary key with userId (partition key) and orderId (sort key) optimally supports both access patterns. Query operations retrieve all items with the same partition key (all orders for a user), while GetItem retrieves specific items using both keys. Data is stored together by partition key, making queries efficient. The sort key enables sorting and range queries within a partition.</content>
@@ -135,7 +135,7 @@
       <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Strongly consistent reads return the most recent data, reflecting all successful writes prior to the read.</content>
+          <content>Consider which read option trades higher cost and latency for a guarantee that you always see the latest written value.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>DynamoDB offers two read consistency options: Eventually consistent reads (default) might return stale data as changes propagate, while strongly consistent reads always return the most recent data. Strongly consistent reads cost twice as many read capacity units and may have higher latency. Use them when your application requires read-after-write consistency.</content>
@@ -170,7 +170,7 @@
       <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>AWS_PROXY (Lambda proxy integration) passes the entire request to Lambda and returns the Lambda response directly.</content>
+          <content>Look for the integration type that forwards the full HTTP request without any mapping templates or transformations.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>Lambda proxy integration (AWS_PROXY) passes the entire HTTP request to the Lambda function including headers, query parameters, body, and context. The Lambda function must return a response in a specific format with statusCode, headers, and body. This simplifies API development by eliminating mapping templates and letting the function handle request/response formatting.</content>
@@ -205,7 +205,7 @@
       <correct-answer>B</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>When Lambda processes SQS messages via event source mapping, successful execution automatically deletes messages from the queue.</content>
+          <content>Think about who manages the message lifecycle when a polling-based event source mapping handles the integration.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>When using Lambda's SQS event source mapping, Lambda manages the polling and message lifecycle. Upon successful function execution, Lambda automatically deletes the message from the queue. If the function fails or times out, the message returns to the queue after the visibility timeout expires, enabling retry. After the maximum receive count, messages move to the dead-letter queue if configured.</content>
@@ -240,7 +240,7 @@
       <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>S3 event notifications support prefix and suffix filters to trigger on specific object keys.</content>
+          <content>Consider S3's built-in mechanism for reacting to object creation, and how you can narrow which keys trigger the action.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>S3 event notifications can trigger Lambda (or SNS/SQS) when objects are created or deleted. You configure event types (s3:ObjectCreated:*), and optionally filter by key prefix (images/) and suffix (.jpg). The Lambda function receives an event containing the bucket name, object key, size, and other metadata. This creates an event-driven architecture without polling.</content>
@@ -275,7 +275,7 @@
       <correct-answer>B</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>User Pools provide authentication (sign-up, sign-in); Identity Pools provide AWS credentials for accessing AWS services.</content>
+          <content>Think about which Cognito component handles sign-in and which one exchanges tokens for temporary AWS service credentials.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>Amazon Cognito has two main components: User Pools handle user authentication - sign-up, sign-in, password reset, MFA - and issue JWT tokens. Identity Pools (Federated Identities) exchange tokens (from User Pools, social providers, or SAML) for temporary AWS credentials, enabling direct access to AWS services like S3 and DynamoDB. For this use case, use both together.</content>
@@ -310,7 +310,7 @@
       <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>The execution role is an IAM role that Lambda assumes, defining what AWS services the function can access.</content>
+          <content>Consider what IAM construct a service assumes at runtime to obtain permissions for accessing other AWS resources.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>Every Lambda function has an execution role - an IAM role that Lambda assumes when running your code. The role's policies define what AWS services and resources the function can access. To fix AccessDeniedException, add the necessary permissions (dynamodb:GetItem, s3:PutObject, etc.) to the execution role's policy. Never use long-term credentials in Lambda.</content>
@@ -345,7 +345,7 @@
       <correct-answer>B</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Cognito User Pool Authorizer natively validates JWT tokens from Cognito User Pools.</content>
+          <content>Look for the authorizer type purpose-built to validate tokens from the same identity provider already in use.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>API Gateway supports multiple authorization methods. Cognito User Pool Authorizer directly validates JWT tokens (ID or Access token) from a Cognito User Pool without custom code. The client includes the token in the Authorization header; API Gateway validates it against the configured User Pool. Claims from the token can be accessed in Lambda via event.requestContext.authorizer.claims.</content>
@@ -380,7 +380,7 @@
       <correct-answer>B</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Secrets Manager securely stores credentials with automatic rotation; cache secrets in Lambda to reduce API calls.</content>
+          <content>Think about which AWS service combines secure credential storage, automatic rotation for databases, and SDK-based retrieval.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>AWS Secrets Manager is the recommended way to manage database credentials in Lambda. It provides secure storage, automatic rotation for supported databases (RDS, Redshift, DocumentDB), and encryption. Use the AWS SDK to retrieve secrets, and cache them outside the handler to reuse across invocations. The Secrets Manager Lambda extension can simplify caching.</content>
@@ -415,7 +415,7 @@
       <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Use KMS Encrypt/Decrypt for small data, or GenerateDataKey for envelope encryption of larger data.</content>
+          <content>Consider which API calls let your application perform client-side encryption, and how the approach differs for small vs. large data.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>For client-side encryption, use KMS Encrypt API to encrypt data up to 4 KB directly with a KMS key. For larger data, use envelope encryption: call GenerateDataKey to get a plaintext and encrypted data key, encrypt your data with the plaintext key, discard the plaintext key, and store the encrypted data key alongside your encrypted data. For decryption, call Decrypt on the encrypted data key.</content>
@@ -450,7 +450,7 @@
       <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Upload large packages to S3 (up to 250 MB unzipped), or use container images (up to 10 GB) for the largest deployments.</content>
+          <content>Think about alternate deployment methods that bypass the direct upload size limit, including one with a much higher ceiling.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>Lambda deployment package limits: 50 MB zipped for direct upload, 250 MB unzipped for S3-based deployment. For packages exceeding these limits, use Lambda container images which support up to 10 GB. Container images can include the runtime, dependencies, and code, making them ideal for ML models, large frameworks, or custom runtimes.</content>
@@ -485,7 +485,7 @@
       <correct-answer>A</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Publish versions for immutable function snapshots; use aliases with weighted routing for gradual traffic shifting.</content>
+          <content>Consider how you can create immutable snapshots of your function and then use named pointers to gradually shift traffic between them.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>Lambda versions are immutable snapshots of function code and configuration. Aliases are pointers to versions (like "prod" pointing to version 5). Aliases support weighted traffic routing - send 10% to version 6 and 90% to version 5 for canary deployments. If issues arise, instantly shift 100% back to the previous version by updating the alias. API Gateway and other triggers should invoke the alias, not $LATEST.</content>
@@ -520,7 +520,7 @@
       <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>SAM templates extend CloudFormation with simplified serverless resource types that transform to standard CloudFormation.</content>
+          <content>Think about whether SAM is a standalone service or builds on top of an existing infrastructure-as-code framework.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>AWS SAM (Serverless Application Model) templates are CloudFormation templates with a Transform (AWS::Serverless-2016-10-31) that adds simplified resource types. AWS::Serverless::Function, AWS::Serverless::Api, and AWS::Serverless::SimpleTable expand to multiple CloudFormation resources. SAM CLI provides local testing, building, and deployment commands. SAM templates can include any CloudFormation resource type.</content>
@@ -555,7 +555,7 @@
       <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>A typical serverless pipeline has Source (fetch code), Build (compile/package), and Deploy (CloudFormation/SAM) stages.</content>
+          <content>Think about the three fundamental phases of getting code from a repository into a running serverless application.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>AWS CodePipeline orchestrates the stages of a CI/CD pipeline. A typical serverless pipeline includes: Source stage (CodeCommit, GitHub, S3) to fetch code on commits; Build stage (CodeBuild) to run tests, compile, and package the SAM template; Deploy stage (CloudFormation or SAM deploy action) to deploy resources. Additional stages can include approval gates and test environments.</content>
@@ -590,7 +590,7 @@
       <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Immutable deployment creates new instances with the new version, then swaps; Blue/Green creates an entirely new environment.</content>
+          <content>Consider which deployment strategies keep the full fleet running while bringing up a completely separate set of new instances.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>Immutable deployment creates a new Auto Scaling group with new instances running the updated version. After health checks pass, instances are moved to the existing ASG and old instances are terminated. Blue/Green creates an entirely new environment and swaps URLs. Both maintain full capacity. Rolling deploys batches sequentially, temporarily reducing capacity.</content>
@@ -625,7 +625,7 @@
       <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>CloudWatch Logs Insights provides SQL-like query language for fast searching and analysis of log data.</content>
+          <content>Look for the CloudWatch capability that lets you run structured queries directly against log data at scale.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>CloudWatch Logs Insights enables interactive log analysis with a purpose-built query language. You can filter logs, extract fields, aggregate data, and visualize results. Queries like "fields @timestamp, @message | filter @message like /ERROR/ | stats count(*) by bin(5m)" efficiently analyze millions of log entries. Auto-discovered fields make querying structured logs easy.</content>
@@ -660,7 +660,7 @@
       <correct-answer>A</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>X-Ray provides end-to-end tracing of requests across AWS services, showing latency at each component.</content>
+          <content>Think about which AWS service visualizes the path of a request across multiple services and pinpoints where time is spent.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>AWS X-Ray traces requests as they flow through your application, providing a service map visualization and detailed timing for each component. Enable X-Ray tracing on API Gateway and Lambda functions; the X-Ray SDK automatically traces AWS SDK calls to DynamoDB, S3, etc. X-Ray shows where time is spent, helping identify performance bottlenecks.</content>
@@ -695,7 +695,7 @@
       <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Cold starts occur when Lambda creates new execution environments; provisioned concurrency keeps environments warm.</content>
+          <content>Consider what happens the very first time an execution environment is created, and how you can pre-initialize environments.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>Cold starts occur when Lambda creates a new execution environment - downloading code, initializing the runtime, and running initialization code. This adds latency to the first request. Mitigate with: provisioned concurrency (pre-warms environments), keeping functions warm with scheduled pings, optimizing initialization code, using smaller deployment packages, and choosing faster runtimes.</content>
@@ -730,7 +730,7 @@
       <correct-answer>A</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Scan reads the entire table and filters afterward; for efficient queries on non-key attributes, create a GSI.</content>
+          <content>Think about the cost of reading every item to filter in memory, versus adding a secondary index that makes the attribute directly queryable.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>Query requires a partition key value; it cannot search by non-key attributes directly. Scan reads every item in the table and applies a filter, consuming capacity proportional to table size regardless of results. For frequent queries on non-key attributes, create a Global Secondary Index (GSI) with the attribute as partition key, enabling efficient Query operations on the GSI.</content>
@@ -765,7 +765,7 @@
       <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Task states perform work by calling services like Lambda; the state machine waits for completion before proceeding.</content>
+          <content>Consider which Step Functions state type is designed to invoke external services and wait for their result before continuing.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>Step Functions Task states perform work by integrating with AWS services. For Lambda, use Resource: arn:aws:states:::lambda:invoke with synchronous invocation (default) - the workflow waits for Lambda to complete and receives the output. Task states support error handling (Catch), retries with exponential backoff (Retry), and timeouts.</content>
@@ -800,7 +800,7 @@
       <correct-answer>B</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>SNS subscription filter policies match message attributes, delivering only matching messages to subscribers.</content>
+          <content>Think about how subscribers can declare which message attributes they care about so the service delivers only relevant messages.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>SNS subscription filter policies evaluate message attributes against a filter policy attached to the subscription. Only messages matching the filter are delivered. Publishers include message attributes (like orderType: "electronics"); the filter policy specifies allowed values. This reduces Lambda invocations and simplifies architecture compared to multiple topics or in-function filtering.</content>
@@ -835,7 +835,7 @@
       <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Presigned URLs grant temporary access to S3 objects using the signer's credentials; presigned POST enables direct browser uploads.</content>
+          <content>Consider the S3 mechanism that lets a server generate time-limited, credential-embedded links so untrusted clients can upload directly.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>Presigned URLs provide temporary access to S3 objects without requiring AWS credentials in the client. The server generates a URL signed with its credentials, valid for a specified duration. For uploads, presigned PUT URLs or presigned POST policies (which can set conditions like file size, content type) enable direct browser-to-S3 uploads while the application controls access.</content>
@@ -870,7 +870,7 @@
       <correct-answer>B</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>TransactWriteItems provides ACID transactions across up to 100 items in one or more tables.</content>
+          <content>Look for the DynamoDB API that guarantees all-or-nothing writes across multiple items in a single atomic operation.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>DynamoDB transactions (TransactWriteItems, TransactGetItems) provide atomicity, consistency, isolation, and durability (ACID) across up to 100 items. For a credit transfer, TransactWriteItems can deduct from one account and credit another atomically - if either operation fails, both are rolled back. This prevents inconsistent states that could occur with separate writes.</content>
@@ -905,7 +905,7 @@
       <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>SQS handles retries via visibility timeout and maxReceiveCount; Lambda doesn't have its own retry for SQS triggers.</content>
+          <content>Think about whether the compute service or the queue service owns the retry behavior when using a polling-based trigger.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>For SQS-triggered Lambda, retries are handled by SQS, not Lambda's retry configuration. When Lambda fails to process a message (throws an error), the message returns to the queue after visibility timeout expires. After maxReceiveCount attempts (set in redrive policy), it moves to the DLQ. Configure visibility timeout longer than Lambda timeout to prevent duplicate processing.</content>
@@ -940,7 +940,7 @@
       <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>CodeDeploy automates Lambda traffic shifting with pre/post hooks and automatic rollback on CloudWatch alarms.</content>
+          <content>Consider which AWS deployment service supports traffic-shifting strategies and can trigger automatic rollback based on alarm thresholds.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>AWS CodeDeploy supports Lambda deployments with configurable traffic shifting strategies: Canary (shift percentage, wait, shift rest), Linear (incremental shifts), and All-at-once. You can configure CloudWatch alarms (like error rate thresholds) that trigger automatic rollback if metrics exceed thresholds during deployment. Pre-traffic and post-traffic hooks run validation Lambda functions.</content>
@@ -975,7 +975,7 @@
       <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>API Gateway stage caching stores responses for a configurable TTL, serving cached responses without invoking the backend.</content>
+          <content>Think about where in the request path you can store responses with a time-to-live so repeated identical requests skip the backend.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>API Gateway provides a caching layer at the stage level. When enabled, API Gateway caches endpoint responses for a specified TTL (up to 3600 seconds). Subsequent identical requests are served from cache without invoking Lambda. Cache capacity is configurable (0.5 GB to 237 GB). Caching can be overridden per method, and cache keys can include query parameters and headers.</content>
@@ -1010,7 +1010,7 @@
       <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Parameter Store SecureString encrypts values with KMS; standard tier is free (with limits) and integrates with IAM.</content>
+          <content>Consider the AWS service that offers hierarchical key-value storage with KMS encryption at no cost in its standard tier.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>AWS Systems Manager Parameter Store provides hierarchical storage for configuration data. SecureString parameters encrypt values using KMS keys. The standard tier is free (up to 10,000 parameters, 4 KB each) with IAM-based access control. While it lacks Secrets Manager's automatic rotation, Parameter Store is more cost-effective for configuration that doesn't need rotation.</content>
@@ -1045,7 +1045,7 @@
       <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Lambda functions can run for up to 15 minutes (900 seconds).</content>
+          <content>Think about the hard ceiling on how long a single invocation can execute before the platform terminates it.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>Lambda's maximum timeout is 15 minutes (900 seconds). The default is 3 seconds, which is too short for most real workloads. Set timeout based on expected execution time plus buffer. For processing that exceeds 15 minutes, consider breaking work into chunks, using Step Functions for orchestration, or AWS Batch for long-running jobs.</content>
@@ -1080,7 +1080,7 @@
       <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>KCL provides checkpointing, shard balancing, and automatic handling of resharding for Kinesis consumers.</content>
+          <content>Consider the client-side library that handles checkpoint tracking, shard assignment, and resharding so your consumer code stays simple.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>The Kinesis Client Library (KCL) simplifies building Kinesis consumers by handling: checkpointing (tracking which records have been processed using DynamoDB), load balancing (distributing shards across workers), and resharding (adapting to shard splits and merges). KCL ensures each shard is processed by exactly one worker in a consumer group.</content>
@@ -1115,7 +1115,7 @@
       <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Fn::GetAtt returns attribute values from resources, including ARN (!GetAtt MyFunction.Arn).</content>
+          <content>Think about which intrinsic function retrieves a specific attribute (like an ARN) rather than just the resource's primary identifier.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>Fn::GetAtt (shorthand !GetAtt) returns an attribute value from a resource. For Lambda functions, !GetAtt MyFunction.Arn returns the function ARN. !Ref returns the resource's primary identifier (for Lambda, the function name). Different resources expose different attributes - check documentation for available attributes like ARN, Endpoint, DomainName.</content>
@@ -1150,7 +1150,7 @@
       <correct-answer>B</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>PutMetricData API or CloudWatch Embedded Metric Format (EMF) in logs send custom metrics to CloudWatch.</content>
+          <content>Consider the two approaches for publishing application-defined metrics: one via direct API calls and another embedded in log output.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>Custom metrics can be published using the CloudWatch PutMetricData API or by using the Embedded Metric Format (EMF) - specially formatted JSON in CloudWatch Logs that CloudWatch automatically extracts as metrics. EMF is recommended for Lambda as it batches metrics efficiently, avoids API calls during function execution, and reduces costs through log-based metric extraction.</content>
@@ -1185,7 +1185,7 @@
       <correct-answer>B</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>ConditionExpression specifies conditions that must be met for write operations to succeed.</content>
+          <content>Look for the write-operation parameter that evaluates a boolean condition and rejects the operation if the condition is not met.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>ConditionExpression evaluates conditions before executing PutItem, UpdateItem, or DeleteItem. If the condition is false, the operation fails with ConditionalCheckFailedException. This enables optimistic locking patterns, ensuring data consistency without explicit locks. Example: only decrement if inventory greater than 0, or only update if version matches expected value.</content>
@@ -1220,7 +1220,7 @@
       <correct-answer>B</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Resource-based policies (function policies) grant other services/accounts permission to invoke Lambda functions.</content>
+          <content>Think about the distinction between what a function can do (outbound permissions) and what is allowed to call the function (inbound permissions).</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>Lambda has two types of policies: the execution role (what the function can access) and resource-based policy (what can invoke the function). When API Gateway, S3, or other services need to invoke Lambda, add a permission to the function's resource-based policy. This is done via add-permission CLI or automatically by SAM/Console when configuring triggers.</content>
@@ -1255,7 +1255,7 @@
       <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>AWS AppSync is a managed GraphQL service with real-time subscriptions and offline data sync.</content>
+          <content>Consider which managed AWS service natively supports a schema-based query language with built-in real-time and offline capabilities.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>AWS AppSync provides managed GraphQL APIs with built-in support for real-time data (WebSocket subscriptions), offline data synchronization (for mobile apps), and multiple data sources (DynamoDB, Lambda, RDS, HTTP). AppSync handles WebSocket connection management, conflict resolution for offline edits, and authentication through Cognito, IAM, API keys, or OIDC.</content>
@@ -1290,7 +1290,7 @@
       <correct-answer>A</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Throttling occurs when requests exceed provisioned capacity; scale capacity, enable auto-scaling, or use on-demand mode.</content>
+          <content>Think about whether the issue is insufficient throughput capacity and what approaches exist to match capacity to demand dynamically.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>ProvisionedThroughputExceededException indicates requests exceeded the table's capacity. Solutions: 1) Increase provisioned RCU/WCU, 2) Enable auto-scaling to adjust capacity automatically, 3) Switch to on-demand capacity mode for unpredictable workloads. Also check for hot partitions - uneven distribution of requests to specific partition keys can cause throttling even with sufficient total capacity.</content>
@@ -1325,7 +1325,7 @@
       <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Lambda Layers package libraries and dependencies that can be shared across multiple functions.</content>
+          <content>Consider the Lambda feature that lets you extract common dependencies into reusable archives attached at deployment time.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>Lambda Layers are ZIP archives containing libraries, custom runtimes, or other dependencies. A function can use up to 5 layers, and layers are extracted to /opt in the execution environment. Layers reduce deployment package size, enable code reuse across functions, and simplify dependency management. Update a layer to update all functions using it.</content>
@@ -1360,7 +1360,7 @@
       <correct-answer>A</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>STS AssumeRole returns temporary credentials for a role, enabling cross-account access or privilege escalation.</content>
+          <content>Think about the STS operation that lets a principal temporarily adopt the permissions of a role in another account.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>AWS STS AssumeRole allows an IAM entity (user, role, or service) to obtain temporary security credentials for a role. For cross-account access, the target account's role must have a trust policy allowing the source account's principal. The caller uses AssumeRole with the role's ARN to get temporary credentials with the role's permissions.</content>
@@ -1395,7 +1395,7 @@
       <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>EventBridge receives events from AWS services and routes them to targets based on rules.</content>
+          <content>Consider the serverless event bus that natively ingests state-change events from AWS services and routes them via pattern-matching rules.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>Amazon EventBridge is a serverless event bus that receives events from AWS services (EC2, S3, etc.), custom applications, and SaaS providers. You create rules with event patterns to match specific events (like EC2 instance state changes) and route them to targets (Lambda, SQS, Step Functions, etc.). EventBridge enables loosely coupled, event-driven architectures.</content>
@@ -1430,7 +1430,7 @@
       <correct-answer>A</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Request validators check request body, query parameters, and headers against models before invoking the integration.</content>
+          <content>Think about the API Gateway feature that rejects malformed requests at the gateway level, before any backend invocation occurs.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>API Gateway request validators validate incoming requests against defined models (JSON Schema) before invoking the backend. Validators can check: request body against a schema, required request parameters, and required headers. Invalid requests receive a 400 error without invoking Lambda, reducing costs and improving security by rejecting malformed requests early.</content>
@@ -1465,7 +1465,7 @@
       <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>FIFO queues guarantee message ordering and exactly-once processing using message group IDs.</content>
+          <content>Consider which queue type trades throughput for strict ordering guarantees and duplicate elimination within a deduplication window.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>SQS FIFO queues guarantee first-in-first-out ordering and exactly-once processing (within a 5-minute deduplication window). Messages with the same Message Group ID are processed in order. Different message groups can be processed in parallel. FIFO queue names must end with .fifo and support up to 3000 messages/second with batching (300 without).</content>
@@ -1500,7 +1500,7 @@
       <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>.ebextensions contains configuration files that customize software, settings, and commands during deployment.</content>
+          <content>Look for the convention of placing YAML/JSON configuration files in a special directory inside your application source bundle.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>The .ebextensions directory in your application source contains configuration files (*.config) in YAML or JSON format. These files can install packages, create files, run commands, configure environment options, and set up container commands. Configuration files are processed alphabetically during deployment, allowing ordered customization of the environment.</content>
@@ -1535,7 +1535,7 @@
       <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Cognito Lambda triggers invoke functions at various authentication events for custom logic.</content>
+          <content>Think about which Cognito feature lets you hook custom code into specific points of the sign-up and authentication lifecycle.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>Cognito User Pools support Lambda triggers at various authentication events: Pre Sign-up (validate/auto-confirm), Post Confirmation (welcome email), Pre Authentication (custom validation), Post Authentication (logging), Pre Token Generation (add custom claims), User Migration (import from existing system), Custom Message (customize emails). Functions receive event data and return modified data.</content>
@@ -1570,7 +1570,7 @@
       <correct-answer>B</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Lambda functions in VPC use private subnets; route traffic through NAT Gateway for internet access.</content>
+          <content>Consider how a function running inside a private subnet can reach the public internet when it has no public IP of its own.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>When Lambda is attached to a VPC, it runs in your VPC using ENIs in the specified subnets. Lambda cannot use public subnets with Internet Gateway for outbound traffic. For internet access, place Lambda in private subnets with a route table entry directing 0.0.0.0/0 to a NAT Gateway (in a public subnet). Alternatively, use VPC endpoints for AWS services to avoid internet routing.</content>
@@ -1605,7 +1605,7 @@
       <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Multipart upload allows uploading objects in parts, enabling parallel uploads and resume capability.</content>
+          <content>Think about the S3 upload strategy that breaks a large object into independently uploadable pieces with resume support.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>S3 Multipart Upload allows uploading large objects in parts independently and in parallel. Benefits: improved throughput (parallel uploads), quick recovery from failures (re-upload only failed parts), pause and resume capability, and begin upload before knowing final size. Recommended for objects over 100 MB; required for objects over 5 GB. Parts can be 5 MB to 5 GB each.</content>
@@ -1640,7 +1640,7 @@
       <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>buildspec.yml defines phases, commands, environment variables, and artifacts for CodeBuild.</content>
+          <content>Consider which file in your source root tells the build service what commands to run, what to output, and in what order.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>The buildspec.yml file (or buildspec.yaml) in the source root defines the CodeBuild project's build commands. It includes: version, env (environment variables, secrets), phases (install, pre_build, build, post_build), artifacts (output files), cache (dependencies to cache). Each phase contains a sequence of commands to run.</content>
@@ -1675,7 +1675,7 @@
       <correct-answer>A</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Dead Letter Queues receive messages that fail processing after maxReceiveCount attempts.</content>
+          <content>Think about where messages go when they have been received too many times without being successfully deleted from the source queue.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>A Dead Letter Queue (DLQ) is a separate SQS queue that receives messages from a source queue after they've been received (and not deleted) more than maxReceiveCount times. The redrive policy on the source queue specifies the DLQ ARN and maxReceiveCount threshold. DLQs help isolate problematic messages for debugging without blocking normal processing.</content>
@@ -1710,7 +1710,7 @@
       <correct-answer>B</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>DynamoDB TTL automatically deletes items after a specified expiration timestamp.</content>
+          <content>Consider the DynamoDB feature that uses a timestamp attribute to automatically clean up expired items at no write-capacity cost.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>DynamoDB Time to Live (TTL) allows automatic deletion of items after a specified time. You designate an attribute to hold the expiration timestamp (Unix epoch seconds), and DynamoDB automatically deletes items after that time. Deletion occurs within 48 hours of expiration (typically sooner) and doesn't consume write capacity. TTL is free.</content>
@@ -1745,7 +1745,7 @@
       <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>CORS headers must be configured on API Gateway to allow cross-origin requests from browsers.</content>
+          <content>Think about the browser security mechanism that blocks requests to a different origin, and what headers the API must return to allow them.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>Cross-Origin Resource Sharing (CORS) allows browsers to make requests to different origins. For API Gateway, enable CORS in the console (which configures OPTIONS method and headers) or manually configure. The integration response (Lambda) must also return CORS headers: Access-Control-Allow-Origin, Access-Control-Allow-Headers, Access-Control-Allow-Methods for non-proxy integrations.</content>

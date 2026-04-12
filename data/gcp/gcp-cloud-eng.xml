@@ -103,7 +103,7 @@
       <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Compute Engine VMs are managed under the gcloud compute instances command group. The creation verb and flag names match GCP's standard naming conventions for machine configuration.</content>
+          <content>How does gcloud typically structure commands for creating a specific resource type? Think about which command group VMs belong to and how flag names relate to the properties being set.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>The correct command is "gcloud compute instances create INSTANCE_NAME --machine-type=TYPE --boot-disk-size=SIZE". Options A, B, and C all use fabricated command groups and flag names that do not exist in the gcloud CLI. The real gcloud compute instances create command supports --zone for placement, --image-family for OS selection, --tags for network tags used by firewall rules, --metadata for startup scripts, and --service-account for the VM's identity. Understanding the correct flag names is critical for the exam since distractors often use plausible-sounding but invalid alternatives.</content>
@@ -139,7 +139,7 @@
       <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Google provides a tunneling service that authenticates users through IAM before forwarding TCP traffic to internal VMs. No public IP is needed on the target instance.</content>
+          <content>Does SSH strictly require a public IP, or does GCP offer a way to reach internal-only VMs through an identity-aware tunnel?</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>Identity-Aware Proxy (IAP) TCP forwarding tunnels SSH connections through Google's infrastructure to VMs that only have internal IPs. The command "gcloud compute ssh INSTANCE --tunnel-through-iap" establishes this secure connection. Option A is wrong because IAP makes SSH fully functional without external IPs. Option B is a security anti-pattern since exposing VMs publicly increases the attack surface. Option D is incorrect because Cloud NAT only handles outbound connections from VMs to the internet, not inbound connections to VMs. IAP verifies user identity via IAM before allowing the tunnel.</content>
@@ -175,7 +175,7 @@
       <correct-answer>B</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Configuring kubectl for a GKE cluster is a gcloud operation, not a kubectl one. The command fetches credentials and writes them to your local kubeconfig file automatically.</content>
+          <content>Is initial cluster authentication setup a kubectl responsibility or a cloud-provider CLI responsibility? Think about which tool owns the credentials.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>The command "gcloud container clusters get-credentials CLUSTER_NAME --zone=ZONE" fetches cluster endpoint and authentication details, then writes them to ~/.kube/config. Option A is invalid because kubectl does not have a "connect" subcommand. Option C uses "gcloud kubernetes" which is not a real command group; GKE commands live under "gcloud container". Option D switches between already-configured contexts but cannot set up a new one from scratch. After running get-credentials, kubectl commands automatically target the configured cluster.</content>
@@ -211,7 +211,7 @@
       <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Service accounts are identity principals that can be granted IAM roles on any resource across project boundaries. Cross-project access does not require creating new accounts or sharing keys.</content>
+          <content>IAM identities are not confined to the project where they were created. What is the simplest way to let an existing identity access a resource it does not currently have permission for?</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>Grant the VM's service account (e.g., SA_NAME@PROJECT_A.iam.gserviceaccount.com) an IAM role directly on the target resource in PROJECT_B. Option A is unnecessary because service accounts from one project work as valid principals in other projects. Option B is a security anti-pattern since sharing key files creates untracked credentials that cannot be easily revoked. Option D confuses networking (VPC Peering connects networks) with IAM (which controls API-level access). IAM roles can be granted at the project, folder, or individual resource level for fine-grained cross-project access.</content>
@@ -247,7 +247,7 @@
       <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>The question specifies three requirements: containerized, scales to zero, and per-request billing. Only one fully managed serverless container platform satisfies all three simultaneously.</content>
+          <content>Which of these compute options can run arbitrary containers, charge nothing when idle, and bill per individual request rather than per provisioned resource?</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>Cloud Run is the ideal choice for containerized stateless applications with variable traffic. It automatically scales instances based on concurrent requests (including down to zero when idle), provides per-request billing charged only for CPU and memory consumed during request processing, and requires no infrastructure management. Option A (App Engine Standard) also scales to zero but restricts you to specific language runtimes and does not accept arbitrary container images. Option B (Compute Engine MIGs) requires managing VMs and cannot scale to zero. Option C (GKE Standard) charges for node infrastructure continuously regardless of traffic.</content>
@@ -319,7 +319,7 @@
       <correct-answer>B</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>The gsutil command-line tool has a specific top-level flag that enables multi-threaded and multi-process execution, dramatically speeding up operations involving many files.</content>
+          <content>Which GCP CLI tool is purpose-built for Cloud Storage operations, and how can you enable parallel transfers with it?</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>The gsutil command with the -m flag enables parallel multi-threaded and multi-process operations for faster bulk transfers. For large files, gsutil automatically switches to resumable uploads (files over 8 MB by default). Use "gsutil -m cp -r SOURCE gs://BUCKET/" for recursive parallel copying. Option A uses a fabricated --fast flag that does not exist. Option C (bq load) is for loading data into BigQuery, not general file transfers. Option D (curl) is low-level and lacks built-in parallelism, resumability, and credential management that gsutil provides out of the box.</content>

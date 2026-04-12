@@ -1,0 +1,549 @@
+<?xml version='1.0' encoding='utf-8'?>
+<hint1-audit xmlns="http://certification.study/schema/v1" source="data\aws\soa-c02.xml" total-questions="50" failing-questions="14">
+  <failing-question>
+    <failure-reasons>
+      <reason>H1 uses unique correct-answer terms not in other choices: {'alarm'}</reason>
+    </failure-reasons>
+    <question id="1" category-ref="cat-monitoring" difficulty="intermediate">
+      <title>CloudWatch Alarm States</title>
+      <scenario>A SysOps administrator is configuring CloudWatch alarms to monitor EC2 CPU utilization. They need to understand alarm behavior when data points are missing due to instance stops.</scenario>
+      <question-text>What are the three possible states of a CloudWatch alarm, and what state should be configured when data is missing?</question-text>
+      <choices>
+        <choice letter="A">Green, Yellow, Red</choice>
+        <choice letter="B">Active, Inactive, Pending</choice>
+        <choice letter="C">Running, Stopped, Terminated</choice>
+        <choice letter="D">OK, ALARM, INSUFFICIENT_DATA; configure "treat missing data as" setting</choice>
+      </choices>
+      <correct-answer>D</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Think about how many distinct states a CloudWatch alarm can be in — and what should happen when data stops arriving.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>CloudWatch alarms have three states: OK (metric within threshold), ALARM (metric breached threshold), and INSUFFICIENT_DATA (not enough data to evaluate). The "treat missing data as" setting controls behavior when data points are missing: missing (maintain current state), notBreaching (treat as OK), breaching (treat as ALARM), or ignore (skip evaluation).</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>For instance monitoring, "missing" often works best - stopped instances don't trigger false alarms.</li>
+              <li>Evaluation periods and datapoints to alarm settings control alarm sensitivity.</li>
+              <li>Composite alarms combine multiple alarms using AND/OR logic for complex conditions.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>CloudWatch</tag>
+        <tag>Alarms</tag>
+        <tag>Monitoring</tag>
+      </tags>
+    </question>
+  </failing-question>
+  <failing-question>
+    <failure-reasons>
+      <reason>H1 uses unique correct-answer terms not in other choices: {'alarm', 'state'}</reason>
+    </failure-reasons>
+    <question id="3" category-ref="cat-monitoring" difficulty="intermediate">
+      <title>EventBridge Automated Remediation</title>
+      <scenario>A SysOps administrator wants to automatically stop EC2 instances when they receive a specific CloudWatch alarm. They need an event-driven solution.</scenario>
+      <question-text>Which service combination enables automatic remediation actions based on CloudWatch alarms?</question-text>
+      <choices>
+        <choice letter="A">CloudWatch Logs metric filters</choice>
+        <choice letter="B">CloudTrail with Lambda triggers</choice>
+        <choice letter="C">EventBridge rule triggered by alarm state change invoking Lambda or SSM Automation</choice>
+        <choice letter="D">SNS notifications only</choice>
+      </choices>
+      <correct-answer>C</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Which AWS service acts as an event bus that can react to alarm state changes and invoke downstream automation targets?</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>CloudWatch alarms can trigger EventBridge rules when they change state. EventBridge rules can then invoke targets like Lambda functions, SSM Automation documents, or Step Functions for automated remediation. For example, when a CPU alarm goes to ALARM state, EventBridge can trigger SSM Automation to stop or restart the instance automatically.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>CloudWatch alarm actions can also directly invoke EC2 actions (stop, terminate, reboot, recover).</li>
+              <li>SSM Automation provides pre-built runbooks for common remediation tasks.</li>
+              <li>EventBridge event pattern matches on detail-type "CloudWatch Alarm State Change".</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>EventBridge</tag>
+        <tag>Automation</tag>
+        <tag>Remediation</tag>
+      </tags>
+    </question>
+  </failing-question>
+  <failing-question>
+    <failure-reasons>
+      <reason>H1 uses unique correct-answer terms not in other choices: {'backup'}</reason>
+    </failure-reasons>
+    <question id="6" category-ref="cat-reliability" difficulty="intermediate">
+      <title>AWS Backup Service</title>
+      <scenario>A SysOps administrator needs to implement centralized backup management across EC2, RDS, EFS, and DynamoDB resources with consistent policies and cross-region copy.</scenario>
+      <question-text>Which service provides centralized backup management across multiple AWS services?</question-text>
+      <choices>
+        <choice letter="A">AWS Backup</choice>
+        <choice letter="B">Amazon Data Lifecycle Manager</choice>
+        <choice letter="C">AWS Storage Gateway</choice>
+        <choice letter="D">Amazon S3 Cross-Region Replication</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Think about which service was purpose-built to unify backup scheduling, retention, and cross-region copy across many AWS resource types.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>AWS Backup is a fully managed service that centralizes and automates data protection across AWS services including EC2, EBS, RDS, Aurora, DynamoDB, EFS, FSx, and Storage Gateway. You create backup plans specifying schedule, retention, lifecycle (transition to cold storage), and cross-region/cross-account copy rules. Backup vaults store recovery points with access policies.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>AWS Backup Audit Manager monitors backup compliance and generates reports.</li>
+              <li>Vault Lock enables WORM (write-once-read-many) for compliance requirements.</li>
+              <li>Resource assignments use tags to automatically include resources in backup plans.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>AWS Backup</tag>
+        <tag>Disaster Recovery</tag>
+        <tag>Data Protection</tag>
+      </tags>
+    </question>
+  </failing-question>
+  <failing-question>
+    <failure-reasons>
+      <reason>H1 uses unique correct-answer terms not in other choices: {'systems', 'manager'}</reason>
+    </failure-reasons>
+    <question id="9" category-ref="cat-deployment" difficulty="intermediate">
+      <title>Systems Manager Run Command</title>
+      <scenario>A SysOps administrator needs to run a script on 100 EC2 instances across multiple regions without SSH access. They want centralized output collection.</scenario>
+      <question-text>Which service allows running commands on managed instances without direct access?</question-text>
+      <choices>
+        <choice letter="A">EC2 Instance Connect</choice>
+        <choice letter="B">AWS Batch</choice>
+        <choice letter="C">AWS Lambda</choice>
+        <choice letter="D">AWS Systems Manager Run Command</choice>
+      </choices>
+      <correct-answer>D</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Think about which Systems Manager capability lets you execute scripts across a fleet without needing direct SSH or RDP access.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>AWS Systems Manager Run Command enables running commands on managed instances without SSH bastion hosts or key management. Select targets by instance IDs, tags, or resource groups. Commands use documents (pre-built like AWS-RunShellScript or custom). Output is captured in S3 or CloudWatch Logs. Rate controls and error thresholds prevent runaway execution.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Requires SSM Agent installed and IAM instance profile with SSM permissions.</li>
+              <li>Rate control: concurrency (percentage or number) and error threshold limits.</li>
+              <li>Run Command works on EC2, on-premises servers, and edge devices with SSM Agent.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Systems Manager</tag>
+        <tag>Run Command</tag>
+        <tag>Operations</tag>
+      </tags>
+    </question>
+  </failing-question>
+  <failing-question>
+    <failure-reasons>
+      <reason>H1 uses unique correct-answer terms not in other choices: {'windows'}</reason>
+    </failure-reasons>
+    <question id="10" category-ref="cat-deployment" difficulty="intermediate">
+      <title>Systems Manager Patch Manager</title>
+      <scenario>A SysOps administrator needs to automate OS patching for Windows and Linux instances on a schedule while ensuring critical patches are applied within 48 hours.</scenario>
+      <question-text>Which Systems Manager capability automates patching with baselines and maintenance windows?</question-text>
+      <choices>
+        <choice letter="A">State Manager</choice>
+        <choice letter="B">Run Command with custom scripts</choice>
+        <choice letter="C">OpsCenter</choice>
+        <choice letter="D">Patch Manager with patch baselines and maintenance windows</choice>
+      </choices>
+      <correct-answer>D</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Which Systems Manager capability combines approval rules for which patches to apply with scheduled time windows for when to apply them?</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Systems Manager Patch Manager automates OS and application patching. Patch baselines define which patches to approve (by classification, severity, auto-approval delay). Maintenance windows schedule when patching occurs. Patch groups associate instances with baselines. Compliance reports show patch status across the fleet. AWS provides default baselines for common OS types.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Scan vs Install: scan-only mode reports compliance without applying patches.</li>
+              <li>Custom baselines can include/exclude specific patches or use approval rules.</li>
+              <li>Integration with AWS-RunPatchBaseline document for patch execution.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Patch Manager</tag>
+        <tag>Systems Manager</tag>
+        <tag>Compliance</tag>
+      </tags>
+    </question>
+  </failing-question>
+  <failing-question>
+    <failure-reasons>
+      <reason>H1 uses unique correct-answer terms not in other choices: {'launch'}</reason>
+    </failure-reasons>
+    <question id="12" category-ref="cat-deployment" difficulty="intermediate">
+      <title>AMI Creation and Management</title>
+      <scenario>A SysOps administrator needs to create a standardized AMI from a running EC2 instance and share it with other AWS accounts in the organization.</scenario>
+      <question-text>What is the recommended process for creating and sharing AMIs?</question-text>
+      <choices>
+        <choice letter="A">Use EC2 Image Builder only</choice>
+        <choice letter="B">Export the instance to S3 and share the bucket</choice>
+        <choice letter="C">Create image from instance, modify launch permissions to share with specific accounts or publicly</choice>
+        <choice letter="D">Copy the EBS volume and share it</choice>
+      </choices>
+      <correct-answer>C</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Think about the two-step process: first capture a golden image from a running instance, then control who else can launch from it.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>To create an AMI: use "Create Image" from the EC2 console or create-image API on a running or stopped instance. For sharing, modify the AMI's launch permissions to add specific AWS account IDs or make it public. For encrypted AMIs, you must also share the encryption key. Consider using EC2 Image Builder for automated, repeatable image pipelines.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>No-reboot option creates AMI without stopping instance but risks filesystem inconsistency.</li>
+              <li>AMI copy enables cross-region AMI distribution with optional re-encryption.</li>
+              <li>EC2 Image Builder automates AMI creation pipelines with testing and distribution.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>AMI</tag>
+        <tag>EC2</tag>
+        <tag>Image Management</tag>
+      </tags>
+    </question>
+  </failing-question>
+  <failing-question>
+    <failure-reasons>
+      <reason>H1 uses unique correct-answer terms not in other choices: {'always'}</reason>
+    </failure-reasons>
+    <question id="13" category-ref="cat-security" difficulty="intermediate">
+      <title>IAM Policy Evaluation</title>
+      <scenario>A SysOps administrator is troubleshooting why a user cannot access an S3 bucket despite having an allow policy attached. They need to understand IAM policy evaluation.</scenario>
+      <question-text>In IAM policy evaluation, what happens when both allow and deny statements apply to the same action?</question-text>
+      <choices>
+        <choice letter="A">The most recent policy wins</choice>
+        <choice letter="B">Allow statements take precedence</choice>
+        <choice letter="C">Explicit deny always wins over allow</choice>
+        <choice letter="D">The first matching statement wins</choice>
+      </choices>
+      <correct-answer>C</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>In IAM, one type of policy statement always wins when there is a conflict. Think about which direction the tiebreaker favors — security or access.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>IAM policy evaluation follows: 1) By default, all requests are implicitly denied. 2) An explicit allow overrides the implicit deny. 3) An explicit deny overrides any allow. So if any policy (identity, resource, SCP, permission boundary) contains an explicit deny for an action, it is denied regardless of allow statements elsewhere. This is crucial for security guardrails.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Use IAM Policy Simulator to test and troubleshoot policy evaluation.</li>
+              <li>For cross-account access, both identity policy AND resource policy must allow.</li>
+              <li>Permission boundaries and SCPs are additional layers that can only restrict, not grant.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>IAM</tag>
+        <tag>Policy Evaluation</tag>
+        <tag>Security</tag>
+      </tags>
+    </question>
+  </failing-question>
+  <failing-question>
+    <failure-reasons>
+      <reason>H1 uses unique correct-answer terms not in other choices: {'failover'}</reason>
+    </failure-reasons>
+    <question id="18" category-ref="cat-networking" difficulty="intermediate">
+      <title>Route 53 Health Checks</title>
+      <scenario>A SysOps administrator needs to configure DNS failover so traffic routes to a secondary site when the primary becomes unhealthy.</scenario>
+      <question-text>What Route 53 features enable automatic DNS failover based on endpoint health?</question-text>
+      <choices>
+        <choice letter="A">Simple routing with TTL</choice>
+        <choice letter="B">Latency-based routing only</choice>
+        <choice letter="C">Health checks with failover routing policy</choice>
+        <choice letter="D">Geolocation routing</choice>
+      </choices>
+      <correct-answer>C</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>DNS-based failover needs two pieces: something to detect the primary is down, and a routing policy that acts on that signal. What combination does Route 53 use?</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Route 53 health checks monitor the health of endpoints via HTTP, HTTPS, or TCP checks. When combined with failover routing policy (primary/secondary records), Route 53 automatically routes traffic to the secondary when the primary fails health checks. Health checks can monitor endpoints directly, other health checks (calculated), or CloudWatch alarms.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Health checks run from multiple regions; configurable threshold determines healthy/unhealthy.</li>
+              <li>String matching health checks verify response body contains expected text.</li>
+              <li>Private hosted zone health checks require CloudWatch alarms since checkers can't reach private IPs.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Route 53</tag>
+        <tag>Health Checks</tag>
+        <tag>DNS Failover</tag>
+      </tags>
+    </question>
+  </failing-question>
+  <failing-question>
+    <failure-reasons>
+      <reason>H1 uses unique correct-answer terms not in other choices: {'permissions'}</reason>
+    </failure-reasons>
+    <question id="26" category-ref="cat-reliability" difficulty="intermediate">
+      <title>EBS Snapshot Sharing</title>
+      <scenario>A SysOps administrator needs to share EBS snapshots with another AWS account for disaster recovery purposes.</scenario>
+      <question-text>How can EBS snapshots be shared with other AWS accounts?</question-text>
+      <choices>
+        <choice letter="A">Use VPC peering to share snapshots</choice>
+        <choice letter="B">Copy the snapshot to S3 and share the bucket</choice>
+        <choice letter="C">Modify snapshot permissions to add the target account ID</choice>
+        <choice letter="D">Export snapshot and import in target account</choice>
+      </choices>
+      <correct-answer>C</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>EBS snapshots have a permissions model — think about how you grant another account the ability to use your snapshot.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>EBS snapshots can be shared by modifying their permissions to add specific AWS account IDs. The target account can then copy the snapshot to their account or create volumes from it. For encrypted snapshots, you must also share the KMS key used for encryption. Shared snapshots remain in the source account; recipients should copy for full control.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Public snapshots are visible to all AWS accounts; avoid for sensitive data.</li>
+              <li>For encrypted snapshots: share KMS key grant or re-encrypt with target's key when copying.</li>
+              <li>Cross-account snapshot copy enables disaster recovery in separate accounts.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>EBS</tag>
+        <tag>Snapshots</tag>
+        <tag>Sharing</tag>
+      </tags>
+    </question>
+  </failing-question>
+  <failing-question>
+    <failure-reasons>
+      <reason>H1 uses unique correct-answer terms not in other choices: {'reserved'}</reason>
+    </failure-reasons>
+    <question id="30" category-ref="cat-cost" difficulty="intermediate">
+      <title>Reserved Instance Coverage</title>
+      <scenario>A SysOps administrator needs to monitor Reserved Instance utilization to ensure purchased reservations are being used and identify opportunities to purchase additional reservations.</scenario>
+      <question-text>Which tools help analyze Reserved Instance coverage and utilization?</question-text>
+      <choices>
+        <choice letter="A">CloudWatch EC2 metrics only</choice>
+        <choice letter="B">Cost Explorer Reserved Instance reports and Trusted Advisor RI checks</choice>
+        <choice letter="C">AWS Config</choice>
+        <choice letter="D">AWS Budgets only</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Think about which AWS tools show both how much of your reserved capacity is being used and how much on-demand usage could be covered.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Cost Explorer provides Reserved Instance utilization reports (how much of purchased RIs are used) and coverage reports (what percentage of usage is covered by RIs). These help identify underutilized reservations and opportunities to purchase more. Trusted Advisor RI checks (Business/Enterprise Support) provide recommendations for RI purchases based on usage patterns.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>RI Coverage: percentage of instance hours covered by reservations vs On-Demand.</li>
+              <li>RI Utilization: percentage of reserved hours actually used vs purchased.</li>
+              <li>AWS Budgets can alert on RI utilization dropping below thresholds.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Reserved Instances</tag>
+        <tag>Cost Explorer</tag>
+        <tag>Cost Optimization</tag>
+      </tags>
+    </question>
+  </failing-question>
+  <failing-question>
+    <failure-reasons>
+      <reason>H1 uses unique correct-answer terms not in other choices: {'services'}</reason>
+    </failure-reasons>
+    <question id="41" category-ref="cat-networking" difficulty="intermediate">
+      <title>PrivateLink Endpoints</title>
+      <scenario>A SysOps administrator needs to allow private subnet instances to access S3 and DynamoDB without using NAT Gateway or internet access.</scenario>
+      <question-text>Which VPC feature enables private connectivity to AWS services without internet access?</question-text>
+      <choices>
+        <choice letter="A">VPC Peering</choice>
+        <choice letter="B">NAT Gateway</choice>
+        <choice letter="C">Internet Gateway</choice>
+        <choice letter="D">VPC Endpoints (Gateway for S3/DynamoDB, Interface for other services)</choice>
+      </choices>
+      <correct-answer>D</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>How can instances in a private subnet reach AWS services without traversing the internet? Think about the two flavors of private connectivity AWS offers.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>VPC Endpoints enable private connectivity between VPCs and AWS services without traversing the internet. Gateway endpoints (free, for S3 and DynamoDB) add routes to route tables. Interface endpoints (PrivateLink, for most other services) create ENIs in your subnets with private IPs. Traffic stays on the AWS network, improving security and potentially reducing data transfer costs.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Endpoint policies can restrict which S3 buckets or actions are accessible through the endpoint.</li>
+              <li>PrivateLink can also expose your own services to other VPCs or accounts.</li>
+              <li>Interface endpoint DNS resolution can use private DNS to override public service endpoints.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>VPC Endpoints</tag>
+        <tag>PrivateLink</tag>
+        <tag>Security</tag>
+      </tags>
+    </question>
+  </failing-question>
+  <failing-question>
+    <failure-reasons>
+      <reason>H1 uses unique correct-answer terms not in other choices: {'billing'}</reason>
+    </failure-reasons>
+    <question id="42" category-ref="cat-cost" difficulty="intermediate">
+      <title>Cost Allocation Tags</title>
+      <scenario>A SysOps administrator needs to track AWS costs by project and department for internal chargeback reporting.</scenario>
+      <question-text>How can AWS costs be tracked and allocated to different business units?</question-text>
+      <choices>
+        <choice letter="A">Apply cost allocation tags to resources and activate them in Billing console</choice>
+        <choice letter="B">Create separate AWS accounts for each department</choice>
+        <choice letter="C">Use CloudWatch metrics only</choice>
+        <choice letter="D">Manually categorize costs in spreadsheets</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Think about how you label AWS resources so that billing reports can break down costs by project, team, or environment.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Cost allocation tags are key-value pairs assigned to AWS resources that appear in billing reports when activated. User-defined tags (like Project, Department, Environment) must be activated in the Billing console to appear in Cost Explorer and Cost and Usage Reports. AWS-generated tags (like aws:createdBy) can also be activated. Use tag policies in Organizations to enforce consistent tagging.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Tags take up to 24 hours to appear in billing reports after activation.</li>
+              <li>Untagged resources show as "Not tagged" in reports.</li>
+              <li>AWS Config rules can check for required tags on resources.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Cost Allocation</tag>
+        <tag>Tags</tag>
+        <tag>Billing</tag>
+      </tags>
+    </question>
+  </failing-question>
+  <failing-question>
+    <failure-reasons>
+      <reason>H1 uses unique correct-answer terms not in other choices: {'iops'}</reason>
+    </failure-reasons>
+    <question id="48" category-ref="cat-cost" difficulty="intermediate">
+      <title>EBS Volume Type Selection</title>
+      <scenario>A SysOps administrator needs to choose the right EBS volume type for a database workload requiring sustained IOPS performance.</scenario>
+      <question-text>Which EBS volume type provides the highest and most consistent IOPS performance?</question-text>
+      <choices>
+        <choice letter="A">st1 (Throughput Optimized HDD)</choice>
+        <choice letter="B">gp3 (General Purpose SSD)</choice>
+        <choice letter="C">io2 Block Express (Provisioned IOPS SSD)</choice>
+        <choice letter="D">sc1 (Cold HDD)</choice>
+      </choices>
+      <correct-answer>C</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Among EBS volume types, which tier is designed for the most demanding I/O workloads — databases needing six-figure IOPS with sub-millisecond latency?</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>EBS io2 Block Express provides the highest performance with up to 256,000 IOPS, 4,000 MB/s throughput, sub-millisecond latency, and 99.999% durability. It's ideal for I/O-intensive databases and critical applications. gp3 is cost-effective for general workloads (up to 16,000 IOPS). io1/io2 provide provisioned IOPS guarantees. HDD types (st1/sc1) are for throughput workloads, not IOPS.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>gp3 baseline: 3,000 IOPS included, up to 16,000 IOPS provisioned.</li>
+              <li>io2 Block Express requires Nitro-based instances.</li>
+              <li>Multi-Attach for io1/io2 enables attaching to multiple instances in same AZ.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>EBS</tag>
+        <tag>Volume Types</tag>
+        <tag>Performance</tag>
+      </tags>
+    </question>
+  </failing-question>
+  <failing-question>
+    <failure-reasons>
+      <reason>H1 uses unique correct-answer terms not in other choices: {'ready'}</reason>
+    </failure-reasons>
+    <question id="50" category-ref="cat-reliability" difficulty="advanced">
+      <title>Disaster Recovery Strategies</title>
+      <scenario>A SysOps administrator is designing a disaster recovery plan. The business requires RTO of 1 hour and RPO of 15 minutes for critical applications.</scenario>
+      <question-text>Which DR strategy best meets RTO of 1 hour and RPO of 15 minutes?</question-text>
+      <choices>
+        <choice letter="A">Warm standby with synchronized data and scaled-down infrastructure ready to scale up</choice>
+        <choice letter="B">Backup and restore from S3</choice>
+        <choice letter="C">Pilot light with core services only</choice>
+        <choice letter="D">Multi-site active-active</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Consider the DR strategies on the cost/speed spectrum. Which approach keeps a functional but smaller copy of production running, ready to scale up?</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Warm standby maintains a scaled-down but fully functional copy of the production environment in the DR region with continuous data replication. During failover, scale up resources and switch traffic. This typically achieves RTO in minutes to hours and RPO in seconds to minutes. Pilot light keeps only critical core components running (longer RTO). Multi-site is overkill and costly for these requirements.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>DR strategies by cost/recovery time: Backup/Restore &lt; Pilot Light &lt; Warm Standby &lt; Multi-Site.</li>
+              <li>Use Auto Scaling or CloudFormation for rapid scale-up during failover.</li>
+              <li>Route 53 health checks and failover routing automate DNS cutover.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Disaster Recovery</tag>
+        <tag>RTO/RPO</tag>
+        <tag>Business Continuity</tag>
+      </tags>
+    </question>
+  </failing-question>
+</hint1-audit>

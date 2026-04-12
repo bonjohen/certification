@@ -1,0 +1,481 @@
+<?xml version='1.0' encoding='utf-8'?>
+<hint1-audit xmlns="http://certification.study/schema/v1" source="data\anthropic\cca-f.xml" total-questions="50" failing-questions="12">
+  <failing-question>
+    <failure-reasons>
+      <reason>H1 uses unique correct-answer terms not in other choices: {'deterministic'}</reason>
+    </failure-reasons>
+    <question id="13" category-ref="cat-tool-design" difficulty="intermediate">
+      <title>When to Use Tools vs Prompting</title>
+      <scenario>A team is building a document processing agent. They are debating whether to implement date parsing as a tool or handle it through prompting. The dates in their documents appear in many formats: "March 15, 2025", "15/03/2025", "2025-03-15", "Q1 2025", and relative dates like "last Tuesday." The parsed dates must be in ISO 8601 format and must be exactly correct — even a one-day error would cause downstream financial calculations to be wrong.</scenario>
+      <question-text>Should date parsing be implemented as a tool or handled through prompting?</question-text>
+      <choices>
+        <choice letter="A">Handle it through prompting — Claude is highly capable at date parsing and the variety of formats is best handled by the model's understanding of natural language</choice>
+        <choice letter="B">Implement it as a tool that uses a deterministic date parsing library, because exactness is required and the tool can handle edge cases (leap years, timezone conversions, relative dates) with guaranteed correctness</choice>
+        <choice letter="C">Train a fine-tuned model specifically for date parsing to handle the variety of formats with better accuracy than the base model</choice>
+        <choice letter="D">Use a hybrid approach: let Claude attempt parsing first, then validate with a tool, falling back to the tool's result only if Claude's answer differs</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>When the output must be exactly correct with zero tolerance for error, which approach gives you deterministic guarantees?</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Date parsing with zero error tolerance is a textbook case for using a tool rather than prompting. Deterministic date parsing libraries handle edge cases that LLMs can get wrong: leap year calculations, day-of-week to date resolution for relative dates, timezone-aware conversions, and ambiguous formats like "01/02/2025" (January 2nd vs February 1st depending on locale). Claude is good at date parsing but not perfect — and "good but not perfect" is unacceptable when downstream financial calculations depend on exact correctness. The hybrid approach (option B) adds complexity without benefit — if you have a correct tool, just use it. Fine-tuning (option C) is massive overkill for a well-solved deterministic problem.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>The general principle: use tools for computation, lookup, and any operation where deterministic correctness is required. Use prompting for reasoning, summarization, classification, and tasks where approximate or creative output is acceptable.</li>
+              <li>Relative dates like "last Tuesday" require knowing the current date, which the model may not have accurately. A tool can anchor relative date calculations to the actual current timestamp from the server.</li>
+              <li>Even when using a parsing tool, Claude adds value by identifying which text fragments in a document are dates and extracting them for the tool to parse. This is a good division of labor: Claude handles the fuzzy NLP task (date extraction), the tool handles the precise computational task (date parsing).</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Tools vs Prompting</tag>
+        <tag>Determinism</tag>
+        <tag>Data Extraction</tag>
+      </tags>
+    </question>
+  </failing-question>
+  <failing-question>
+    <failure-reasons>
+      <reason>H1 uses unique correct-answer terms not in other choices: {'server-side'}</reason>
+    </failure-reasons>
+    <question id="15" category-ref="cat-mcp-integration" difficulty="basic">
+      <title>MCP Server Architecture Basics</title>
+      <scenario>A development team wants to give Claude Desktop access to their company's internal knowledge base. The knowledge base has a REST API. They are evaluating whether to build a custom MCP server or integrate the REST API directly using Claude's built-in HTTP tool. The knowledge base requires authentication with rotating API keys and has rate limiting that requires careful request management.</scenario>
+      <question-text>What is the primary architectural advantage of building an MCP server that wraps the knowledge base API, compared to exposing the REST API directly to Claude?</question-text>
+      <choices>
+        <choice letter="A">MCP servers are faster than direct HTTP calls because they use a binary protocol</choice>
+        <choice letter="B">The MCP server acts as a controlled boundary that manages authentication, rate limiting, and data sanitization in server-side code, rather than exposing credentials and API complexity to the model</choice>
+        <choice letter="C">MCP servers automatically cache all responses, eliminating the need for rate limit management</choice>
+        <choice letter="D">MCP is required by Claude Desktop — there is no way to make HTTP calls from Claude Desktop without MCP</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Think about where secrets and complex logic should live — in the model's context or in server-side code?</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>An MCP server acts as a security and abstraction boundary between Claude and the external system. Authentication credentials stay in the server's environment — they are never exposed to the model or included in prompts. Rate limiting logic is implemented in server-side code where it can be properly enforced with counters and backoff, rather than relying on the model to manage request pacing. The server can also sanitize responses, removing sensitive fields before they reach Claude. Option A is incorrect — MCP uses JSON-RPC, not a binary protocol. Option B is wrong because Claude Desktop could theoretically use other integration methods. Option D is wrong because MCP does not automatically cache responses.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>MCP follows a client-server architecture where the MCP client (embedded in Claude Desktop or Claude Code) communicates with MCP servers using the JSON-RPC 2.0 protocol. The server exposes tools, resources, and prompts as primitives that the client can discover and use.</li>
+              <li>The security boundary is crucial: MCP servers run in a separate process (or even on a separate machine) with their own credentials and permissions. This separation of concerns means the model never sees database connection strings, API keys, or other secrets.</li>
+              <li>MCP servers can implement business logic like input validation, output filtering, and audit logging that would be unreliable if delegated to the model. For example, the server can ensure that queries against the knowledge base are scoped to the current user's permissions.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>MCP Architecture</tag>
+        <tag>Security Boundaries</tag>
+        <tag>Claude Desktop</tag>
+      </tags>
+    </question>
+  </failing-question>
+  <failing-question>
+    <failure-reasons>
+      <reason>H1 uses unique correct-answer terms not in other choices: {'capabilities'}</reason>
+    </failure-reasons>
+    <question id="22" category-ref="cat-claude-code" difficulty="intermediate">
+      <title>MCP Server Configuration for Database Access</title>
+      <scenario>A developer is building a data analysis workflow where Claude Code needs to query a PostgreSQL database to explore schemas and run read-only analytics queries. They want Claude to be able to discover tables and run SELECT queries, but never execute DDL or DML statements. They are considering how to expose database access via MCP in Claude Code.</scenario>
+      <question-text>What is the recommended approach for giving Claude Code read-only database access through MCP?</question-text>
+      <choices>
+        <choice letter="A">Export the entire database to CSV files and let Claude read them as local files</choice>
+        <choice letter="B">Give Claude the database connection string in CLAUDE.md and let it use Bash to run psql commands directly</choice>
+        <choice letter="C">Configure an MCP server that exposes specific read-only tools (list_tables, describe_table, run_select_query) with the database connection handled server-side and no DDL/DML capabilities exposed</choice>
+        <choice letter="D">Install a PostgreSQL extension that exposes an HTTP API and have Claude call it via curl</choice>
+      </choices>
+      <correct-answer>C</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>MCP servers act as controlled interfaces that expose only the capabilities you choose to make available.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>An MCP server designed for read-only database access encapsulates the connection details server-side and exposes only specific, safe tools like listing tables, describing schemas, and running SELECT queries. This provides a clean security boundary: Claude never sees connection credentials, and the MCP server can enforce read-only access regardless of what Claude requests. Giving Claude raw psql access via Bash is dangerous because it could craft DROP or DELETE statements. CSV exports lose the ability to run ad-hoc queries and become stale. HTTP APIs via PostgreSQL extensions introduce unnecessary infrastructure complexity.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>MCP servers are configured in Claude Code's settings (project-level or user-level) and launched as subprocess or remote connections, making them portable across team members.</li>
+              <li>A well-designed database MCP server can include query validation (rejecting non-SELECT statements), result size limits (to prevent overwhelming the context window), and query timeout enforcement.</li>
+              <li>The MCP protocol supports tool schemas with parameter definitions, allowing the MCP server to declare that run_select_query accepts a SQL string and returns tabular results, giving Claude type-safe interaction with the database.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Claude Code</tag>
+        <tag>MCP</tag>
+        <tag>Database</tag>
+        <tag>Security</tag>
+      </tags>
+    </question>
+  </failing-question>
+  <failing-question>
+    <failure-reasons>
+      <reason>H1 uses unique correct-answer terms not in other choices: {'duplicating', 'repository'}</reason>
+    </failure-reasons>
+    <question id="23" category-ref="cat-claude-code" difficulty="advanced">
+      <title>Worktree Isolation for Parallel Tasks</title>
+      <scenario>A senior engineer uses Claude Code to work on three features simultaneously in a large monorepo. They find that switching branches between tasks causes Claude to lose context and mix up changes from different features. They want each task to have its own isolated file state while sharing the same Git history. The engineer is evaluating worktree-based isolation versus other approaches.</scenario>
+      <question-text>Why is git worktree-based isolation the preferred approach for running parallel Claude Code tasks on the same repository?</question-text>
+      <choices>
+        <choice letter="A">Worktrees are faster than cloning because they copy only the files Claude has modified</choice>
+        <choice letter="B">Worktrees allow Claude Code to merge changes from multiple features automatically without conflicts</choice>
+        <choice letter="C">Worktrees enable Claude Code to run in a different programming language context per task</choice>
+        <choice letter="D">Worktrees provide separate working directories with independent file state and branch checkouts while sharing the same .git object store, preventing cross-task file contamination without duplicating repository data</choice>
+      </choices>
+      <correct-answer>D</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Think about what Git feature lets you have separate file states for different branches without duplicating the entire repository history.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Git worktrees create separate working directory checkouts that share the same underlying .git object store. Each worktree can be on a different branch with its own file state, so changes in one task don't affect another. This is ideal for parallel Claude Code sessions because each session operates in its own directory with no risk of cross-contamination. Unlike full clones, worktrees don't duplicate the object store, saving disk space and setup time. They don't automatically merge changes or change language contexts — those are unrelated capabilities. The key benefit is isolation without duplication.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Each Claude Code session launched in a worktree directory gets its own CLAUDE.md context (if the worktree contains one), enabling task-specific instructions for each parallel feature.</li>
+              <li>Worktree isolation is particularly valuable in CI/CD scenarios where multiple Claude Code agents process different tasks concurrently — each agent gets a clean filesystem view without race conditions on file modifications.</li>
+              <li>When combining worktrees with Claude Code's /compact or conversation management, each worktree session maintains its own conversation history, preventing context bleed between unrelated features.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Claude Code</tag>
+        <tag>Git Worktree</tag>
+        <tag>Parallel Tasks</tag>
+        <tag>Isolation</tag>
+      </tags>
+    </question>
+  </failing-question>
+  <failing-question>
+    <failure-reasons>
+      <reason>H1 uses unique correct-answer terms not in other choices: {'truncated'}</reason>
+    </failure-reasons>
+    <question id="30" category-ref="cat-structured-output" difficulty="advanced">
+      <title>Handling Partial and Malformed Output</title>
+      <scenario>A real-time data extraction pipeline uses Claude to process streaming news articles and extract structured event records. The pipeline uses streaming API responses so it can begin processing before Claude finishes generating. Occasionally, network interruptions or max_tokens limits cause truncated responses. The team needs a resilient parsing strategy that handles partial output gracefully.</scenario>
+      <question-text>What is the best strategy for handling truncated or partial structured output from Claude's streaming API in a production pipeline?</question-text>
+      <choices>
+        <choice letter="A">Use a streaming JSON parser that processes tokens incrementally, detect truncation via the stop_reason field (checking for "end_turn" vs "max_tokens"), and for truncated responses either salvage complete records from the partial output or trigger a continuation request</choice>
+        <choice letter="B">Set max_tokens to a very large value so truncation never happens</choice>
+        <choice letter="C">Buffer the entire streamed response before parsing so truncation is never an issue</choice>
+        <choice letter="D">Switch from JSON to CSV output since CSV rows are independently parseable even if the stream is cut off</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Consider how the pipeline can distinguish between a complete response and a truncated one, and what it should do with partial data.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>A resilient streaming pipeline should: (1) use an incremental JSON parser that can extract complete objects from a partial stream, (2) check the stop_reason field to distinguish between natural completion ("end_turn") and truncation ("max_tokens"), and (3) for truncated responses, either salvage fully-formed records from the partial output or send a continuation request asking Claude to resume from where it was cut off. Buffering the entire response defeats the purpose of streaming. Setting very large max_tokens doesn't prevent network interruptions and wastes token budget. CSV seems simpler but loses the hierarchical structure that JSON provides and introduces its own escaping and quoting complexities.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>When designing for continuation, include the partial output in the next request's assistant prefill so Claude can seamlessly continue the JSON structure from the exact point of truncation — this avoids duplicate records or structural breaks.</li>
+              <li>A streaming JSON parser like jsonstream or ijson can emit complete objects as they are parsed from the stream, allowing the pipeline to process finished records (e.g., the first 8 of 10 events) even if the final records are truncated.</li>
+              <li>For critical pipelines, implement a "completeness check" that verifies the expected number of records against a count field emitted early in the output (e.g., "total_events": 10 as the first field), so the system knows when truncation caused data loss versus when all records were delivered.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Structured Output</tag>
+        <tag>Streaming</tag>
+        <tag>Error Handling</tag>
+        <tag>Resilience</tag>
+      </tags>
+    </question>
+  </failing-question>
+  <failing-question>
+    <failure-reasons>
+      <reason>H1 uses unique correct-answer terms not in other choices: {'text'}</reason>
+    </failure-reasons>
+    <question id="31" category-ref="cat-structured-output" difficulty="intermediate">
+      <title>XML vs JSON Output Pattern Selection</title>
+      <scenario>A content management team uses Claude for two distinct tasks: (1) extracting metadata fields (title, author, date, tags) from blog posts into a database, and (2) generating editorial markup where sections of text need annotations like "needs citation," "tone too informal," or "factual claim — verify." The team is debating whether to standardize on JSON for both tasks or use different output formats.</scenario>
+      <question-text>Which output format strategy best fits the two distinct use cases described?</question-text>
+      <choices>
+        <choice letter="A">Use YAML for both tasks since it's the most human-readable structured format</choice>
+        <choice letter="B">Use XML for both tasks since it supports both structured data and inline annotations</choice>
+        <choice letter="C">Use JSON (via tool-use) for the metadata extraction task where you need typed fields conforming to a database schema, and use XML for the editorial markup task where annotations need to be interleaved within the source text</choice>
+        <choice letter="D">Use JSON for both tasks since it's the universal data interchange format</choice>
+      </choices>
+      <correct-answer>C</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Think about whether these two tasks have the same structural needs — does one require wrapping annotations around flowing text?</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>The two tasks have fundamentally different output structure needs. Metadata extraction produces flat or nested key-value data that maps perfectly to JSON, and using tool-use provides schema enforcement for the database. Editorial markup, however, requires annotations to be embedded within flowing text — wrapping phrases with tags like &lt;annotation type="needs-citation"&gt;some claim&lt;/annotation&gt; — which is XML's native strength. JSON is awkward for inline text annotation because you'd need to split text into fragments and wrap each in objects. Standardizing on one format forces an unnatural fit for one of the two tasks. YAML adds parsing complexity without meaningful benefits over JSON for these use cases.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Claude is naturally skilled at producing XML-style inline annotations because its training data includes extensive HTML and XML markup, making it reliable at opening and closing tags around relevant text spans.</li>
+              <li>For the JSON metadata task, tool-use schemas can enforce enum constraints (e.g., tags must come from an allowed list) and required fields, providing validation that prompt-based XML cannot match.</li>
+              <li>A practical pattern for the annotation task is to ask Claude to return the original text with XML annotation tags inserted, then use an XML parser to extract both the annotations and their positions — this preserves the original text while adding a structured annotation layer.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Structured Output</tag>
+        <tag>XML</tag>
+        <tag>JSON</tag>
+        <tag>Content Management</tag>
+      </tags>
+    </question>
+  </failing-question>
+  <failing-question>
+    <failure-reasons>
+      <reason>H1 uses unique correct-answer terms not in other choices: {'token'}</reason>
+    </failure-reasons>
+    <question id="32" category-ref="cat-context-mgmt" difficulty="basic">
+      <title>Context Window Limits and Token Budgeting</title>
+      <scenario>A developer is building a document Q&amp;A system that ingests long research papers (up to 80 pages) and answers questions about them. They plan to include the full document in every API request along with the conversation history. Using Claude with a 200K token context window, they notice that as conversations grow longer, responses slow down and costs increase significantly.</scenario>
+      <question-text>What is the primary reason costs increase as the conversation grows, and what is the most effective mitigation?</question-text>
+      <choices>
+        <choice letter="A">Costs increase because Claude's per-token price goes up as the context fills; mitigate by truncating older messages</choice>
+        <choice letter="B">Costs increase because longer conversations use a more expensive model tier; mitigate by switching to a smaller model mid-conversation</choice>
+        <choice letter="C">Costs increase due to network bandwidth; mitigate by compressing the document with gzip before sending</choice>
+        <choice letter="D">Costs increase because the API charges per input token and the full document is re-sent with every turn; mitigate by using prompt caching to avoid re-processing the unchanged document prefix across turns</choice>
+      </choices>
+      <correct-answer>D</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Every API call sends the full message history including the document, and you pay per input token each time.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>The Claude API is stateless — every request must include the full conversation context, including the document and all prior turns. Since pricing is per input token, re-sending the same 80-page document with each turn means paying for those tokens repeatedly. Prompt caching is the most effective mitigation: it tells the API to cache the static document prefix so subsequent requests that include the same prefix pay a reduced rate (typically a significant discount) for the cached portion. The per-token price does not increase based on context fullness. The API handles text, not compressed binary. Model tiers don't change mid-conversation based on length.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Prompt caching works by adding a cache_control breakpoint after the static content (the document); content before the breakpoint is cached and subsequent requests that match the cached prefix pay roughly 10% of the normal input token price after a small cache write premium.</li>
+              <li>To maximize cache hits, structure your messages so the stable content (system prompt, document) comes first in the message array and the varying content (conversation turns) comes last — any change before the cache breakpoint invalidates the cache.</li>
+              <li>For very long conversations, combine prompt caching (for the document) with conversation summarization (for older turns) to keep total token count manageable while preserving both document access and conversation context.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Context Management</tag>
+        <tag>Token Budgeting</tag>
+        <tag>Prompt Caching</tag>
+        <tag>Cost Optimization</tag>
+      </tags>
+    </question>
+  </failing-question>
+  <failing-question>
+    <failure-reasons>
+      <reason>H1 uses unique correct-answer terms not in other choices: {'reasoning'}</reason>
+    </failure-reasons>
+    <question id="34" category-ref="cat-context-mgmt" difficulty="advanced">
+      <title>Long-Context vs RAG Tradeoffs</title>
+      <scenario>A law firm is building a contract analysis system that needs to answer questions across a corpus of 10,000 contracts (averaging 15 pages each). Some questions require comparing clauses across multiple contracts, while others ask about specific provisions in a single contract. The firm has access to Claude with a 200K token context window and is deciding between a RAG architecture (embedding + retrieval + generation) and a long-context approach (loading full documents into the context).</scenario>
+      <question-text>Which architecture should the firm choose, and why?</question-text>
+      <choices>
+        <choice letter="A">Pre-process all contracts into a structured database and use SQL queries instead of Claude</choice>
+        <choice letter="B">Long-context only: load all 10,000 contracts into a single request since Claude's 200K context can handle it</choice>
+        <choice letter="C">RAG only: embed all contracts, retrieve relevant chunks for every query, and generate answers from the retrieved chunks</choice>
+        <choice letter="D">RAG for corpus-level retrieval to identify relevant contracts, then long-context for loading full retrieved contracts into the prompt for detailed analysis — combining retrieval precision with full-document reasoning</choice>
+      </choices>
+      <correct-answer>D</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Consider the different strengths needed for finding relevant documents in a large corpus versus reasoning deeply about their full contents.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>The hybrid RAG + long-context approach is optimal for this use case. Pure long-context fails because 10,000 contracts (~150,000 pages) far exceeds any context window. Pure RAG retrieves small chunks, which loses the full-document context needed for nuanced clause analysis and cross-section reasoning within a contract. The hybrid approach uses RAG to solve the needle-in-a-haystack problem (finding the 3-5 relevant contracts from 10,000) and then uses long-context to load those full contracts into Claude's 200K window for deep analysis. This combines retrieval precision at corpus scale with full-document reasoning at analysis time. A SQL-only approach cannot handle the semantic reasoning required for legal clause interpretation.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>The hybrid architecture also optimizes cost: RAG retrieval is cheap (embedding lookups), and long-context API calls are expensive — by using RAG to narrow the document set first, you minimize the tokens sent to Claude while maximizing analytical depth on the relevant documents.</li>
+              <li>For cross-contract comparison queries, the RAG layer retrieves candidate contracts from both sides of the comparison, and Claude's long context window allows side-by-side analysis of full contract texts, which chunk-based RAG would fragment into incoherent snippets.</li>
+              <li>This pattern generalizes to many enterprise use cases: use retrieval for discovery over large corpora, long-context for deep reasoning over retrieved documents, and prompt caching to amortize the cost when multiple questions are asked about the same retrieved document set.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Context Management</tag>
+        <tag>RAG</tag>
+        <tag>Long Context</tag>
+        <tag>Legal Tech</tag>
+      </tags>
+    </question>
+  </failing-question>
+  <failing-question>
+    <failure-reasons>
+      <reason>H1 uses unique correct-answer terms not in other choices: {'decision'}</reason>
+    </failure-reasons>
+    <question id="39" category-ref="cat-guardrails" difficulty="intermediate">
+      <title>Escalation to Human Reviewers</title>
+      <scenario>A large e-commerce company has deployed a Claude-powered agent that handles refund requests. The agent can autonomously approve refunds up to $50 and generate templated responses. For requests over $50 or those involving suspected fraud, the agent should escalate to a human reviewer. The team notices that the agent sometimes approves borderline cases autonomously when the user is persistent, and other times escalates trivially simple low-value requests unnecessarily.</scenario>
+      <question-text>Which design change would MOST effectively improve the escalation accuracy of this refund agent?</question-text>
+      <choices>
+        <choice letter="A">Add more emphatic language to the system prompt telling Claude to "strictly follow the $50 rule no matter what"</choice>
+        <choice letter="B">Remove the agent's ability to approve any refunds and route all requests to human reviewers</choice>
+        <choice letter="C">Implement the escalation decision as a programmatic rule in the orchestration layer based on structured data extracted by Claude, rather than letting Claude make the escalation decision in natural language</choice>
+        <choice letter="D">Train the agent with examples of persistent users so it learns to resist social pressure</choice>
+      </choices>
+      <correct-answer>C</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Think about which part of the decision — understanding the request versus enforcing the business rule — is best handled by the model versus by code.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Moving the escalation decision into deterministic code in the orchestration layer ensures that policy rules (refund amount thresholds, fraud signals) are enforced consistently regardless of conversational pressure. Claude's role becomes extracting structured data (refund amount, reason, fraud indicators) which the orchestrator then evaluates against hard-coded rules. Emphatic prompting (A) is unreliable against persistent or cleverly phrased requests. Removing all autonomy (B) eliminates the agent's value proposition. Training with examples (D) may help but cannot guarantee deterministic policy compliance. The key insight is that business rules should live in code, not in prompts.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>The "extract then decide" pattern is a foundational principle in production agent design: use the LLM for understanding and extraction, use deterministic code for policy enforcement and routing.</li>
+              <li>This architecture is also more auditable -- you can log both the extracted data and the rule evaluation separately, making it easy to diagnose why any particular case was escalated or approved.</li>
+              <li>Anthropic recommends using tool-use responses with defined schemas to enforce structured extraction, which naturally separates the extraction step from the decision step.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Guardrails</tag>
+        <tag>Escalation</tag>
+        <tag>Customer Support</tag>
+        <tag>Orchestration</tag>
+      </tags>
+    </question>
+  </failing-question>
+  <failing-question>
+    <failure-reasons>
+      <reason>H1 uses unique correct-answer terms not in other choices: {'call'}</reason>
+    </failure-reasons>
+    <question id="41" category-ref="cat-retry-recovery" difficulty="advanced">
+      <title>Idempotent Tool Calls in Multi-Step Agents</title>
+      <scenario>A multi-agent research system uses Claude to gather data from external APIs, synthesize findings, and write reports. The agent executes tool calls to query databases and POST results to a reporting service. During a network interruption, the orchestrator loses connection mid-workflow and must resume. Some tool calls may have already executed successfully but the orchestrator did not receive confirmation. The architect must ensure resumption does not cause duplicate side effects.</scenario>
+      <question-text>Which design pattern BEST ensures safe resumption of this multi-step workflow without duplicate side effects?</question-text>
+      <choices>
+        <choice letter="A">Assign a unique idempotency key to each tool call, persist the key and result before execution, and on resume check whether each tool call has already completed before executing it</choice>
+        <choice letter="B">Set the Claude API temperature to 0 to guarantee identical outputs on replay, then re-run from the start</choice>
+        <choice letter="C">Re-run the entire workflow from the beginning, since Claude will generate the same tool calls deterministically</choice>
+        <choice letter="D">Skip all tool calls that might have executed and only run the remaining steps, accepting possible gaps in data</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Think about how the orchestrator can tell whether a tool call already executed successfully before the crash, even if it never received the confirmation.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Assigning unique idempotency keys to each tool call and persisting their execution state creates a checkpoint system that allows safe resumption. On recovery, the orchestrator checks each tool call's key: if already executed, it reuses the stored result; if not, it executes normally. Re-running from scratch (A) is unsafe because Claude is not deterministic (even at temperature 0, outputs are not guaranteed identical) and because external APIs may create duplicates. Temperature 0 (B) does not guarantee determinism due to batching and floating-point differences, and even if it did, the external API calls would still duplicate. Skipping potentially-executed calls (C) loses data integrity.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>The idempotency pattern for agent tool calls follows the same principle as payment processing: write-ahead logging of intent, execution, and confirmation creates a recoverable state machine.</li>
+              <li>For read-only tool calls (database queries), idempotency is naturally safe -- the key concern is write operations (POSTs, updates, deletes) where duplication causes real harm.</li>
+              <li>Production agent frameworks often implement a "tool execution ledger" that records: tool name, parameters hash, idempotency key, execution status, and result -- enabling both safe retry and full audit trails.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Idempotency</tag>
+        <tag>Recovery</tag>
+        <tag>Multi-Step Workflows</tag>
+        <tag>Multi-Agent</tag>
+      </tags>
+    </question>
+  </failing-question>
+  <failing-question>
+    <failure-reasons>
+      <reason>H1 uses unique correct-answer terms not in other choices: {'successful'}</reason>
+    </failure-reasons>
+    <question id="43" category-ref="cat-retry-recovery" difficulty="intermediate">
+      <title>Partial Failure in Multi-Step Extraction</title>
+      <scenario>A structured data extraction pipeline processes incoming contracts by sending each contract to Claude in three sequential steps: (1) extract party names and dates, (2) extract financial terms, (3) extract obligations and deadlines. Step 1 and Step 2 succeed, but Step 3 fails with a 500 Internal Server Error after two retries. The pipeline processes hundreds of contracts per day and must maintain high throughput.</scenario>
+      <question-text>How should the pipeline handle this partial failure scenario?</question-text>
+      <choices>
+        <choice letter="A">Save the successful results from Steps 1 and 2 with a status marker indicating Step 3 is incomplete, place the contract in a retry queue for Step 3 only, and proceed to the next contract</choice>
+        <choice letter="B">Halt the entire pipeline until the 500 error is resolved to prevent any incomplete data from being stored</choice>
+        <choice letter="C">Discard all results from Steps 1 and 2 and re-queue the entire contract for reprocessing from scratch</choice>
+        <choice letter="D">Return the partial results from Steps 1 and 2 as the final output and mark the contract as complete</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Consider the cost of re-doing successful work versus the risk of storing incomplete data — how would you balance both concerns?</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Saving partial results with a clear status marker and retrying only the failed step is the optimal approach. It preserves the work already done (avoiding redundant API calls and costs), maintains data integrity through explicit status tracking, and keeps the pipeline moving for other contracts. Discarding all results (A) wastes successful work and increases API costs. Marking incomplete data as complete (C) silently loses information and violates data integrity. Halting the entire pipeline (D) lets one failure block all other processing, which is unacceptable at high throughput. The checkpoint pattern enables both efficiency and correctness.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Production extraction pipelines should model each document as a state machine with explicit states: queued, step-1-complete, step-2-complete, complete, and failed-at-step-N -- enabling targeted retries and progress monitoring.</li>
+              <li>A dead-letter queue should capture contracts that fail repeatedly (after max retries), routing them to human review rather than retrying indefinitely.</li>
+              <li>500 errors from the Claude API indicate a server-side issue and are transient -- they are safe to retry, unlike 400-level errors which typically indicate a problem with the request itself.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Partial Failure</tag>
+        <tag>Checkpointing</tag>
+        <tag>Structured Data Extraction</tag>
+        <tag>Pipeline Design</tag>
+      </tags>
+    </question>
+  </failing-question>
+  <failing-question>
+    <failure-reasons>
+      <reason>H1 uses unique correct-answer terms not in other choices: {'review', 'missing'}</reason>
+    </failure-reasons>
+    <question id="45" category-ref="cat-hitl" difficulty="advanced">
+      <title>Confidence Thresholds for Escalation</title>
+      <scenario>A legal technology company has built a Claude-based contract review agent that identifies risky clauses and classifies them by severity (low, medium, high). The agent processes thousands of contracts per week. The legal team wants to review only the contracts that truly need human attention, but they cannot afford to miss genuinely high-risk clauses. The team is debating how to set the confidence threshold for escalation to human review.</scenario>
+      <question-text>Which threshold strategy BEST balances thoroughness with reviewer efficiency for this contract review system?</question-text>
+      <choices>
+        <choice letter="A">Escalate everything classified as medium or high risk regardless of confidence, ensuring humans see all potentially risky clauses</choice>
+        <choice letter="B">Use asymmetric thresholds: escalate high-risk classifications at a low confidence bar (e.g., 60%) to avoid missing dangers, but require high confidence (e.g., 90%) before autonomously marking a contract as low-risk and skipping human review</choice>
+        <choice letter="C">Set a single high confidence threshold (e.g., 95%) -- only escalate when the agent is very confident a clause is high-risk, minimizing the volume of human reviews</choice>
+        <choice letter="D">Let the legal team manually set thresholds per contract type without providing a default, since risk tolerance varies</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Consider whether the consequences of missing a real risk and the consequences of an unnecessary review are equally severe for this use case.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Asymmetric thresholds correctly reflect the asymmetric costs in legal review. Missing a genuinely high-risk clause (false negative) could expose the company to significant legal liability, so the bar for escalation should be low -- even moderate suspicion warrants human eyes. Conversely, the bar for autonomously clearing a contract should be high, because incorrectly skipping review is the dangerous failure mode. A single high threshold (A) optimizes for reviewer efficiency at the cost of safety. Escalating everything medium+ (B) overwhelms reviewers and defeats the purpose of automation. Deferring entirely to per-type manual configuration (D) provides no safe default and risks misconfiguration.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Asymmetric thresholds mirror the concept of "sensitivity vs. specificity" in medical testing -- for high-consequence domains, you optimize for sensitivity (catching all true positives) even at the cost of more false positives.</li>
+              <li>The confidence scores from Claude can be obtained by asking the model to rate its confidence explicitly in a structured response, or by analyzing logprobs where available -- but these should be calibrated against ground truth before relying on specific numeric thresholds.</li>
+              <li>Over time, the thresholds can be tuned using feedback data: track which escalated contracts actually required human intervention and which were false alarms, then adjust thresholds to optimize the precision-recall tradeoff for the specific domain.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Human-in-the-Loop</tag>
+        <tag>Confidence Thresholds</tag>
+        <tag>Escalation</tag>
+        <tag>Legal Technology</tag>
+      </tags>
+    </question>
+  </failing-question>
+</hint1-audit>

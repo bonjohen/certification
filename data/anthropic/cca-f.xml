@@ -73,7 +73,7 @@
       <correct-answer>B</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Effective stop conditions use multiple signals — not just one dimension of cost or count.</content>
+          <content>Think about what happens when an agent is stuck versus when it is making slow but real progress — how would you tell the difference?</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>A layered approach to stop conditions is the industry best practice for agentic loops. A maximum iteration count prevents unbounded execution. A wall-clock timeout catches cases where individual iterations are slow (e.g., waiting on external tools). A progress-stall detector is the most nuanced — it detects when the agent is churning without making meaningful progress, which is the exact failure mode described. Setting a limit of only 3 iterations is too restrictive for complex tasks. Relying solely on the model's judgment is unsafe since models can get stuck in loops. Token budget alone misses time-based issues and doesn't detect stalls.</content>
@@ -108,7 +108,7 @@
       <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>When sub-tasks have data dependencies and eventual consistency, the orchestrator must model those dependencies explicitly.</content>
+          <content>Consider what goes wrong if you start generating the invoice before all upstream changes have fully propagated.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>A dependency graph is the correct approach because it explicitly models the ordering constraints: the discount can only be applied to the new plan (so migration must complete first), and the invoice must reflect the propagated discount (so it must wait for confirmation). Parallel execution would produce an incorrect invoice since the discount may not have propagated. Delegating ordering to the model at inference time is unreliable for operations with real-world side effects. Fixed delays are wasteful and fragile — 10 seconds may be too long or too short depending on system load.</content>
@@ -144,7 +144,7 @@
       <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>When sub-tasks need different model configurations, system prompts, or tool sets, separation provides clarity and reliability.</content>
+          <content>Think about what each responsibility in this pipeline needs in terms of configuration — are those needs compatible in a single context?</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>Delegating to separate sub-agents is the best pattern here because each responsibility has distinct requirements: different system prompts, different temperature settings, and different tool access. A single call with everything combined would create a bloated system prompt and risk the model underperforming on specialized tasks like security analysis. Sequential calls with changing system prompts is a misuse of conversation history — the security check does not benefit from the summary's conversation context. Prompt chaining creates artificial dependencies between tasks that are actually independent, adding latency without benefit. Separate sub-agents can also run in parallel since none depends on the others' output.</content>
@@ -179,7 +179,7 @@
       <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Restart-safe systems externalize progress incrementally, not just at the end.</content>
+          <content>If the process crashes after document 250, how would it know which documents have already been handled when it restarts?</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>An append-only log with document IDs provides restart safety because progress is persisted after each document is processed. On restart, the agent reads the log to determine what has already been completed and resumes from where it left off. Writing a checkpoint only at batch completion (option A) loses all progress on preemption. A database transaction wrapping the entire batch (option B) would roll back all work on interruption, which is the opposite of what we want. Random ordering (option C) does not solve the fundamental problem of duplicate processing and produces unpredictable results.</content>
@@ -250,7 +250,7 @@
       <correct-answer>B</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Cache the part that stays the same across requests, not the part that changes.</content>
+          <content>Think about which parts of your API requests are repeated identically across calls and which change per request.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>Prompt caching is designed for exactly this pattern: a large, repeated prefix (the system prompt with extraction rules) followed by a small, variable suffix (the invoice text). By placing a cache_control breakpoint with ephemeral type at the end of the system prompt, subsequent requests reuse the cached system prompt tokens at a 90% discount on input token cost. Caching the variable user message (option B) is counterproductive since each invoice is different. Batching all invoices into one call (option D) risks hitting context limits and makes error handling much harder. There is no implicit cache at 1,024 tokens (option A) — prompt caching requires explicit cache_control markers.</content>
@@ -391,7 +391,7 @@
       <correct-answer>B</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>The model needs clear, structured signals to distinguish between "no data found" and "the lookup failed" — and the API has a built-in mechanism for this.</content>
+          <content>Consider what information the model needs to respond honestly when a data lookup fails versus when it returns empty results.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>The is_error field in the tool result content block is specifically designed for this scenario. When set to true, it signals to Claude that the tool call failed and the result should be treated as an error message, not as data. Combined with a structured error message that specifies the error type (timeout, permission denied, malformed query) and explicitly states that no customer data was retrieved, this gives Claude the information it needs to respond honestly — e.g., "I wasn't able to look up your account due to a system issue." Returning raw stack traces (option B) is a security risk and provides no useful signal to the model. Silent retries (option C) add latency and don't solve the signaling problem when retries are exhausted. Removing the tool (option D) does not address the fundamental issue.</content>
@@ -426,7 +426,7 @@
       <correct-answer>B</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>The tool_choice parameter can be changed between turns — use a specific tool requirement when you need guaranteed execution, then relax to auto for flexibility.</content>
+          <content>Think about whether the orchestrator can enforce certain actions on specific turns rather than relying on the model to choose correctly every time.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>By setting tool_choice to {"type": "tool", "name": "run_linter"} on the first orchestrator turn, you guarantee the linter runs before anything else — the model has no choice but to call it. On subsequent turns, switching to {"type": "auto"} gives Claude the flexibility to read files, run the linter again, or post comments as it sees fit. This enforces the "linter first" invariant without rigidly scripting the entire review process. Relying on system prompt instructions alone (option A) is not reliable for hard requirements. Using "any" (option B) forces tool use on every turn but doesn't control which tool. Running the linter outside the loop (option C) works but loses the ability for the agent to run the linter selectively on specific files it identifies during review.</content>
@@ -497,7 +497,7 @@
       <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>The orchestrator can enforce sequencing at the phase level while allowing parallelism within each phase.</content>
+          <content>Consider how you might get the benefits of concurrent execution without allowing calls that depend on results that haven't arrived yet.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>Phase-based orchestration is the right approach: the orchestrator divides the workflow into phases where within each phase, tool calls are independent and can run in parallel, but phases execute sequentially. Phase 1: search_papers (returns IDs). Phase 2: multiple get_paper calls in parallel using the IDs from phase 1. Phase 3: get_citations calls in parallel using data from phase 2. This preserves the latency benefits of parallelism (fetching 5 papers simultaneously) while ensuring data dependencies are respected. Disabling parallelism entirely (option A) sacrifices significant latency gains. Server-side dependency tracking (option D) is complex and the server doesn't have the semantic understanding of which calls depend on which. Pre-fetching (option C) is impossible when you don't know which papers are relevant until after the search.</content>
@@ -567,7 +567,7 @@
       <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>MCP defines specific transport protocols: one for local process communication and another for network-accessible servers.</content>
+          <content>Think about the fundamental difference between a server running on the same machine versus one shared across a network — what communication styles suit each?</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>MCP supports two primary transport mechanisms. The stdio transport is designed for local servers: the MCP client (Claude Code or Claude Desktop) spawns the server as a child process and communicates via stdin/stdout. This is ideal for the local development tools server — it's simple, requires no network configuration, and the server lifecycle is managed by the client. The Streamable HTTP transport (which supersedes the older HTTP+SSE transport) is designed for network-accessible servers: it uses HTTP POST for client-to-server messages and optional SSE for server-to-client streaming. This is correct for the shared analytics server that multiple users connect to over the network. MCP does not natively support WebSocket or gRPC (option C). Piping stdio over SSH (option D) is an impractical hack for a multi-user shared server.</content>
@@ -638,7 +638,7 @@
       <correct-answer>A</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Security controls must be enforced in code on the server side, not in prompts that can be circumvented.</content>
+          <content>Consider which layer of the system can enforce file access restrictions even if the model has been manipulated by injected instructions.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>Server-side access controls are the only reliable security boundary because they cannot be bypassed by prompt injection or model misbehavior. The MCP server should: (1) restrict the write_file tool to only accept paths within a designated output directory, rejecting any path traversal attempts; (2) validate all paths against an allowlist of permitted directories; (3) leverage Claude Desktop's built-in consent UI that prompts the user before executing tool calls, giving the analyst a chance to review and reject suspicious operations. Relying on system prompt instructions (option A) is ineffective against prompt injection — a malicious document could override those instructions. Running with elevated permissions and relying on post-hoc logging (option C) allows damage to occur before detection. Disabling the server entirely (option D) eliminates the productivity benefit.</content>
@@ -674,7 +674,7 @@
       <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Claude Code loads CLAUDE.md files from multiple locations and merges them together.</content>
+          <content>Think about how other developer tools (like .gitconfig) handle the tension between personal preferences and shared project settings.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>Claude Code supports a hierarchy of CLAUDE.md files: user-level (~/.claude/CLAUDE.md), project-level (repository root), and even directory-level within a project. All applicable CLAUDE.md files are merged, with more specific files augmenting broader ones. This design lets organizations define universal standards in the user-level file while projects add their own conventions without duplication. Duplicating files across repos creates maintenance burden, and Claude Code does not read configuration from environment variables or npm packages.</content>
@@ -709,7 +709,7 @@
       <correct-answer>B</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Claude Code hooks allow you to run custom scripts at specific lifecycle points like after edits or before commits.</content>
+          <content>Think about where in the tool's lifecycle you'd want automatic, non-optional enforcement rather than instructions the model might skip.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>Claude Code's hooks system provides lifecycle events such as afterEdit and preCommit where you can configure scripts to run automatically. An afterEdit hook fires after any file modification, making it ideal for automatic linting. A preCommit hook runs before a commit is finalized and can block the commit if it returns a non-zero exit code, making it perfect for security scanning. This is deterministic and doesn't rely on Claude remembering instructions. CLAUDE.md instructions are best-effort guidance, not enforcement. Shell wrappers and MCP interception are fragile workarounds that don't integrate with Claude Code's lifecycle.</content>
@@ -745,7 +745,7 @@
       <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Headless CI environments need non-interactive mode with scoped permissions — not blanket approval or blanket denial.</content>
+          <content>Consider the tradeoffs between convenience and safety when no human is present to approve actions — what principle guides that balance?</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>The correct approach combines non-interactive mode (so Claude Code doesn't block waiting for human input) with an allowlist of permitted tools scoped to the specific CI task. This provides autonomous operation while maintaining guardrails. Piping "yes" to approve everything is dangerous and could allow destructive actions. The "dangerously skip permissions" flag removes all safety checks, which violates the team's guardrail requirement. Disabling all tool use defeats the purpose of using Claude Code as an autonomous agent and pushes execution complexity into a separate, less controlled script.</content>
@@ -817,7 +817,7 @@
       <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Git worktrees give you multiple working directories backed by one repository — each with its own branch and file state.</content>
+          <content>Think about what Git feature lets you have separate file states for different branches without duplicating the entire repository history.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>Git worktrees create separate working directory checkouts that share the same underlying .git object store. Each worktree can be on a different branch with its own file state, so changes in one task don't affect another. This is ideal for parallel Claude Code sessions because each session operates in its own directory with no risk of cross-contamination. Unlike full clones, worktrees don't duplicate the object store, saving disk space and setup time. They don't automatically merge changes or change language contexts — those are unrelated capabilities. The key benefit is isolation without duplication.</content>
@@ -853,7 +853,7 @@
       <correct-answer>A</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>The system prompt is the highest-priority instruction channel in the Claude API message hierarchy.</content>
+          <content>Consider which part of the API message structure is designed for persistent, high-priority behavioral rules that resist override.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>The system prompt is the correct location for identity, behavioral constraints, and escalation rules because it occupies the highest position in Claude's instruction hierarchy (system &gt; user &gt; assistant). Instructions in the system prompt persist across all conversation turns and are harder for user messages to override. Placing rules in the first user message makes them lower priority and susceptible to being overridden by subsequent user messages. Fine-tuning Claude is not available as a standard API feature, and there is no separate configuration API call — the system prompt is the mechanism for this.</content>
@@ -889,7 +889,7 @@
       <correct-answer>A</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>You can pre-populate the beginning of Claude's response to steer the output format from the first token.</content>
+          <content>Think about whether the API lets you control how the model's response begins, not just what instructions you give it.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>Prefilling the assistant response is the most reliable technique for ensuring Claude outputs a specific format. By including an assistant message that starts with "{", you constrain Claude to continue generating valid JSON from that point — there is no opportunity to insert preamble text or code fences because the response has already started. Capitalized instructions improve compliance but are not foolproof. Temperature 0 reduces randomness but doesn't prevent format variations. Regex stripping is a fragile post-processing workaround that doesn't solve the root cause and can break on nested braces.</content>
@@ -925,7 +925,7 @@
       <correct-answer>A</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Extended thinking gives Claude a dedicated space to reason without polluting the output.</content>
+          <content>Consider whether the API offers a way to let the model reason deeply while keeping the final response clean and structured.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>Extended thinking (enabled via the API's thinking parameter with a budget_tokens allocation) gives Claude a dedicated internal reasoning space — a thinking block — where it can work through complex analysis step by step. The final response contains only the clean output. This separates the reasoning process (which improves accuracy) from the deliverable (which must be structured and clean). Regex stripping is fragile and can corrupt output. Higher temperature increases randomness, not analytical depth. Running the analysis twice doubles cost and latency without guaranteeing the second run's clean output matches the first run's accurate analysis.</content>
@@ -961,7 +961,7 @@
       <correct-answer>B</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Grounding instructions that constrain Claude to provided context and define a clear fallback behavior address hallucination at its source.</content>
+          <content>Think about what the model needs to know — both about where to look for answers and what to do when it cannot find one.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>The most effective anti-hallucination strategy combines three techniques in the system prompt: (1) explicitly constrain Claude to answer only from the provided documents, (2) require citation of specific passages so claims are traceable, and (3) define a clear fallback response for when information is absent. This addresses hallucination at its source — Claude's tendency to generate plausible text when uncertain. Retrieving more documents risks adding noise and doesn't prevent hallucination when the answer truly isn't in the corpus. Temperature 0 reduces randomness but doesn't prevent confident fabrication. Fine-tuning Claude is not a standard API offering and wouldn't solve the core grounding problem.</content>
@@ -997,7 +997,7 @@
       <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Tool-use mode lets you define a JSON schema that the API enforces structurally on the output.</content>
+          <content>Consider which approach gives you structural guarantees enforced by the API rather than relying on the model's best effort.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>Tool-use based structured output provides the strongest schema guarantees because you define the expected structure as a JSON schema in the tool's input_schema, and the API constrains Claude's output to conform to it. This means the response is guaranteed to have the required fields with the correct types. Prompt-based JSON with few-shot examples improves compliance but cannot guarantee schema conformance — Claude may still omit fields or use wrong types. XML output from Claude has no built-in schema enforcement since Claude isn't validating against an XSD. Custom delimiter formats are fragile and error-prone to parse.</content>
@@ -1033,7 +1033,7 @@
       <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>A validation loop combines programmatic checks with targeted LLM self-correction, catching errors that pure generation can't prevent.</content>
+          <content>Think about how you'd combine the strengths of deterministic checks with the model's ability to understand and fix its own mistakes.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>A validation loop is the most robust approach because it combines the strengths of deterministic programmatic validation (checking schema conformance, verifying arithmetic) with Claude's ability to understand and correct its own errors when given specific feedback. The loop: (1) generates output, (2) validates programmatically, (3) if invalid, sends Claude the output plus specific error messages, (4) Claude produces a corrected version, (5) repeat until valid or max retries exceeded. Majority voting is expensive (3x cost) and doesn't guarantee correctness. Pre-calculating totals works for simple cases but doesn't scale to complex narrative reports. Larger models still make errors — validation is a separate concern from generation quality.</content>
@@ -1069,7 +1069,7 @@
       <correct-answer>A</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>The stop_reason field tells you whether Claude finished naturally or was cut off, and streaming parsers can extract value from partial output.</content>
+          <content>Consider how the pipeline can distinguish between a complete response and a truncated one, and what it should do with partial data.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>A resilient streaming pipeline should: (1) use an incremental JSON parser that can extract complete objects from a partial stream, (2) check the stop_reason field to distinguish between natural completion ("end_turn") and truncation ("max_tokens"), and (3) for truncated responses, either salvage fully-formed records from the partial output or send a continuation request asking Claude to resume from where it was cut off. Buffering the entire response defeats the purpose of streaming. Setting very large max_tokens doesn't prevent network interruptions and wastes token budget. CSV seems simpler but loses the hierarchical structure that JSON provides and introduces its own escaping and quoting complexities.</content>
@@ -1105,7 +1105,7 @@
       <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>JSON excels at flat/nested data structures; XML excels at annotating content inline where markup wraps around text.</content>
+          <content>Think about whether these two tasks have the same structural needs — does one require wrapping annotations around flowing text?</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>The two tasks have fundamentally different output structure needs. Metadata extraction produces flat or nested key-value data that maps perfectly to JSON, and using tool-use provides schema enforcement for the database. Editorial markup, however, requires annotations to be embedded within flowing text — wrapping phrases with tags like &lt;annotation type="needs-citation"&gt;some claim&lt;/annotation&gt; — which is XML's native strength. JSON is awkward for inline text annotation because you'd need to split text into fragments and wrap each in objects. Standardizing on one format forces an unnatural fit for one of the two tasks. YAML adds parsing complexity without meaningful benefits over JSON for these use cases.</content>
@@ -1177,7 +1177,7 @@
       <correct-answer>A</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Summarization compresses the essential information from many turns into a fraction of the tokens, preserving continuity.</content>
+          <content>Think about how you would hand off an investigation to a colleague who needs to continue from where you left off with limited reading time.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>Conversation summarization is the most effective strategy because it preserves the intellectual progress of the investigation (findings, decisions, open questions) while dramatically reducing token usage. The summary becomes the foundation of a new conversation that can continue the investigation with full awareness of prior work. Starting fresh loses all context since Claude has no cross-conversation memory. Dropping old messages arbitrarily may discard critical early findings that inform later analysis. Switching to a larger model is not always possible, defers the problem rather than solving it, and larger contexts still have limits.</content>
@@ -1213,7 +1213,7 @@
       <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Neither pure long-context nor pure RAG handles both corpus search and deep document analysis well on their own.</content>
+          <content>Consider the different strengths needed for finding relevant documents in a large corpus versus reasoning deeply about their full contents.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>The hybrid RAG + long-context approach is optimal for this use case. Pure long-context fails because 10,000 contracts (~150,000 pages) far exceeds any context window. Pure RAG retrieves small chunks, which loses the full-document context needed for nuanced clause analysis and cross-section reasoning within a contract. The hybrid approach uses RAG to solve the needle-in-a-haystack problem (finding the 3-5 relevant contracts from 10,000) and then uses long-context to load those full contracts into Claude's 200K window for deep analysis. This combines retrieval precision at corpus scale with full-document reasoning at analysis time. A SQL-only approach cannot handle the semantic reasoning required for legal clause interpretation.</content>
@@ -1249,7 +1249,7 @@
       <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Selectively compressing resolved work while preserving active context gives the best ratio of information retention to token savings.</content>
+          <content>Think about which parts of the conversation history are still relevant to the current task versus which represent already-resolved work.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>The most effective technique is selective summarization: replace completed work sequences (e.g., "read file X, found bug on line 45, edited to fix null check, tests now pass") with concise summaries, while keeping recent unresolved interactions in full fidelity. This preserves the agent's understanding of what has been accomplished and what remains, without wasting tokens on obsolete error traces or superseded file contents. Deleting all tool results removes context Claude may need to understand the current state. Restarting wastes all accumulated progress. Uniform truncation may cut critical information from some results while keeping irrelevant content from others.</content>
@@ -1285,7 +1285,7 @@
       <correct-answer>B</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Effective prompt injection defense is layered, combining model-level instructions with input-level detection.</content>
+          <content>Think about whether a single defense technique is sufficient, or whether different attack vectors require defenses at different layers.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>The most effective approach combines system prompt hardening (explicitly instructing Claude to never disclose its instructions) with an input classification layer that detects and flags suspicious injection-style messages. Regex-based blocklists (A) are trivially bypassed through paraphrasing, encoding, or foreign languages. Removing the system prompt (C) sacrifices the most powerful control mechanism and does not prevent extraction of few-shot examples. Rate limiting (D) slows attackers but does not prevent successful injection on the very first attempt. Layered defense addresses both the model's behavior and the input pipeline.</content>
@@ -1320,7 +1320,7 @@
       <correct-answer>B</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Safe defaults mean restricting by default and explicitly granting elevated permissions, not the other way around.</content>
+          <content>Consider what "least privilege" means for an AI agent — should it start with broad access and remove it, or start narrow and expand?</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>An allowlist-based approach with safe defaults (read-only by default, explicit escalation for writes/deletes) directly addresses the incident while preserving autonomy for known-safe operations. Logging without restrictions (B) detects problems only after damage occurs. Full read-only mode (C) eliminates the agent's ability to fix bugs autonomously, defeating its purpose. A sandbox with auto-approve (D) still allows destructive operations within the container and does not teach the agent boundaries -- if the sandbox includes the real repo checkout, the damage is real. The allowlist approach provides the principle of least privilege while maintaining useful autonomy.</content>
@@ -1356,7 +1356,7 @@
       <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>When regulatory compliance is at stake, relying solely on prompt instructions is insufficient -- you need a programmatic enforcement layer.</content>
+          <content>Think about whether instructions to the model alone can provide the level of guarantee that regulatory compliance demands.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>A post-generation output classifier provides a deterministic, auditable safety layer that catches non-compliant outputs regardless of how or why the model generated them. System prompt improvements (A) reduce but cannot eliminate violations because language models are probabilistic. Lower temperature (B) reduces randomness but does not prevent systematic patterns. Fine-tuning (D) is expensive, unavailable for Claude through the standard API, and still cannot guarantee zero violations. The output classifier approach is the industry standard for regulated environments because it provides a hard boundary that is independent of model behavior.</content>
@@ -1391,7 +1391,7 @@
       <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Separate data extraction (what Claude is good at) from policy enforcement (what code is good at).</content>
+          <content>Think about which part of the decision — understanding the request versus enforcing the business rule — is best handled by the model versus by code.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>Moving the escalation decision into deterministic code in the orchestration layer ensures that policy rules (refund amount thresholds, fraud signals) are enforced consistently regardless of conversational pressure. Claude's role becomes extracting structured data (refund amount, reason, fraud indicators) which the orchestrator then evaluates against hard-coded rules. Emphatic prompting (A) is unreliable against persistent or cleverly phrased requests. Removing all autonomy (B) eliminates the agent's value proposition. Training with examples (D) may help but cannot guarantee deterministic policy compliance. The key insight is that business rules should live in code, not in prompts.</content>
@@ -1427,7 +1427,7 @@
       <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Exponential backoff with jitter is the standard pattern for handling transient overload errors in distributed systems.</content>
+          <content>Consider the standard distributed systems approach for handling transient server overload without overwhelming the service further.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>Exponential backoff with jitter is the correct approach because it gradually increases the wait time between retries (reducing pressure on an overloaded service) while the jitter component prevents multiple clients from retrying in synchronized bursts (the "thundering herd" problem). Immediate retries (A) worsen the overload. Failing immediately (B) provides poor user experience for a transient condition. Fixed 60-second waits (C) are unnecessarily slow for transient issues and still lack jitter. The combination of exponential backoff, jitter, and a reasonable retry cap balances reliability with responsible API usage.</content>
@@ -1463,7 +1463,7 @@
       <correct-answer>A</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Idempotency keys let you safely retry operations without worrying about duplicating side effects.</content>
+          <content>Think about how the orchestrator can tell whether a tool call already executed successfully before the crash, even if it never received the confirmation.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>Assigning unique idempotency keys to each tool call and persisting their execution state creates a checkpoint system that allows safe resumption. On recovery, the orchestrator checks each tool call's key: if already executed, it reuses the stored result; if not, it executes normally. Re-running from scratch (A) is unsafe because Claude is not deterministic (even at temperature 0, outputs are not guaranteed identical) and because external APIs may create duplicates. Temperature 0 (B) does not guarantee determinism due to batching and floating-point differences, and even if it did, the external API calls would still duplicate. Skipping potentially-executed calls (C) loses data integrity.</content>
@@ -1499,7 +1499,7 @@
       <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Graceful degradation means providing reduced but functional service, not no service or error spam.</content>
+          <content>Think about what the developer experience should look like during an outage — disrupted, queued, or reduced but functional?</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>Falling back to a simpler local suggestion engine maintains the developer's workflow with reduced quality rather than complete disruption. Queuing requests (A) is pointless for real-time suggestions -- by the time they are processed, the developer has moved on, and the context is stale. Showing error dialogs on every keystroke (B) is disruptive and provides no value. Maintaining hot-standby connections to alternative providers (D) adds significant complexity, cost, and prompt compatibility challenges, and is typically not justified for a suggestion feature. The best degradation maintains the user experience at reduced quality while clearly communicating the temporary limitation.</content>
@@ -1535,7 +1535,7 @@
       <correct-answer>A</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Checkpoint-and-resume patterns save completed work and retry only the failed step.</content>
+          <content>Consider the cost of re-doing successful work versus the risk of storing incomplete data — how would you balance both concerns?</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>Saving partial results with a clear status marker and retrying only the failed step is the optimal approach. It preserves the work already done (avoiding redundant API calls and costs), maintains data integrity through explicit status tracking, and keeps the pipeline moving for other contracts. Discarding all results (A) wastes successful work and increases API costs. Marking incomplete data as complete (C) silently loses information and violates data integrity. Halting the entire pipeline (D) lets one failure block all other processing, which is unacceptable at high throughput. The checkpoint pattern enables both efficiency and correctness.</content>
@@ -1571,7 +1571,7 @@
       <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Classify actions by their blast radius: low-risk reversible actions can be autonomous, high-risk or hard-to-reverse actions need human oversight.</content>
+          <content>Think about what property of each action should determine whether it runs autonomously or requires a human to approve it.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>Security best practices dictate that the approval requirement should be based on the risk and reversibility of each action, not on time-of-day or blanket policies. Read-only queries have zero blast radius and password resets are easily reversible and self-service -- both are safe for autonomous execution. Account provisioning creates new access surfaces and ACL modifications can escalate privileges, making both high-risk actions that warrant human review. Full autonomy (A) exposes the organization to agent errors on critical operations. Full manual mode (B) negates the agent's value. Time-based policies (D) have no security rationale -- a misconfigured ACL is equally dangerous at 2 PM and 2 AM.</content>
@@ -1607,7 +1607,7 @@
       <correct-answer>B</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>When the cost of a false negative (missing a real risk) far exceeds the cost of a false positive (unnecessary review), thresholds should be asymmetric.</content>
+          <content>Consider whether the consequences of missing a real risk and the consequences of an unnecessary review are equally severe for this use case.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>Asymmetric thresholds correctly reflect the asymmetric costs in legal review. Missing a genuinely high-risk clause (false negative) could expose the company to significant legal liability, so the bar for escalation should be low -- even moderate suspicion warrants human eyes. Conversely, the bar for autonomously clearing a contract should be high, because incorrectly skipping review is the dangerous failure mode. A single high threshold (A) optimizes for reviewer efficiency at the cost of safety. Escalating everything medium+ (B) overwhelms reviewers and defeats the purpose of automation. Deferring entirely to per-type manual configuration (D) provides no safe default and risks misconfiguration.</content>
@@ -1643,7 +1643,7 @@
       <correct-answer>A</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Effective feedback loops identify patterns in corrections rather than treating each edit as an independent example.</content>
+          <content>Think about what you could learn from hundreds of human edits if you looked at them as a dataset rather than individual corrections.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>Analyzing edit patterns to identify systematic issues and then updating prompt instructions is the most effective and sustainable approach. It converts raw data (individual edits) into actionable insights (instruction improvements) and targeted examples. Dumping all edits as few-shot examples (A) does not scale -- prompt context is limited, and raw examples without analysis may contain contradictions or noise. Fine-tuning (B) is not available through Claude's standard API, is expensive, and creates a static improvement that does not adapt to changing needs. Tracking unedited drafts (C) only identifies when the agent is "good enough" but does not provide direction for improvement.</content>
@@ -1679,7 +1679,7 @@
       <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Use the AI to triage which messages need human review, while maintaining audit mechanisms to verify the triage accuracy.</content>
+          <content>Think about how to reduce the volume of messages reaching the compliance team while still meeting the regulatory requirement for pre-send review.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>Having Claude classify communications and routing only regulated content to compliance review directly addresses both constraints: it satisfies the regulatory requirement by ensuring regulated communications are reviewed before sending, while respecting the team's 50-review-per-day capacity by filtering out routine messages. The sampling-based audit of auto-sent messages provides a safety net to catch classification errors. Reviewing everything (A) is infeasible at current capacity. Weekly batch reviews (C) violate the "before being sent" requirement. Self-certification with a low threshold (D) provides no human oversight and would not satisfy regulators -- the compliance officer review is the requirement, not optional.</content>
@@ -1715,7 +1715,7 @@
       <correct-answer>A</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>When the document fits in the context window, avoid chunking entirely. When chunking is necessary, respect the document's logical structure.</content>
+          <content>Consider whether every document actually needs to be chunked, and if so, what boundaries would preserve the meaning of cross-referencing clauses.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>The optimal strategy avoids unnecessary chunking (single-pass for documents that fit) and uses intelligent, structure-aware chunking when needed. Chunking by logical sections preserves the semantic coherence of individual clauses. Including the table of contents and referenced sections in the overlap provides the cross-reference context that fixed-size chunking (B) destroys. Very small chunks (C) maximize the risk of splitting related content and lose cross-reference context entirely. Skipping middle sections (D) guarantees missing critical contract terms. The reconciliation step across chunks catches any extraction inconsistencies or duplicates from the overlap.</content>
@@ -1751,7 +1751,7 @@
       <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Citation accuracy requires provenance tracking from source document through every processing stage to the final output.</content>
+          <content>Think about how you would ensure every claim in the final review can be traced back to a specific passage in a specific paper.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>The three-phase map-reduce approach is the only option that maintains citation provenance throughout the entire pipeline. Phase 1 (map) creates structured, citable extractions from each paper with verbatim quotes that can be verified. Phase 2 (reduce) organizes findings without losing their source attribution. Phase 3 (synthesis) generates prose from verified extractions rather than from memory, dramatically reducing hallucination risk. Abstract-only analysis (A) loses the supporting evidence and nuance in the full papers. Batch processing with iterative merging (C) degrades citation accuracy at each merge step as context is compressed. A single massive call (D) exceeds Claude's context window by orders of magnitude -- 500 papers at 10-30 pages each is roughly 5,000-15,000 pages of text.</content>
@@ -1787,7 +1787,7 @@
       <correct-answer>A</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>When processing sequentially, carry forward a compressed representation of prior context to inform each new chunk.</content>
+          <content>Think about how the system can "remember" what happened in earlier chapters when it is only looking at one chunk at a time.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>A running summary document acts as a "memory" that persists across chunk boundaries, giving Claude the context it needs to provide consistent feedback. This summary captures the essential information (characters, plot, style decisions, prior feedback) in a compact form that fits alongside each new chunk. Independent processing (B) guarantees inconsistency and pushes the burden to the human. Reverse processing (C) does not solve the coherence problem -- it simply moves the inconsistencies to different chapters. Maximizing chunk size (D) reduces but does not eliminate boundaries, and the largest chunks may leave too little room for the summary context and instructions in the prompt.</content>

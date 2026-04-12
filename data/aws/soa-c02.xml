@@ -32,7 +32,7 @@
       <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>CloudWatch alarms have three states: OK, ALARM, and INSUFFICIENT_DATA. Missing data treatment determines behavior during data gaps.</content>
+          <content>Think about how many distinct states a CloudWatch alarm can be in — and what should happen when data stops arriving.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>CloudWatch alarms have three states: OK (metric within threshold), ALARM (metric breached threshold), and INSUFFICIENT_DATA (not enough data to evaluate). The "treat missing data as" setting controls behavior when data points are missing: missing (maintain current state), notBreaching (treat as OK), breaching (treat as ALARM), or ignore (skip evaluation).</content>
@@ -67,7 +67,7 @@
       <correct-answer>B</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>The CloudWatch agent collects system-level metrics like memory, disk, and custom metrics from EC2 instances.</content>
+          <content>Standard EC2 metrics don't include memory or disk space. What would need to run on the instance itself to collect OS-level data?</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>Standard EC2 metrics include CPU, network, and disk I/O, but not memory or disk space utilization. The CloudWatch agent (unified agent) must be installed on instances to collect these OS-level metrics. The agent is configured via JSON configuration file specifying which metrics to collect and can also collect logs. Systems Manager can automate agent deployment across instances.</content>
@@ -102,7 +102,7 @@
       <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>EventBridge can capture CloudWatch alarm state changes and trigger automated remediation through Lambda or SSM Automation.</content>
+          <content>Which AWS service acts as an event bus that can react to alarm state changes and invoke downstream automation targets?</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>CloudWatch alarms can trigger EventBridge rules when they change state. EventBridge rules can then invoke targets like Lambda functions, SSM Automation documents, or Step Functions for automated remediation. For example, when a CPU alarm goes to ALARM state, EventBridge can trigger SSM Automation to stop or restart the instance automatically.</content>
@@ -137,7 +137,7 @@
       <correct-answer>A</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Metric filters extract metric data from log events, enabling alarms based on log content patterns.</content>
+          <content>Consider the two-step process: first turn log patterns into numeric data, then alert on that data. Which CloudWatch feature bridges logs to metrics?</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>CloudWatch metric filters scan log events for specific patterns and create custom metrics when matches occur. Define a filter pattern (e.g., "ERROR" or JSON field matches), specify the metric name and value to publish. Then create a CloudWatch alarm on this custom metric with appropriate threshold and evaluation period to alert when errors exceed the limit.</content>
@@ -172,7 +172,7 @@
       <correct-answer>B</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>System status checks verify AWS infrastructure; instance status checks verify guest OS and network configuration.</content>
+          <content>EC2 has two layers of health checks — one for what AWS controls and one for what runs inside the VM. Which layer maps to which?</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>EC2 provides two status check types: System status checks monitor the AWS systems required for the instance (host hardware, power, network). Instance status checks monitor software and network configuration on the instance (OS boot, network reachability). System check failures require AWS intervention or instance stop/start; instance check failures often require OS-level troubleshooting.</content>
@@ -207,7 +207,7 @@
       <correct-answer>A</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>AWS Backup provides centralized backup management for multiple AWS services with backup plans and policies.</content>
+          <content>Think about which service was purpose-built to unify backup scheduling, retention, and cross-region copy across many AWS resource types.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>AWS Backup is a fully managed service that centralizes and automates data protection across AWS services including EC2, EBS, RDS, Aurora, DynamoDB, EFS, FSx, and Storage Gateway. You create backup plans specifying schedule, retention, lifecycle (transition to cold storage), and cross-region/cross-account copy rules. Backup vaults store recovery points with access policies.</content>
@@ -242,7 +242,7 @@
       <correct-answer>A</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>RDS automated backups include daily snapshots and transaction logs for point-in-time recovery up to 35 days.</content>
+          <content>Consider what combination of snapshot frequency and log capture enables restoring a database to any second within a retention window.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>RDS automated backups include daily storage volume snapshots during the backup window and continuous transaction log backups. Together they enable point-in-time recovery to any second within the retention period (1-35 days). Setting retention to 0 disables automated backups. Manual snapshots persist indefinitely until deleted and are not affected by retention settings.</content>
@@ -277,7 +277,7 @@
       <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Lifecycle hooks pause Auto Scaling during launch or termination to perform custom actions.</content>
+          <content>Which Auto Scaling feature lets you insert a pause between "instance created" and "instance receiving traffic" for custom setup?</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>Auto Scaling lifecycle hooks pause instances in a pending state during launch (Pending:Wait) or termination (Terminating:Wait) while custom actions execute. You can trigger Lambda functions, SSM commands, or custom scripts. After completing actions, signal the hook to continue (CONTINUE) or abandon (ABANDON) the instance. Hooks have a default timeout of 1 hour.</content>
@@ -312,7 +312,7 @@
       <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Systems Manager Run Command executes commands on managed instances at scale without SSH/RDP.</content>
+          <content>Think about which Systems Manager capability lets you execute scripts across a fleet without needing direct SSH or RDP access.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>AWS Systems Manager Run Command enables running commands on managed instances without SSH bastion hosts or key management. Select targets by instance IDs, tags, or resource groups. Commands use documents (pre-built like AWS-RunShellScript or custom). Output is captured in S3 or CloudWatch Logs. Rate controls and error thresholds prevent runaway execution.</content>
@@ -347,7 +347,7 @@
       <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Patch Manager automates patching using patch baselines that define approval rules and maintenance windows for scheduling.</content>
+          <content>Which Systems Manager capability combines approval rules for which patches to apply with scheduled time windows for when to apply them?</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>Systems Manager Patch Manager automates OS and application patching. Patch baselines define which patches to approve (by classification, severity, auto-approval delay). Maintenance windows schedule when patching occurs. Patch groups associate instances with baselines. Compliance reports show patch status across the fleet. AWS provides default baselines for common OS types.</content>
@@ -382,7 +382,7 @@
       <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Change sets preview the changes CloudFormation will make to a stack before execution.</content>
+          <content>CloudFormation offers a way to see exactly what will be added, modified, or removed before you commit to a stack update. What is it?</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>CloudFormation change sets provide a preview of proposed changes to a stack before executing them. You create a change set from an updated template, review the changes (Add, Modify, Remove resources and their properties), and then execute or delete the change set. This enables review and approval workflows before changes impact running infrastructure.</content>
@@ -417,7 +417,7 @@
       <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Create AMI from instance using create-image API/console, then modify launch permissions for sharing.</content>
+          <content>Think about the two-step process: first capture a golden image from a running instance, then control who else can launch from it.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>To create an AMI: use "Create Image" from the EC2 console or create-image API on a running or stopped instance. For sharing, modify the AMI's launch permissions to add specific AWS account IDs or make it public. For encrypted AMIs, you must also share the encryption key. Consider using EC2 Image Builder for automated, repeatable image pipelines.</content>
@@ -452,7 +452,7 @@
       <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>IAM evaluation: explicit deny overrides any allow; implicit deny is the default for anything not explicitly allowed.</content>
+          <content>In IAM, one type of policy statement always wins when there is a conflict. Think about which direction the tiebreaker favors — security or access.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>IAM policy evaluation follows: 1) By default, all requests are implicitly denied. 2) An explicit allow overrides the implicit deny. 3) An explicit deny overrides any allow. So if any policy (identity, resource, SCP, permission boundary) contains an explicit deny for an action, it is denied regardless of allow statements elsewhere. This is crucial for security guardrails.</content>
@@ -487,7 +487,7 @@
       <correct-answer>A</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>AWS Config rules evaluate resource configurations against desired settings and report compliance status.</content>
+          <content>Which service continuously records resource configurations and evaluates them against compliance rules you define?</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>AWS Config continuously records resource configurations and evaluates them against rules. Managed rules (pre-built by AWS) cover common compliance checks like encrypted-volumes, required-tags, and restricted-ssh. Custom rules use Lambda for specific requirements. Config tracks compliance over time and can trigger remediation actions through SSM Automation when resources become non-compliant.</content>
@@ -522,7 +522,7 @@
       <correct-answer>B</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>CloudTrail log file integrity validation creates digest files with hashes to verify logs haven't been tampered with.</content>
+          <content>Think about how you would cryptographically prove that audit logs have not been altered after delivery. What mechanism provides this?</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>CloudTrail log file integrity validation produces a digest file for each hour of log delivery. Digest files contain hashes of log files and are signed with a private key. Using the aws cloudtrail validate-logs CLI command, you can verify that log files haven't been modified or deleted since delivery. This supports forensic investigations and compliance requirements.</content>
@@ -557,7 +557,7 @@
       <correct-answer>B</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Security Hub aggregates security findings from AWS services and third-party tools with compliance checks.</content>
+          <content>Which service acts as a single pane of glass for security findings from multiple AWS detection services and third-party integrations?</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>AWS Security Hub provides a comprehensive view of security alerts and compliance status. It aggregates findings from GuardDuty, Inspector, Macie, IAM Access Analyzer, Firewall Manager, and third-party tools using AWS Security Finding Format (ASFF). Security Hub runs automated compliance checks against standards like CIS AWS Foundations and AWS Foundational Security Best Practices.</content>
@@ -592,7 +592,7 @@
       <correct-answer>A</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>VPC Flow Logs capture IP traffic information including source, destination, ports, and accept/reject status.</content>
+          <content>When troubleshooting network connectivity, which VPC feature shows whether packets were accepted or rejected at the interface level?</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>VPC Flow Logs capture information about IP traffic going to and from network interfaces in your VPC. Logs include source/destination IP, ports, protocol, bytes, packets, and action (ACCEPT/REJECT). Flow logs can be created at VPC, subnet, or ENI level and published to CloudWatch Logs, S3, or Kinesis Data Firehose for analysis.</content>
@@ -627,7 +627,7 @@
       <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Route 53 health checks monitor endpoint health; failover routing policy directs traffic to healthy resources.</content>
+          <content>DNS-based failover needs two pieces: something to detect the primary is down, and a routing policy that acts on that signal. What combination does Route 53 use?</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>Route 53 health checks monitor the health of endpoints via HTTP, HTTPS, or TCP checks. When combined with failover routing policy (primary/secondary records), Route 53 automatically routes traffic to the secondary when the primary fails health checks. Health checks can monitor endpoints directly, other health checks (calculated), or CloudWatch alarms.</content>
@@ -662,7 +662,7 @@
       <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>ALB access logs capture detailed request information including client IP, latency, and request/response details.</content>
+          <content>Think about which load balancer feature writes per-request details — client IP, latency, path, response code — to a durable store for later analysis.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>Application Load Balancer access logs provide detailed information about requests including: client IP and port, request processing time, target processing time, response time, request path, user agent, SSL cipher, and response code. Logs are stored in S3 with configurable prefix. Analyze with Athena, CloudWatch Logs Insights (via S3 export), or third-party tools.</content>
@@ -697,7 +697,7 @@
       <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>S3 Storage Lens provides organization-wide analytics; Storage Class Analysis recommends optimal storage classes.</content>
+          <content>S3 has built-in tools that analyze access patterns and recommend when objects should move to a different storage tier. What are they?</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>S3 Storage Lens provides organization-wide visibility into storage usage, activity trends, and recommendations across all buckets and accounts. S3 Storage Class Analysis monitors access patterns for specific prefixes/buckets and provides recommendations for transitioning to Infrequent Access storage classes. Together they help optimize storage costs based on actual usage patterns.</content>
@@ -732,7 +732,7 @@
       <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Trusted Advisor inspects your AWS environment and provides recommendations based on best practices.</content>
+          <content>Which service gives automated best-practice recommendations spanning cost, performance, security, fault tolerance, and service limits?</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>AWS Trusted Advisor analyzes your AWS environment and provides recommendations in five categories: Cost Optimization (unused resources), Performance (overprovisioned), Security (open ports, IAM), Fault Tolerance (missing backups), and Service Limits (approaching quotas). All accounts get 7 core checks; Business/Enterprise Support unlocks all checks plus API access.</content>
@@ -767,7 +767,7 @@
       <correct-answer>A</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>CloudWatch Dashboards provide customizable home pages with metrics, alarms, and text widgets.</content>
+          <content>Which CloudWatch feature lets you build a single-screen view combining graphs, numbers, and alarm status from multiple services?</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>CloudWatch Dashboards are customizable pages displaying metrics from multiple AWS services and accounts. Widgets include line graphs, stacked areas, numbers, gauges, text, and alarm status. Dashboards can display metrics from different regions (cross-region) and accounts (cross-account with appropriate setup). Automatic dashboards are pre-built for common services.</content>
@@ -802,7 +802,7 @@
       <correct-answer>B</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>For impaired EBS volumes, attempt to create a snapshot to preserve data, then create a new volume from the snapshot.</content>
+          <content>When an EBS volume fails, what is the first thing you should try to do with any remaining data before replacing the volume?</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>When an EBS volume becomes impaired (I/O disabled) or enters an error state, try to create a snapshot immediately to preserve any recoverable data. If successful, create a new volume from the snapshot. EBS volumes can become impaired due to hardware failures; regular automated snapshots are critical for data protection. Failed volume data may be unrecoverable without backups.</content>
@@ -837,7 +837,7 @@
       <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Drift detection compares actual resource configurations to expected template configurations.</content>
+          <content>When someone modifies a resource outside of CloudFormation, which feature reveals the gap between the template and the live state?</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>CloudFormation drift detection identifies resources whose actual configuration differs from the expected configuration defined in the stack template. It detects added, deleted, or modified properties. Run drift detection on a stack to see which resources have drifted and the specific property differences. This helps maintain infrastructure consistency and identify unauthorized changes.</content>
@@ -872,7 +872,7 @@
       <correct-answer>B</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>EC2 Instance Connect pushes temporary SSH keys using IAM for authentication, enabling secure access.</content>
+          <content>Think about which service uses short-lived SSH keys and IAM-based authorization rather than long-lived key pairs for instance access.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>EC2 Instance Connect provides a simple way to connect to Linux instances using SSH. It pushes a one-time-use SSH public key to the instance metadata, and IAM policies control who can connect. Access via browser-based console, EC2 Instance Connect CLI, or standard SSH client. No need to manage long-term SSH keys. Requires Instance Connect installed on the instance.</content>
@@ -907,7 +907,7 @@
       <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Modify EBS snapshot permissions to share with specific AWS account IDs or make public.</content>
+          <content>EBS snapshots have a permissions model — think about how you grant another account the ability to use your snapshot.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>EBS snapshots can be shared by modifying their permissions to add specific AWS account IDs. The target account can then copy the snapshot to their account or create volumes from it. For encrypted snapshots, you must also share the KMS key used for encryption. Shared snapshots remain in the source account; recipients should copy for full control.</content>
@@ -942,7 +942,7 @@
       <correct-answer>A</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>CloudWatch Anomaly Detection uses machine learning to establish baselines and detect unusual metric behavior.</content>
+          <content>Which CloudWatch feature replaces static thresholds with dynamically learned baselines to flag metrics that deviate from normal patterns?</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>CloudWatch Anomaly Detection applies machine learning algorithms to metrics to establish expected value bands based on historical patterns (hourly, daily, weekly seasonality). Instead of static thresholds, alarms trigger when metrics fall outside the dynamically calculated band. This is useful for metrics with variable baselines that are hard to set static thresholds for.</content>
@@ -977,7 +977,7 @@
       <correct-answer>A</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>State Manager associations define desired state and automatically apply it on schedule or on instance launch.</content>
+          <content>Which Systems Manager capability continuously enforces a desired configuration on instances, reapplying it automatically if it drifts?</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>Systems Manager State Manager maintains consistent configuration on managed instances through associations. An association links a document (defining desired state) with targets (instances). State Manager applies the association on a schedule, ensuring instances maintain the desired configuration. If configuration drifts, State Manager automatically reapplies. Common uses include installing agents, configuring services, and domain joining.</content>
@@ -1012,7 +1012,7 @@
       <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Deploy NAT Gateways in each AZ for HA; route tables direct each AZ's traffic to its local NAT Gateway.</content>
+          <content>NAT Gateways are scoped to a single AZ. How would you eliminate a single point of failure for outbound internet across multiple AZs?</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>NAT Gateways are AZ-scoped resources. For high availability, create a NAT Gateway in each Availability Zone and configure route tables so private subnets in each AZ route to their local NAT Gateway. This prevents cross-AZ traffic (reducing cost) and ensures that if one AZ fails, other AZs maintain internet access through their own NAT Gateways.</content>
@@ -1047,7 +1047,7 @@
       <correct-answer>B</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Cost Explorer RI reports show utilization and coverage; Trusted Advisor provides RI optimization recommendations.</content>
+          <content>Think about which AWS tools show both how much of your reserved capacity is being used and how much on-demand usage could be covered.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>Cost Explorer provides Reserved Instance utilization reports (how much of purchased RIs are used) and coverage reports (what percentage of usage is covered by RIs). These help identify underutilized reservations and opportunities to purchase more. Trusted Advisor RI checks (Business/Enterprise Support) provide recommendations for RI purchases based on usage patterns.</content>
@@ -1082,7 +1082,7 @@
       <correct-answer>B</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>X-Ray Service Map shows application components, connections, and health/latency metrics visually.</content>
+          <content>Which AWS tracing service builds a visual topology of your distributed application showing where latency and errors originate?</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>AWS X-Ray Service Map provides a visual representation of your application's components and their connections. It shows services (Lambda, EC2, external APIs), their relationships, latency percentiles, error rates, and request counts. Color-coded health indicators quickly identify problematic services. Click on nodes to drill down into traces and identify root causes.</content>
@@ -1117,7 +1117,7 @@
       <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>RDS Multi-AZ failover updates the DNS CNAME to point to the standby; applications reconnect to the same endpoint.</content>
+          <content>Think about how RDS keeps the connection endpoint stable during a failover — what changes behind the scenes so applications don't need new connection strings?</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>During RDS Multi-AZ failover (triggered by AZ outage, instance failure, or maintenance), AWS automatically updates the DNS CNAME record for the DB instance endpoint to point to the standby. The endpoint name doesn't change, so applications reconnect using the same connection string. Failover typically completes in 60-120 seconds. Applications should implement connection retry logic.</content>
@@ -1152,7 +1152,7 @@
       <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>S3 Access Points provide named network endpoints with distinct permissions for accessing buckets.</content>
+          <content>Instead of one massive bucket policy, what S3 feature lets you create per-team or per-application endpoints each with their own access policy?</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>S3 Access Points are named network endpoints with dedicated access policies that simplify managing data access at scale. Each access point has its own hostname and access point policy. You can restrict access points to specific VPCs (no internet access), specific prefixes, or specific actions. This simplifies complex bucket policies into manageable per-application access points.</content>
@@ -1187,7 +1187,7 @@
       <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Launch templates define EC2 instance configurations with versioning and support for Auto Scaling and more features.</content>
+          <content>AWS recommends one method over another for defining reusable EC2 configurations — think about which one supports versioning and the full feature set.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>Launch templates are the recommended way to define EC2 instance configurations. They support versioning (update configurations while keeping history), multiple instance types (for Spot Fleet/Auto Scaling), and all EC2 features including Dedicated Hosts, Capacity Reservations, and placement groups. Launch configurations (older) are being deprecated and lack these capabilities.</content>
@@ -1222,7 +1222,7 @@
       <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Transit Gateway acts as a cloud router connecting VPCs, VPNs, and Direct Connect in a hub-and-spoke model.</content>
+          <content>With many VPCs, full-mesh peering becomes unmanageable. Which service replaces that mesh with a single central hub?</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>AWS Transit Gateway is a network transit hub that connects VPCs and on-premises networks through a central gateway. Instead of meshed VPC peering (45 connections for 10 VPCs), attach each VPC once to Transit Gateway (10 attachments). Transit Gateway supports VPC attachments, VPN attachments, Direct Connect Gateway attachments, and peering with other Transit Gateways.</content>
@@ -1257,7 +1257,7 @@
       <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Spot interruption notices appear in instance metadata 2 minutes before termination; EventBridge also captures these events.</content>
+          <content>Spot Instances can be reclaimed by AWS at any time. How does an application learn that reclamation is imminent so it can save state?</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>When AWS needs Spot capacity back, instances receive a 2-minute warning. Applications can detect this by polling the instance metadata endpoint (http://169.254.169.254/latest/meta-data/spot/termination-time) or by configuring EventBridge rules for EC2 Spot Instance Interruption Warning events. This allows graceful shutdown, checkpointing, or transferring work to other instances.</content>
@@ -1292,7 +1292,7 @@
       <correct-answer>A</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>CloudWatch Synthetics canaries run scheduled scripts that monitor endpoints and workflows like automated users.</content>
+          <content>Which CloudWatch capability simulates real user interactions on a schedule to catch availability or functionality issues before real users do?</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>CloudWatch Synthetics creates canaries - configurable scripts that run on schedule to monitor endpoints and APIs. Canaries can check availability, latency, UI workflows (using headless Chrome), and data integrity. They provide consistent monitoring regardless of actual user traffic, helping detect issues before users are affected. Canary results integrate with CloudWatch alarms and dashboards.</content>
@@ -1327,7 +1327,7 @@
       <correct-answer>A</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Amazon Inspector automatically scans workloads for vulnerabilities and network exposure.</content>
+          <content>Which AWS service continuously scans EC2 instances and container images for known CVEs and unintended network exposure?</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>Amazon Inspector is an automated vulnerability management service that continuously scans EC2 instances, Lambda functions, and container images in ECR for software vulnerabilities (CVEs) and unintended network exposure. Inspector uses Systems Manager Agent on EC2 for agentless scanning capabilities. Findings are prioritized by severity and include remediation guidance.</content>
@@ -1362,7 +1362,7 @@
       <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>S3 Versioning keeps multiple variants of objects; deletions add delete markers rather than removing data.</content>
+          <content>Which S3 feature ensures that overwrites and deletes don't permanently destroy previous copies of an object?</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>S3 Versioning keeps multiple versions of an object in the same bucket. When enabled, uploads create new versions while preserving previous ones. Deletions add a delete marker (current version) rather than permanently removing objects - previous versions remain accessible. This protects against accidental deletions and overwrites. MFA Delete adds additional protection for version deletion.</content>
@@ -1397,7 +1397,7 @@
       <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>SSM Automation runbooks define multi-step automated workflows with actions, branching, and approvals.</content>
+          <content>Which Systems Manager feature orchestrates complex multi-step workflows — not just single commands, but sequences with branching and approval gates?</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>Systems Manager Automation enables creating runbooks (documents) that define multi-step automated workflows. Actions can include AWS API calls, Run Command execution, Lambda invocations, approvals, and more. AWS provides pre-built runbooks for common tasks (patching, AMI creation, remediation). Custom runbooks can include branching logic, rate control, and integration with Change Manager for approvals.</content>
@@ -1432,7 +1432,7 @@
       <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>VPC Endpoints provide private connectivity to AWS services; Gateway endpoints for S3/DynamoDB, Interface endpoints (PrivateLink) for others.</content>
+          <content>How can instances in a private subnet reach AWS services without traversing the internet? Think about the two flavors of private connectivity AWS offers.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>VPC Endpoints enable private connectivity between VPCs and AWS services without traversing the internet. Gateway endpoints (free, for S3 and DynamoDB) add routes to route tables. Interface endpoints (PrivateLink, for most other services) create ENIs in your subnets with private IPs. Traffic stays on the AWS network, improving security and potentially reducing data transfer costs.</content>
@@ -1467,7 +1467,7 @@
       <correct-answer>A</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Cost allocation tags categorize resources; when activated, they appear in billing reports for cost tracking.</content>
+          <content>Think about how you label AWS resources so that billing reports can break down costs by project, team, or environment.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>Cost allocation tags are key-value pairs assigned to AWS resources that appear in billing reports when activated. User-defined tags (like Project, Department, Environment) must be activated in the Billing console to appear in Cost Explorer and Cost and Usage Reports. AWS-generated tags (like aws:createdBy) can also be activated. Use tag policies in Organizations to enforce consistent tagging.</content>
@@ -1502,7 +1502,7 @@
       <correct-answer>B</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>EventBridge archives store events that can be replayed to event buses for debugging or testing.</content>
+          <content>Which EventBridge capability lets you store past events and re-send them through your rules to test handler changes or debug issues?</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>EventBridge event archive captures and stores events from an event bus with configurable retention (indefinite or up to specific days). Archived events can be replayed to an event bus, sending them through rules again. This is useful for debugging (replay events that caused issues), testing (verify handler changes with real events), and disaster recovery (replay events to catch up after an outage).</content>
@@ -1537,7 +1537,7 @@
       <correct-answer>B</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Control Tower guardrails include preventive (SCPs blocking actions) and detective (Config rules detecting violations).</content>
+          <content>Control Tower enforces governance at two levels — one that blocks prohibited actions outright, and one that detects non-compliant state after the fact.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>AWS Control Tower guardrails are governance rules for multi-account environments. Preventive guardrails use SCPs to prevent non-compliant actions (like disabling CloudTrail). Detective guardrails use AWS Config rules to detect non-compliant resources and alert. Guardrails can be mandatory (always on), strongly recommended, or elective, and apply to organizational units.</content>
@@ -1572,7 +1572,7 @@
       <correct-answer>B</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Connection draining (deregistration delay) allows in-flight requests to complete before removing targets.</content>
+          <content>When a target is being removed from a load balancer, what mechanism ensures existing requests finish rather than being abruptly dropped?</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>Connection draining (called deregistration delay in ALB/NLB) keeps deregistering targets available to complete in-flight requests while preventing new requests. Default is 300 seconds. During this period, existing connections complete normally but no new connections are sent. This ensures graceful removal during deployments, scale-in, or health check failures.</content>
@@ -1607,7 +1607,7 @@
       <correct-answer>B</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>StackSets deploy CloudFormation stacks to multiple accounts and regions from a single template.</content>
+          <content>Which CloudFormation feature lets you manage a single template deployment across many accounts and regions simultaneously?</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>CloudFormation StackSets extend stack functionality across multiple AWS accounts and regions. You create a stack set from a template, specify target accounts (by ID or OU), and target regions. StackSets deploy stack instances to each account/region combination. With AWS Organizations integration, StackSets can automatically deploy to new accounts added to OUs.</content>
@@ -1642,7 +1642,7 @@
       <correct-answer>A</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>CloudFront invalidations remove specified objects from edge caches before TTL expiration.</content>
+          <content>When origin content changes but edge caches still serve stale data, what operation forces those caches to fetch fresh copies before TTL expires?</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>CloudFront invalidations force removal of objects from edge location caches. Specify exact paths (/images/logo.png) or use wildcards (/images/*). Invalidations typically complete within minutes. The first 1,000 invalidation paths per month are free; additional paths cost $0.005 each. Alternative: use versioned filenames (logo-v2.png) to immediately serve new content without invalidation.</content>
@@ -1677,7 +1677,7 @@
       <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>io2 Block Express provides highest IOPS (256,000), lowest latency, and 99.999% durability for critical workloads.</content>
+          <content>Among EBS volume types, which tier is designed for the most demanding I/O workloads — databases needing six-figure IOPS with sub-millisecond latency?</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>EBS io2 Block Express provides the highest performance with up to 256,000 IOPS, 4,000 MB/s throughput, sub-millisecond latency, and 99.999% durability. It's ideal for I/O-intensive databases and critical applications. gp3 is cost-effective for general workloads (up to 16,000 IOPS). io1/io2 provide provisioned IOPS guarantees. HDD types (st1/sc1) are for throughput workloads, not IOPS.</content>
@@ -1712,7 +1712,7 @@
       <correct-answer>A</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Session Manager provides browser-based or CLI shell access through SSM Agent without open inbound ports.</content>
+          <content>Which service provides shell access to instances using only an outbound-connected agent — no inbound SSH ports, no key pairs required?</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>Systems Manager Session Manager provides secure, auditable shell access to EC2 instances (and on-premises servers) without SSH keys, bastion hosts, or open inbound ports. Access is controlled via IAM policies. All session activity can be logged to S3 and CloudWatch Logs for auditing. Sessions work through the SSM Agent which initiates outbound HTTPS connections.</content>
@@ -1747,7 +1747,7 @@
       <correct-answer>A</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Warm standby runs a scaled-down but fully functional environment that can scale up quickly, meeting moderate RTO/RPO.</content>
+          <content>Consider the DR strategies on the cost/speed spectrum. Which approach keeps a functional but smaller copy of production running, ready to scale up?</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>Warm standby maintains a scaled-down but fully functional copy of the production environment in the DR region with continuous data replication. During failover, scale up resources and switch traffic. This typically achieves RTO in minutes to hours and RPO in seconds to minutes. Pilot light keeps only critical core components running (longer RTO). Multi-site is overkill and costly for these requirements.</content>

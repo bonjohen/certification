@@ -1,203 +1,9 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<certification-exam xmlns="http://certification.study/schema/v1" version="1.0">
-  <metadata>
-    <exam-code>GCP-CLOUD-ARCH</exam-code>
-    <exam-title>Google Cloud Certified Professional Cloud Architect</exam-title>
-    <provider>Google Cloud</provider>
-    <description>Scenario-Based Study Companion for Professional Cloud Architect certification - designing and planning cloud solution architecture, managing implementation, and ensuring security and compliance.</description>
-    <total-questions>50</total-questions>
-    <created-date>2026-01-21</created-date>
-    <last-modified>2026-01-21T00:00:00Z</last-modified>
-    <categories>
-      <category id="cat-design">Designing and Planning Cloud Solutions</category>
-      <category id="cat-manage">Managing and Provisioning Infrastructure</category>
-      <category id="cat-security">Designing for Security and Compliance</category>
-      <category id="cat-reliability">Designing for Reliability</category>
-      <category id="cat-operations">Optimizing and Operating Solutions</category>
-    </categories>
-  </metadata>
-
-  <questions>
-    <question id="1" category-ref="cat-design" difficulty="advanced">
-      <title>Multi-Region Architecture</title>
-      <scenario>A global financial services company requires an application with 99.99% availability, data residency compliance in multiple regions, and sub-100ms latency for users worldwide.</scenario>
-      <question-text>Which architecture pattern best meets these requirements?</question-text>
-      <choices>
-        <choice letter="A">Multi-region active-active deployment with Cloud Spanner and global load balancing</choice>
-        <choice letter="B">Single region with cross-region read replicas and Cloud CDN</choice>
-        <choice letter="C">Multi-region active-passive with scheduled failover</choice>
-        <choice letter="D">Single region with increased instance redundancy</choice>
-      </choices>
-      <correct-answer>A</correct-answer>
-      <hints>
-        <hint level="1" label="Brief Hint">
-          <content>Think about which deployment model eliminates single-region failure as a risk factor while still providing globally consistent data access for financial workloads.</content>
-        </hint>
-        <hint level="2" label="Complete Explanation">
-          <content>An active-active multi-region deployment with Cloud Spanner delivers the strongest availability guarantee on GCP, backed by a 99.999% SLA with multi-region configurations. Global HTTP(S) Load Balancing uses anycast IPs to route each user to the nearest healthy region, keeping latency under 100ms. Cloud Spanner provides synchronous replication with strong consistency across regions, satisfying both data residency and zero-RPO requirements. Options B and D fail because single-region architectures cannot achieve 99.99% during a regional outage. Option C introduces downtime during failover windows, violating the latency and availability targets.</content>
-        </hint>
-        <hint level="3" label="Deep Knowledge">
-          <content>
-            <ul>
-              <li>Cloud Spanner multi-region configurations (nam-eur-asia1, nam6, etc.) replicate data synchronously across continents, providing automatic failover with zero RPO and near-zero RTO.</li>
-              <li>Data residency is achieved by selecting regional or dual-regional Spanner configurations that keep replicas within approved geographies, while still enabling global reads via stale-read options.</li>
-              <li>Global anycast IP addresses route traffic to Google's nearest edge PoP, and the Premium Tier network carries it on Google's backbone to the serving region, minimizing latency.</li>
-              <li>Active-active eliminates RTO entirely because both regions serve live traffic simultaneously; Cloud Armor and Cloud CDN add DDoS protection and static-asset caching at the edge.</li>
-            </ul>
-          </content>
-        </hint>
-      </hints>
-      <tags>
-        <tag>High Availability</tag>
-        <tag>Multi-Region</tag>
-        <tag>Architecture</tag>
-      </tags>
-    </question>
-
-    <question id="2" category-ref="cat-security" difficulty="advanced">
-      <title>Defense in Depth</title>
-      <scenario>A healthcare organization migrating to GCP must protect patient data with multiple security layers and demonstrate HIPAA compliance.</scenario>
-      <question-text>Which combination of services provides defense-in-depth for PHI data?</question-text>
-      <choices>
-        <choice letter="A">VPC firewall rules and Cloud Storage encryption only</choice>
-        <choice letter="B">Cloud IAM with basic roles and default encryption</choice>
-        <choice letter="C">VPC Service Controls, Cloud KMS with CMEK, Cloud Armor, DLP API, and Audit Logs</choice>
-        <choice letter="D">Private VPC with no internet connectivity</choice>
-      </choices>
-      <correct-answer>C</correct-answer>
-      <hints>
-        <hint level="1" label="Brief Hint">
-          <content>How many independent security layers would need to fail simultaneously before PHI is exposed? Count the layers each option actually covers.</content>
-        </hint>
-        <hint level="2" label="Complete Explanation">
-          <content>Defense-in-depth for PHI demands multiple complementary security controls. VPC Service Controls create a security perimeter that blocks API-level data exfiltration even if IAM is misconfigured. CMEK through Cloud KMS gives the healthcare org control over encryption keys, enabling key revocation if needed. Cloud Armor provides WAF and DDoS protection at the edge. The DLP API discovers, classifies, and optionally redacts PHI across Cloud Storage and BigQuery. Comprehensive Audit Logs supply the tamper-evident trail auditors require. Options A and B each cover only one layer, and Option D sacrifices functionality without addressing identity or data-level threats.</content>
-        </hint>
-        <hint level="3" label="Deep Knowledge">
-          <content>
-            <ul>
-              <li>VPC Service Controls create security perimeters that prevent API-level data exfiltration; even a compromised service account inside the perimeter cannot copy data to an external project.</li>
-              <li>CMEK with Cloud HSM provides FIPS 140-2 Level 3 key protection, and enabling Key Access Justifications logs every Google admin key-access attempt for compliance evidence.</li>
-              <li>Access Transparency logs record all Google support and engineering access to customer data, giving auditors visibility beyond standard Cloud Audit Logs.</li>
-              <li>Binary Authorization ensures only vulnerability-scanned, signed container images deploy to GKE, closing the supply-chain vector that network controls alone cannot address.</li>
-            </ul>
-          </content>
-        </hint>
-      </hints>
-      <tags>
-        <tag>Security</tag>
-        <tag>Compliance</tag>
-        <tag>Defense in Depth</tag>
-      </tags>
-    </question>
-
-    <question id="3" category-ref="cat-design" difficulty="advanced">
-      <title>Microservices Communication</title>
-      <scenario>An e-commerce platform is decomposing a monolith into microservices. Services need reliable asynchronous communication, request tracing, and resilience to temporary failures.</scenario>
-      <question-text>Which architecture pattern best enables decoupled, resilient microservices communication?</question-text>
-      <choices>
-        <choice letter="A">Event-driven architecture with Pub/Sub, dead-letter topics, and distributed tracing</choice>
-        <choice letter="B">Synchronous REST calls between all services</choice>
-        <choice letter="C">Shared database for all service communication</choice>
-        <choice letter="D">Direct gRPC calls with no retry logic</choice>
-      </choices>
-      <correct-answer>A</correct-answer>
-      <hints>
-        <hint level="1" label="Brief Hint">
-          <content>Consider which communication model lets producers and consumers scale independently and survive temporary downstream outages without losing messages.</content>
-        </hint>
-        <hint level="2" label="Complete Explanation">
-          <content>Event-driven architecture using Pub/Sub decouples producers from consumers so each service scales and deploys independently. Pub/Sub guarantees at-least-once delivery with configurable retry policies and exponential backoff, absorbing transient failures without data loss. Dead-letter topics capture messages that exceed retry limits, enabling operators to inspect and replay failures. Cloud Trace provides distributed tracing across asynchronous boundaries using trace-context propagation. Options B and D create tight runtime coupling where one slow service cascades failures. Option C creates a shared-state bottleneck that defeats the purpose of microservice independence.</content>
-        </hint>
-        <hint level="3" label="Deep Knowledge">
-          <content>
-            <ul>
-              <li>The Saga pattern coordinates distributed transactions across services using compensating events published through Pub/Sub, avoiding two-phase commits that would re-introduce coupling.</li>
-              <li>Event sourcing captures every state change as an immutable event, enabling full audit trails and the ability to replay history to rebuild read models or debug production issues.</li>
-              <li>Anthos Service Mesh (managed Istio) adds observability, mTLS, and traffic management for the synchronous calls that remain, complementing the async Pub/Sub backbone.</li>
-              <li>Cloud Tasks provides exactly-once task execution with configurable rate limiting, which is preferable to Pub/Sub when you need precise dispatch control to a single handler.</li>
-            </ul>
-          </content>
-        </hint>
-      </hints>
-      <tags>
-        <tag>Microservices</tag>
-        <tag>Event-Driven</tag>
-        <tag>Pub/Sub</tag>
-      </tags>
-    </question>
-
-    <question id="4" category-ref="cat-reliability" difficulty="advanced">
-      <title>Disaster Recovery Strategy</title>
-      <scenario>A company requires RTO of 4 hours and RPO of 1 hour for their critical application currently running in a single region.</scenario>
-      <question-text>Which disaster recovery strategy meets these requirements cost-effectively?</question-text>
-      <choices>
-        <choice letter="A">Warm standby with scaled-down infrastructure in DR region and hourly database backups</choice>
-        <choice letter="B">Hot standby with full-scale active-active deployment</choice>
-        <choice letter="C">Cold backup with daily database exports to Cloud Storage</choice>
-        <choice letter="D">Pilot light with only database replication</choice>
-      </choices>
-      <correct-answer>A</correct-answer>
-      <hints>
-        <hint level="1" label="Brief Hint">
-          <content>Match the DR tier to the stated RTO and RPO: 4-hour RTO is too tight for cold backup but does not justify the cost of a full active-active hot standby.</content>
-        </hint>
-        <hint level="2" label="Complete Explanation">
-          <content>Warm standby maintains a scaled-down but functional copy of the production environment in a second region. Hourly database backups or continuous replication satisfy the 1-hour RPO, while pre-deployed infrastructure can be scaled up and switched to within the 4-hour RTO window. Option B (hot standby) exceeds requirements and wastes budget on full-scale redundancy. Option C fails because daily exports produce a 24-hour RPO and cold provisioning typically exceeds 4 hours. Option D (pilot light) keeps only the database running, and provisioning all compute from scratch risks breaching the 4-hour RTO if images or configs are stale.</content>
-        </hint>
-        <hint level="3" label="Deep Knowledge">
-          <content>
-            <ul>
-              <li>Cold DR: backups only, hours-to-days recovery, lowest cost; suitable when RTO exceeds 24 hours and RPO tolerance matches backup frequency.</li>
-              <li>Pilot light: core database replicating continuously with minimal compute; recovery requires provisioning app servers, so RTO is typically 1-4 hours depending on automation maturity.</li>
-              <li>Warm standby: reduced-scale deployment running in the DR region, so failover means scaling up existing instances rather than provisioning from scratch, hitting sub-4-hour RTO reliably.</li>
-              <li>Hot standby (active-active): full-scale deployment in both regions with synchronous replication, delivering near-zero RTO and RPO but at roughly double the infrastructure cost.</li>
-            </ul>
-          </content>
-        </hint>
-      </hints>
-      <tags>
-        <tag>Disaster Recovery</tag>
-        <tag>RTO/RPO</tag>
-        <tag>Business Continuity</tag>
-      </tags>
-    </question>
-
-    <question id="5" category-ref="cat-manage" difficulty="advanced">
-      <title>Hybrid Connectivity</title>
-      <scenario>An enterprise needs to connect their on-premises data center to GCP with high bandwidth (10 Gbps), low latency, and traffic that never traverses the public internet.</scenario>
-      <question-text>Which connectivity option meets these requirements?</question-text>
-      <choices>
-        <choice letter="A">Cloud VPN with multiple tunnels</choice>
-        <choice letter="B">Dedicated Interconnect with redundant connections</choice>
-        <choice letter="C">Partner Interconnect with lowest bandwidth tier</choice>
-        <choice letter="D">Public internet with Cloud CDN caching</choice>
-      </choices>
-      <correct-answer>B</correct-answer>
-      <hints>
-        <hint level="1" label="Brief Hint">
-          <content>Which connectivity options guarantee a fully private path, and among those, which ones can meet the stated bandwidth requirement?</content>
-        </hint>
-        <hint level="2" label="Complete Explanation">
-          <content>Dedicated Interconnect provides direct physical connections between on-premises infrastructure and Google's network at colocation facilities, available in 10 Gbps or 100 Gbps circuits. Because traffic flows over a private cross-connect, it never traverses the public internet, satisfying the security requirement. Redundant connections across two edge availability domains achieve a 99.99% availability SLA. Option A (Cloud VPN) routes encrypted traffic over the public internet, violating the private-path requirement. Option C at its lowest tier provides only 50 Mbps, far below 10 Gbps. Option D is entirely public-internet-based.</content>
-        </hint>
-        <hint level="3" label="Deep Knowledge">
-          <content>
-            <ul>
-              <li>Dedicated Interconnect requires the enterprise to have equipment at one of Google's colocation facilities (or a partner facility with a cross-connect), and VLAN attachments map the physical circuit to specific VPC networks.</li>
-              <li>Cloud Router with BGP runs on each VLAN attachment, enabling dynamic route exchange so on-premises and GCP subnets discover each other automatically without static route maintenance.</li>
-              <li>Partner Interconnect is the fallback when the enterprise cannot co-locate with Google; a service provider bridges the gap, but latency and bandwidth depend on the partner's network.</li>
-              <li>HA VPN (IPsec over public internet) is commonly paired with Interconnect as an encrypted backup path, ensuring connectivity survives even if the physical Interconnect link fails.</li>
-            </ul>
-          </content>
-        </hint>
-      </hints>
-      <tags>
-        <tag>Dedicated Interconnect</tag>
-        <tag>Hybrid</tag>
-        <tag>Networking</tag>
-      </tags>
-    </question>
-
+<?xml version='1.0' encoding='utf-8'?>
+<hint1-audit xmlns="http://certification.study/schema/v1" source="data\gcp\gcp-cloud-arch.xml" total-questions="50" failing-questions="29">
+  <failing-question>
+    <failure-reasons>
+      <reason>H1 uses unique correct-answer terms not in other choices: {'analytics'}</reason>
+    </failure-reasons>
     <question id="6" category-ref="cat-design" difficulty="advanced">
       <title>Data Lake Architecture</title>
       <scenario>A media company needs to ingest, store, and analyze petabytes of video metadata, user interactions, and streaming logs for ML-based recommendations.</scenario>
@@ -233,115 +39,11 @@
         <tag>Analytics</tag>
       </tags>
     </question>
-
-    <question id="7" category-ref="cat-security" difficulty="advanced">
-      <title>Zero Trust Architecture</title>
-      <scenario>A company wants to implement zero trust security where every access request is verified regardless of network location.</scenario>
-      <question-text>Which combination implements zero trust principles in GCP?</question-text>
-      <choices>
-        <choice letter="A">BeyondCorp Enterprise, Identity-Aware Proxy, context-aware access, and VPC Service Controls</choice>
-        <choice letter="B">VPN-only access with IP allowlisting</choice>
-        <choice letter="C">Perimeter firewall with single sign-on</choice>
-        <choice letter="D">Network segmentation with traditional firewalls only</choice>
-      </choices>
-      <correct-answer>A</correct-answer>
-      <hints>
-        <hint level="1" label="Brief Hint">
-          <content>Zero trust means the network location alone never grants access; every request must prove identity, device health, and context before being allowed through.</content>
-        </hint>
-        <hint level="2" label="Complete Explanation">
-          <content>BeyondCorp Enterprise is Google's zero-trust framework that replaces perimeter-based security with per-request verification. Identity-Aware Proxy (IAP) authenticates and authorizes every request to web apps, VMs, and APIs without requiring a VPN. Context-aware access policies evaluate device posture, user identity, IP, and time-of-day before granting access. VPC Service Controls add API-level perimeters that block data exfiltration even from authenticated principals. Options B and C rely on network-perimeter trust, which is the exact model zero trust replaces. Option D provides segmentation but no identity-based verification.</content>
-        </hint>
-        <hint level="3" label="Deep Knowledge">
-          <content>
-            <ul>
-              <li>Access Context Manager defines access levels combining attributes like IP range, device OS version, disk encryption status, and screen-lock presence, which IAP and VPC-SC evaluate on every request.</li>
-              <li>Endpoint Verification is a lightweight agent that reports device posture (OS patch level, encryption, screen lock) to Access Context Manager, enabling device-trust decisions without a full MDM deployment.</li>
-              <li>Certificate-based access (CBA) binds device identity to mTLS certificates, ensuring that only corporate-managed devices can reach protected resources even if user credentials are phished.</li>
-              <li>IAP secures not just web applications but also SSH and RDP access to VMs via TCP forwarding, eliminating the need to expose management ports on the public internet.</li>
-            </ul>
-          </content>
-        </hint>
-      </hints>
-      <tags>
-        <tag>Zero Trust</tag>
-        <tag>BeyondCorp</tag>
-        <tag>Security</tag>
-      </tags>
-    </question>
-
-    <question id="8" category-ref="cat-operations" difficulty="advanced">
-      <title>Cost Optimization Strategy</title>
-      <scenario>A startup needs to optimize their GCP costs while maintaining performance. Their workloads include steady-state production services and variable batch processing.</scenario>
-      <question-text>Which combination of strategies provides the best cost optimization?</question-text>
-      <choices>
-        <choice letter="A">Largest instance types to ensure headroom</choice>
-        <choice letter="B">On-demand pricing for all resources</choice>
-        <choice letter="C">Committed use discounts for steady-state, Spot VMs for batch, rightsizing recommendations, and scheduled scaling</choice>
-        <choice letter="D">Preemptible VMs for all workloads including production</choice>
-      </choices>
-      <correct-answer>C</correct-answer>
-      <hints>
-        <hint level="1" label="Brief Hint">
-          <content>Does every workload in a portfolio have the same runtime profile? Think about how pricing model choice should vary with workload predictability and fault tolerance.</content>
-        </hint>
-        <hint level="2" label="Complete Explanation">
-          <content>Cost optimization requires segmenting workloads by behavior. Committed Use Discounts (CUDs) lock in steady-state production resources at up to 57% savings for 1- or 3-year terms. Spot VMs slash batch-processing costs by up to 91% for fault-tolerant jobs that can handle preemption. Rightsizing recommendations from the Recommender API identify over-provisioned instances wasting money. Scheduled scaling reduces non-production environments during off-hours. Option A wastes budget on unused headroom. Option B pays full price for predictable workloads. Option D risks production outages because Spot VMs can be reclaimed at any time.</content>
-        </hint>
-        <hint level="3" label="Deep Knowledge">
-          <content>
-            <ul>
-              <li>Sustained-use discounts apply automatically to Compute Engine VMs running more than 25% of a month, stacking with custom machine types to avoid paying for unused vCPU or RAM.</li>
-              <li>The Recommender API surfaces rightsizing, idle-resource, and CUD purchase recommendations directly in the Console and via API, enabling FinOps automation with Pub/Sub-triggered Cloud Functions.</li>
-              <li>Cloud Billing export to BigQuery enables custom cost-allocation dashboards, showback/chargeback reporting by label, and anomaly detection using BigQuery ML.</li>
-              <li>Budget alerts with Pub/Sub notifications can trigger automated responses such as scaling down non-critical workloads or notifying team leads before spend exceeds thresholds.</li>
-            </ul>
-          </content>
-        </hint>
-      </hints>
-      <tags>
-        <tag>Cost Optimization</tag>
-        <tag>FinOps</tag>
-        <tag>Pricing</tag>
-      </tags>
-    </question>
-
-    <question id="9" category-ref="cat-design" difficulty="advanced">
-      <title>Container Platform Selection</title>
-      <scenario>A company needs to run containerized workloads across GCP, on-premises, and AWS with consistent management and security policies.</scenario>
-      <question-text>Which platform provides consistent container management across multiple environments?</question-text>
-      <choices>
-        <choice letter="A">Anthos with GKE Enterprise, attached clusters, and Config Management</choice>
-        <choice letter="B">Separate GKE, EKS, and on-premises Kubernetes clusters</choice>
-        <choice letter="C">Cloud Run on all platforms</choice>
-        <choice letter="D">Compute Engine VMs running Docker</choice>
-      </choices>
-      <correct-answer>A</correct-answer>
-      <hints>
-        <hint level="1" label="Brief Hint">
-          <content>What is the core challenge when Kubernetes clusters live in three different environments? Think about what breaks when each cluster is managed independently.</content>
-        </hint>
-        <hint level="2" label="Complete Explanation">
-          <content>Anthos provides a unified platform for managing containerized workloads across GCP (GKE), on-premises (Anthos on VMware or bare metal), and other clouds via attached clusters. Config Management (Config Sync + Policy Controller) ensures that security policies, resource quotas, and namespace configurations stay consistent across every cluster regardless of location. Anthos Service Mesh adds unified observability and mTLS. Option B creates management silos with divergent tooling. Option C lacks on-premises and multi-cloud support. Option D abandons orchestration entirely.</content>
-        </hint>
-        <hint level="3" label="Deep Knowledge">
-          <content>
-            <ul>
-              <li>Policy Controller (built on OPA Gatekeeper) enforces organization-wide security constraints such as disallowing privileged containers or requiring resource limits, and violations are reported centrally.</li>
-              <li>Connect gateway provides a secure, authenticated tunnel from the GCP Console to any registered cluster, enabling remote management of on-premises and AWS clusters without exposing the Kubernetes API publicly.</li>
-              <li>Fleet management groups clusters into a logical fleet, enabling fleet-wide feature rollouts, RBAC synchronization, and centralized namespace-level multi-tenancy across all environments.</li>
-              <li>Binary Authorization policies can be enforced fleet-wide, ensuring that only images built by trusted CI/CD pipelines and scanned by Artifact Registry are deployed to any cluster in the fleet.</li>
-            </ul>
-          </content>
-        </hint>
-      </hints>
-      <tags>
-        <tag>Anthos</tag>
-        <tag>Multi-Cloud</tag>
-        <tag>Kubernetes</tag>
-      </tags>
-    </question>
-
+  </failing-question>
+  <failing-question>
+    <failure-reasons>
+      <reason>H1 uses unique correct-answer terms not in other choices: {'fault'}</reason>
+    </failure-reasons>
     <question id="10" category-ref="cat-reliability" difficulty="advanced">
       <title>Chaos Engineering</title>
       <scenario>An architect wants to validate that their distributed system handles failures gracefully and meets reliability targets.</scenario>
@@ -377,79 +79,11 @@
         <tag>SRE</tag>
       </tags>
     </question>
-
-    <question id="11" category-ref="cat-design" difficulty="advanced">
-      <title>API Gateway Architecture</title>
-      <scenario>A company needs to expose multiple backend services as a unified API with authentication, rate limiting, and analytics.</scenario>
-      <question-text>Which GCP service provides API management with developer portal and monetization capabilities?</question-text>
-      <choices>
-        <choice letter="A">Cloud Endpoints</choice>
-        <choice letter="B">Apigee API Management</choice>
-        <choice letter="C">API Gateway</choice>
-        <choice letter="D">Cloud Load Balancing alone</choice>
-      </choices>
-      <correct-answer>B</correct-answer>
-      <hints>
-        <hint level="1" label="Brief Hint">
-          <content>The question specifically asks for a developer portal and monetization, which are enterprise API lifecycle features beyond basic proxying or gateway routing.</content>
-        </hint>
-        <hint level="2" label="Complete Explanation">
-          <content>Apigee is Google Cloud's full-lifecycle API management platform, purpose-built for enterprises exposing APIs to external developers. It provides API design and documentation, a customizable developer portal for onboarding third-party consumers, security controls (OAuth 2.0, API keys, threat protection), traffic management (quotas, spike arrest, rate limiting), deep analytics on API usage patterns, and monetization to charge consumers per call or subscription. Option A (Cloud Endpoints) is simpler and lacks a developer portal or monetization. Option C (API Gateway) is serverless and lightweight but also lacks those enterprise features. Option D provides no API management at all.</content>
-        </hint>
-        <hint level="3" label="Deep Knowledge">
-          <content>
-            <ul>
-              <li>Cloud Endpoints is best suited for internal or first-party APIs where you need OpenAPI-based authentication and monitoring but not a full developer ecosystem with portal and monetization.</li>
-              <li>API Gateway is a fully serverless, pay-per-call option ideal for GCP-native workloads (Cloud Functions, Cloud Run) that need simple routing and auth without managing infrastructure.</li>
-              <li>Apigee X (the latest generation) runs natively on GCP infrastructure, while Apigee hybrid deploys the runtime in customer-controlled Kubernetes clusters for data-residency or latency requirements.</li>
-              <li>API products in Apigee bundle multiple API proxies into tiered offerings (free, premium, enterprise), each with independent quota and monetization policies, enabling a full API-as-a-product business model.</li>
-            </ul>
-          </content>
-        </hint>
-      </hints>
-      <tags>
-        <tag>Apigee</tag>
-        <tag>API Management</tag>
-        <tag>Enterprise</tag>
-      </tags>
-    </question>
-
-    <question id="12" category-ref="cat-security" difficulty="advanced">
-      <title>Data Loss Prevention</title>
-      <scenario>A company needs to automatically discover, classify, and protect sensitive data across Cloud Storage, BigQuery, and databases.</scenario>
-      <question-text>Which service provides automated sensitive data discovery and protection?</question-text>
-      <choices>
-        <choice letter="A">Network-level traffic inspection</choice>
-        <choice letter="B">Manual data classification by data owners</choice>
-        <choice letter="C">Cloud Storage access controls only</choice>
-        <choice letter="D">Cloud Data Loss Prevention (DLP) API with automatic data profiling</choice>
-      </choices>
-      <correct-answer>D</correct-answer>
-      <hints>
-        <hint level="1" label="Brief Hint">
-          <content>Automated discovery across multiple data stores requires a service that understands data content, not just network traffic or access controls on a single storage layer.</content>
-        </hint>
-        <hint level="2" label="Complete Explanation">
-          <content>Cloud DLP API provides automated sensitive-data discovery across Cloud Storage, BigQuery, and Datastore. It detects over 150 built-in InfoTypes (PII, credentials, financial data) plus custom patterns, classifies data by sensitivity level, and generates compliance-ready reports. Transformation capabilities include redaction, masking, tokenization, and format-preserving encryption to protect data while retaining analytical utility. Automatic data profiling continuously scans for newly added sensitive data. Option A sees traffic but not stored data. Option B does not scale to petabytes. Option C protects only one storage service and does not classify content.</content>
-        </hint>
-        <hint level="3" label="Deep Knowledge">
-          <content>
-            <ul>
-              <li>InfoTypes are pattern detectors for sensitive data (SSN, credit card, email, etc.); custom InfoTypes extend detection to organization-specific identifiers like patient IDs or internal account numbers.</li>
-              <li>Inspection jobs can run on-demand or on a recurring schedule, scanning entire BigQuery datasets or Cloud Storage buckets and writing findings to a dedicated BigQuery table for trend analysis.</li>
-              <li>De-identification transforms (tokenization, k-anonymity, l-diversity) protect data for analytics use cases while preserving referential integrity, enabling data science teams to work without exposing raw PII.</li>
-              <li>DLP Discovery (automatic data profiling) continuously profiles new BigQuery tables and Cloud Storage buckets at the organization or folder level, surfacing sensitivity scores in Security Command Center.</li>
-            </ul>
-          </content>
-        </hint>
-      </hints>
-      <tags>
-        <tag>DLP</tag>
-        <tag>Data Protection</tag>
-        <tag>Compliance</tag>
-      </tags>
-    </question>
-
+  </failing-question>
+  <failing-question>
+    <failure-reasons>
+      <reason>H1 uses unique correct-answer terms not in other choices: {'state'}</reason>
+    </failure-reasons>
     <question id="13" category-ref="cat-manage" difficulty="advanced">
       <title>Infrastructure as Code</title>
       <scenario>An organization wants to manage all GCP infrastructure declaratively with version control, code review, and automated deployment.</scenario>
@@ -485,79 +119,11 @@
         <tag>DevOps</tag>
       </tags>
     </question>
-
-    <question id="14" category-ref="cat-design" difficulty="advanced">
-      <title>Serverless Orchestration</title>
-      <scenario>A company needs to coordinate a complex workflow involving multiple Cloud Functions, external APIs, and human approval steps.</scenario>
-      <question-text>Which service provides serverless workflow orchestration with error handling and state management?</question-text>
-      <choices>
-        <choice letter="A">Pub/Sub message chains</choice>
-        <choice letter="B">Cloud Scheduler triggering sequential functions</choice>
-        <choice letter="C">Cloud Workflows</choice>
-        <choice letter="D">Cloud Composer for simple workflows</choice>
-      </choices>
-      <correct-answer>C</correct-answer>
-      <hints>
-        <hint level="1" label="Brief Hint">
-          <content>The scenario involves orchestrating multiple steps with human approvals and error handling, which requires a stateful orchestrator rather than simple event chaining or scheduling.</content>
-        </hint>
-        <hint level="2" label="Complete Explanation">
-          <content>Cloud Workflows is a fully serverless orchestration service designed for coordinating GCP services, external APIs, and Cloud Functions into complex multi-step processes. It supports conditional logic, loops, parallel branches, structured error handling with retries and exponential backoff, and callback-based human approval steps that pause execution until an external signal resumes it. Option A (Pub/Sub chains) lacks centralized state and error handling across the full workflow. Option B (Cloud Scheduler) can trigger but not coordinate dependent steps. Option D (Cloud Composer) is an Airflow-based service designed for heavyweight data pipelines, overkill and costly for general orchestration.</content>
-        </hint>
-        <hint level="3" label="Deep Knowledge">
-          <content>
-            <ul>
-              <li>Workflow definitions use YAML or JSON and include built-in connectors for calling GCP services (BigQuery, Firestore, Compute Engine) with automatic authentication, reducing boilerplate code.</li>
-              <li>Callbacks enable long-running human approval steps: the workflow pauses, returns a callback URL, and resumes only when an external system (e.g., a Slack bot or approval UI) POSTs to that URL.</li>
-              <li>Subworkflows promote reusability by encapsulating common patterns (retry-with-backoff, fan-out/fan-in) as callable modules that any parent workflow can invoke.</li>
-              <li>Cloud Composer (managed Apache Airflow) is the right choice when the workflow involves complex DAG scheduling, backfills, and sensor-based waiting for data pipeline orchestration rather than general service coordination.</li>
-            </ul>
-          </content>
-        </hint>
-      </hints>
-      <tags>
-        <tag>Cloud Workflows</tag>
-        <tag>Orchestration</tag>
-        <tag>Serverless</tag>
-      </tags>
-    </question>
-
-    <question id="15" category-ref="cat-reliability" difficulty="advanced">
-      <title>SLO and Error Budgets</title>
-      <scenario>A platform team needs to balance new feature development with reliability investments using data-driven decision making.</scenario>
-      <question-text>Which SRE practice uses availability targets to guide development velocity decisions?</question-text>
-      <choices>
-        <choice letter="A">Manual prioritization of features vs stability</choice>
-        <choice letter="B">Fixed percentage of time for reliability work</choice>
-        <choice letter="C">Error budgets based on SLOs with automated policy enforcement</choice>
-        <choice letter="D">No reliability targets, focus on features only</choice>
-      </choices>
-      <correct-answer>C</correct-answer>
-      <hints>
-        <hint level="1" label="Brief Hint">
-          <content>The practice that converts an availability target into a quantitative budget for acceptable risk is what lets teams decide when to push features versus when to freeze and fix reliability.</content>
-        </hint>
-        <hint level="2" label="Complete Explanation">
-          <content>Error budgets are derived from SLOs: if the SLO is 99.9% availability over 30 days, the error budget is 0.1% (about 43 minutes of allowed downtime). When budget remains, teams can deploy aggressively and ship features. When the budget is exhausted or burning too fast, policy enforcement shifts focus to reliability work (bug fixes, capacity, redundancy). This data-driven approach removes subjective prioritization debates and aligns product and SRE incentives. Option A lacks objectivity. Option B is arbitrary and ignores actual system health. Option D leads to reliability debt and user-impacting outages.</content>
-        </hint>
-        <hint level="3" label="Deep Knowledge">
-          <content>
-            <ul>
-              <li>SLIs (Service Level Indicators) measure specific user-facing signals like request latency, error rate, or throughput; they feed into SLOs, which set target values over rolling time windows (e.g., 99.9% of requests under 300ms over 30 days).</li>
-              <li>Cloud Monitoring's SLO monitoring feature tracks error-budget burn rate in real time, and multi-window alerting (fast-burn 1h + slow-burn 3d) catches both sudden incidents and gradual degradation before the budget is fully consumed.</li>
-              <li>Error budget policies are written agreements that define concrete actions when budget depletes: feature freezes, mandatory postmortems, architecture reviews, or capacity increases, removing ambiguity about what happens next.</li>
-              <li>Separate SLOs for different user journeys (e.g., checkout vs. browse) allow teams to protect critical paths with tighter budgets while accepting more risk on less impactful features.</li>
-            </ul>
-          </content>
-        </hint>
-      </hints>
-      <tags>
-        <tag>SRE</tag>
-        <tag>SLO</tag>
-        <tag>Error Budgets</tag>
-      </tags>
-    </question>
-
+  </failing-question>
+  <failing-question>
+    <failure-reasons>
+      <reason>H1 uses unique correct-answer terms not in other choices: {'ingestion', 'streaming', 'analytics'}</reason>
+    </failure-reasons>
     <question id="16" category-ref="cat-design" difficulty="advanced">
       <title>Real-Time Analytics</title>
       <scenario>An online gaming platform needs to process millions of events per second for real-time leaderboards and fraud detection.</scenario>
@@ -593,79 +159,11 @@
         <tag>Analytics</tag>
       </tags>
     </question>
-
-    <question id="17" category-ref="cat-security" difficulty="advanced">
-      <title>Supply Chain Security</title>
-      <scenario>A security team needs to ensure only verified, trusted container images are deployed to production GKE clusters.</scenario>
-      <question-text>Which service enforces container image deployment policies based on attestations?</question-text>
-      <choices>
-        <choice letter="A">Network policies restricting image pulls</choice>
-        <choice letter="B">Artifact Registry scanning only</choice>
-        <choice letter="C">Binary Authorization with attestations from Cloud Build</choice>
-        <choice letter="D">Manual image verification before deployment</choice>
-      </choices>
-      <correct-answer>C</correct-answer>
-      <hints>
-        <hint level="1" label="Brief Hint">
-          <content>Deploy-time enforcement based on cryptographic proof that an image passed required checks is what distinguishes policy-driven supply chain security from scan-only approaches.</content>
-        </hint>
-        <hint level="2" label="Complete Explanation">
-          <content>Binary Authorization is a deploy-time security control on GKE (and Cloud Run) that blocks images lacking required cryptographic attestations. During CI/CD, Cloud Build creates signed attestations after each verification step (vulnerability scan passed, code reviewed, built by trusted pipeline). At deploy time, Binary Authorization checks that all required attestations are present and valid before allowing the image to run. Option A controls network access but not image trust. Option B detects vulnerabilities but does not block untrusted deployments. Option D cannot scale and has no cryptographic proof chain.</content>
-        </hint>
-        <hint level="3" label="Deep Knowledge">
-          <content>
-            <ul>
-              <li>Attestors are authorities that vouch for specific properties (e.g., "built by Cloud Build," "scan clean," "approved by security review"); each attestor signs with a KMS-managed key, and policies require one or more attestors per image.</li>
-              <li>Break-glass mode allows emergency deployments that bypass Binary Authorization, but every bypass is logged to Cloud Audit Logs and can trigger alerts, ensuring accountability without blocking critical hotfixes.</li>
-              <li>The SLSA (Supply-chain Levels for Software Artifacts) framework defines progressive security levels; Binary Authorization with Cloud Build attestations achieves SLSA Level 3 by ensuring a trusted build service produced the artifact.</li>
-              <li>Artifact Registry's vulnerability scanning integrates with Binary Authorization so that an attestation is only created when a scan returns zero critical CVEs, automating the gate between build and deploy.</li>
-            </ul>
-          </content>
-        </hint>
-      </hints>
-      <tags>
-        <tag>Binary Authorization</tag>
-        <tag>Supply Chain</tag>
-        <tag>Security</tag>
-      </tags>
-    </question>
-
-    <question id="18" category-ref="cat-manage" difficulty="advanced">
-      <title>Multi-Project Organization</title>
-      <scenario>A large enterprise needs to organize hundreds of GCP projects across multiple business units with centralized governance and distributed administration.</scenario>
-      <question-text>Which resource hierarchy design supports this requirement?</question-text>
-      <choices>
-        <choice letter="A">Single project for all workloads</choice>
-        <choice letter="B">Flat structure with all projects under organization</choice>
-        <choice letter="C">Separate organizations per business unit</choice>
-        <choice letter="D">Organization with folders per business unit, environment sub-folders, and inherited IAM/policies</choice>
-      </choices>
-      <correct-answer>D</correct-answer>
-      <hints>
-        <hint level="1" label="Brief Hint">
-          <content>Centralized governance with distributed administration requires a hierarchy where policies inherit downward and business units manage their own scope without org-level access.</content>
-        </hint>
-        <hint level="2" label="Complete Explanation">
-          <content>The recommended design uses a single organization with top-level folders per business unit, then sub-folders for environments (prod, staging, dev). IAM bindings and organization policies inherit downward, so central teams set security baselines once at the org or folder level and every child project inherits them automatically. Business-unit admins receive folder-level IAM roles, letting them create and manage projects within their scope without organization-wide access. Option A collapses isolation and blast radius. Option B makes per-unit policy impossible. Option C fragments billing, audit, and policy enforcement across multiple organizations.</content>
-        </hint>
-        <hint level="3" label="Deep Knowledge">
-          <content>
-            <ul>
-              <li>A central networking team manages Shared VPC host projects at the folder level, provisioning subnets that service projects in each business unit consume, enforcing consistent IP addressing and firewall rules.</li>
-              <li>Organization policies (e.g., restrict resource locations, disable service account key creation, require OS Login) enforce constraints across the entire hierarchy, and IAM deny policies block specific actions regardless of allow grants.</li>
-              <li>Tags (key-value pairs attached to resources) enable conditional IAM bindings, so a single policy can grant access only when a resource is tagged "environment:dev," replacing the need for per-project IAM grants.</li>
-              <li>The Resource Manager API enables programmatic hierarchy management, allowing platform teams to automate project creation, folder moves, and policy assignments as part of an IaC pipeline.</li>
-            </ul>
-          </content>
-        </hint>
-      </hints>
-      <tags>
-        <tag>Resource Hierarchy</tag>
-        <tag>Organization</tag>
-        <tag>Governance</tag>
-      </tags>
-    </question>
-
+  </failing-question>
+  <failing-question>
+    <failure-reasons>
+      <reason>H1 uses unique correct-answer terms not in other choices: {'replication', 'continuous', 'migration'}</reason>
+    </failure-reasons>
     <question id="19" category-ref="cat-operations" difficulty="advanced">
       <title>Database Migration Strategy</title>
       <scenario>A company is migrating a 10TB Oracle database to GCP with minimal downtime and needs to choose between Cloud SQL, Spanner, and AlloyDB.</scenario>
@@ -701,7 +199,11 @@
         <tag>DMS</tag>
       </tags>
     </question>
-
+  </failing-question>
+  <failing-question>
+    <failure-reasons>
+      <reason>H1 uses unique correct-answer terms not in other choices: {'edge'}</reason>
+    </failure-reasons>
     <question id="20" category-ref="cat-design" difficulty="advanced">
       <title>Edge Computing</title>
       <scenario>An IoT solution needs to process sensor data at edge locations with intermittent connectivity to the cloud.</scenario>
@@ -737,7 +239,11 @@
         <tag>IoT</tag>
       </tags>
     </question>
-
+  </failing-question>
+  <failing-question>
+    <failure-reasons>
+      <reason>H1 uses unique correct-answer terms not in other choices: {'capacity'}</reason>
+    </failure-reasons>
     <question id="21" category-ref="cat-reliability" difficulty="advanced">
       <title>Capacity Planning</title>
       <scenario>A retail company expects 10x traffic increase during holiday sales and needs to ensure their GCP infrastructure can handle the load.</scenario>
@@ -773,7 +279,11 @@
         <tag>Scalability</tag>
       </tags>
     </question>
-
+  </failing-question>
+  <failing-question>
+    <failure-reasons>
+      <reason>H1 uses unique correct-answer terms not in other choices: {'rotation', 'automatic'}</reason>
+    </failure-reasons>
     <question id="22" category-ref="cat-security" difficulty="advanced">
       <title>Secrets Management at Scale</title>
       <scenario>An organization with hundreds of applications needs centralized secrets management with automatic rotation and access auditing.</scenario>
@@ -809,7 +319,11 @@
         <tag>Rotation</tag>
       </tags>
     </question>
-
+  </failing-question>
+  <failing-question>
+    <failure-reasons>
+      <reason>H1 uses unique correct-answer terms not in other choices: {'training'}</reason>
+    </failure-reasons>
     <question id="23" category-ref="cat-design" difficulty="advanced">
       <title>ML Platform Architecture</title>
       <scenario>A data science team needs an end-to-end ML platform for experiment tracking, model training, and production deployment with monitoring.</scenario>
@@ -845,43 +359,11 @@
         <tag>Machine Learning</tag>
       </tags>
     </question>
-
-    <question id="24" category-ref="cat-operations" difficulty="advanced">
-      <title>Incident Management</title>
-      <scenario>An SRE team needs to improve their incident response with better alerting, on-call management, and post-incident analysis.</scenario>
-      <question-text>Which combination provides comprehensive incident management?</question-text>
-      <choices>
-        <choice letter="A">Manual log checking by on-call engineers</choice>
-        <choice letter="B">Email-only alerts reviewed during business hours</choice>
-        <choice letter="C">Dashboard monitoring without alerting</choice>
-        <choice letter="D">Cloud Monitoring alerting, PagerDuty integration, and error budget-based SLO alerts</choice>
-      </choices>
-      <correct-answer>D</correct-answer>
-      <hints>
-        <hint level="1" label="Brief Hint">
-          <content>Effective incident response requires automated detection that pages the right on-call engineer immediately, plus SLO-based alerting that catches meaningful degradation rather than noisy threshold breaches.</content>
-        </hint>
-        <hint level="2" label="Complete Explanation">
-          <content>Comprehensive incident management combines Cloud Monitoring alerting policies with multiple notification channels (PagerDuty, Slack, SMS) to reach on-call engineers within minutes. SLO-based alerting uses error-budget burn rate to detect meaningful service degradation rather than individual metric spikes, drastically reducing alert fatigue. PagerDuty (or Opsgenie) manages escalation schedules, on-call rotations, and acknowledgment tracking. Post-incident, blameless postmortems with documented action items drive continuous improvement. Option A is reactive and slow. Option B misses after-hours incidents. Option C detects issues only when someone looks at the dashboard.</content>
-        </hint>
-        <hint level="3" label="Deep Knowledge">
-          <content>
-            <ul>
-              <li>Multi-window, multi-burn-rate alerting (e.g., 2% budget consumed in 1 hour for fast burns, 5% in 3 days for slow burns) provides early warning at different incident severities without generating false positives on transient spikes.</li>
-              <li>Alert fatigue is the top incident-management failure mode; proper threshold tuning, alert grouping by service, and routing only actionable alerts to pagers (vs. informational to Slack) keeps engineers responsive.</li>
-              <li>Blameless postmortems focus on system and process improvements rather than individual fault, creating psychological safety that encourages honest root-cause analysis and prevents repeat incidents.</li>
-              <li>Automated remediation runbooks (triggered by Cloud Monitoring webhooks) can restart pods, scale up instances, or failover databases for known failure modes, reducing MTTR for classes of incidents that have well-understood fixes.</li>
-            </ul>
-          </content>
-        </hint>
-      </hints>
-      <tags>
-        <tag>Incident Management</tag>
-        <tag>SRE</tag>
-        <tag>Operations</tag>
-      </tags>
-    </question>
-
+  </failing-question>
+  <failing-question>
+    <failure-reasons>
+      <reason>H1 uses unique correct-answer terms not in other choices: {'shared'}</reason>
+    </failure-reasons>
     <question id="25" category-ref="cat-design" difficulty="advanced">
       <title>Network Segmentation</title>
       <scenario>An enterprise requires network isolation between departments while enabling controlled communication between approved services.</scenario>
@@ -917,7 +399,11 @@
         <tag>Security</tag>
       </tags>
     </question>
-
+  </failing-question>
+  <failing-question>
+    <failure-reasons>
+      <reason>H1 uses unique correct-answer terms not in other choices: {'backend', 'automatic', 'health', 'failover'}</reason>
+    </failure-reasons>
     <question id="26" category-ref="cat-reliability" difficulty="advanced">
       <title>Global Traffic Management</title>
       <scenario>A global SaaS company needs to route users to the closest healthy region with automatic failover during regional outages.</scenario>
@@ -953,7 +439,11 @@
         <tag>Global</tag>
       </tags>
     </question>
-
+  </failing-question>
+  <failing-question>
+    <failure-reasons>
+      <reason>H1 uses unique correct-answer terms not in other choices: {'compliance'}</reason>
+    </failure-reasons>
     <question id="27" category-ref="cat-security" difficulty="advanced">
       <title>Compliance Automation</title>
       <scenario>A company in a regulated industry needs to continuously monitor GCP resources for compliance with security standards and generate audit reports.</scenario>
@@ -989,43 +479,11 @@
         <tag>Governance</tag>
       </tags>
     </question>
-
-    <question id="28" category-ref="cat-manage" difficulty="advanced">
-      <title>GitOps for Infrastructure</title>
-      <scenario>A DevOps team wants to manage GKE cluster configuration through Git with automated synchronization and drift detection.</scenario>
-      <question-text>Which approach implements GitOps for Kubernetes configuration?</question-text>
-      <choices>
-        <choice letter="A">Manual kubectl apply after each commit</choice>
-        <choice letter="B">Anthos Config Management with Policy Controller and Config Sync</choice>
-        <choice letter="C">CI/CD pipelines without state tracking</choice>
-        <choice letter="D">Configuration stored only in clusters</choice>
-      </choices>
-      <correct-answer>B</correct-answer>
-      <hints>
-        <hint level="1" label="Brief Hint">
-          <content>GitOps requires a reconciliation loop that continuously syncs cluster state to match a Git repository and automatically corrects any drift, not just a one-time apply.</content>
-        </hint>
-        <hint level="2" label="Complete Explanation">
-          <content>Anthos Config Management implements true GitOps for Kubernetes. Config Sync continuously reconciles cluster resources to match the desired state declared in a Git repository, automatically detecting and correcting configuration drift. Policy Controller (built on OPA Gatekeeper) enforces guardrails defined in Git, blocking non-compliant changes before they reach the cluster. All changes flow through pull requests with code review, providing a full audit trail and easy rollback via git revert. Option A is manual and has no drift detection. Option C applies changes but does not reconcile drift. Option D has no source of truth outside the cluster.</content>
-        </hint>
-        <hint level="3" label="Deep Knowledge">
-          <content>
-            <ul>
-              <li>Config Sync supports both hierarchical repo layouts (with namespace inheritance for multi-tenant configurations) and unstructured repos (flat directory of manifests), adapting to different team organization patterns.</li>
-              <li>Vet-and-hydrate pipelines run in CI before merging to validate Kubernetes manifests, expand Kustomize overlays or Helm charts, and run Policy Controller checks, catching errors before they reach any cluster.</li>
-              <li>Drift prevention means that even if an operator manually changes a resource via kubectl, Config Sync detects the divergence within its sync interval and reverts the resource to match the Git-declared state.</li>
-              <li>Multi-cluster support applies configurations fleet-wide through ClusterSelectors and NamespaceSelectors, enabling a single Git repo to manage hundreds of clusters with environment-specific overrides.</li>
-            </ul>
-          </content>
-        </hint>
-      </hints>
-      <tags>
-        <tag>GitOps</tag>
-        <tag>Config Management</tag>
-        <tag>Kubernetes</tag>
-      </tags>
-    </question>
-
+  </failing-question>
+  <failing-question>
+    <failure-reasons>
+      <reason>H1 uses unique correct-answer terms not in other choices: {'affinity', 'persistent', 'session'}</reason>
+    </failure-reasons>
     <question id="29" category-ref="cat-design" difficulty="advanced">
       <title>Stateful Application Migration</title>
       <scenario>A company is migrating a legacy stateful application with sticky sessions and local file storage to GKE.</scenario>
@@ -1061,7 +519,11 @@
         <tag>Migration</tag>
       </tags>
     </question>
-
+  </failing-question>
+  <failing-question>
+    <failure-reasons>
+      <reason>H1 uses unique correct-answer terms not in other choices: {'trace', 'traces', 'three'}</reason>
+    </failure-reasons>
     <question id="30" category-ref="cat-operations" difficulty="advanced">
       <title>Observability Strategy</title>
       <scenario>A distributed system architect needs to implement comprehensive observability across microservices for troubleshooting and performance optimization.</scenario>
@@ -1097,7 +559,11 @@
         <tag>Distributed Systems</tag>
       </tags>
     </question>
-
+  </failing-question>
+  <failing-question>
+    <failure-reasons>
+      <reason>H1 uses unique correct-answer terms not in other choices: {'shielding', 'caching', 'edge'}</reason>
+    </failure-reasons>
     <question id="31" category-ref="cat-design" difficulty="advanced">
       <title>Content Delivery Architecture</title>
       <scenario>A media streaming service needs to deliver video content globally with low latency and optimize origin offload.</scenario>
@@ -1133,7 +599,11 @@
         <tag>Streaming</tag>
       </tags>
     </question>
-
+  </failing-question>
+  <failing-question>
+    <failure-reasons>
+      <reason>H1 uses unique correct-answer terms not in other choices: {'azure'}</reason>
+    </failure-reasons>
     <question id="32" category-ref="cat-security" difficulty="advanced">
       <title>Identity Federation</title>
       <scenario>An enterprise with existing Azure AD wants to enable their users to access GCP resources without creating separate Google accounts.</scenario>
@@ -1169,43 +639,11 @@
         <tag>Enterprise</tag>
       </tags>
     </question>
-
-    <question id="33" category-ref="cat-manage" difficulty="advanced">
-      <title>Resource Labeling Strategy</title>
-      <scenario>A finance team needs to track cloud costs by business unit, project, environment, and cost center across the organization.</scenario>
-      <question-text>Which approach enables comprehensive cost allocation and tracking?</question-text>
-      <choices>
-        <choice letter="A">Manual spreadsheet tracking</choice>
-        <choice letter="B">Project names encoding cost information</choice>
-        <choice letter="C">Mandatory resource labels with billing export to BigQuery and custom dashboards</choice>
-        <choice letter="D">Single project for all resources</choice>
-      </choices>
-      <correct-answer>C</correct-answer>
-      <hints>
-        <hint level="1" label="Brief Hint">
-          <content>Cost allocation at scale requires machine-readable metadata on every resource, exported to an analytics engine where finance teams can slice and dice spend by any dimension.</content>
-        </hint>
-        <hint level="2" label="Complete Explanation">
-          <content>A mandatory labeling strategy with a standardized taxonomy (cost-center, business-unit, environment, team) provides the metadata needed for cost allocation. Organization policies with custom constraints enforce that resources cannot be created without required labels. Billing export to BigQuery makes every line item queryable with labels included, enabling custom cost-allocation dashboards in Looker Studio or Looker. This approach scales to thousands of projects and supports showback/chargeback reporting. Option A cannot scale. Option B breaks when naming conventions change. Option D collapses all cost signals into one project.</content>
-        </hint>
-        <hint level="3" label="Deep Knowledge">
-          <content>
-            <ul>
-              <li>Organization policies using custom constraints (or the built-in compute.requireLabels) can enforce that specific label keys must be present at resource creation time, preventing untagged resources from being provisioned.</li>
-              <li>Labels propagate to Cloud Billing line items, so BigQuery queries can group and filter costs by any label dimension; common queries include cost-per-team-per-month and environment-breakdown (prod vs. dev vs. staging).</li>
-              <li>The Recommender API surfaces cost-optimization recommendations (idle VMs, over-provisioned disks, unattached IPs) that can be enriched with label metadata to route action items to the owning team automatically.</li>
-              <li>Billing budgets can be scoped to label filters, enabling per-team or per-cost-center budget alerts with Pub/Sub notifications that trigger automated responses like scaling down non-production workloads.</li>
-            </ul>
-          </content>
-        </hint>
-      </hints>
-      <tags>
-        <tag>Cost Management</tag>
-        <tag>Labels</tag>
-        <tag>FinOps</tag>
-      </tags>
-    </question>
-
+  </failing-question>
+  <failing-question>
+    <failure-reasons>
+      <reason>H1 uses unique correct-answer terms not in other choices: {'replication', 'synchronous'}</reason>
+    </failure-reasons>
     <question id="34" category-ref="cat-design" difficulty="advanced">
       <title>Database High Availability</title>
       <scenario>A financial trading platform requires a relational database with zero data loss, automatic failover within seconds, and cross-region redundancy.</scenario>
@@ -1241,43 +679,11 @@
         <tag>Database</tag>
       </tags>
     </question>
-
-    <question id="35" category-ref="cat-operations" difficulty="advanced">
-      <title>Blue-Green Deployments</title>
-      <scenario>A team needs to deploy application updates with instant rollback capability and zero downtime.</scenario>
-      <question-text>Which deployment strategy enables instant rollback by maintaining two production environments?</question-text>
-      <choices>
-        <choice letter="A">Single version with feature flags</choice>
-        <choice letter="B">Rolling updates with slow rollout</choice>
-        <choice letter="C">In-place updates during maintenance window</choice>
-        <choice letter="D">Blue-green deployment with traffic splitting at load balancer</choice>
-      </choices>
-      <correct-answer>D</correct-answer>
-      <hints>
-        <hint level="1" label="Brief Hint">
-          <content>Instant rollback requires keeping the previous version fully running so that reverting is just a traffic switch, not a re-deployment of the old version.</content>
-        </hint>
-        <hint level="2" label="Complete Explanation">
-          <content>Blue-green deployment maintains two identical production environments. The new version deploys to the inactive environment (green), where it is fully tested with production configuration. Once validated, the load balancer switches 100% of traffic from the current environment (blue) to green. Rollback is an instant traffic switch back to blue, which is still running the previous version. Cloud Run revision-based routing, GKE service selectors, and Global Load Balancer backend switching all support this pattern natively. Option A does not maintain two full environments. Option B provides gradual rollout but not instant rollback of completed deployments. Option C requires downtime.</content>
-        </hint>
-        <hint level="3" label="Deep Knowledge">
-          <content>
-            <ul>
-              <li>Cloud Run natively supports revision-based traffic splitting: deploy a new revision, shift 100% of traffic to it, and roll back to the previous revision instantly by updating the traffic percentage without redeploying.</li>
-              <li>In GKE, blue-green is implemented with two Deployments behind a single Service; switching the Service selector label from "version: blue" to "version: green" redirects all traffic in one kubectl command.</li>
-              <li>Cloud Deploy provides managed blue-green and canary deployment strategies with built-in verification steps that automatically roll back if health checks or custom metrics fail during the promotion window.</li>
-              <li>Database schema changes require careful coordination in blue-green deployments: the expand-and-contract pattern (add new columns first, deploy code that writes both, then remove old columns) ensures both versions work against the same schema.</li>
-            </ul>
-          </content>
-        </hint>
-      </hints>
-      <tags>
-        <tag>Deployment Strategies</tag>
-        <tag>Blue-Green</tag>
-        <tag>CI/CD</tag>
-      </tags>
-    </question>
-
+  </failing-question>
+  <failing-question>
+    <failure-reasons>
+      <reason>H1 uses unique correct-answer terms not in other choices: {'path', 'deprecation'}</reason>
+    </failure-reasons>
     <question id="36" category-ref="cat-design" difficulty="advanced">
       <title>API Versioning Strategy</title>
       <scenario>A platform team needs to evolve APIs without breaking existing clients while providing clear deprecation paths.</scenario>
@@ -1313,7 +719,11 @@
         <tag>Architecture</tag>
       </tags>
     </question>
-
+  </failing-question>
+  <failing-question>
+    <failure-reasons>
+      <reason>H1 uses unique correct-answer terms not in other choices: {'quotas', 'logical'}</reason>
+    </failure-reasons>
     <question id="37" category-ref="cat-reliability" difficulty="advanced">
       <title>Multi-Tenant Architecture</title>
       <scenario>A SaaS company needs to serve multiple customers on shared infrastructure while ensuring isolation, fair resource allocation, and per-tenant customization.</scenario>
@@ -1349,7 +759,11 @@
         <tag>Isolation</tag>
       </tags>
     </question>
-
+  </failing-question>
+  <failing-question>
+    <failure-reasons>
+      <reason>H1 uses unique correct-answer terms not in other choices: {'rest', 'transit'}</reason>
+    </failure-reasons>
     <question id="38" category-ref="cat-security" difficulty="advanced">
       <title>Encryption Strategy</title>
       <scenario>A company requires different encryption approaches for data at rest, in transit, and in use across their GCP environment.</scenario>
@@ -1385,7 +799,11 @@
         <tag>Confidential Computing</tag>
       </tags>
     </question>
-
+  </failing-question>
+  <failing-question>
+    <failure-reasons>
+      <reason>H1 uses unique correct-answer terms not in other choices: {'backend'}</reason>
+    </failure-reasons>
     <question id="39" category-ref="cat-manage" difficulty="advanced">
       <title>Terraform State Management</title>
       <scenario>A multi-team organization uses Terraform for GCP infrastructure and needs secure, collaborative state management.</scenario>
@@ -1421,7 +839,11 @@
         <tag>IaC</tag>
       </tags>
     </question>
-
+  </failing-question>
+  <failing-question>
+    <failure-reasons>
+      <reason>H1 uses unique correct-answer terms not in other choices: {'spot', 'batch'}</reason>
+    </failure-reasons>
     <question id="40" category-ref="cat-design" difficulty="advanced">
       <title>Batch Processing Architecture</title>
       <scenario>A scientific computing team needs to process large datasets with variable compute requirements, cost optimization, and job scheduling.</scenario>
@@ -1457,7 +879,11 @@
         <tag>Compute</tag>
       </tags>
     </question>
-
+  </failing-question>
+  <failing-question>
+    <failure-reasons>
+      <reason>H1 uses unique correct-answer terms not in other choices: {'baselines'}</reason>
+    </failure-reasons>
     <question id="41" category-ref="cat-operations" difficulty="advanced">
       <title>Performance Testing</title>
       <scenario>A team needs to validate application performance before major releases and establish performance baselines.</scenario>
@@ -1493,7 +919,11 @@
         <tag>CI/CD</tag>
       </tags>
     </question>
-
+  </failing-question>
+  <failing-question>
+    <failure-reasons>
+      <reason>H1 uses unique correct-answer terms not in other choices: {'third-party'}</reason>
+    </failure-reasons>
     <question id="42" category-ref="cat-design" difficulty="advanced">
       <title>Event-Driven Integration</title>
       <scenario>A company needs to integrate multiple SaaS applications with their GCP backend using event-driven patterns.</scenario>
@@ -1529,43 +959,11 @@
         <tag>Integration</tag>
       </tags>
     </question>
-
-    <question id="43" category-ref="cat-security" difficulty="advanced">
-      <title>Network Security Architecture</title>
-      <scenario>An enterprise needs comprehensive network security with microsegmentation, threat detection, and centralized policy management.</scenario>
-      <question-text>Which combination provides enterprise network security?</question-text>
-      <choices>
-        <choice letter="A">Network ACLs at subnet level only</choice>
-        <choice letter="B">Perimeter firewall only</choice>
-        <choice letter="C">Hierarchical firewall policies, Cloud IDS, VPC flow logs, and Security Command Center</choice>
-        <choice letter="D">Default network settings</choice>
-      </choices>
-      <correct-answer>C</correct-answer>
-      <hints>
-        <hint level="1" label="Brief Hint">
-          <content>Enterprise network security requires layered controls: centralized policies for consistency, threat detection for active attacks, and traffic visibility for forensic analysis and anomaly detection.</content>
-        </hint>
-        <hint level="2" label="Complete Explanation">
-          <content>Enterprise network security combines multiple complementary controls. Hierarchical firewall policies applied at the organization or folder level enforce baseline rules (block known-bad IPs, restrict management ports) that project-level rules cannot override. Microsegmentation through VPC firewall rules with tags isolates workloads within the network. Cloud IDS inspects traffic for threats using deep-packet inspection powered by Palo Alto threat intelligence. VPC Flow Logs capture metadata on every network flow for analysis. Security Command Center correlates all findings into a unified threat-and-compliance view. Option A lacks depth. Option B has no internal visibility. Option D provides no security controls.</content>
-        </hint>
-        <hint level="3" label="Deep Knowledge">
-          <content>
-            <ul>
-              <li>Firewall policy tags (distinct from network tags) are IAM-governed and cannot be modified by workload owners, providing tamper-resistant microsegmentation that scales across thousands of VMs and GKE pods.</li>
-              <li>Cloud IDS creates a traffic mirror of selected subnets and inspects it using Palo Alto Networks' threat-detection engine, identifying malware, command-and-control traffic, and lateral movement without inline latency impact.</li>
-              <li>Packet Mirroring sends a copy of network traffic to a collector instance or third-party NGFW appliance for deep packet inspection, enabling custom IDS/IPS deployments for workloads requiring specialized analysis.</li>
-              <li>Cloud NAT provides controlled outbound internet access for private VMs and GKE pods, logging all outbound connections while preventing inbound initiation, which is essential for egress security in a defense-in-depth model.</li>
-            </ul>
-          </content>
-        </hint>
-      </hints>
-      <tags>
-        <tag>Network Security</tag>
-        <tag>Defense in Depth</tag>
-        <tag>Enterprise</tag>
-      </tags>
-    </question>
-
+  </failing-question>
+  <failing-question>
+    <failure-reasons>
+      <reason>H1 uses unique correct-answer terms not in other choices: {'gates', 'delivery', 'approval'}</reason>
+    </failure-reasons>
     <question id="44" category-ref="cat-manage" difficulty="advanced">
       <title>Deployment Pipelines</title>
       <scenario>A platform team needs to implement consistent deployment pipelines across multiple applications with approval gates and progressive rollouts.</scenario>
@@ -1601,43 +999,11 @@
         <tag>DevOps</tag>
       </tags>
     </question>
-
-    <question id="45" category-ref="cat-design" difficulty="advanced">
-      <title>Graph Database Use Case</title>
-      <scenario>A social network needs to store and query highly connected data with complex relationship traversals.</scenario>
-      <question-text>Which GCP database solution handles graph-like queries for connected data?</question-text>
-      <choices>
-        <choice letter="A">Spanner Graph for native graph queries or Neo4j on GCP Marketplace</choice>
-        <choice letter="B">Cloud SQL with recursive joins</choice>
-        <choice letter="C">BigQuery for relationship analysis</choice>
-        <choice letter="D">Firestore for all graph data</choice>
-      </choices>
-      <correct-answer>A</correct-answer>
-      <hints>
-        <hint level="1" label="Brief Hint">
-          <content>Complex multi-hop relationship traversals (friend-of-friend, influence paths) require a graph-native query engine, not recursive SQL joins that degrade exponentially with depth.</content>
-        </hint>
-        <hint level="2" label="Complete Explanation">
-          <content>For graph workloads on GCP, two primary options exist. Spanner Graph adds native graph query capabilities (GQL) to Cloud Spanner, combining graph traversal with Spanner's horizontal scalability, strong consistency, and 99.999% SLA. Neo4j on GCP Marketplace provides a dedicated graph database with the mature Cypher query language, deep graph algorithms, and visualization tools. Option B (Cloud SQL recursive joins) degrades severely beyond 3-4 hops in a social graph. Option C (BigQuery) handles batch graph analytics but not low-latency interactive traversals. Option D (Firestore) has no graph query capabilities and would require client-side traversal.</content>
-        </hint>
-        <hint level="3" label="Deep Knowledge">
-          <content>
-            <ul>
-              <li>Spanner Graph uses the GQL (Graph Query Language) standard and stores graph data as property graphs with nodes and edges, while leveraging Spanner's existing distributed storage layer for horizontal scaling across regions.</li>
-              <li>Property graphs store typed attributes on both nodes (user: name, age, location) and edges (follows: since_date, weight), enabling queries that filter traversals by relationship properties for precise result sets.</li>
-              <li>BigQuery graph analytics (using SQL with GRAPH keywords) handles batch graph processing like PageRank, community detection, and shortest-path analysis on large datasets, complementing interactive graph databases for offline workloads.</li>
-              <li>JanusGraph on Bigtable provides an open-source graph database option that leverages Bigtable's petabyte-scale storage, suitable for custom graph solutions where the team has JanusGraph expertise and needs fine-grained control.</li>
-            </ul>
-          </content>
-        </hint>
-      </hints>
-      <tags>
-        <tag>Graph Database</tag>
-        <tag>Data Modeling</tag>
-        <tag>Architecture</tag>
-      </tags>
-    </question>
-
+  </failing-question>
+  <failing-question>
+    <failure-reasons>
+      <reason>H1 uses unique correct-answer terms not in other choices: {'mesh'}</reason>
+    </failure-reasons>
     <question id="46" category-ref="cat-reliability" difficulty="advanced">
       <title>Service Mesh Architecture</title>
       <scenario>A microservices platform needs consistent traffic management, security, and observability across all services.</scenario>
@@ -1673,7 +1039,11 @@
         <tag>Microservices</tag>
       </tags>
     </question>
-
+  </failing-question>
+  <failing-question>
+    <failure-reasons>
+      <reason>H1 uses unique correct-answer terms not in other choices: {'rate'}</reason>
+    </failure-reasons>
     <question id="47" category-ref="cat-security" difficulty="advanced">
       <title>API Security</title>
       <scenario>A public API needs protection against abuse, DDoS attacks, and unauthorized access while maintaining availability for legitimate users.</scenario>
@@ -1709,7 +1079,11 @@
         <tag>Protection</tag>
       </tags>
     </question>
-
+  </failing-question>
+  <failing-question>
+    <failure-reasons>
+      <reason>H1 uses unique correct-answer terms not in other choices: {'export', 'retention'}</reason>
+    </failure-reasons>
     <question id="48" category-ref="cat-operations" difficulty="advanced">
       <title>Logging Architecture</title>
       <scenario>An enterprise needs centralized logging across multiple projects with retention policies, access controls, and export for long-term analysis.</scenario>
@@ -1745,43 +1119,11 @@
         <tag>Enterprise</tag>
       </tags>
     </question>
-
-    <question id="49" category-ref="cat-design" difficulty="advanced">
-      <title>Data Residency</title>
-      <scenario>A multinational company must ensure customer data stays within specific geographic regions for regulatory compliance.</scenario>
-      <question-text>Which approach ensures data residency compliance in GCP?</question-text>
-      <choices>
-        <choice letter="A">Multi-region for all services</choice>
-        <choice letter="B">Organization policies for resource locations, regional storage, and Assured Workloads</choice>
-        <choice letter="C">Application-level geo-routing only</choice>
-        <choice letter="D">Trust that data stays in chosen region</choice>
-      </choices>
-      <correct-answer>B</correct-answer>
-      <hints>
-        <hint level="1" label="Brief Hint">
-          <content>Data residency compliance requires enforceable constraints that prevent resources from being created outside approved regions, not just application-level intent or trust assumptions.</content>
-        </hint>
-        <hint level="2" label="Complete Explanation">
-          <content>Data residency on GCP is enforced through multiple complementary controls. The gcp.resourceLocations organization policy constraint restricts which regions resources can be created in, applying to all data-storing services across the hierarchy. Regional or dual-regional Cloud Storage buckets keep objects within specific geographies. Assured Workloads provides additional compliance controls for regulated industries (EU Sovereign, FedRAMP, etc.) including data residency, personnel access restrictions, and encryption requirements. Compliance reports verify data location for auditors. Option A spreads data globally by design. Option C can be bypassed by misconfigured services. Option D provides no enforcement or evidence.</content>
-        </hint>
-        <hint level="3" label="Deep Knowledge">
-          <content>
-            <ul>
-              <li>The gcp.resourceLocations constraint accepts a list of allowed locations (e.g., europe-west1, europe-west4) and applies to resource creation across Compute Engine, Cloud Storage, BigQuery, Spanner, and other data services.</li>
-              <li>Sovereign controls (available for specific countries like Germany and Japan) add personnel restrictions ensuring only vetted, in-country Google staff can access customer data, beyond what standard data residency provides.</li>
-              <li>VPC Service Controls complement data residency by preventing API-level data exfiltration; even if data resides in the correct region, VPC-SC ensures it cannot be copied to a project outside the security perimeter.</li>
-              <li>Some GCP metadata (billing records, IAM policies, resource names) may exist outside the chosen data region; Assured Workloads documentation specifies exactly which metadata is covered and which is excluded from residency guarantees.</li>
-            </ul>
-          </content>
-        </hint>
-      </hints>
-      <tags>
-        <tag>Data Residency</tag>
-        <tag>Compliance</tag>
-        <tag>Governance</tag>
-      </tags>
-    </question>
-
+  </failing-question>
+  <failing-question>
+    <failure-reasons>
+      <reason>H1 uses unique correct-answer terms not in other choices: {'incrementally'}</reason>
+    </failure-reasons>
     <question id="50" category-ref="cat-manage" difficulty="advanced">
       <title>Migration Strategy</title>
       <scenario>A company is planning to migrate their on-premises workloads to GCP and needs to choose the right migration approach for different application types.</scenario>
@@ -1817,33 +1159,5 @@
         <tag>Modernization</tag>
       </tags>
     </question>
-  </questions>
-
-  <glossary>
-    <term id="rto" category="Reliability">
-      <name>Recovery Time Objective (RTO)</name>
-      <definition>The maximum acceptable time from a disaster to full service restoration.</definition>
-      <exam-note>RTO determines DR strategy: lower RTO requires more standby infrastructure.</exam-note>
-    </term>
-    <term id="rpo" category="Reliability">
-      <name>Recovery Point Objective (RPO)</name>
-      <definition>The maximum acceptable data loss measured in time.</definition>
-      <exam-note>RPO determines backup/replication frequency: zero RPO requires synchronous replication.</exam-note>
-    </term>
-    <term id="slo" category="SRE">
-      <name>Service Level Objective (SLO)</name>
-      <definition>A target value for a service level indicator that defines acceptable service quality.</definition>
-      <exam-note>SLOs drive error budgets and operational decisions.</exam-note>
-    </term>
-    <term id="defense-in-depth" category="Security">
-      <name>Defense in Depth</name>
-      <definition>A security strategy using multiple layers of protection.</definition>
-      <exam-note>No single control is sufficient; layer network, identity, data, and application security.</exam-note>
-    </term>
-    <term id="zero-trust" category="Security">
-      <name>Zero Trust</name>
-      <definition>Security model that requires verification for every access request regardless of source.</definition>
-      <exam-note>BeyondCorp Enterprise implements zero trust for GCP.</exam-note>
-    </term>
-  </glossary>
-</certification-exam>
+  </failing-question>
+</hint1-audit>
