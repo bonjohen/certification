@@ -148,14 +148,15 @@ All questions have a single tag matching the exam code. The reference file uses 
 
 | Task | Status | Started (PST) | Completed (PST) | Description |
 |------|--------|---------------|------------------|-------------|
-| 4.1 | Open | | | Rewrite all hints in `data/gcp/cloud-data-engineer.xml` |
-| 4.2 | Open | | | Rewrite all hints in `data/gcp/gen-ai-leader.xml` |
-| 4.3 | Open | | | Rewrite all hints in `data/gcp/pro-ml-eng.xml` |
-| 4.4 | Open | | | Validate all 3 files against XSD |
-| 4.5 | Open | | | Stage and commit Phase 4 |
+| 4.1 | Completed | 2026-04-12 07:15 AM (PST) | 2026-04-12 01:53 PM (PST) | Rewrite all hints in `data/gcp/cloud-data-engineer.xml` |
+| 4.2 | Completed | 2026-04-12 07:15 AM (PST) | 2026-04-12 01:53 PM (PST) | Rewrite all hints in `data/gcp/gen-ai-leader.xml` |
+| 4.3 | Completed | 2026-04-12 07:15 AM (PST) | 2026-04-12 01:53 PM (PST) | Rewrite all hints in `data/gcp/pro-ml-eng.xml` |
+| 4.4 | Completed | 2026-04-12 01:53 PM (PST) | 2026-04-12 01:53 PM (PST) | Validate all 3 files against XSD |
+| 4.5 | Completed | 2026-04-12 01:53 PM (PST) | 2026-04-12 01:53 PM (PST) | Stage and commit Phase 4 |
 
 ### Phase 4 Summary
-- **Changes:** TBD
+- **Changes:** Rewrote all 450 hints across 3 GCP files. cloud-data-engineer: H1=148, H2=466, H3=792. gen-ai-leader: H1=156, H2=579, H3=946. pro-ml-eng: H1=156, H2=610, H3=993. All XSD valid, 172 tests passing.
+- **Changes hosted at:** TBD
 - **Commit:** `Enrich hints for GCP cloud-data-engineer, gen-ai-leader, pro-ml-eng to reference quality`
 
 ---
