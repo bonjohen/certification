@@ -192,16 +192,17 @@ These files have real hint content but fall short on at least one metric. The pr
 
 | Task | Status | Started (PST) | Completed (PST) | Description |
 |------|--------|---------------|------------------|-------------|
-| 6.1 | Open | | | Enrich all hints in `data/gcp/gcp-gk-compute.xml` (H1=66→100+) |
-| 6.2 | Open | | | Enrich all hints in `data/gcp/gcp-exam-prep-ace.xml` (H1=75→100+) |
-| 6.3 | Open | | | Validate both files against XSD |
-| 6.4 | Open | | | Run `npx vitest run` |
-| 6.5 | Open | | | Run full audit script to confirm all 33 files meet thresholds |
-| 6.6 | Open | | | Stage and commit Phase 6 |
+| 6.1 | Completed | 2026-04-12 07:27 AM (PST) | 2026-04-12 01:53 PM (PST) | Enrich all hints in `data/gcp/gcp-gk-compute.xml` (H1=66→193) |
+| 6.2 | Completed | 2026-04-12 07:27 AM (PST) | 2026-04-12 01:53 PM (PST) | Enrich all hints in `data/gcp/gcp-exam-prep-ace.xml` (H1=75→173) |
+| 6.3 | Completed | 2026-04-12 01:53 PM (PST) | 2026-04-12 01:53 PM (PST) | Validate both files against XSD |
+| 6.4 | Completed | 2026-04-12 01:53 PM (PST) | 2026-04-12 01:53 PM (PST) | Run `npx vitest run` |
+| 6.5 | Completed | 2026-04-12 01:53 PM (PST) | 2026-04-12 01:56 PM (PST) | Run full audit script to confirm all 33 files meet thresholds |
+| 6.6 | Completed | 2026-04-12 01:56 PM (PST) | 2026-04-12 01:56 PM (PST) | Stage and commit Phase 6 |
 
 ### Phase 6 Summary
-- **Changes:** TBD
-- **Commit:** `Enrich hints for GCP gk-compute, exam-prep-ace; all exams at reference quality`
+- **Changes:** gk-compute: H1=193, H2=635, H3=957. exam-prep-ace: H1=173, H2=606, H3=1245. Final audit: all 33 XML files valid against XSD, all meet H1>=80, H2>=250, H3>=200 thresholds. 172 tests passing.
+- **Changes hosted at:** TBD
+- **Commit:** `Enrich hints for GCP gk-compute, exam-prep-ace; all 33 exams at reference quality`
 
 ---
 
