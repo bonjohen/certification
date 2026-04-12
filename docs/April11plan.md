@@ -95,7 +95,7 @@ All questions have a single tag matching the exam code. The reference file uses 
 | 1.1 | Completed | 2026-04-12 07:01 AM (PST) | 2026-04-12 07:02 AM (PST) | Run `scripts/randomize_answers.py` on all 7 new XML files |
 | 1.2 | Completed | 2026-04-12 07:02 AM (PST) | 2026-04-12 07:02 AM (PST) | Verify post-randomization distribution is roughly uniform (no letter > 35%) |
 | 1.3 | Completed | 2026-04-12 07:02 AM (PST) | 2026-04-12 07:03 AM (PST) | Run `npx vitest run` to confirm no regressions |
-| 1.4 | Started | 2026-04-12 07:03 AM (PST) | | Stage and commit Phase 1 |
+| 1.4 | Completed | 2026-04-12 07:03 AM (PST) | 2026-04-12 07:03 AM (PST) | Stage and commit Phase 1 |
 
 ### Phase 1 Summary
 - **Changes:** Ran `scripts/randomize_answers.py` across all 33 XML files (7 new + 26 existing). The 7 new files went from 90-100% single-letter bias to well-distributed answers (overall: A=24.6%, B=23.0%, C=27.7%, D=24.7%). Two files at 36% on one letter — within normal variance for n=50. 172 tests passing.
@@ -110,14 +110,15 @@ All questions have a single tag matching the exam code. The reference file uses 
 
 | Task | Status | Started (PST) | Completed (PST) | Description |
 |------|--------|---------------|------------------|-------------|
-| 2.1 | Open | | | Rewrite all Hint 1 entries in `data/aws/aip-c01.xml` — 1-2 sentence nudges |
-| 2.2 | Open | | | Rewrite all Hint 2 entries in `data/aws/aip-c01.xml` — full explanations with distractor analysis |
-| 2.3 | Open | | | Rewrite all Hint 3 entries in `data/aws/aip-c01.xml` — bulleted deep knowledge with `<ul><li>` markup |
-| 2.4 | Open | | | Validate XML against `data/schema/certification.xsd` |
-| 2.5 | Open | | | Stage and commit Phase 2 |
+| 2.1 | Completed | 2026-04-12 07:04 AM (PST) | 2026-04-12 07:14 AM (PST) | Rewrite all Hint 1 entries in `data/aws/aip-c01.xml` — 1-2 sentence nudges |
+| 2.2 | Completed | 2026-04-12 07:04 AM (PST) | 2026-04-12 07:14 AM (PST) | Rewrite all Hint 2 entries in `data/aws/aip-c01.xml` — full explanations with distractor analysis |
+| 2.3 | Completed | 2026-04-12 07:04 AM (PST) | 2026-04-12 07:14 AM (PST) | Rewrite all Hint 3 entries in `data/aws/aip-c01.xml` — bulleted deep knowledge with `<ul><li>` markup |
+| 2.4 | Completed | 2026-04-12 07:14 AM (PST) | 2026-04-12 07:14 AM (PST) | Validate XML against `data/schema/certification.xsd` |
+| 2.5 | Started | 2026-04-12 07:14 AM (PST) | | Stage and commit Phase 2 |
 
 ### Phase 2 Summary
-- **Changes:** TBD
+- **Changes:** Rewrote all 150 hints (50 questions x 3 levels) in `data/aws/aip-c01.xml`. Hint 1: 1-2 sentence conceptual nudges (avg 187 chars, up from 20). Hint 2: full paragraph explanations with distractor analysis (avg 587 chars, up from 131). Hint 3: bulleted deep knowledge with `<ul><li>` markup covering AWS-specific details, best practices, and edge cases (avg 676 chars, up from 24). XSD valid, 172 tests passing.
+- **Changes hosted at:** TBD
 - **Commit:** `Enrich hints for AWS AIP-C01 to reference quality`
 
 ---
