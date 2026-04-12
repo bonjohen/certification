@@ -1,126 +1,8 @@
 <?xml version='1.0' encoding='utf-8'?>
-<hint1-audit xmlns="http://certification.study/schema/v1" source="data\anthropic\cca-f.xml" total-questions="50" failing-questions="12">
+<hint1-audit xmlns="http://certification.study/schema/v1" source="data\anthropic\cca-f.xml" total-questions="50" failing-questions="7">
   <failing-question>
     <failure-reasons>
-      <reason>H1 uses unique correct-answer terms not in other choices: {'deterministic'}</reason>
-    </failure-reasons>
-    <question id="13" category-ref="cat-tool-design" difficulty="intermediate">
-      <title>When to Use Tools vs Prompting</title>
-      <scenario>A team is building a document processing agent. They are debating whether to implement date parsing as a tool or handle it through prompting. The dates in their documents appear in many formats: "March 15, 2025", "15/03/2025", "2025-03-15", "Q1 2025", and relative dates like "last Tuesday." The parsed dates must be in ISO 8601 format and must be exactly correct — even a one-day error would cause downstream financial calculations to be wrong.</scenario>
-      <question-text>Should date parsing be implemented as a tool or handled through prompting?</question-text>
-      <choices>
-        <choice letter="A">Handle it through prompting — Claude is highly capable at date parsing and the variety of formats is best handled by the model's understanding of natural language</choice>
-        <choice letter="B">Implement it as a tool that uses a deterministic date parsing library, because exactness is required and the tool can handle edge cases (leap years, timezone conversions, relative dates) with guaranteed correctness</choice>
-        <choice letter="C">Train a fine-tuned model specifically for date parsing to handle the variety of formats with better accuracy than the base model</choice>
-        <choice letter="D">Use a hybrid approach: let Claude attempt parsing first, then validate with a tool, falling back to the tool's result only if Claude's answer differs</choice>
-      </choices>
-      <correct-answer>B</correct-answer>
-      <hints>
-        <hint level="1" label="Brief Hint">
-          <content>When the output must be exactly correct with zero tolerance for error, which approach gives you deterministic guarantees?</content>
-        </hint>
-        <hint level="2" label="Complete Explanation">
-          <content>Date parsing with zero error tolerance is a textbook case for using a tool rather than prompting. Deterministic date parsing libraries handle edge cases that LLMs can get wrong: leap year calculations, day-of-week to date resolution for relative dates, timezone-aware conversions, and ambiguous formats like "01/02/2025" (January 2nd vs February 1st depending on locale). Claude is good at date parsing but not perfect — and "good but not perfect" is unacceptable when downstream financial calculations depend on exact correctness. The hybrid approach (option B) adds complexity without benefit — if you have a correct tool, just use it. Fine-tuning (option C) is massive overkill for a well-solved deterministic problem.</content>
-        </hint>
-        <hint level="3" label="Deep Knowledge">
-          <content>
-            <ul>
-              <li>The general principle: use tools for computation, lookup, and any operation where deterministic correctness is required. Use prompting for reasoning, summarization, classification, and tasks where approximate or creative output is acceptable.</li>
-              <li>Relative dates like "last Tuesday" require knowing the current date, which the model may not have accurately. A tool can anchor relative date calculations to the actual current timestamp from the server.</li>
-              <li>Even when using a parsing tool, Claude adds value by identifying which text fragments in a document are dates and extracting them for the tool to parse. This is a good division of labor: Claude handles the fuzzy NLP task (date extraction), the tool handles the precise computational task (date parsing).</li>
-            </ul>
-          </content>
-        </hint>
-      </hints>
-      <tags>
-        <tag>Tools vs Prompting</tag>
-        <tag>Determinism</tag>
-        <tag>Data Extraction</tag>
-      </tags>
-    </question>
-  </failing-question>
-  <failing-question>
-    <failure-reasons>
-      <reason>H1 uses unique correct-answer terms not in other choices: {'server-side'}</reason>
-    </failure-reasons>
-    <question id="15" category-ref="cat-mcp-integration" difficulty="basic">
-      <title>MCP Server Architecture Basics</title>
-      <scenario>A development team wants to give Claude Desktop access to their company's internal knowledge base. The knowledge base has a REST API. They are evaluating whether to build a custom MCP server or integrate the REST API directly using Claude's built-in HTTP tool. The knowledge base requires authentication with rotating API keys and has rate limiting that requires careful request management.</scenario>
-      <question-text>What is the primary architectural advantage of building an MCP server that wraps the knowledge base API, compared to exposing the REST API directly to Claude?</question-text>
-      <choices>
-        <choice letter="A">MCP servers are faster than direct HTTP calls because they use a binary protocol</choice>
-        <choice letter="B">The MCP server acts as a controlled boundary that manages authentication, rate limiting, and data sanitization in server-side code, rather than exposing credentials and API complexity to the model</choice>
-        <choice letter="C">MCP servers automatically cache all responses, eliminating the need for rate limit management</choice>
-        <choice letter="D">MCP is required by Claude Desktop — there is no way to make HTTP calls from Claude Desktop without MCP</choice>
-      </choices>
-      <correct-answer>B</correct-answer>
-      <hints>
-        <hint level="1" label="Brief Hint">
-          <content>Think about where secrets and complex logic should live — in the model's context or in server-side code?</content>
-        </hint>
-        <hint level="2" label="Complete Explanation">
-          <content>An MCP server acts as a security and abstraction boundary between Claude and the external system. Authentication credentials stay in the server's environment — they are never exposed to the model or included in prompts. Rate limiting logic is implemented in server-side code where it can be properly enforced with counters and backoff, rather than relying on the model to manage request pacing. The server can also sanitize responses, removing sensitive fields before they reach Claude. Option A is incorrect — MCP uses JSON-RPC, not a binary protocol. Option B is wrong because Claude Desktop could theoretically use other integration methods. Option D is wrong because MCP does not automatically cache responses.</content>
-        </hint>
-        <hint level="3" label="Deep Knowledge">
-          <content>
-            <ul>
-              <li>MCP follows a client-server architecture where the MCP client (embedded in Claude Desktop or Claude Code) communicates with MCP servers using the JSON-RPC 2.0 protocol. The server exposes tools, resources, and prompts as primitives that the client can discover and use.</li>
-              <li>The security boundary is crucial: MCP servers run in a separate process (or even on a separate machine) with their own credentials and permissions. This separation of concerns means the model never sees database connection strings, API keys, or other secrets.</li>
-              <li>MCP servers can implement business logic like input validation, output filtering, and audit logging that would be unreliable if delegated to the model. For example, the server can ensure that queries against the knowledge base are scoped to the current user's permissions.</li>
-            </ul>
-          </content>
-        </hint>
-      </hints>
-      <tags>
-        <tag>MCP Architecture</tag>
-        <tag>Security Boundaries</tag>
-        <tag>Claude Desktop</tag>
-      </tags>
-    </question>
-  </failing-question>
-  <failing-question>
-    <failure-reasons>
-      <reason>H1 uses unique correct-answer terms not in other choices: {'capabilities'}</reason>
-    </failure-reasons>
-    <question id="22" category-ref="cat-claude-code" difficulty="intermediate">
-      <title>MCP Server Configuration for Database Access</title>
-      <scenario>A developer is building a data analysis workflow where Claude Code needs to query a PostgreSQL database to explore schemas and run read-only analytics queries. They want Claude to be able to discover tables and run SELECT queries, but never execute DDL or DML statements. They are considering how to expose database access via MCP in Claude Code.</scenario>
-      <question-text>What is the recommended approach for giving Claude Code read-only database access through MCP?</question-text>
-      <choices>
-        <choice letter="A">Export the entire database to CSV files and let Claude read them as local files</choice>
-        <choice letter="B">Give Claude the database connection string in CLAUDE.md and let it use Bash to run psql commands directly</choice>
-        <choice letter="C">Configure an MCP server that exposes specific read-only tools (list_tables, describe_table, run_select_query) with the database connection handled server-side and no DDL/DML capabilities exposed</choice>
-        <choice letter="D">Install a PostgreSQL extension that exposes an HTTP API and have Claude call it via curl</choice>
-      </choices>
-      <correct-answer>C</correct-answer>
-      <hints>
-        <hint level="1" label="Brief Hint">
-          <content>MCP servers act as controlled interfaces that expose only the capabilities you choose to make available.</content>
-        </hint>
-        <hint level="2" label="Complete Explanation">
-          <content>An MCP server designed for read-only database access encapsulates the connection details server-side and exposes only specific, safe tools like listing tables, describing schemas, and running SELECT queries. This provides a clean security boundary: Claude never sees connection credentials, and the MCP server can enforce read-only access regardless of what Claude requests. Giving Claude raw psql access via Bash is dangerous because it could craft DROP or DELETE statements. CSV exports lose the ability to run ad-hoc queries and become stale. HTTP APIs via PostgreSQL extensions introduce unnecessary infrastructure complexity.</content>
-        </hint>
-        <hint level="3" label="Deep Knowledge">
-          <content>
-            <ul>
-              <li>MCP servers are configured in Claude Code's settings (project-level or user-level) and launched as subprocess or remote connections, making them portable across team members.</li>
-              <li>A well-designed database MCP server can include query validation (rejecting non-SELECT statements), result size limits (to prevent overwhelming the context window), and query timeout enforcement.</li>
-              <li>The MCP protocol supports tool schemas with parameter definitions, allowing the MCP server to declare that run_select_query accepts a SQL string and returns tabular results, giving Claude type-safe interaction with the database.</li>
-            </ul>
-          </content>
-        </hint>
-      </hints>
-      <tags>
-        <tag>Claude Code</tag>
-        <tag>MCP</tag>
-        <tag>Database</tag>
-        <tag>Security</tag>
-      </tags>
-    </question>
-  </failing-question>
-  <failing-question>
-    <failure-reasons>
-      <reason>H1 uses unique correct-answer terms not in other choices: {'duplicating', 'repository'}</reason>
+      <reason>H1 uses unique correct-answer terms not in other choices: {'sharing', 'directories'}</reason>
     </failure-reasons>
     <question id="23" category-ref="cat-claude-code" difficulty="advanced">
       <title>Worktree Isolation for Parallel Tasks</title>
@@ -135,7 +17,7 @@
       <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Think about what Git feature lets you have separate file states for different branches without duplicating the entire repository history.</content>
+          <content>Think about what Git feature lets multiple branches be checked out simultaneously in separate directories, sharing one underlying repo.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>Git worktrees create separate working directory checkouts that share the same underlying .git object store. Each worktree can be on a different branch with its own file state, so changes in one task don't affect another. This is ideal for parallel Claude Code sessions because each session operates in its own directory with no risk of cross-contamination. Unlike full clones, worktrees don't duplicate the object store, saving disk space and setup time. They don't automatically merge changes or change language contexts — those are unrelated capabilities. The key benefit is isolation without duplication.</content>
@@ -160,7 +42,7 @@
   </failing-question>
   <failing-question>
     <failure-reasons>
-      <reason>H1 uses unique correct-answer terms not in other choices: {'truncated'}</reason>
+      <reason>H1 uses unique correct-answer terms not in other choices: {'detect'}</reason>
     </failure-reasons>
     <question id="30" category-ref="cat-structured-output" difficulty="advanced">
       <title>Handling Partial and Malformed Output</title>
@@ -175,7 +57,7 @@
       <correct-answer>A</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Consider how the pipeline can distinguish between a complete response and a truncated one, and what it should do with partial data.</content>
+          <content>Consider how the pipeline can detect whether the model finished normally or was cut off, and how to extract value from incomplete output.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>A resilient streaming pipeline should: (1) use an incremental JSON parser that can extract complete objects from a partial stream, (2) check the stop_reason field to distinguish between natural completion ("end_turn") and truncation ("max_tokens"), and (3) for truncated responses, either salvage fully-formed records from the partial output or send a continuation request asking Claude to resume from where it was cut off. Buffering the entire response defeats the purpose of streaming. Setting very large max_tokens doesn't prevent network interruptions and wastes token budget. CSV seems simpler but loses the hierarchical structure that JSON provides and introduces its own escaping and quoting complexities.</content>
@@ -235,86 +117,6 @@
         <tag>XML</tag>
         <tag>JSON</tag>
         <tag>Content Management</tag>
-      </tags>
-    </question>
-  </failing-question>
-  <failing-question>
-    <failure-reasons>
-      <reason>H1 uses unique correct-answer terms not in other choices: {'token'}</reason>
-    </failure-reasons>
-    <question id="32" category-ref="cat-context-mgmt" difficulty="basic">
-      <title>Context Window Limits and Token Budgeting</title>
-      <scenario>A developer is building a document Q&amp;A system that ingests long research papers (up to 80 pages) and answers questions about them. They plan to include the full document in every API request along with the conversation history. Using Claude with a 200K token context window, they notice that as conversations grow longer, responses slow down and costs increase significantly.</scenario>
-      <question-text>What is the primary reason costs increase as the conversation grows, and what is the most effective mitigation?</question-text>
-      <choices>
-        <choice letter="A">Costs increase because Claude's per-token price goes up as the context fills; mitigate by truncating older messages</choice>
-        <choice letter="B">Costs increase because longer conversations use a more expensive model tier; mitigate by switching to a smaller model mid-conversation</choice>
-        <choice letter="C">Costs increase due to network bandwidth; mitigate by compressing the document with gzip before sending</choice>
-        <choice letter="D">Costs increase because the API charges per input token and the full document is re-sent with every turn; mitigate by using prompt caching to avoid re-processing the unchanged document prefix across turns</choice>
-      </choices>
-      <correct-answer>D</correct-answer>
-      <hints>
-        <hint level="1" label="Brief Hint">
-          <content>Every API call sends the full message history including the document, and you pay per input token each time.</content>
-        </hint>
-        <hint level="2" label="Complete Explanation">
-          <content>The Claude API is stateless — every request must include the full conversation context, including the document and all prior turns. Since pricing is per input token, re-sending the same 80-page document with each turn means paying for those tokens repeatedly. Prompt caching is the most effective mitigation: it tells the API to cache the static document prefix so subsequent requests that include the same prefix pay a reduced rate (typically a significant discount) for the cached portion. The per-token price does not increase based on context fullness. The API handles text, not compressed binary. Model tiers don't change mid-conversation based on length.</content>
-        </hint>
-        <hint level="3" label="Deep Knowledge">
-          <content>
-            <ul>
-              <li>Prompt caching works by adding a cache_control breakpoint after the static content (the document); content before the breakpoint is cached and subsequent requests that match the cached prefix pay roughly 10% of the normal input token price after a small cache write premium.</li>
-              <li>To maximize cache hits, structure your messages so the stable content (system prompt, document) comes first in the message array and the varying content (conversation turns) comes last — any change before the cache breakpoint invalidates the cache.</li>
-              <li>For very long conversations, combine prompt caching (for the document) with conversation summarization (for older turns) to keep total token count manageable while preserving both document access and conversation context.</li>
-            </ul>
-          </content>
-        </hint>
-      </hints>
-      <tags>
-        <tag>Context Management</tag>
-        <tag>Token Budgeting</tag>
-        <tag>Prompt Caching</tag>
-        <tag>Cost Optimization</tag>
-      </tags>
-    </question>
-  </failing-question>
-  <failing-question>
-    <failure-reasons>
-      <reason>H1 uses unique correct-answer terms not in other choices: {'reasoning'}</reason>
-    </failure-reasons>
-    <question id="34" category-ref="cat-context-mgmt" difficulty="advanced">
-      <title>Long-Context vs RAG Tradeoffs</title>
-      <scenario>A law firm is building a contract analysis system that needs to answer questions across a corpus of 10,000 contracts (averaging 15 pages each). Some questions require comparing clauses across multiple contracts, while others ask about specific provisions in a single contract. The firm has access to Claude with a 200K token context window and is deciding between a RAG architecture (embedding + retrieval + generation) and a long-context approach (loading full documents into the context).</scenario>
-      <question-text>Which architecture should the firm choose, and why?</question-text>
-      <choices>
-        <choice letter="A">Pre-process all contracts into a structured database and use SQL queries instead of Claude</choice>
-        <choice letter="B">Long-context only: load all 10,000 contracts into a single request since Claude's 200K context can handle it</choice>
-        <choice letter="C">RAG only: embed all contracts, retrieve relevant chunks for every query, and generate answers from the retrieved chunks</choice>
-        <choice letter="D">RAG for corpus-level retrieval to identify relevant contracts, then long-context for loading full retrieved contracts into the prompt for detailed analysis — combining retrieval precision with full-document reasoning</choice>
-      </choices>
-      <correct-answer>D</correct-answer>
-      <hints>
-        <hint level="1" label="Brief Hint">
-          <content>Consider the different strengths needed for finding relevant documents in a large corpus versus reasoning deeply about their full contents.</content>
-        </hint>
-        <hint level="2" label="Complete Explanation">
-          <content>The hybrid RAG + long-context approach is optimal for this use case. Pure long-context fails because 10,000 contracts (~150,000 pages) far exceeds any context window. Pure RAG retrieves small chunks, which loses the full-document context needed for nuanced clause analysis and cross-section reasoning within a contract. The hybrid approach uses RAG to solve the needle-in-a-haystack problem (finding the 3-5 relevant contracts from 10,000) and then uses long-context to load those full contracts into Claude's 200K window for deep analysis. This combines retrieval precision at corpus scale with full-document reasoning at analysis time. A SQL-only approach cannot handle the semantic reasoning required for legal clause interpretation.</content>
-        </hint>
-        <hint level="3" label="Deep Knowledge">
-          <content>
-            <ul>
-              <li>The hybrid architecture also optimizes cost: RAG retrieval is cheap (embedding lookups), and long-context API calls are expensive — by using RAG to narrow the document set first, you minimize the tokens sent to Claude while maximizing analytical depth on the relevant documents.</li>
-              <li>For cross-contract comparison queries, the RAG layer retrieves candidate contracts from both sides of the comparison, and Claude's long context window allows side-by-side analysis of full contract texts, which chunk-based RAG would fragment into incoherent snippets.</li>
-              <li>This pattern generalizes to many enterprise use cases: use retrieval for discovery over large corpora, long-context for deep reasoning over retrieved documents, and prompt caching to amortize the cost when multiple questions are asked about the same retrieved document set.</li>
-            </ul>
-          </content>
-        </hint>
-      </hints>
-      <tags>
-        <tag>Context Management</tag>
-        <tag>RAG</tag>
-        <tag>Long Context</tag>
-        <tag>Legal Tech</tag>
       </tags>
     </question>
   </failing-question>

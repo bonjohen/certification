@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<hint1-audit xmlns="http://certification.study/schema/v1" source="data\gcp\gcp-db-stor.xml" total-questions="50" failing-questions="28">
+<hint1-audit xmlns="http://certification.study/schema/v1" source="data\gcp\gcp-db-stor.xml" total-questions="50" failing-questions="15">
   <failing-question>
     <failure-reasons>
       <reason>H1 uses unique correct-answer terms not in other choices: {'availability'}</reason>
@@ -82,7 +82,7 @@
   </failing-question>
   <failing-question>
     <failure-reasons>
-      <reason>H1 uses unique correct-answer terms not in other choices: {'cloud', 'proxy'}</reason>
+      <reason>H1 uses unique correct-answer terms not in other choices: {'proxy', 'cloud'}</reason>
     </failure-reasons>
     <question id="8" category-ref="cat-relational" difficulty="basic">
       <title>Cloud SQL Connection Methods</title>
@@ -322,7 +322,7 @@
   </failing-question>
   <failing-question>
     <failure-reasons>
-      <reason>H1 uses unique correct-answer terms not in other choices: {'real-time', 'zero'}</reason>
+      <reason>H1 uses unique correct-answer terms not in other choices: {'zero', 'real-time'}</reason>
     </failure-reasons>
     <question id="17" category-ref="cat-nosql" difficulty="intermediate">
       <title>Bigtable vs Firestore</title>
@@ -402,7 +402,7 @@
   </failing-question>
   <failing-question>
     <failure-reasons>
-      <reason>H1 uses unique correct-answer terms not in other choices: {'collection', 'column', 'garbage'}</reason>
+      <reason>H1 uses unique correct-answer terms not in other choices: {'column', 'garbage', 'collection'}</reason>
     </failure-reasons>
     <question id="20" category-ref="cat-nosql" difficulty="advanced">
       <title>Bigtable Garbage Collection</title>
@@ -437,87 +437,6 @@
         <tag>Bigtable</tag>
         <tag>Garbage Collection</tag>
         <tag>Data Lifecycle</tag>
-      </tags>
-    </question>
-  </failing-question>
-  <failing-question>
-    <failure-reasons>
-      <reason>H1 contains correct answer text verbatim: "Signed URLs"</reason>
-      <reason>H1 uses unique correct-answer terms not in other choices: {'urls', 'signed'}</reason>
-    </failure-reasons>
-    <question id="24" category-ref="cat-object-storage" difficulty="intermediate">
-      <title>Cloud Storage Access Control</title>
-      <scenario>A company needs to provide temporary access to specific objects in Cloud Storage to external partners without creating Google accounts for them.</scenario>
-      <question-text>Which method provides time-limited access to Cloud Storage objects without requiring authentication?</question-text>
-      <choices>
-        <choice letter="A">VPC Service Controls</choice>
-        <choice letter="B">IAM policies</choice>
-        <choice letter="C">Signed URLs</choice>
-        <choice letter="D">Access Control Lists (ACLs)</choice>
-      </choices>
-      <correct-answer>C</correct-answer>
-      <hints>
-        <hint level="1" label="Brief Hint">
-          <content>Signed URLs embed a cryptographic signature and expiration time directly in the URL, granting temporary access to a specific object without requiring the recipient to authenticate.</content>
-        </hint>
-        <hint level="2" label="Complete Explanation">
-          <content>Signed URLs provide time-limited, per-object access by embedding a cryptographic signature in the URL itself. Anyone with the URL can perform the allowed operation (read or write) until it expires, without needing a Google account or any authentication. VPC Service Controls restrict network-level access perimeters. IAM policies require Google identities. ACLs also require Google identities and do not support time-limited access. Only Signed URLs meet the requirement of temporary access for unauthenticated external partners.</content>
-        </hint>
-        <hint level="3" label="Deep Knowledge">
-          <content>
-            <ul>
-              <li>Signed URLs are generated using a service account's private key or HMAC keys, and the maximum expiration is 7 days when signing with service account credentials via the signBlob API.</li>
-              <li>Each Signed URL grants access to exactly one object and one HTTP method (GET, PUT, DELETE); separate URLs are needed for different objects or operations.</li>
-              <li>Signed Policy Documents extend the concept to uploads, allowing you to constrain the uploaded object's size, content type, and key prefix while still permitting unauthenticated access.</li>
-              <li>For broader sharing, consider Signed URLs for individual objects and IAM with allUsers or allAuthenticatedUsers for public bucket-level access — but never combine public access with sensitive data.</li>
-            </ul>
-          </content>
-        </hint>
-      </hints>
-      <tags>
-        <tag>Cloud Storage</tag>
-        <tag>Signed URLs</tag>
-        <tag>Access Control</tag>
-      </tags>
-    </question>
-  </failing-question>
-  <failing-question>
-    <failure-reasons>
-      <reason>H1 contains correct answer text verbatim: "Strong global consistency for all operations"</reason>
-    </failure-reasons>
-    <question id="25" category-ref="cat-object-storage" difficulty="intermediate">
-      <title>Cloud Storage Consistency</title>
-      <scenario>An application uploads an object to Cloud Storage and immediately tries to read it.</scenario>
-      <question-text>What consistency does Cloud Storage provide for object operations?</question-text>
-      <choices>
-        <choice letter="A">Strong global consistency for all operations</choice>
-        <choice letter="B">Eventual consistency for reads after writes</choice>
-        <choice letter="C">Strong consistency only within the same region</choice>
-        <choice letter="D">Read-your-writes consistency only</choice>
-      </choices>
-      <correct-answer>A</correct-answer>
-      <hints>
-        <hint level="1" label="Brief Hint">
-          <content>Cloud Storage provides strong global consistency for all operations — after a write completes successfully, any subsequent read from anywhere in the world sees the new data immediately.</content>
-        </hint>
-        <hint level="2" label="Complete Explanation">
-          <content>Cloud Storage delivers strong global consistency for all data and metadata operations. Once a write (upload, overwrite, or delete) returns success, every subsequent read from any location will see the result. This applies to object data, metadata, ACLs, and even bucket listing operations. There is no eventual consistency window. This simplifies application logic compared to storage systems that offer only eventual or read-your-writes consistency, because developers never need to handle stale reads or implement retry loops for consistency convergence.</content>
-        </hint>
-        <hint level="3" label="Deep Knowledge">
-          <content>
-            <ul>
-              <li>Bucket listing (list operations) is also strongly consistent: after a successful upload or delete, a subsequent list immediately reflects the change, with no lag or missing entries.</li>
-              <li>This strong consistency model was a significant engineering achievement for a globally distributed system and eliminates an entire class of race-condition bugs in distributed applications.</li>
-              <li>Object versioning does not weaken consistency: when versioning is enabled, overwriting an object immediately makes the new version the live version and the previous version a noncurrent version, both visible consistently.</li>
-              <li>Strong consistency applies regardless of bucket location type (regional, dual-regional, or multi-regional) and regardless of the storage class of the object.</li>
-            </ul>
-          </content>
-        </hint>
-      </hints>
-      <tags>
-        <tag>Cloud Storage</tag>
-        <tag>Consistency</tag>
-        <tag>Architecture</tag>
       </tags>
     </question>
   </failing-question>
@@ -563,48 +482,7 @@
   </failing-question>
   <failing-question>
     <failure-reasons>
-      <reason>H1 contains correct answer text verbatim: "Regional bucket"</reason>
-      <reason>H1 uses unique correct-answer terms not in other choices: {'regional'}</reason>
-    </failure-reasons>
-    <question id="28" category-ref="cat-object-storage" difficulty="basic">
-      <title>Cloud Storage Bucket Location</title>
-      <scenario>A company needs to store data that will be accessed primarily from a single region to minimize latency and cost.</scenario>
-      <question-text>What type of Cloud Storage bucket location provides the lowest cost for single-region access?</question-text>
-      <choices>
-        <choice letter="A">Regional bucket</choice>
-        <choice letter="B">Multi-regional bucket</choice>
-        <choice letter="C">Dual-regional bucket</choice>
-        <choice letter="D">Global bucket</choice>
-      </choices>
-      <correct-answer>A</correct-answer>
-      <hints>
-        <hint level="1" label="Brief Hint">
-          <content>A regional bucket stores all data in a single region, providing the lowest storage cost and optimal latency for applications co-located in that same region.</content>
-        </hint>
-        <hint level="2" label="Complete Explanation">
-          <content>Regional buckets store data redundantly within a single geographic region, offering the lowest storage cost per GB and the lowest latency for applications in that region. Multi-regional buckets replicate data across multiple regions in a continent for higher availability but cost more. Dual-regional buckets provide geo-redundancy between two specific regions at a premium. There is no "global bucket" location type in Cloud Storage. For single-region access patterns, the regional bucket is the most cost-effective and lowest-latency choice.</content>
-        </hint>
-        <hint level="3" label="Deep Knowledge">
-          <content>
-            <ul>
-              <li>Regional buckets still provide 99.999999999% (11 nines) annual durability through redundant storage across multiple zones within the region, so durability is not sacrificed for cost savings.</li>
-              <li>Dual-regional buckets store data in two specific regions you choose (e.g., us-east1 and us-west1), providing automatic failover and turbo replication with an RPO target of 15 minutes.</li>
-              <li>Multi-regional locations (US, EU, ASIA) distribute data across multiple regions within a continent, offering the highest availability but at the highest storage cost per GB.</li>
-              <li>Bucket location is permanent and cannot be changed after creation; choosing the wrong location requires creating a new bucket and migrating data with Storage Transfer Service or gsutil.</li>
-            </ul>
-          </content>
-        </hint>
-      </hints>
-      <tags>
-        <tag>Cloud Storage</tag>
-        <tag>Bucket Location</tag>
-        <tag>Cost Optimization</tag>
-      </tags>
-    </question>
-  </failing-question>
-  <failing-question>
-    <failure-reasons>
-      <reason>H1 uses unique correct-answer terms not in other choices: {'bucket', 'retention'}</reason>
+      <reason>H1 uses unique correct-answer terms not in other choices: {'retention', 'bucket'}</reason>
     </failure-reasons>
     <question id="29" category-ref="cat-object-storage" difficulty="advanced">
       <title>Cloud Storage Retention Policy</title>
@@ -644,375 +522,7 @@
   </failing-question>
   <failing-question>
     <failure-reasons>
-      <reason>H1 contains correct answer text verbatim: "Extreme Persistent Disk"</reason>
-      <reason>H1 uses unique correct-answer terms not in other choices: {'extreme'}</reason>
-    </failure-reasons>
-    <question id="32" category-ref="cat-block-file" difficulty="intermediate">
-      <title>Persistent Disk Types</title>
-      <scenario>A database workload requires the highest possible IOPS and throughput from block storage.</scenario>
-      <question-text>Which Persistent Disk type provides the highest performance for demanding workloads?</question-text>
-      <choices>
-        <choice letter="A">Balanced Persistent Disk</choice>
-        <choice letter="B">Standard Persistent Disk</choice>
-        <choice letter="C">Extreme Persistent Disk</choice>
-        <choice letter="D">SSD Persistent Disk</choice>
-      </choices>
-      <correct-answer>C</correct-answer>
-      <hints>
-        <hint level="1" label="Brief Hint">
-          <content>Extreme Persistent Disk lets you provision IOPS independently of disk size, reaching up to 120,000 IOPS for the most demanding database and enterprise workloads.</content>
-        </hint>
-        <hint level="2" label="Complete Explanation">
-          <content>Extreme Persistent Disk delivers the highest performance among Persistent Disk types, with independently configurable IOPS (up to 120,000) and throughput decoupled from disk size. It is designed for enterprise databases like Oracle, SAP HANA, and SQL Server that demand predictable, high I/O. SSD Persistent Disk and Balanced Persistent Disk offer strong performance at lower cost but scale IOPS proportionally with size. Standard Persistent Disk is HDD-backed, offering the lowest cost but also the lowest performance.</content>
-        </hint>
-        <hint level="3" label="Deep Knowledge">
-          <content>
-            <ul>
-              <li>Extreme PD allows provisioning IOPS and throughput independently of disk capacity, so you can attach a small high-IOPS disk to a database VM without paying for unneeded storage.</li>
-              <li>Hyperdisk Extreme offers even higher IOPS limits (up to 350,000) and dynamic performance adjustment for specific machine types (e.g., C3, M3), surpassing traditional Extreme PD.</li>
-              <li>Balanced Persistent Disk provides SSD-class performance at a price point between Standard and SSD PD, making it the default choice for general-purpose workloads that do not need extreme IOPS.</li>
-              <li>Standard Persistent Disk uses HDD backing and is best suited for bulk storage, sequential I/O, and non-latency-sensitive workloads like log processing or large dataset storage.</li>
-            </ul>
-          </content>
-        </hint>
-      </hints>
-      <tags>
-        <tag>Persistent Disk</tag>
-        <tag>Performance</tag>
-        <tag>IOPS</tag>
-      </tags>
-    </question>
-  </failing-question>
-  <failing-question>
-    <failure-reasons>
-      <reason>H1 contains correct answer text verbatim: "Snapshots"</reason>
-      <reason>H1 uses unique correct-answer terms not in other choices: {'snapshots'}</reason>
-    </failure-reasons>
-    <question id="33" category-ref="cat-block-file" difficulty="intermediate">
-      <title>Persistent Disk Snapshots</title>
-      <scenario>A company needs to create backups of their Persistent Disks that can be used to restore data or create new disks in any region.</scenario>
-      <question-text>Which feature creates point-in-time copies of Persistent Disks that can be stored across regions?</question-text>
-      <choices>
-        <choice letter="A">Object versioning</choice>
-        <choice letter="B">Machine images</choice>
-        <choice letter="C">Snapshots</choice>
-        <choice letter="D">Disk clones</choice>
-      </choices>
-      <correct-answer>C</correct-answer>
-      <hints>
-        <hint level="1" label="Brief Hint">
-          <content>Persistent Disk snapshots capture a point-in-time disk state incrementally and can be stored in regional or multi-regional locations to create new disks in any target region.</content>
-        </hint>
-        <hint level="2" label="Complete Explanation">
-          <content>Snapshots create incremental, point-in-time backups of Persistent Disks. After the initial full snapshot, subsequent snapshots capture only changed blocks, reducing storage cost and creation time. Snapshots can be stored in multi-regional or regional locations and used to create new disks in any region, making them ideal for cross-region disaster recovery and migration. Object versioning applies to Cloud Storage, not block storage. Machine images capture entire VM configurations. Disk clones create instant copies but only within the same zone.</content>
-        </hint>
-        <hint level="3" label="Deep Knowledge">
-          <content>
-            <ul>
-              <li>Snapshots are incremental at the block level: only blocks changed since the last snapshot are stored, but each snapshot is independently restorable — deleting an intermediate snapshot does not break the chain.</li>
-              <li>Application-consistent snapshots require coordinating with the application (e.g., flushing database buffers, freezing the file system) before taking the snapshot to ensure data integrity.</li>
-              <li>Snapshot schedules can be attached to disks to automate regular backups with configurable retention policies (number of snapshots to keep or maximum age).</li>
-              <li>Disk clones use copy-on-write semantics for near-instant creation, but they are limited to the same zone as the source disk and cannot be used for cross-region recovery.</li>
-            </ul>
-          </content>
-        </hint>
-      </hints>
-      <tags>
-        <tag>Persistent Disk</tag>
-        <tag>Snapshots</tag>
-        <tag>Backup</tag>
-      </tags>
-    </question>
-  </failing-question>
-  <failing-question>
-    <failure-reasons>
-      <reason>H1 contains correct answer text verbatim: "Local SSD"</reason>
-    </failure-reasons>
-    <question id="34" category-ref="cat-block-file" difficulty="basic">
-      <title>Local SSD</title>
-      <scenario>An application requires extremely low-latency storage for temporary data processing, and data loss on VM termination is acceptable.</scenario>
-      <question-text>Which storage option provides the lowest latency for Compute Engine VMs but does not persist data if the VM stops?</question-text>
-      <choices>
-        <choice letter="A">RAM disk</choice>
-        <choice letter="B">Persistent Disk SSD</choice>
-        <choice letter="C">Local SSD</choice>
-        <choice letter="D">Balanced Persistent Disk</choice>
-      </choices>
-      <correct-answer>C</correct-answer>
-      <hints>
-        <hint level="1" label="Brief Hint">
-          <content>Local SSD is physically attached NVMe storage on the VM's host machine, delivering the lowest latency of any GCP disk option but with ephemeral data that is lost when the VM stops.</content>
-        </hint>
-        <hint level="2" label="Complete Explanation">
-          <content>Local SSD provides high-performance storage physically attached to the server hosting your VM, offering sub-millisecond latency and very high IOPS via NVMe interface. However, data is ephemeral — it is lost when the VM stops, is deleted, is preempted, or undergoes a host maintenance event that requires migration to a new host. This makes it ideal for scratch space, caches, temporary processing buffers, and shuffle storage. Persistent Disk SSD and Balanced PD persist data across VM lifecycle events but have higher latency due to network attachment. RAM disk is not a GCP storage product.</content>
-        </hint>
-        <hint level="3" label="Deep Knowledge">
-          <content>
-            <ul>
-              <li>Local SSDs come in fixed 375 GB partitions; you can attach up to 24 partitions (9 TB total) per VM, depending on the machine type, and they can be configured as a single RAID-0 array.</li>
-              <li>Local SSD data survives live migration events (where the VM moves to another host without stopping), but does not survive VM stop, restart, termination, or preemption.</li>
-              <li>Persistent Disk (SSD or Balanced) should be used for any data that must survive VM lifecycle events — OS boot disks, application data, and databases all require persistent storage.</li>
-              <li>Local SSD pricing is included in the VM cost for certain machine types (e.g., C3-lssd) or billed per-partition-hour for standard machine types, with no charge for I/O operations.</li>
-            </ul>
-          </content>
-        </hint>
-      </hints>
-      <tags>
-        <tag>Local SSD</tag>
-        <tag>Ephemeral Storage</tag>
-        <tag>Low Latency</tag>
-      </tags>
-    </question>
-  </failing-question>
-  <failing-question>
-    <failure-reasons>
-      <reason>H1 contains correct answer text verbatim: "Filestore"</reason>
-      <reason>H1 uses unique correct-answer terms not in other choices: {'filestore'}</reason>
-    </failure-reasons>
-    <question id="35" category-ref="cat-block-file" difficulty="basic">
-      <title>Filestore Overview</title>
-      <scenario>An application requires shared file storage accessible by multiple VMs simultaneously using standard file system protocols.</scenario>
-      <question-text>Which Google Cloud service provides managed NFS file shares for Compute Engine and GKE?</question-text>
-      <choices>
-        <choice letter="A">Cloud Storage FUSE</choice>
-        <choice letter="B">Cloud Storage</choice>
-        <choice letter="C">Filestore</choice>
-        <choice letter="D">Persistent Disk</choice>
-      </choices>
-      <correct-answer>C</correct-answer>
-      <hints>
-        <hint level="1" label="Brief Hint">
-          <content>Filestore is the fully managed NFS file server on GCP, providing shared read-write access from multiple VMs and GKE pods using standard NFSv3 protocol.</content>
-        </hint>
-        <hint level="2" label="Complete Explanation">
-          <content>Filestore is a fully managed network file storage service that exposes NFSv3 file shares. Multiple Compute Engine VMs and GKE pods can mount the same Filestore instance simultaneously with full read-write access, making it suitable for shared configuration, content management, media processing, and legacy applications that require POSIX file system semantics. Cloud Storage FUSE mounts object storage as a file system but with different performance and consistency characteristics. Cloud Storage is object storage without native mount capability. Persistent Disk supports multi-attach only in read-only mode.</content>
-        </hint>
-        <hint level="3" label="Deep Knowledge">
-          <content>
-            <ul>
-              <li>Filestore tiers include Basic (HDD and SSD for development and small workloads), Zonal (high performance within a single zone), and Enterprise (multi-zonal replication with 99.99% SLA).</li>
-              <li>Cloud Storage FUSE allows mounting Cloud Storage buckets as directories, but it is not POSIX-compliant, has higher latency for metadata operations, and does not support file locking.</li>
-              <li>Persistent Disk multi-attach supports connecting a single disk to multiple VMs but only in read-only mode, making it unsuitable for shared read-write file workloads.</li>
-              <li>Filestore integrates with GKE via the CSI driver, allowing dynamic provisioning of NFS volumes as PersistentVolumeClaims in Kubernetes workloads.</li>
-            </ul>
-          </content>
-        </hint>
-      </hints>
-      <tags>
-        <tag>Filestore</tag>
-        <tag>NFS</tag>
-        <tag>File Storage</tag>
-      </tags>
-    </question>
-  </failing-question>
-  <failing-question>
-    <failure-reasons>
-      <reason>H1 contains correct answer text verbatim: "Enterprise tier"</reason>
-      <reason>H1 uses unique correct-answer terms not in other choices: {'enterprise'}</reason>
-    </failure-reasons>
-    <question id="36" category-ref="cat-block-file" difficulty="intermediate">
-      <title>Filestore Tiers</title>
-      <scenario>A media company needs high-performance shared storage that can survive a zone failure without data loss.</scenario>
-      <question-text>Which Filestore tier provides multi-zonal availability for high availability requirements?</question-text>
-      <choices>
-        <choice letter="A">Basic SSD tier</choice>
-        <choice letter="B">Basic HDD tier</choice>
-        <choice letter="C">Zonal tier</choice>
-        <choice letter="D">Enterprise tier</choice>
-      </choices>
-      <correct-answer>D</correct-answer>
-      <hints>
-        <hint level="1" label="Brief Hint">
-          <content>Only the Enterprise tier replicates data across multiple zones within a region, providing the multi-zonal availability needed to survive a zone failure without data loss.</content>
-        </hint>
-        <hint level="2" label="Complete Explanation">
-          <content>Filestore Enterprise tier provides regional availability by replicating data synchronously across multiple zones in the same region. It offers a 99.99% availability SLA and is designed for business-critical workloads that must tolerate zone failures. The Zonal tier provides high performance within a single zone but cannot survive a zone outage. Basic HDD and Basic SSD tiers are single-zone without built-in redundancy and offer no high-availability guarantees beyond local disk durability.</content>
-        </hint>
-        <hint level="3" label="Deep Knowledge">
-          <content>
-            <ul>
-              <li>Enterprise tier requires a minimum capacity of 1 TB and can scale up to 10 TB; it supports both NFS and snapshot capabilities for backup and point-in-time recovery.</li>
-              <li>Zonal tier offers the best price-performance ratio for high-throughput workloads (e.g., rendering, genomics) that can tolerate single-zone placement or handle zone failure at the application layer.</li>
-              <li>Basic tiers (HDD and SSD) are the most cost-effective options for development, testing, and small production workloads that do not require high availability or high throughput.</li>
-              <li>Enterprise tier supports automated backups and can be used with GKE's CSI driver for dynamically provisioned, highly available shared volumes in Kubernetes clusters.</li>
-            </ul>
-          </content>
-        </hint>
-      </hints>
-      <tags>
-        <tag>Filestore</tag>
-        <tag>High Availability</tag>
-        <tag>Enterprise</tag>
-      </tags>
-    </question>
-  </failing-question>
-  <failing-question>
-    <failure-reasons>
-      <reason>H1 contains correct answer text verbatim: "Hyperdisk"</reason>
-      <reason>H1 uses unique correct-answer terms not in other choices: {'hyperdisk'}</reason>
-    </failure-reasons>
-    <question id="37" category-ref="cat-block-file" difficulty="intermediate">
-      <title>Hyperdisk</title>
-      <scenario>A database workload needs the ability to dynamically change IOPS and throughput without recreating the disk.</scenario>
-      <question-text>Which storage option allows provisioning IOPS and throughput independently and changing them dynamically?</question-text>
-      <choices>
-        <choice letter="A">Local SSD</choice>
-        <choice letter="B">Persistent Disk SSD</choice>
-        <choice letter="C">Hyperdisk</choice>
-        <choice letter="D">Balanced Persistent Disk</choice>
-      </choices>
-      <correct-answer>C</correct-answer>
-      <hints>
-        <hint level="1" label="Brief Hint">
-          <content>Hyperdisk decouples capacity, IOPS, and throughput into independently provisionable dimensions that can be adjusted dynamically on a live disk without recreation or downtime.</content>
-        </hint>
-        <hint level="2" label="Complete Explanation">
-          <content>Hyperdisk lets you provision disk capacity, IOPS, and throughput as independent dimensions and adjust any of them dynamically without recreating the disk or detaching it from the VM. This gives you the flexibility to right-size performance for current workload demands and scale up or down as needs change. Local SSD performance is fixed by the hardware. Persistent Disk SSD and Balanced PD scale performance proportionally with disk size, so increasing IOPS requires increasing capacity even if more storage is not needed.</content>
-        </hint>
-        <hint level="3" label="Deep Knowledge">
-          <content>
-            <ul>
-              <li>Hyperdisk comes in three types: Extreme (highest IOPS, up to 350,000), Throughput (optimized for high sequential bandwidth), and Balanced (general-purpose with moderate IOPS and throughput).</li>
-              <li>Traditional Persistent Disk types tie performance to size — for example, SSD PD provides 30 IOPS per GB, so reaching 30,000 IOPS requires provisioning at least 1 TB, even if the workload needs only 100 GB of capacity.</li>
-              <li>Hyperdisk supports dynamic performance changes via the gcloud CLI or API; adjustments take effect within minutes and do not require VM restart or disk detach/reattach.</li>
-              <li>Hyperdisk is available only on specific machine types (C3, M3, and later series); check compatibility with your chosen machine type before planning a migration from Persistent Disk.</li>
-            </ul>
-          </content>
-        </hint>
-      </hints>
-      <tags>
-        <tag>Hyperdisk</tag>
-        <tag>Block Storage</tag>
-        <tag>Performance</tag>
-      </tags>
-    </question>
-  </failing-question>
-  <failing-question>
-    <failure-reasons>
-      <reason>H1 contains correct answer text verbatim: "Regional Persistent Disk"</reason>
-      <reason>H1 uses unique correct-answer terms not in other choices: {'regional'}</reason>
-    </failure-reasons>
-    <question id="38" category-ref="cat-block-file" difficulty="advanced">
-      <title>Regional Persistent Disk</title>
-      <scenario>A company needs block storage that can survive a zone failure and allow the VM to be restarted in another zone using the same data.</scenario>
-      <question-text>Which Persistent Disk configuration provides synchronous replication across two zones?</question-text>
-      <choices>
-        <choice letter="A">Multi-attach Persistent Disk</choice>
-        <choice letter="B">Zonal Persistent Disk with snapshots</choice>
-        <choice letter="C">Persistent Disk with scheduled backups</choice>
-        <choice letter="D">Regional Persistent Disk</choice>
-      </choices>
-      <correct-answer>D</correct-answer>
-      <hints>
-        <hint level="1" label="Brief Hint">
-          <content>Regional Persistent Disk synchronously replicates every write to two zones in the same region, so if one zone fails the disk data is immediately available in the surviving zone.</content>
-        </hint>
-        <hint level="2" label="Complete Explanation">
-          <content>Regional Persistent Disk synchronously replicates block data to two zones within a region. If the active zone fails, you can force-attach the disk to a VM in the secondary zone with near-zero RPO (recovery point objective). This provides significantly better availability than zonal disks. Multi-attach PD shares a single disk across VMs but does not replicate data. Snapshots and scheduled backups have RPO measured in hours and require restore time. Regional PD costs approximately double a comparable zonal PD because you pay for storage in both zones.</content>
-        </hint>
-        <hint level="3" label="Deep Knowledge">
-          <content>
-            <ul>
-              <li>Regional Persistent Disk provides a 99.99% availability SLA compared to 99.9% for zonal Persistent Disk, a 10x improvement in expected annual downtime minutes.</li>
-              <li>During a zone failure, you must use the force-attach API to reassign the disk to a VM in the surviving zone; this is a manual or automation-triggered step, not automatic failover.</li>
-              <li>Synchronous replication introduces slightly higher write latency (typically a few hundred microseconds) compared to zonal PD because every write must be acknowledged by both zone replicas.</li>
-              <li>Regional PD can be combined with managed instance groups (MIGs) and autohealing to build self-recovering applications that automatically restart in the healthy zone during a zonal outage.</li>
-            </ul>
-          </content>
-        </hint>
-      </hints>
-      <tags>
-        <tag>Regional Persistent Disk</tag>
-        <tag>High Availability</tag>
-        <tag>Disaster Recovery</tag>
-      </tags>
-    </question>
-  </failing-question>
-  <failing-question>
-    <failure-reasons>
-      <reason>H1 contains correct answer text verbatim: "Cloud Storage FUSE"</reason>
-      <reason>H1 uses unique correct-answer terms not in other choices: {'cloud', 'fuse'}</reason>
-    </failure-reasons>
-    <question id="39" category-ref="cat-block-file" difficulty="intermediate">
-      <title>Cloud Storage FUSE</title>
-      <scenario>An application needs to access Cloud Storage objects using standard file system commands without code changes.</scenario>
-      <question-text>Which tool mounts Cloud Storage buckets as local file systems on Compute Engine VMs?</question-text>
-      <choices>
-        <choice letter="A">Storage Transfer Service</choice>
-        <choice letter="B">Cloud Storage FUSE</choice>
-        <choice letter="C">gsutil</choice>
-        <choice letter="D">Filestore</choice>
-      </choices>
-      <correct-answer>B</correct-answer>
-      <hints>
-        <hint level="1" label="Brief Hint">
-          <content>Cloud Storage FUSE is an open-source FUSE adapter that mounts a Cloud Storage bucket as a local directory, letting applications use standard file I/O calls without code changes.</content>
-        </hint>
-        <hint level="2" label="Complete Explanation">
-          <content>Cloud Storage FUSE is an open-source adapter that mounts Cloud Storage buckets as local file system directories on Linux VMs. Applications can use standard POSIX file I/O operations (open, read, write, close) to interact with objects in the bucket without any code modifications. However, FUSE has different performance and consistency characteristics than a native file system. Storage Transfer Service migrates data between storage systems, not mount them. gsutil is a CLI tool for copying objects, not for mounting. Filestore is a separate managed NFS service, not a Cloud Storage adapter.</content>
-        </hint>
-        <hint level="3" label="Deep Knowledge">
-          <content>
-            <ul>
-              <li>Cloud Storage FUSE is not fully POSIX-compliant: operations like atomic rename, hard links, and file locking are not supported, which can break applications that depend on these semantics.</li>
-              <li>Metadata operations (stat, list directory) have significantly higher latency than a local file system because each operation requires an HTTP round trip to the Cloud Storage API.</li>
-              <li>FUSE performs best with large sequential reads and writes (e.g., reading training data for ML workloads); small random I/O patterns suffer from the per-operation HTTP overhead.</li>
-              <li>For workloads needing POSIX compliance, file locking, and low-latency metadata operations, Filestore (managed NFS) is a better choice, though it does not offer Cloud Storage's global accessibility or storage-class tiering.</li>
-            </ul>
-          </content>
-        </hint>
-      </hints>
-      <tags>
-        <tag>Cloud Storage FUSE</tag>
-        <tag>Cloud Storage</tag>
-        <tag>File System</tag>
-      </tags>
-    </question>
-  </failing-question>
-  <failing-question>
-    <failure-reasons>
-      <reason>H1 contains correct answer text verbatim: "Backup and DR Service"</reason>
-      <reason>H1 uses unique correct-answer terms not in other choices: {'backup'}</reason>
-    </failure-reasons>
-    <question id="40" category-ref="cat-block-file" difficulty="advanced">
-      <title>Backup and DR for Compute Engine</title>
-      <scenario>A company needs an enterprise-grade backup solution for their Compute Engine VMs that provides centralized management and compliance reporting.</scenario>
-      <question-text>Which Google Cloud service provides managed backup and disaster recovery for Compute Engine?</question-text>
-      <choices>
-        <choice letter="A">Snapshot schedules</choice>
-        <choice letter="B">Backup and DR Service</choice>
-        <choice letter="C">Cloud Storage transfer</choice>
-        <choice letter="D">VM cloning</choice>
-      </choices>
-      <correct-answer>B</correct-answer>
-      <hints>
-        <hint level="1" label="Brief Hint">
-          <content>Google Cloud Backup and DR Service is the enterprise-grade managed service providing centralized backup management, application-consistent backups, and compliance reporting beyond what basic snapshot schedules offer.</content>
-        </hint>
-        <hint level="2" label="Complete Explanation">
-          <content>Google Cloud Backup and DR Service is a fully managed backup and disaster recovery platform that provides centralized policy management, application-consistent backups for enterprise databases, incremental-forever backup with instant mount recovery, and built-in compliance reporting and SLA monitoring. Snapshot schedules provide basic automated disk-level backups but lack application awareness, centralized management, and compliance features. Cloud Storage transfer moves object data and is not a backup solution. VM cloning creates a one-time copy without ongoing backup capability.</content>
-        </hint>
-        <hint level="3" label="Deep Knowledge">
-          <content>
-            <ul>
-              <li>Backup and DR Service supports application-aware backups for databases including Oracle, SQL Server, SAP HANA, MySQL, and PostgreSQL, ensuring transactional consistency at backup time.</li>
-              <li>Instant mount recovery allows mounting a backup directly as a disk on a new VM, enabling rapid recovery without waiting for a full data restore — critical for meeting tight RTO targets.</li>
-              <li>The service provides centralized dashboards for backup job monitoring, SLA compliance tracking, and audit logging, meeting enterprise governance requirements that basic snapshots cannot address.</li>
-              <li>Incremental-forever backups capture only changed blocks after the initial full backup, minimizing storage consumption and backup window duration while maintaining the ability to restore to any point in time.</li>
-            </ul>
-          </content>
-        </hint>
-      </hints>
-      <tags>
-        <tag>Backup and DR</tag>
-        <tag>Disaster Recovery</tag>
-        <tag>Compute Engine</tag>
-      </tags>
-    </question>
-  </failing-question>
-  <failing-question>
-    <failure-reasons>
-      <reason>H1 uses unique correct-answer terms not in other choices: {'filestore', 'tier'}</reason>
+      <reason>H1 uses unique correct-answer terms not in other choices: {'tier', 'filestore'}</reason>
     </failure-reasons>
     <question id="47" category-ref="cat-selection" difficulty="intermediate">
       <title>Storage Selection: Media Rendering</title>
@@ -1053,48 +563,7 @@
   </failing-question>
   <failing-question>
     <failure-reasons>
-      <reason>H1 contains correct answer text verbatim: "Cloud Storage"</reason>
-    </failure-reasons>
-    <question id="48" category-ref="cat-selection" difficulty="intermediate">
-      <title>Storage Selection: Data Lake</title>
-      <scenario>A company is building a data lake to store raw data from multiple sources in various formats for future analytics processing.</scenario>
-      <question-text>Which storage solution is most appropriate for a data lake storing diverse data formats at scale?</question-text>
-      <choices>
-        <choice letter="A">Bigtable</choice>
-        <choice letter="B">Persistent Disk</choice>
-        <choice letter="C">Cloud SQL</choice>
-        <choice letter="D">Cloud Storage</choice>
-      </choices>
-      <correct-answer>D</correct-answer>
-      <hints>
-        <hint level="1" label="Brief Hint">
-          <content>Cloud Storage is the standard foundation for data lakes on GCP, storing any file format at any scale with seamless integration into BigQuery, Dataflow, Dataproc, and other analytics services.</content>
-        </hint>
-        <hint level="2" label="Complete Explanation">
-          <content>Cloud Storage is the natural foundation for a data lake on Google Cloud. It stores any data format (CSV, JSON, Parquet, Avro, images, video) at unlimited scale with 11-nines durability and strong consistency. It integrates directly with analytics services: BigQuery for SQL queries via external tables, Dataflow for stream and batch ETL, and Dataproc for Spark/Hadoop processing. Storage class tiering (Standard to Archive) optimizes cost as data ages. Bigtable is a NoSQL database for structured key-value data. Persistent Disk is block storage for VMs. Cloud SQL is a relational database — none are designed for format-agnostic data lake storage.</content>
-        </hint>
-        <hint level="3" label="Deep Knowledge">
-          <content>
-            <ul>
-              <li>BigQuery can query Parquet, ORC, Avro, CSV, and JSON files directly in Cloud Storage using external or BigLake tables, enabling SQL analytics without loading data into BigQuery's managed storage.</li>
-              <li>Using columnar formats like Parquet or Avro for data lake files dramatically improves query performance and reduces cost because analytics engines can read only the needed columns and leverage compression.</li>
-              <li>Object Lifecycle Management policies can automatically tier older data from Standard to Nearline to Coldline to Archive, reducing storage costs for historical data that is queried less frequently over time.</li>
-              <li>Cloud Storage's flat namespace and strong consistency simplify data lake management — there are no directory-lock contention issues, and newly written files are immediately visible to all analytics jobs.</li>
-            </ul>
-          </content>
-        </hint>
-      </hints>
-      <tags>
-        <tag>Storage Selection</tag>
-        <tag>Cloud Storage</tag>
-        <tag>Data Lake</tag>
-        <tag>Analytics</tag>
-      </tags>
-    </question>
-  </failing-question>
-  <failing-question>
-    <failure-reasons>
-      <reason>H1 uses unique correct-answer terms not in other choices: {'class', 'lock', 'retention', 'bucket'}</reason>
+      <reason>H1 uses unique correct-answer terms not in other choices: {'lock', 'class', 'retention', 'bucket'}</reason>
     </failure-reasons>
     <question id="50" category-ref="cat-selection" difficulty="advanced">
       <title>Storage Selection: Compliance Archive</title>

@@ -462,7 +462,7 @@
       <correct-answer>B</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>When the output must be exactly correct with zero tolerance for error, which approach gives you deterministic guarantees?</content>
+          <content>When the output must be exactly correct every time with zero tolerance for variation, think about which approach removes the model from the critical path entirely.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>Date parsing with zero error tolerance is a textbook case for using a tool rather than prompting. Deterministic date parsing libraries handle edge cases that LLMs can get wrong: leap year calculations, day-of-week to date resolution for relative dates, timezone-aware conversions, and ambiguous formats like "01/02/2025" (January 2nd vs February 1st depending on locale). Claude is good at date parsing but not perfect — and "good but not perfect" is unacceptable when downstream financial calculations depend on exact correctness. The hybrid approach (option B) adds complexity without benefit — if you have a correct tool, just use it. Fine-tuning (option C) is massive overkill for a well-solved deterministic problem.</content>
@@ -532,7 +532,7 @@
       <correct-answer>B</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Think about where secrets and complex logic should live — in the model's context or in server-side code?</content>
+          <content>Think about where secrets and complex integration logic should live — exposed in the model's context window, or behind an abstraction layer?</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>An MCP server acts as a security and abstraction boundary between Claude and the external system. Authentication credentials stay in the server's environment — they are never exposed to the model or included in prompts. Rate limiting logic is implemented in server-side code where it can be properly enforced with counters and backoff, rather than relying on the model to manage request pacing. The server can also sanitize responses, removing sensitive fields before they reach Claude. Option A is incorrect — MCP uses JSON-RPC, not a binary protocol. Option B is wrong because Claude Desktop could theoretically use other integration methods. Option D is wrong because MCP does not automatically cache responses.</content>
@@ -781,7 +781,7 @@
       <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>MCP servers act as controlled interfaces that expose only the capabilities you choose to make available.</content>
+          <content>Think about which integration pattern lets you present a curated, restricted view of a complex system to an AI assistant.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>An MCP server designed for read-only database access encapsulates the connection details server-side and exposes only specific, safe tools like listing tables, describing schemas, and running SELECT queries. This provides a clean security boundary: Claude never sees connection credentials, and the MCP server can enforce read-only access regardless of what Claude requests. Giving Claude raw psql access via Bash is dangerous because it could craft DROP or DELETE statements. CSV exports lose the ability to run ad-hoc queries and become stale. HTTP APIs via PostgreSQL extensions introduce unnecessary infrastructure complexity.</content>
@@ -817,7 +817,7 @@
       <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Think about what Git feature lets you have separate file states for different branches without duplicating the entire repository history.</content>
+          <content>Think about what Git feature lets multiple branches be checked out simultaneously in separate directories, sharing one underlying repo.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>Git worktrees create separate working directory checkouts that share the same underlying .git object store. Each worktree can be on a different branch with its own file state, so changes in one task don't affect another. This is ideal for parallel Claude Code sessions because each session operates in its own directory with no risk of cross-contamination. Unlike full clones, worktrees don't duplicate the object store, saving disk space and setup time. They don't automatically merge changes or change language contexts — those are unrelated capabilities. The key benefit is isolation without duplication.</content>
@@ -1069,7 +1069,7 @@
       <correct-answer>A</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Consider how the pipeline can distinguish between a complete response and a truncated one, and what it should do with partial data.</content>
+          <content>Consider how the pipeline can detect whether the model finished normally or was cut off, and how to extract value from incomplete output.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>A resilient streaming pipeline should: (1) use an incremental JSON parser that can extract complete objects from a partial stream, (2) check the stop_reason field to distinguish between natural completion ("end_turn") and truncation ("max_tokens"), and (3) for truncated responses, either salvage fully-formed records from the partial output or send a continuation request asking Claude to resume from where it was cut off. Buffering the entire response defeats the purpose of streaming. Setting very large max_tokens doesn't prevent network interruptions and wastes token budget. CSV seems simpler but loses the hierarchical structure that JSON provides and introduces its own escaping and quoting complexities.</content>
@@ -1141,7 +1141,7 @@
       <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Every API call sends the full message history including the document, and you pay per input token each time.</content>
+          <content>Think about what gets sent with every API call in a multi-turn conversation and how the pricing model compounds that cost over many turns.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>The Claude API is stateless — every request must include the full conversation context, including the document and all prior turns. Since pricing is per input token, re-sending the same 80-page document with each turn means paying for those tokens repeatedly. Prompt caching is the most effective mitigation: it tells the API to cache the static document prefix so subsequent requests that include the same prefix pay a reduced rate (typically a significant discount) for the cached portion. The per-token price does not increase based on context fullness. The API handles text, not compressed binary. Model tiers don't change mid-conversation based on length.</content>
@@ -1213,7 +1213,7 @@
       <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
-          <content>Consider the different strengths needed for finding relevant documents in a large corpus versus reasoning deeply about their full contents.</content>
+          <content>Consider whether the same technique is best for both narrowing down which documents matter and then analyzing those documents in depth.</content>
         </hint>
         <hint level="2" label="Complete Explanation">
           <content>The hybrid RAG + long-context approach is optimal for this use case. Pure long-context fails because 10,000 contracts (~150,000 pages) far exceeds any context window. Pure RAG retrieves small chunks, which loses the full-document context needed for nuanced clause analysis and cross-section reasoning within a contract. The hybrid approach uses RAG to solve the needle-in-a-haystack problem (finding the 3-5 relevant contracts from 10,000) and then uses long-context to load those full contracts into Claude's 200K window for deep analysis. This combines retrieval precision at corpus scale with full-document reasoning at analysis time. A SQL-only approach cannot handle the semantic reasoning required for legal clause interpretation.</content>
