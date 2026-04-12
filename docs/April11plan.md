@@ -167,18 +167,18 @@ All questions have a single tag matching the exam code. The reference file uses 
 
 | Task | Status | Started (PST) | Completed (PST) | Description |
 |------|--------|---------------|------------------|-------------|
-| 5.1 | Open | | | Define 3-5 categories per exam in each file's `<metadata><categories>` |
-| 5.2 | Open | | | Replace "Question N" titles with descriptive titles across all 7 files |
-| 5.3 | Open | | | Write unique real-world scenarios for all 350 questions |
-| 5.4 | Open | | | Assign `category-ref` per question to match new categories |
-| 5.5 | Open | | | Add 2-3 descriptive tags per question |
-| 5.6 | Open | | | Validate all 7 files against XSD |
-| 5.7 | Open | | | Run `npx vitest run` to confirm no regressions |
-| 5.8 | Open | | | Stage and commit Phase 5 |
+| 5.1 | Completed | 2026-04-12 04:27 PM (PST) | 2026-04-12 04:35 PM (PST) | Define 3-5 categories per exam in each file's `<metadata><categories>` |
+| 5.2 | Completed | 2026-04-12 04:27 PM (PST) | 2026-04-12 04:35 PM (PST) | Replace "Question N" titles with descriptive titles across all 7 files |
+| 5.3 | Completed | 2026-04-12 04:27 PM (PST) | 2026-04-12 04:35 PM (PST) | Write unique real-world scenarios for all 350 questions |
+| 5.4 | Completed | 2026-04-12 04:27 PM (PST) | 2026-04-12 04:35 PM (PST) | Assign `category-ref` per question to match new categories |
+| 5.5 | Completed | 2026-04-12 04:27 PM (PST) | 2026-04-12 04:35 PM (PST) | Add 2-3 descriptive tags per question |
+| 5.6 | Completed | 2026-04-12 04:35 PM (PST) | 2026-04-12 04:35 PM (PST) | Validate all 7 files against XSD |
+| 5.7 | Completed | 2026-04-12 04:35 PM (PST) | 2026-04-12 04:35 PM (PST) | Run `npx vitest run` to confirm no regressions — 172 passed |
+| 5.8 | Completed | 2026-04-12 04:35 PM (PST) | 2026-04-12 04:36 PM (PST) | Stage and commit Phase 5 |
 
 ### Phase 5 Summary
-- **Changes:** TBD
-- **Commit:** `Add descriptive titles, unique scenarios, categories, and tags to 7 new XML files`
+- **Changes:** Added `scripts/patch_metadata.py` tooling. Generated JSON manifests for all 7 files. Applied 3-5 categories, descriptive titles, unique real-world scenarios, category-refs, and 2-3 topical tags to all 350 questions. All 7 files XSD valid, 172 tests passing.
+- **Commit:** `Add titles, scenarios, categories, tags to all 7 April 11 XML files; complete April11 Phase 5`
 
 ---
 
