@@ -110,17 +110,18 @@ These files have real hint content but fall short on at least one metric. The pr
 
 | Task | Status | Started (PST) | Completed (PST) | Description |
 |------|--------|---------------|------------------|-------------|
-| 2.1 | Open | | | Enrich hints in `data/aws/dea-c01.xml` if below threshold |
-| 2.2 | Open | | | Enrich hints in `data/aws/mla-c01.xml` if below threshold |
-| 2.3 | Open | | | Enrich hints in `data/azure/ai-900.xml` if below threshold |
-| 2.4 | Open | | | Enrich hints in `data/azure/dp-900.xml` if below threshold |
-| 2.5 | Open | | | Validate all files against XSD |
-| 2.6 | Open | | | Run `npx vitest run` |
-| 2.7 | Open | | | Stage and commit Phase 2 |
+| 2.1 | Completed | 2026-04-12 07:25 AM (PST) | 2026-04-12 07:25 AM (PST) | Enrich hints in `data/aws/dea-c01.xml` if below threshold — SKIPPED, already OK (H2=588) |
+| 2.2 | Completed | 2026-04-12 07:25 AM (PST) | 2026-04-12 07:25 AM (PST) | Enrich hints in `data/aws/mla-c01.xml` if below threshold — SKIPPED, already OK (H2=609) |
+| 2.3 | Completed | 2026-04-12 07:25 AM (PST) | 2026-04-12 01:53 PM (PST) | Enrich hints in `data/azure/ai-900.xml` if below threshold |
+| 2.4 | Completed | 2026-04-12 07:25 AM (PST) | 2026-04-12 01:53 PM (PST) | Enrich hints in `data/azure/dp-900.xml` if below threshold |
+| 2.5 | Completed | 2026-04-12 01:53 PM (PST) | 2026-04-12 01:53 PM (PST) | Validate all files against XSD |
+| 2.6 | Completed | 2026-04-12 01:53 PM (PST) | 2026-04-12 01:53 PM (PST) | Run `npx vitest run` |
+| 2.7 | Completed | 2026-04-12 01:53 PM (PST) | 2026-04-12 01:54 PM (PST) | Stage and commit Phase 2 |
 
 ### Phase 2 Summary
-- **Changes:** TBD
-- **Commit:** `Enrich hints for dea-c01, mla-c01, ai-900, dp-900 to reference quality`
+- **Changes:** dea-c01 and mla-c01 already met thresholds after schema conversion (skipped). Enriched ai-900: H1=146, H2=663, H3=1141. Enriched dp-900: H1=187, H2=671, H3=969. All XSD valid, 172 tests passing.
+- **Changes hosted at:** TBD
+- **Commit:** `Enrich hints for ai-900, dp-900 to reference quality`
 
 ---
 
