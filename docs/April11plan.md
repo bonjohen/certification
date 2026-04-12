@@ -114,7 +114,7 @@ All questions have a single tag matching the exam code. The reference file uses 
 | 2.2 | Completed | 2026-04-12 07:04 AM (PST) | 2026-04-12 07:14 AM (PST) | Rewrite all Hint 2 entries in `data/aws/aip-c01.xml` — full explanations with distractor analysis |
 | 2.3 | Completed | 2026-04-12 07:04 AM (PST) | 2026-04-12 07:14 AM (PST) | Rewrite all Hint 3 entries in `data/aws/aip-c01.xml` — bulleted deep knowledge with `<ul><li>` markup |
 | 2.4 | Completed | 2026-04-12 07:14 AM (PST) | 2026-04-12 07:14 AM (PST) | Validate XML against `data/schema/certification.xsd` |
-| 2.5 | Started | 2026-04-12 07:14 AM (PST) | | Stage and commit Phase 2 |
+| 2.5 | Completed | 2026-04-12 07:14 AM (PST) | 2026-04-12 07:15 AM (PST) | Stage and commit Phase 2 |
 
 ### Phase 2 Summary
 - **Changes:** Rewrote all 150 hints (50 questions x 3 levels) in `data/aws/aip-c01.xml`. Hint 1: 1-2 sentence conceptual nudges (avg 187 chars, up from 20). Hint 2: full paragraph explanations with distractor analysis (avg 587 chars, up from 131). Hint 3: bulleted deep knowledge with `<ul><li>` markup covering AWS-specific details, best practices, and edge cases (avg 676 chars, up from 24). XSD valid, 172 tests passing.
@@ -129,14 +129,15 @@ All questions have a single tag matching the exam code. The reference file uses 
 
 | Task | Status | Started (PST) | Completed (PST) | Description |
 |------|--------|---------------|------------------|-------------|
-| 3.1 | Open | | | Rewrite all hints in `data/azure/ai-102.xml` |
-| 3.2 | Open | | | Rewrite all hints in `data/azure/ai-300.xml` |
-| 3.3 | Open | | | Rewrite all hints in `data/azure/az-700.xml` |
-| 3.4 | Open | | | Validate all 3 files against XSD |
-| 3.5 | Open | | | Stage and commit Phase 3 |
+| 3.1 | Completed | 2026-04-12 07:15 AM (PST) | 2026-04-12 07:27 AM (PST) | Rewrite all hints in `data/azure/ai-102.xml` |
+| 3.2 | Completed | 2026-04-12 07:15 AM (PST) | 2026-04-12 07:27 AM (PST) | Rewrite all hints in `data/azure/ai-300.xml` |
+| 3.3 | Completed | 2026-04-12 07:15 AM (PST) | 2026-04-12 07:27 AM (PST) | Rewrite all hints in `data/azure/az-700.xml` |
+| 3.4 | Completed | 2026-04-12 07:27 AM (PST) | 2026-04-12 07:27 AM (PST) | Validate all 3 files against XSD |
+| 3.5 | Completed | 2026-04-12 07:27 AM (PST) | 2026-04-12 07:27 AM (PST) | Stage and commit Phase 3 |
 
 ### Phase 3 Summary
-- **Changes:** TBD
+- **Changes:** Rewrote all 450 hints across 3 Azure files. AI-102: H1=150, H2=549, H3=696. AI-300: H1=146, H2=536, H3=746. AZ-700: H1=141, H2=549, H3=779. All XSD valid, 172 tests passing.
+- **Changes hosted at:** TBD
 - **Commit:** `Enrich hints for Azure AI-102, AI-300, AZ-700 to reference quality`
 
 ---
