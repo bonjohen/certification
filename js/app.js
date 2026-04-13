@@ -24,6 +24,8 @@ export function getProviderFromExam(examId, metaProvider) {
         if (p.includes('aws') || p.includes('amazon')) return 'aws';
         if (p.includes('gcp') || p.includes('google')) return 'gcp';
         if (p.includes('anthropic')) return 'anthropic';
+        if (p.includes('comptia')) return 'comptia';
+        if (p.includes('isc2') || p.includes('(isc)²')) return 'isc2';
     }
 
     // Fall back to exam ID prefix detection
@@ -40,6 +42,11 @@ export function getProviderFromExam(examId, metaProvider) {
             id === 'gen-ai-leader' || id === 'pro-ml-eng') return 'gcp';
         // Anthropic exams: cca-*
         if (id.startsWith('cca-')) return 'anthropic';
+        // CompTIA exams: sy0-*, core1*, core2*, cas-*, cv0-*
+        if (id.startsWith('sy0-') || id.startsWith('cas-') || id.startsWith('cv0-') ||
+            id.startsWith('core') || id.startsWith('pt0-') || id.startsWith('cs0-')) return 'comptia';
+        // ISC2 exams: cissp, ccsp, sscp, cap
+        if (id === 'cissp' || id === 'ccsp' || id === 'sscp' || id === 'cap') return 'isc2';
     }
 
     return 'azure'; // Default fallback
@@ -243,7 +250,9 @@ export class QuizApp {
             azure: 'azure.html',
             aws: 'aws.html',
             gcp: 'gcp.html',
-            anthropic: 'anthropic.html'
+            anthropic: 'anthropic.html',
+            comptia: 'comptia.html',
+            isc2: 'isc2.html'
         };
         const backUrl = providerPages[provider] || 'index.html';
 
@@ -281,13 +290,17 @@ export class QuizApp {
             azure: 'azure.html',
             aws: 'aws.html',
             gcp: 'gcp.html',
-            anthropic: 'anthropic.html'
+            anthropic: 'anthropic.html',
+            comptia: 'comptia.html',
+            isc2: 'isc2.html'
         };
         const providerNames = {
             azure: 'Azure',
             aws: 'AWS',
             gcp: 'Google Cloud',
-            anthropic: 'Anthropic'
+            anthropic: 'Anthropic',
+            comptia: 'CompTIA',
+            isc2: 'ISC2'
         };
 
         this.elements.backLink.href = providerPages[provider] || 'index.html';

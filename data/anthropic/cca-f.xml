@@ -30,12 +30,12 @@
       <scenario>A fintech company is building a research agent that must gather data from regulatory filings, news feeds, and internal databases, then synthesize a risk assessment report. The team is deciding how to coordinate multiple specialized sub-agents (one per data source) with a central orchestrator. The system must handle partial failures gracefully — if one data source is unavailable, the report should still be generated with whatever data was collected, noting the gap.</scenario>
       <question-text>Which coordination pattern best fits these requirements for the multi-agent research system?</question-text>
       <choices>
-        <choice letter="A">A hub-and-spoke orchestrator that dispatches tasks to sub-agents, collects results with timeout handling, and synthesizes the final report even if some spokes fail</choice>
+        <choice letter="A">A sequential pipeline where each sub-agent passes its output to the next agent in a fixed chain, with the last agent producing the report</choice>
         <choice letter="B">A peer-to-peer mesh where each sub-agent communicates directly with every other sub-agent and they collectively decide when the report is ready</choice>
         <choice letter="C">A single monolithic agent with all data-source access tools defined directly, avoiding multi-agent complexity entirely</choice>
-        <choice letter="D">A sequential pipeline where each sub-agent passes its output to the next agent in a fixed chain, with the last agent producing the report</choice>
+        <choice letter="D">A hub-and-spoke orchestrator that dispatches tasks to sub-agents, collects results with timeout handling, and synthesizes the final report even if some spokes fail</choice>
       </choices>
-      <correct-answer>A</correct-answer>
+      <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Consider which pattern gives you centralized error handling and the ability to produce partial results.</content>
@@ -66,11 +66,11 @@
       <question-text>Which combination of stop conditions is most appropriate for preventing runaway agentic loops while still allowing the agent to complete legitimate complex tasks?</question-text>
       <choices>
         <choice letter="A">Set a hard limit of 3 iterations — most tasks should complete in fewer steps</choice>
-        <choice letter="B">Combine a maximum iteration count, a wall-clock timeout, and a progress-stall detector that stops the loop if the last N iterations produced no meaningful state change</choice>
-        <choice letter="C">Only stop when the agent explicitly outputs a completion token — trust the model's judgment entirely</choice>
+        <choice letter="B">Only stop when the agent explicitly outputs a completion token — trust the model's judgment entirely</choice>
+        <choice letter="C">Combine a maximum iteration count, a wall-clock timeout, and a progress-stall detector that stops the loop if the last N iterations produced no meaningful state change</choice>
         <choice letter="D">Monitor token usage only and stop when cumulative tokens exceed a budget, regardless of task progress</choice>
       </choices>
-      <correct-answer>B</correct-answer>
+      <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Think about what happens when an agent is stuck versus when it is making slow but real progress — how would you tell the difference?</content>
@@ -102,10 +102,10 @@
       <choices>
         <choice letter="A">Send the entire request as a single prompt to Claude and let the model decide the ordering at inference time</choice>
         <choice letter="B">Use a fixed sequential pipeline that always runs migration, discount, and invoicing in order with fixed 10-second delays between each step</choice>
-        <choice letter="C">Execute all three sub-tasks in parallel to minimize latency, then generate the invoice from cached data</choice>
-        <choice letter="D">Decompose into a dependency graph where migration completes first, discount application waits for migration confirmation, and invoice generation polls for discount propagation before proceeding</choice>
+        <choice letter="C">Decompose into a dependency graph where migration completes first, discount application waits for migration confirmation, and invoice generation polls for discount propagation before proceeding</choice>
+        <choice letter="D">Execute all three sub-tasks in parallel to minimize latency, then generate the invoice from cached data</choice>
       </choices>
-      <correct-answer>D</correct-answer>
+      <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Consider what goes wrong if you start generating the invoice before all upstream changes have fully propagated.</content>
@@ -138,10 +138,10 @@
       <choices>
         <choice letter="A">Use prompt chaining where the output of the summary is fed as input to the security check, which is then fed to the style check</choice>
         <choice letter="B">Run all three checks as sequential calls to the same Claude instance, changing the system prompt between each call but reusing the conversation history</choice>
-        <choice letter="C">Use a single Claude call with one system prompt that covers all three responsibilities, passing all tools in a single request</choice>
-        <choice letter="D">Delegate each responsibility to a separate sub-agent with its own system prompt, model parameters, and tool set, coordinated by an orchestrator that merges the results</choice>
+        <choice letter="C">Delegate each responsibility to a separate sub-agent with its own system prompt, model parameters, and tool set, coordinated by an orchestrator that merges the results</choice>
+        <choice letter="D">Use a single Claude call with one system prompt that covers all three responsibilities, passing all tools in a single request</choice>
       </choices>
-      <correct-answer>D</correct-answer>
+      <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Think about what each responsibility in this pipeline needs in terms of configuration — are those needs compatible in a single context?</content>
@@ -173,10 +173,10 @@
       <choices>
         <choice letter="A">Keep a progress counter in memory and write it to a checkpoint file only when the entire batch completes</choice>
         <choice letter="B">Process documents in random order so that restarts statistically reduce duplicates over time</choice>
-        <choice letter="C">Use a database transaction that wraps the entire batch, rolling back all work if the process is interrupted</choice>
-        <choice letter="D">Write each extracted result to an append-only log with the document ID, and on startup, read the log to build a set of already-processed IDs before resuming</choice>
+        <choice letter="C">Write each extracted result to an append-only log with the document ID, and on startup, read the log to build a set of already-processed IDs before resuming</choice>
+        <choice letter="D">Use a database transaction that wraps the entire batch, rolling back all work if the process is interrupted</choice>
       </choices>
-      <correct-answer>D</correct-answer>
+      <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>If the process crashes after document 250, how would it know which documents have already been handled when it restarts?</content>
@@ -209,10 +209,10 @@
       <choices>
         <choice letter="A">Use the non-streaming API with a very low max_tokens value and repeatedly call the API to get the next chunk of the response</choice>
         <choice letter="B">Make multiple non-streaming API calls with increasing max_tokens to simulate progressive output</choice>
-        <choice letter="C">Use the non-streaming API and implement a client-side typing animation that reveals the complete response character by character</choice>
-        <choice letter="D">Use the streaming API with server-sent events, forwarding content_block_delta events to the frontend as they arrive</choice>
+        <choice letter="C">Use the streaming API with server-sent events, forwarding content_block_delta events to the frontend as they arrive</choice>
+        <choice letter="D">Use the non-streaming API and implement a client-side typing animation that reveals the complete response character by character</choice>
       </choices>
-      <correct-answer>D</correct-answer>
+      <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>True incremental delivery requires the API to send partial results as they are generated.</content>
@@ -243,11 +243,11 @@
       <question-text>How should the team leverage prompt caching to optimize costs for this workload?</question-text>
       <choices>
         <choice letter="A">Enable prompt caching on the user message containing the invoice text, since that is the variable part that changes across requests</choice>
-        <choice letter="B">Mark the system prompt with a cache_control breakpoint so it is cached across requests, while the per-invoice user message is sent fresh each time</choice>
+        <choice letter="B">Concatenate all invoices into a single massive request to amortize the system prompt cost, processing them in one call</choice>
         <choice letter="C">Shorten the system prompt to under 1,024 tokens so it fits in the model's implicit cache without any explicit caching configuration</choice>
-        <choice letter="D">Concatenate all invoices into a single massive request to amortize the system prompt cost, processing them in one call</choice>
+        <choice letter="D">Mark the system prompt with a cache_control breakpoint so it is cached across requests, while the per-invoice user message is sent fresh each time</choice>
       </choices>
-      <correct-answer>B</correct-answer>
+      <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Think about which parts of your API requests are repeated identically across calls and which change per request.</content>
@@ -314,10 +314,10 @@
       <choices>
         <choice letter="A">Start a new conversation after every 5 turns, asking the user to repeat any relevant context</choice>
         <choice letter="B">Always send the full conversation history regardless of length, relying on the model's full context window</choice>
-        <choice letter="C">Use a sliding window of recent turns combined with a summarized digest of earlier conversation, injected as a system prompt update</choice>
-        <choice letter="D">Truncate the conversation to only the last 3 turns, discarding all earlier history to keep costs low</choice>
+        <choice letter="C">Truncate the conversation to only the last 3 turns, discarding all earlier history to keep costs low</choice>
+        <choice letter="D">Use a sliding window of recent turns combined with a summarized digest of earlier conversation, injected as a system prompt update</choice>
       </choices>
-      <correct-answer>C</correct-answer>
+      <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>The best approach preserves important context without paying the full cost of sending every historical token on every turn.</content>
@@ -349,11 +349,11 @@
       <question-text>What is the primary design problem with the proposed "manage_infrastructure" tool?</question-text>
       <choices>
         <choice letter="A">The tool name is too long — tool names should be under 10 characters for the model to use them reliably</choice>
-        <choice letter="B">The tool needs a confirmation step built into its schema — all destructive operations must require user approval in the tool definition</choice>
+        <choice letter="B">The tool combines multiple distinct operations into one, making the schema ambiguous and harder for the model to use correctly because required parameters depend on which action is selected</choice>
         <choice letter="C">The tool should use XML parameters instead of JSON for better model compatibility</choice>
-        <choice letter="D">The tool combines multiple distinct operations into one, making the schema ambiguous and harder for the model to use correctly because required parameters depend on which action is selected</choice>
+        <choice letter="D">The tool needs a confirmation step built into its schema — all destructive operations must require user approval in the tool definition</choice>
       </choices>
-      <correct-answer>D</correct-answer>
+      <correct-answer>B</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Think about how clear the tool's contract is — can the model determine exactly what parameters are required?</content>
@@ -384,11 +384,11 @@
       <question-text>How should the tool's error handling be redesigned to prevent the agent from hallucinating after failures?</question-text>
       <choices>
         <choice letter="A">Remove the tool entirely and embed the database query logic in the system prompt as instructions for Claude to generate SQL directly</choice>
-        <choice letter="B">Return a structured error response with the error type, a human-readable message, and explicit instruction that no data was retrieved, using the is_error field in the tool result</choice>
-        <choice letter="C">Return the raw stack trace as the tool result so Claude can debug the error itself</choice>
+        <choice letter="B">Return the raw stack trace as the tool result so Claude can debug the error itself</choice>
+        <choice letter="C">Return a structured error response with the error type, a human-readable message, and explicit instruction that no data was retrieved, using the is_error field in the tool result</choice>
         <choice letter="D">Silently retry the tool call 10 times before returning any error, since most failures are transient</choice>
       </choices>
-      <correct-answer>B</correct-answer>
+      <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Consider what information the model needs to respond honestly when a data lookup fails versus when it returns empty results.</content>
@@ -419,11 +419,11 @@
       <question-text>Which combination of tool_choice settings across the agent's turns best enforces this requirement?</question-text>
       <choices>
         <choice letter="A">Set tool_choice to {"type": "auto"} for all turns and add instructions in the system prompt to always run the linter first</choice>
-        <choice letter="B">On the first turn, set tool_choice to {"type": "tool", "name": "run_linter"} to force linter execution, then switch to {"type": "auto"} for subsequent turns</choice>
+        <choice letter="B">Remove the linter tool and run it outside the agent loop, injecting linter results into the system prompt</choice>
         <choice letter="C">Set tool_choice to {"type": "any"} for all turns so the agent is forced to use a tool on every turn</choice>
-        <choice letter="D">Remove the linter tool and run it outside the agent loop, injecting linter results into the system prompt</choice>
+        <choice letter="D">On the first turn, set tool_choice to {"type": "tool", "name": "run_linter"} to force linter execution, then switch to {"type": "auto"} for subsequent turns</choice>
       </choices>
-      <correct-answer>B</correct-answer>
+      <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Think about whether the orchestrator can enforce certain actions on specific turns rather than relying on the model to choose correctly every time.</content>
@@ -455,11 +455,11 @@
       <question-text>Should date parsing be implemented as a tool or handled through prompting?</question-text>
       <choices>
         <choice letter="A">Handle it through prompting — Claude is highly capable at date parsing and the variety of formats is best handled by the model's understanding of natural language</choice>
-        <choice letter="B">Implement it as a tool that uses a deterministic date parsing library, because exactness is required and the tool can handle edge cases (leap years, timezone conversions, relative dates) with guaranteed correctness</choice>
-        <choice letter="C">Train a fine-tuned model specifically for date parsing to handle the variety of formats with better accuracy than the base model</choice>
+        <choice letter="B">Train a fine-tuned model specifically for date parsing to handle the variety of formats with better accuracy than the base model</choice>
+        <choice letter="C">Implement it as a tool that uses a deterministic date parsing library, because exactness is required and the tool can handle edge cases (leap years, timezone conversions, relative dates) with guaranteed correctness</choice>
         <choice letter="D">Use a hybrid approach: let Claude attempt parsing first, then validate with a tool, falling back to the tool's result only if Claude's answer differs</choice>
       </choices>
-      <correct-answer>B</correct-answer>
+      <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>When the output must be exactly correct every time with zero tolerance for variation, think about which approach removes the model from the critical path entirely.</content>
@@ -490,11 +490,11 @@
       <question-text>What is the best way to handle the dependency between these tool calls while still benefiting from parallelism where possible?</question-text>
       <choices>
         <choice letter="A">Pre-fetch all papers and citations into a local cache before the agent runs, eliminating the need for tool calls during the agent loop</choice>
-        <choice letter="B">Disable parallel tool calls entirely and force sequential execution for all tool calls</choice>
-        <choice letter="C">Structure the orchestration so the agent makes tool calls in explicit phases — search phase returns IDs, then a parallel fetch phase uses those IDs — with the orchestrator controlling when to advance phases</choice>
+        <choice letter="B">Structure the orchestration so the agent makes tool calls in explicit phases — search phase returns IDs, then a parallel fetch phase uses those IDs — with the orchestrator controlling when to advance phases</choice>
+        <choice letter="C">Disable parallel tool calls entirely and force sequential execution for all tool calls</choice>
         <choice letter="D">Allow parallel tool calls but implement server-side dependency tracking that queues dependent calls until their prerequisites complete</choice>
       </choices>
-      <correct-answer>C</correct-answer>
+      <correct-answer>B</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Consider how you might get the benefits of concurrent execution without allowing calls that depend on results that haven't arrived yet.</content>
@@ -525,11 +525,11 @@
       <question-text>What is the primary architectural advantage of building an MCP server that wraps the knowledge base API, compared to exposing the REST API directly to Claude?</question-text>
       <choices>
         <choice letter="A">MCP servers are faster than direct HTTP calls because they use a binary protocol</choice>
-        <choice letter="B">The MCP server acts as a controlled boundary that manages authentication, rate limiting, and data sanitization in server-side code, rather than exposing credentials and API complexity to the model</choice>
+        <choice letter="B">MCP is required by Claude Desktop — there is no way to make HTTP calls from Claude Desktop without MCP</choice>
         <choice letter="C">MCP servers automatically cache all responses, eliminating the need for rate limit management</choice>
-        <choice letter="D">MCP is required by Claude Desktop — there is no way to make HTTP calls from Claude Desktop without MCP</choice>
+        <choice letter="D">The MCP server acts as a controlled boundary that manages authentication, rate limiting, and data sanitization in server-side code, rather than exposing credentials and API complexity to the model</choice>
       </choices>
-      <correct-answer>B</correct-answer>
+      <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Think about where secrets and complex integration logic should live — exposed in the model's context window, or behind an abstraction layer?</content>
@@ -559,12 +559,12 @@
       <scenario>A platform team is deploying MCP servers for two use cases: (1) a local development tools server that Claude Code uses on each developer's machine, and (2) a shared analytics server that multiple users' Claude Desktop instances connect to over the network. They need to choose the appropriate transport protocol for each deployment.</scenario>
       <question-text>Which transport protocol pairing is correct for these two deployment scenarios?</question-text>
       <choices>
-        <choice letter="A">Use WebSocket transport for the local server and gRPC for the shared server, since MCP supports both natively</choice>
+        <choice letter="A">Use stdio transport for the local development tools server (Claude Code spawns it as a child process) and Streamable HTTP transport for the shared analytics server (accessible over the network)</choice>
         <choice letter="B">Use HTTP with SSE for both — it is the universal MCP transport that works for all scenarios</choice>
         <choice letter="C">Use stdio for both — the shared server can be accessed by piping stdio over SSH tunnels to each developer's machine</choice>
-        <choice letter="D">Use stdio transport for the local development tools server (Claude Code spawns it as a child process) and Streamable HTTP transport for the shared analytics server (accessible over the network)</choice>
+        <choice letter="D">Use WebSocket transport for the local server and gRPC for the shared server, since MCP supports both natively</choice>
       </choices>
-      <correct-answer>D</correct-answer>
+      <correct-answer>A</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Think about the fundamental difference between a server running on the same machine versus one shared across a network — what communication styles suit each?</content>
@@ -630,12 +630,12 @@
       <scenario>A consulting firm is configuring Claude Desktop for their analysts. They want to connect an MCP server that provides access to client project files stored on a shared network drive. The MCP server exposes both a "read_file" resource and a "write_file" tool. The firm's security team is concerned that an analyst could accidentally (or through a prompt injection in a client document) cause Claude to overwrite or delete critical project files. The MCP server currently runs with the analyst's full file system permissions.</scenario>
       <question-text>What is the most effective security measure to address the security team's concern?</question-text>
       <choices>
-        <choice letter="A">Implement server-side access controls in the MCP server: restrict write operations to a specific output directory, validate all file paths against an allowlist, and require explicit user approval for destructive operations through Claude Desktop's consent mechanism</choice>
+        <choice letter="A">Disable the MCP server entirely and have analysts copy-paste file contents into Claude manually</choice>
         <choice letter="B">Add a disclaimer to Claude's system prompt instructing it never to overwrite files without explicit user confirmation</choice>
         <choice letter="C">Run the MCP server with root/admin permissions but add logging so that any unauthorized writes can be detected after the fact</choice>
-        <choice letter="D">Disable the MCP server entirely and have analysts copy-paste file contents into Claude manually</choice>
+        <choice letter="D">Implement server-side access controls in the MCP server: restrict write operations to a specific output directory, validate all file paths against an allowlist, and require explicit user approval for destructive operations through Claude Desktop's consent mechanism</choice>
       </choices>
-      <correct-answer>A</correct-answer>
+      <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Consider which layer of the system can enforce file access restrictions even if the model has been manipulated by injected instructions.</content>
@@ -666,12 +666,12 @@
       <scenario>A developer joins a team that uses Claude Code across several repositories. They notice inconsistent behavior: Claude follows certain coding conventions in one repo but not in another. The team lead asks them to set up a configuration hierarchy so that organization-wide rules always apply, while individual repos can add project-specific instructions.</scenario>
       <question-text>How should the developer configure CLAUDE.md files to establish organization-wide defaults that are augmented by project-specific instructions?</question-text>
       <choices>
-        <choice letter="A">Create a shared npm package that injects CLAUDE.md content at build time</choice>
+        <choice letter="A">Use the user-level ~/.claude/CLAUDE.md for organization-wide rules and a project-level CLAUDE.md for project-specific instructions, since Claude Code merges instructions from all levels</choice>
         <choice letter="B">Place all rules in a single CLAUDE.md at the repository root and duplicate it across every project</choice>
-        <choice letter="C">Use the user-level ~/.claude/CLAUDE.md for organization-wide rules and a project-level CLAUDE.md for project-specific instructions, since Claude Code merges instructions from all levels</choice>
+        <choice letter="C">Create a shared npm package that injects CLAUDE.md content at build time</choice>
         <choice letter="D">Define all rules in environment variables that Claude Code reads at startup</choice>
       </choices>
-      <correct-answer>C</correct-answer>
+      <correct-answer>A</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Think about how other developer tools (like .gitconfig) handle the tension between personal preferences and shared project settings.</content>
@@ -738,11 +738,11 @@
       <question-text>What is the most appropriate permission configuration for the headless CI pipeline use case?</question-text>
       <choices>
         <choice letter="A">Run Claude Code in default interactive mode and pre-approve all prompts with a "yes" pipe</choice>
-        <choice letter="B">Disable all tool use and have Claude Code only generate code as text output that a separate script executes</choice>
-        <choice letter="C">Use an allowlist-based permission configuration that pre-authorizes specific safe tools (file read, file write to migration directory, test runner) while blocking destructive operations, combined with the non-interactive flag</choice>
+        <choice letter="B">Use an allowlist-based permission configuration that pre-authorizes specific safe tools (file read, file write to migration directory, test runner) while blocking destructive operations, combined with the non-interactive flag</choice>
+        <choice letter="C">Disable all tool use and have Claude Code only generate code as text output that a separate script executes</choice>
         <choice letter="D">Use the permissive "dangerously skip permissions" flag to bypass all permission checks since CI has no interactive user</choice>
       </choices>
-      <correct-answer>C</correct-answer>
+      <correct-answer>B</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Consider the tradeoffs between convenience and safety when no human is present to approve actions — what principle guides that balance?</content>
@@ -773,12 +773,12 @@
       <scenario>A developer is building a data analysis workflow where Claude Code needs to query a PostgreSQL database to explore schemas and run read-only analytics queries. They want Claude to be able to discover tables and run SELECT queries, but never execute DDL or DML statements. They are considering how to expose database access via MCP in Claude Code.</scenario>
       <question-text>What is the recommended approach for giving Claude Code read-only database access through MCP?</question-text>
       <choices>
-        <choice letter="A">Export the entire database to CSV files and let Claude read them as local files</choice>
+        <choice letter="A">Configure an MCP server that exposes specific read-only tools (list_tables, describe_table, run_select_query) with the database connection handled server-side and no DDL/DML capabilities exposed</choice>
         <choice letter="B">Give Claude the database connection string in CLAUDE.md and let it use Bash to run psql commands directly</choice>
-        <choice letter="C">Configure an MCP server that exposes specific read-only tools (list_tables, describe_table, run_select_query) with the database connection handled server-side and no DDL/DML capabilities exposed</choice>
+        <choice letter="C">Export the entire database to CSV files and let Claude read them as local files</choice>
         <choice letter="D">Install a PostgreSQL extension that exposes an HTTP API and have Claude call it via curl</choice>
       </choices>
-      <correct-answer>C</correct-answer>
+      <correct-answer>A</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Think about which integration pattern lets you present a curated, restricted view of a complex system to an AI assistant.</content>
@@ -810,11 +810,11 @@
       <question-text>Why is git worktree-based isolation the preferred approach for running parallel Claude Code tasks on the same repository?</question-text>
       <choices>
         <choice letter="A">Worktrees are faster than cloning because they copy only the files Claude has modified</choice>
-        <choice letter="B">Worktrees allow Claude Code to merge changes from multiple features automatically without conflicts</choice>
+        <choice letter="B">Worktrees provide separate working directories with independent file state and branch checkouts while sharing the same .git object store, preventing cross-task file contamination without duplicating repository data</choice>
         <choice letter="C">Worktrees enable Claude Code to run in a different programming language context per task</choice>
-        <choice letter="D">Worktrees provide separate working directories with independent file state and branch checkouts while sharing the same .git object store, preventing cross-task file contamination without duplicating repository data</choice>
+        <choice letter="D">Worktrees allow Claude Code to merge changes from multiple features automatically without conflicts</choice>
       </choices>
-      <correct-answer>D</correct-answer>
+      <correct-answer>B</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Think about what Git feature lets multiple branches be checked out simultaneously in separate directories, sharing one underlying repo.</content>
@@ -845,12 +845,12 @@
       <scenario>A startup is building a customer support chatbot powered by Claude. The chatbot must always identify itself as "Aria from TechCorp," never reveal it is an AI when asked indirectly, stay on topic about TechCorp products, and escalate billing disputes to human agents. The engineering team is deciding where to place these behavioral constraints.</scenario>
       <question-text>Where should the team place the identity, scope, and escalation rules to maximize their reliability?</question-text>
       <choices>
-        <choice letter="A">In the system prompt, since system-level instructions take precedence over user messages and persist across all turns</choice>
-        <choice letter="B">In the first user message of every conversation</choice>
+        <choice letter="A">In the first user message of every conversation</choice>
+        <choice letter="B">In the system prompt, since system-level instructions take precedence over user messages and persist across all turns</choice>
         <choice letter="C">In a fine-tuned model that has the identity baked into its weights</choice>
         <choice letter="D">In a separate API call that configures the model before the conversation starts</choice>
       </choices>
-      <correct-answer>A</correct-answer>
+      <correct-answer>B</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Consider which part of the API message structure is designed for persistent, high-priority behavioral rules that resist override.</content>
@@ -881,12 +881,12 @@
       <scenario>An engineering team is building a code review tool that uses Claude to analyze pull requests and output a structured JSON report with fields for severity, category, file, line, and description. Despite clear instructions in the system prompt, Claude occasionally wraps the JSON in markdown code fences or includes a preamble like "Here is the analysis:". The team needs 100% machine-parseable output without post-processing hacks.</scenario>
       <question-text>Which technique will most reliably ensure Claude's response starts directly with valid JSON and includes no extraneous text?</question-text>
       <choices>
-        <choice letter="A">Prefill the assistant response with the opening brace "{" so Claude continues generating the JSON object directly</choice>
-        <choice letter="B">Set temperature to 0 to eliminate all variability in output format</choice>
+        <choice letter="A">Set temperature to 0 to eliminate all variability in output format</choice>
+        <choice letter="B">Prefill the assistant response with the opening brace "{" so Claude continues generating the JSON object directly</choice>
         <choice letter="C">Parse the output with a regex that strips everything before the first "{" character</choice>
         <choice letter="D">Add "IMPORTANT: Output ONLY JSON" in capital letters to the system prompt</choice>
       </choices>
-      <correct-answer>A</correct-answer>
+      <correct-answer>B</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Think about whether the API lets you control how the model's response begins, not just what instructions you give it.</content>
@@ -917,12 +917,12 @@
       <scenario>A legal tech company uses Claude to analyze contracts and identify clauses that conflict with a set of regulatory requirements. Early testing shows that Claude sometimes misses subtle conflicts or flags non-issues. The team observes that when they ask Claude to "think step by step" it catches more genuine conflicts but the response is much longer. They need high accuracy for production use and are evaluating how to deploy chain-of-thought effectively.</scenario>
       <question-text>What is the best strategy for using chain-of-thought prompting to maximize accuracy while keeping the final output clean and structured?</question-text>
       <choices>
-        <choice letter="A">Enable extended thinking (budget tokens for internal reasoning) so Claude reasons thoroughly in a separate thinking block, then outputs only the clean structured result in the response</choice>
+        <choice letter="A">Skip chain-of-thought entirely and increase temperature to encourage broader exploration of possible conflicts</choice>
         <choice letter="B">Ask Claude to think step by step and then use regex to strip the reasoning from the output</choice>
         <choice letter="C">Run the analysis twice — once with chain-of-thought for accuracy and once without for clean output — and use the second response</choice>
-        <choice letter="D">Skip chain-of-thought entirely and increase temperature to encourage broader exploration of possible conflicts</choice>
+        <choice letter="D">Enable extended thinking (budget tokens for internal reasoning) so Claude reasons thoroughly in a separate thinking block, then outputs only the clean structured result in the response</choice>
       </choices>
-      <correct-answer>A</correct-answer>
+      <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Consider whether the API offers a way to let the model reason deeply while keeping the final response clean and structured.</content>
@@ -953,12 +953,12 @@
       <scenario>A medical information company uses Claude with RAG to answer healthcare provider questions based on a curated drug database. During testing, they discover that when the retrieved documents don't contain the answer, Claude sometimes generates plausible-sounding but fabricated drug interaction information instead of admitting the information is not available. This is a patient safety risk.</scenario>
       <question-text>Which combination of prompt engineering techniques is most effective at reducing hallucination when retrieved context is insufficient?</question-text>
       <choices>
-        <choice letter="A">Increase the number of retrieved documents to 50 per query so Claude always has enough context</choice>
-        <choice letter="B">Instruct Claude in the system prompt to answer only based on the provided documents, quote source passages to support claims, and respond with a specific "information not found" message when the documents don't contain sufficient information</choice>
+        <choice letter="A">Instruct Claude in the system prompt to answer only based on the provided documents, quote source passages to support claims, and respond with a specific "information not found" message when the documents don't contain sufficient information</choice>
+        <choice letter="B">Increase the number of retrieved documents to 50 per query so Claude always has enough context</choice>
         <choice letter="C">Fine-tune Claude on the drug database so it doesn't need to rely on retrieved documents</choice>
         <choice letter="D">Set temperature to 0 and increase max_tokens so Claude has more space to be thorough</choice>
       </choices>
-      <correct-answer>B</correct-answer>
+      <correct-answer>A</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Think about what the model needs to know — both about where to look for answers and what to do when it cannot find one.</content>
@@ -990,11 +990,11 @@
       <question-text>When strict schema conformance is required for production data pipelines, which approach provides the strongest output validation guarantees?</question-text>
       <choices>
         <choice letter="A">Use a text-based output format with custom delimiters and parse it with a regex</choice>
-        <choice letter="B">Prompt-based JSON output with few-shot examples, since examples teach Claude the exact structure</choice>
+        <choice letter="B">Tool-use based structured output, where the tool's input_schema defines the expected structure and the API validates the response against it</choice>
         <choice letter="C">Ask Claude to output XML instead of JSON since XML schemas provide built-in validation</choice>
-        <choice letter="D">Tool-use based structured output, where the tool's input_schema defines the expected structure and the API validates the response against it</choice>
+        <choice letter="D">Prompt-based JSON output with few-shot examples, since examples teach Claude the exact structure</choice>
       </choices>
-      <correct-answer>D</correct-answer>
+      <correct-answer>B</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Consider which approach gives you structural guarantees enforced by the API rather than relying on the model's best effort.</content>
@@ -1026,11 +1026,11 @@
       <question-text>What is the most robust architecture for automatically detecting and correcting structured output errors from Claude?</question-text>
       <choices>
         <choice letter="A">Generate three reports in parallel and use majority voting to select the correct values</choice>
-        <choice letter="B">Increase the model size and temperature to reduce errors at generation time</choice>
-        <choice letter="C">Implement a validation loop: parse Claude's output, run programmatic checks (schema validation, arithmetic verification), and if validation fails, send the output back to Claude with the specific error messages for correction, repeating until valid or a retry limit is reached</choice>
+        <choice letter="B">Implement a validation loop: parse Claude's output, run programmatic checks (schema validation, arithmetic verification), and if validation fails, send the output back to Claude with the specific error messages for correction, repeating until valid or a retry limit is reached</choice>
+        <choice letter="C">Increase the model size and temperature to reduce errors at generation time</choice>
         <choice letter="D">Pre-calculate all totals in application code and inject them into the prompt so Claude doesn't need to compute anything</choice>
       </choices>
-      <correct-answer>C</correct-answer>
+      <correct-answer>B</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Think about how you'd combine the strengths of deterministic checks with the model's ability to understand and fix its own mistakes.</content>
@@ -1133,12 +1133,12 @@
       <scenario>A developer is building a document Q&amp;A system that ingests long research papers (up to 80 pages) and answers questions about them. They plan to include the full document in every API request along with the conversation history. Using Claude with a 200K token context window, they notice that as conversations grow longer, responses slow down and costs increase significantly.</scenario>
       <question-text>What is the primary reason costs increase as the conversation grows, and what is the most effective mitigation?</question-text>
       <choices>
-        <choice letter="A">Costs increase because Claude's per-token price goes up as the context fills; mitigate by truncating older messages</choice>
+        <choice letter="A">Costs increase because the API charges per input token and the full document is re-sent with every turn; mitigate by using prompt caching to avoid re-processing the unchanged document prefix across turns</choice>
         <choice letter="B">Costs increase because longer conversations use a more expensive model tier; mitigate by switching to a smaller model mid-conversation</choice>
         <choice letter="C">Costs increase due to network bandwidth; mitigate by compressing the document with gzip before sending</choice>
-        <choice letter="D">Costs increase because the API charges per input token and the full document is re-sent with every turn; mitigate by using prompt caching to avoid re-processing the unchanged document prefix across turns</choice>
+        <choice letter="D">Costs increase because Claude's per-token price goes up as the context fills; mitigate by truncating older messages</choice>
       </choices>
-      <correct-answer>D</correct-answer>
+      <correct-answer>A</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Think about what gets sent with every API call in a multi-turn conversation and how the pricing model compounds that cost over many turns.</content>
@@ -1207,10 +1207,10 @@
       <choices>
         <choice letter="A">Pre-process all contracts into a structured database and use SQL queries instead of Claude</choice>
         <choice letter="B">Long-context only: load all 10,000 contracts into a single request since Claude's 200K context can handle it</choice>
-        <choice letter="C">RAG only: embed all contracts, retrieve relevant chunks for every query, and generate answers from the retrieved chunks</choice>
-        <choice letter="D">RAG for corpus-level retrieval to identify relevant contracts, then long-context for loading full retrieved contracts into the prompt for detailed analysis — combining retrieval precision with full-document reasoning</choice>
+        <choice letter="C">RAG for corpus-level retrieval to identify relevant contracts, then long-context for loading full retrieved contracts into the prompt for detailed analysis — combining retrieval precision with full-document reasoning</choice>
+        <choice letter="D">RAG only: embed all contracts, retrieve relevant chunks for every query, and generate answers from the retrieved chunks</choice>
       </choices>
-      <correct-answer>D</correct-answer>
+      <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Consider whether the same technique is best for both narrowing down which documents matter and then analyzing those documents in depth.</content>
@@ -1242,11 +1242,11 @@
       <question-text>What is the most effective technique for compressing the agent's context in this situation?</question-text>
       <choices>
         <choice letter="A">Delete all tool call results from the conversation history since Claude already processed them</choice>
-        <choice letter="B">Truncate all tool results to their first 10 lines to reduce token count uniformly</choice>
+        <choice letter="B">Replace resolved tool call sequences (file reads, failed tests, fixes) with concise summaries of what was done and what the outcome was, while keeping recent and unresolved tool interactions intact</choice>
         <choice letter="C">Restart the agent from scratch with only the original task description and let it re-discover the current code state</choice>
-        <choice letter="D">Replace resolved tool call sequences (file reads, failed tests, fixes) with concise summaries of what was done and what the outcome was, while keeping recent and unresolved tool interactions intact</choice>
+        <choice letter="D">Truncate all tool results to their first 10 lines to reduce token count uniformly</choice>
       </choices>
-      <correct-answer>D</correct-answer>
+      <correct-answer>B</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Think about which parts of the conversation history are still relevant to the current task versus which represent already-resolved work.</content>
@@ -1278,11 +1278,11 @@
       <question-text>What is the MOST effective first line of defense against prompt injection that attempts to extract system prompt contents from this customer-facing agent?</question-text>
       <choices>
         <choice letter="A">Add a regex filter that blocks any user message containing the words "system prompt," "instructions," or "ignore"</choice>
-        <choice letter="B">Place clear boundaries in the system prompt instructing Claude never to reveal its instructions, combined with input classification that flags suspicious messages for additional scrutiny</choice>
-        <choice letter="C">Remove the system prompt entirely and encode all instructions in few-shot examples within the conversation history</choice>
+        <choice letter="B">Remove the system prompt entirely and encode all instructions in few-shot examples within the conversation history</choice>
+        <choice letter="C">Place clear boundaries in the system prompt instructing Claude never to reveal its instructions, combined with input classification that flags suspicious messages for additional scrutiny</choice>
         <choice letter="D">Rate limit each user to one message per minute so they cannot iterate on injection attempts</choice>
       </choices>
-      <correct-answer>B</correct-answer>
+      <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Think about whether a single defense technique is sufficient, or whether different attack vectors require defenses at different layers.</content>
@@ -1313,11 +1313,11 @@
       <question-text>Which guardrail design BEST balances autonomous operation with safety for this coding agent?</question-text>
       <choices>
         <choice letter="A">Restrict the agent to read-only operations only, requiring a human to apply all suggested changes manually</choice>
-        <choice letter="B">Maintain an allowlist of permitted shell commands and file paths, require human approval for any operation outside the allowlist, and enforce a read-only mode as the default that the agent must explicitly escalate out of</choice>
+        <choice letter="B">Run all commands inside a sandbox container with no network access and auto-approve everything</choice>
         <choice letter="C">Log all agent actions for post-hoc review but allow unrestricted execution to maximize throughput</choice>
-        <choice letter="D">Run all commands inside a sandbox container with no network access and auto-approve everything</choice>
+        <choice letter="D">Maintain an allowlist of permitted shell commands and file paths, require human approval for any operation outside the allowlist, and enforce a read-only mode as the default that the agent must explicitly escalate out of</choice>
       </choices>
-      <correct-answer>B</correct-answer>
+      <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Consider what "least privilege" means for an AI agent — should it start with broad access and remove it, or start narrow and expand?</content>
@@ -1421,10 +1421,10 @@
       <choices>
         <choice letter="A">Retry immediately with no delay, up to 10 times, to get through as quickly as possible</choice>
         <choice letter="B">Fail immediately on the first 529 error and alert the developer to retry manually</choice>
-        <choice letter="C">Exponential backoff with jitter, starting at 1-2 seconds and capping at 60 seconds, with a maximum of 3-5 retries</choice>
-        <choice letter="D">Wait exactly 60 seconds between each retry to guarantee the API has recovered</choice>
+        <choice letter="C">Wait exactly 60 seconds between each retry to guarantee the API has recovered</choice>
+        <choice letter="D">Exponential backoff with jitter, starting at 1-2 seconds and capping at 60 seconds, with a maximum of 3-5 retries</choice>
       </choices>
-      <correct-answer>C</correct-answer>
+      <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Consider the standard distributed systems approach for handling transient server overload without overwhelming the service further.</content>
@@ -1527,12 +1527,12 @@
       <scenario>A structured data extraction pipeline processes incoming contracts by sending each contract to Claude in three sequential steps: (1) extract party names and dates, (2) extract financial terms, (3) extract obligations and deadlines. Step 1 and Step 2 succeed, but Step 3 fails with a 500 Internal Server Error after two retries. The pipeline processes hundreds of contracts per day and must maintain high throughput.</scenario>
       <question-text>How should the pipeline handle this partial failure scenario?</question-text>
       <choices>
-        <choice letter="A">Save the successful results from Steps 1 and 2 with a status marker indicating Step 3 is incomplete, place the contract in a retry queue for Step 3 only, and proceed to the next contract</choice>
-        <choice letter="B">Halt the entire pipeline until the 500 error is resolved to prevent any incomplete data from being stored</choice>
+        <choice letter="A">Halt the entire pipeline until the 500 error is resolved to prevent any incomplete data from being stored</choice>
+        <choice letter="B">Save the successful results from Steps 1 and 2 with a status marker indicating Step 3 is incomplete, place the contract in a retry queue for Step 3 only, and proceed to the next contract</choice>
         <choice letter="C">Discard all results from Steps 1 and 2 and re-queue the entire contract for reprocessing from scratch</choice>
         <choice letter="D">Return the partial results from Steps 1 and 2 as the final output and mark the contract as complete</choice>
       </choices>
-      <correct-answer>A</correct-answer>
+      <correct-answer>B</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Consider the cost of re-doing successful work versus the risk of storing incomplete data — how would you balance both concerns?</content>
@@ -1563,12 +1563,12 @@
       <scenario>A company is deploying a Claude-powered agent for internal IT operations. The agent can reset passwords, provision new accounts, modify access control lists, and answer general IT questions. The security team needs to define which actions require human approval and which can be fully autonomous.</scenario>
       <question-text>Which categorization of actions into autonomous vs. human-approved BEST reflects security best practices for this IT operations agent?</question-text>
       <choices>
-        <choice letter="A">Actions are autonomous during business hours and require approval outside business hours</choice>
+        <choice letter="A">Read-only queries and password resets are autonomous; account provisioning and ACL modifications require human approval</choice>
         <choice letter="B">All actions require human approval -- the agent only drafts actions for a human to execute</choice>
-        <choice letter="C">Read-only queries and password resets are autonomous; account provisioning and ACL modifications require human approval</choice>
+        <choice letter="C">Actions are autonomous during business hours and require approval outside business hours</choice>
         <choice letter="D">All actions autonomous -- the agent has the same permissions as an IT administrator</choice>
       </choices>
-      <correct-answer>C</correct-answer>
+      <correct-answer>A</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Think about what property of each action should determine whether it runs autonomously or requires a human to approve it.</content>
@@ -1600,11 +1600,11 @@
       <question-text>Which threshold strategy BEST balances thoroughness with reviewer efficiency for this contract review system?</question-text>
       <choices>
         <choice letter="A">Escalate everything classified as medium or high risk regardless of confidence, ensuring humans see all potentially risky clauses</choice>
-        <choice letter="B">Use asymmetric thresholds: escalate high-risk classifications at a low confidence bar (e.g., 60%) to avoid missing dangers, but require high confidence (e.g., 90%) before autonomously marking a contract as low-risk and skipping human review</choice>
-        <choice letter="C">Set a single high confidence threshold (e.g., 95%) -- only escalate when the agent is very confident a clause is high-risk, minimizing the volume of human reviews</choice>
+        <choice letter="B">Set a single high confidence threshold (e.g., 95%) -- only escalate when the agent is very confident a clause is high-risk, minimizing the volume of human reviews</choice>
+        <choice letter="C">Use asymmetric thresholds: escalate high-risk classifications at a low confidence bar (e.g., 60%) to avoid missing dangers, but require high confidence (e.g., 90%) before autonomously marking a contract as low-risk and skipping human review</choice>
         <choice letter="D">Let the legal team manually set thresholds per contract type without providing a default, since risk tolerance varies</choice>
       </choices>
-      <correct-answer>B</correct-answer>
+      <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Consider whether the consequences of missing a real risk and the consequences of an unnecessary review are equally severe for this use case.</content>
@@ -1635,12 +1635,12 @@
       <scenario>A customer support team uses a Claude-powered agent that drafts responses to support tickets. Human agents review each draft, edit it if needed, and send the final version. After three months, the team wants to use the accumulated human edits to improve the agent's drafts. The architect is designing the feedback loop.</scenario>
       <question-text>Which feedback loop design will MOST effectively improve the agent's draft quality over time?</question-text>
       <choices>
-        <choice letter="A">Track edit patterns to identify systematic issues (e.g., tone adjustments, missing information types), then update the system prompt instructions to address those specific patterns, and use representative before/after pairs as few-shot examples</choice>
+        <choice letter="A">Automatically accept any draft that a human agent sends without editing, and only flag drafts that required significant changes for review</choice>
         <choice letter="B">Collect all human edits and add them as few-shot examples in the system prompt, replacing the oldest examples as the prompt grows too long</choice>
-        <choice letter="C">Automatically accept any draft that a human agent sends without editing, and only flag drafts that required significant changes for review</choice>
+        <choice letter="C">Track edit patterns to identify systematic issues (e.g., tone adjustments, missing information types), then update the system prompt instructions to address those specific patterns, and use representative before/after pairs as few-shot examples</choice>
         <choice letter="D">Fine-tune Claude on the corrected responses to permanently encode the team's preferences into the model</choice>
       </choices>
-      <correct-answer>A</correct-answer>
+      <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Think about what you could learn from hundreds of human edits if you looked at them as a dataset rather than individual corrections.</content>
@@ -1672,11 +1672,11 @@
       <question-text>Which approval workflow design BEST satisfies the regulatory requirement while respecting the compliance team's capacity constraints?</question-text>
       <choices>
         <choice letter="A">Route all 500+ communications through compliance review, hiring additional compliance officers to handle the volume</choice>
-        <choice letter="B">Auto-send all communications and conduct weekly batch reviews of a random sample to check compliance</choice>
-        <choice letter="C">Have Claude classify each communication as "contains regulated content" or "routine," auto-send routine messages, and route only regulated messages to compliance review, with sampling-based audits of auto-sent messages</choice>
+        <choice letter="B">Have Claude classify each communication as "contains regulated content" or "routine," auto-send routine messages, and route only regulated messages to compliance review, with sampling-based audits of auto-sent messages</choice>
+        <choice letter="C">Auto-send all communications and conduct weekly batch reviews of a random sample to check compliance</choice>
         <choice letter="D">Allow the agent to self-certify compliance by including a confidence score, and only escalate messages where the score is below 50%</choice>
       </choices>
-      <correct-answer>C</correct-answer>
+      <correct-answer>B</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Think about how to reduce the volume of messages reaching the compliance team while still meeting the regulatory requirement for pre-send review.</content>
@@ -1707,12 +1707,12 @@
       <scenario>A legal analytics platform needs to extract key terms, obligations, and risk factors from commercial contracts that range from 20 to 200 pages. Claude's context window can handle approximately 150 pages of text. The architect must design a chunking strategy that works for all document sizes while maintaining extraction accuracy, especially for clauses that reference other sections of the contract (e.g., "subject to the indemnification provisions in Section 12.3").</scenario>
       <question-text>Which chunking strategy BEST handles cross-reference dependencies while maintaining extraction accuracy?</question-text>
       <choices>
-        <choice letter="A">For documents under 150 pages, process in a single pass; for longer documents, chunk by logical sections (e.g., articles/clauses) with overlapping context windows that include the table of contents and referenced sections, then reconcile extracted terms across chunks</choice>
+        <choice letter="A">Use only the first and last 50 pages of each contract, since key terms are typically in the preamble and schedules</choice>
         <choice letter="B">Split the document into fixed-size chunks of 10 pages each with no overlap, process each independently, then merge results</choice>
         <choice letter="C">Always split into the smallest possible chunks (1-2 pages each) to maximize parallelism and reduce per-call cost</choice>
-        <choice letter="D">Use only the first and last 50 pages of each contract, since key terms are typically in the preamble and schedules</choice>
+        <choice letter="D">For documents under 150 pages, process in a single pass; for longer documents, chunk by logical sections (e.g., articles/clauses) with overlapping context windows that include the table of contents and referenced sections, then reconcile extracted terms across chunks</choice>
       </choices>
-      <correct-answer>A</correct-answer>
+      <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Consider whether every document actually needs to be chunked, and if so, what boundaries would preserve the meaning of cross-referencing clauses.</content>
@@ -1744,11 +1744,11 @@
       <question-text>Which workflow architecture MOST reliably produces an accurate, well-cited literature synthesis at this scale?</question-text>
       <choices>
         <choice letter="A">Concatenate all 500 paper abstracts into a single prompt and ask Claude to write the literature review in one pass</choice>
-        <choice letter="B">Send all papers to Claude with extended thinking enabled and a very large max_tokens value to handle the full analysis in a single call</choice>
+        <choice letter="B">A three-phase map-reduce: (1) Map phase extracts structured findings with verbatim quotes and metadata from each paper individually; (2) Reduce phase clusters and cross-references findings by topic; (3) Synthesis phase generates the review using only the structured extractions as source material, with citation provenance tracked from phase 1 through to the final output</choice>
         <choice letter="C">Process papers in batches of 50, generate a partial synthesis for each batch, then ask Claude to merge all 10 partial syntheses into a final review</choice>
-        <choice letter="D">A three-phase map-reduce: (1) Map phase extracts structured findings with verbatim quotes and metadata from each paper individually; (2) Reduce phase clusters and cross-references findings by topic; (3) Synthesis phase generates the review using only the structured extractions as source material, with citation provenance tracked from phase 1 through to the final output</choice>
+        <choice letter="D">Send all papers to Claude with extended thinking enabled and a very large max_tokens value to handle the full analysis in a single call</choice>
       </choices>
-      <correct-answer>D</correct-answer>
+      <correct-answer>B</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Think about how you would ensure every claim in the final review can be traced back to a specific passage in a specific paper.</content>
@@ -1779,12 +1779,12 @@
       <scenario>A publishing company uses Claude to proofread and provide editorial feedback on book manuscripts (200-400 pages). The manuscripts must be processed in chunks due to context window limits. Early testers report that feedback on later chapters sometimes contradicts advice given on earlier chapters, and the agent loses track of character names, plot points, and stylistic preferences established in previous chunks.</scenario>
       <question-text>Which approach MOST effectively maintains coherence and consistency of editorial feedback across chunks of a long manuscript?</question-text>
       <choices>
-        <choice letter="A">Maintain a running summary document that captures key context (character names, plot points, established style decisions, and prior feedback) and include it as a preamble in each subsequent chunk's prompt</choice>
+        <choice letter="A">Process the manuscript backwards (last chapter first) so that the final pass covers the opening chapters where consistency matters most</choice>
         <choice letter="B">Process each chunk independently and let the human editor resolve any inconsistencies across chunks</choice>
-        <choice letter="C">Process the manuscript backwards (last chapter first) so that the final pass covers the opening chapters where consistency matters most</choice>
+        <choice letter="C">Maintain a running summary document that captures key context (character names, plot points, established style decisions, and prior feedback) and include it as a preamble in each subsequent chunk's prompt</choice>
         <choice letter="D">Increase the chunk size to the maximum possible context window length to minimize the number of boundaries</choice>
       </choices>
-      <correct-answer>A</correct-answer>
+      <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Think about how the system can "remember" what happened in earlier chapters when it is only looking at one chunk at a time.</content>
