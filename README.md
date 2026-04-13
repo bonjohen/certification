@@ -71,17 +71,17 @@ A scenario-based quiz application for studying technology certification exams. S
 
 2. Start a local server:
    ```bash
-   # Using Python 3
-   python -m http.server 8000
+   # Using npm (recommended — uses port 8080)
+   npm start
 
-   # Using Node.js
-   npx serve .
+   # Using Python 3
+   python -m http.server 8080
 
    # Using VS Code
    # Install "Live Server" extension and click "Go Live"
    ```
 
-3. Open http://localhost:8000 in your browser
+3. Open http://localhost:8080 in your browser
 
 ### Deployment
 
@@ -103,7 +103,8 @@ certification/
 ├── anthropic.html      # Anthropic exam selection
 ├── quiz.html           # Quiz interface
 ├── css/
-│   └── styles.css      # Application styles
+│   ├── styles.css      # Application styles
+│   └── quiz.css        # Quiz page styles
 ├── js/
 │   ├── app.js          # Main application logic
 │   ├── quiz-engine.js  # Quiz state management

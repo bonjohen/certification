@@ -71,13 +71,13 @@ Source review: Mode A Whole Codebase Review, approved with non-blocking comments
 
 | #   | Task                                                                                                                         | Finding | Status | Started | Completed |
 |-----|------------------------------------------------------------------------------------------------------------------------------|---------|--------|---------|-----------|
-| 4.1 | Fix README.md port mismatch: "Running Locally" section says 8000, actual dev server uses 8080 — align or document both       | F-07    | [ ]    |         |           |
-| 4.2 | Add `css/quiz.css` to README project structure listing                                                                       | F-07    | [ ]    |         |           |
-| 4.3 | Add GitHub Actions CI workflow (`.github/workflows/ci.yml`): `npm ci && npm test` on push/PR                                 | F-09    | [ ]    |         |           |
-| 4.4 | Add XML schema validation step to CI workflow                                                                                | F-09    | [ ]    |         |           |
-| 4.5 | Organize `docs/` directory: move historical working documents to `docs/archive/` or add `docs/README.md` index               | F-10    | [ ]    |         |           |
-| 4.6 | Commit or delete untracked `docs/add_anthropic_claude_design.md`                                                             | F-10    | [ ]    |         |           |
-| 4.7 | Run accessibility audit (axe-core or manual) on quiz page and document results                                               | Missing | [ ]    |         |           |
+| 4.1 | Fix README.md port mismatch: "Running Locally" section says 8000, actual dev server uses 8080 — align or document both       | F-07    | [X]    | 2026-04-13 | 2026-04-13 |
+| 4.2 | Add `css/quiz.css` to README project structure listing                                                                       | F-07    | [X]    | 2026-04-13 | 2026-04-13 |
+| 4.3 | Add GitHub Actions CI workflow (`.github/workflows/ci.yml`): `npm ci && npm test` on push/PR                                 | F-09    | [X]    | 2026-04-13 | 2026-04-13 |
+| 4.4 | Add XML schema validation step to CI workflow                                                                                | F-09    | [X]    | 2026-04-13 | 2026-04-13 |
+| 4.5 | Organize `docs/` directory: move historical working documents to `docs/archive/` or add `docs/README.md` index               | F-10    | [X]    | 2026-04-13 | 2026-04-13 |
+| 4.6 | Commit or delete untracked `docs/add_anthropic_claude_design.md`                                                             | F-10    | [X]    | 2026-04-13 | 2026-04-13 |
+| 4.7 | Run accessibility audit (axe-core or manual) on quiz page and document results                                               | Missing | [X]    | 2026-04-13 | 2026-04-13 |
 
 ---
 
