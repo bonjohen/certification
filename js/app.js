@@ -341,12 +341,46 @@ export class QuizApp {
             cisco: 'https://www.cisco.com/site/us/en/learn/training-certifications/index.html'
         };
 
+        // Per-exam URLs that point to the specific exam/cert page
+        const examUrls = {
+            // AWS
+            'aip-c01': 'https://aws.amazon.com/certification/certified-ai-practitioner/',
+            'clf-c02': 'https://aws.amazon.com/certification/certified-cloud-practitioner/',
+            'aif-c01': 'https://aws.amazon.com/certification/certified-ai-practitioner/',
+            'saa-c03': 'https://aws.amazon.com/certification/certified-solutions-architect-associate/',
+            'dva-c02': 'https://aws.amazon.com/certification/certified-developer-associate/',
+            'soa-c02': 'https://aws.amazon.com/certification/certified-sysops-admin-associate/',
+            'dea-c01': 'https://aws.amazon.com/certification/certified-data-engineer-associate/',
+            'mla-c01': 'https://aws.amazon.com/certification/certified-machine-learning-engineer-associate/',
+            // Azure
+            'ai-102': 'https://learn.microsoft.com/en-us/credentials/certifications/exams/ai-102/',
+            'ai-300': 'https://learn.microsoft.com/en-us/credentials/certifications/exams/ai-300/',
+            'az-700': 'https://learn.microsoft.com/en-us/credentials/certifications/exams/az-700/',
+            'az-900': 'https://learn.microsoft.com/en-us/credentials/certifications/exams/az-900/',
+            'az-104': 'https://learn.microsoft.com/en-us/credentials/certifications/exams/az-104/',
+            'az-204': 'https://learn.microsoft.com/en-us/credentials/certifications/exams/az-204/',
+            'az-305': 'https://learn.microsoft.com/en-us/credentials/certifications/exams/az-305/',
+            'az-400': 'https://learn.microsoft.com/en-us/credentials/certifications/exams/az-400/',
+            'az-500': 'https://learn.microsoft.com/en-us/credentials/certifications/exams/az-500/',
+            'dp-900': 'https://learn.microsoft.com/en-us/credentials/certifications/exams/dp-900/',
+            'ai-900': 'https://learn.microsoft.com/en-us/credentials/certifications/exams/ai-900/',
+            // GCP certifications
+            'cloud-data-engineer': 'https://cloud.google.com/learn/certification/data-engineer',
+            'pro-ml-eng': 'https://cloud.google.com/learn/certification/machine-learning-engineer',
+            'gcp-pca': 'https://cloud.google.com/learn/certification/cloud-architect',
+            // CompTIA
+            'sy0-701': 'https://www.comptia.org/certifications/security',
+            // ISC2
+            'cissp': 'https://www.isc2.org/certifications/cissp'
+        };
+
         this.elements.backLink.href = providerPages[provider] || 'index.html';
         document.title = `${meta.examCode} Quiz - ${providerNames[provider] || ''} Study Guide`;
 
-        // Set certification org link if element exists and URL is known
-        if (this.elements.certOrgLink && certOrgUrls[provider]) {
-            this.elements.certOrgLink.href = certOrgUrls[provider];
+        // Set certification link: prefer exam-specific URL, fall back to provider
+        const certUrl = examUrls[examId] || certOrgUrls[provider];
+        if (this.elements.certOrgLink && certUrl) {
+            this.elements.certOrgLink.href = certUrl;
             this.elements.certOrgLink.textContent = `${providerNames[provider] || provider} Certifications`;
             this.elements.certOrgLink.hidden = false;
         }
