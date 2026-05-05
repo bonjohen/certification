@@ -26,17 +26,22 @@ export function getProviderFromExam(examId, metaProvider) {
         if (p.includes('anthropic')) return 'anthropic';
         if (p.includes('comptia')) return 'comptia';
         if (p.includes('isc2') || p.includes('(isc)²')) return 'isc2';
+        if (p.includes('github')) return 'github';
+        if (p.includes('databricks')) return 'databricks';
+        if (p.includes('nvidia')) return 'nvidia';
+        if (p.includes('cisco')) return 'cisco';
     }
 
     // Fall back to exam ID prefix detection
     if (examId) {
         const id = examId.toLowerCase();
-        // Azure exams: az-*, dp-*, ai-*
-        if (id.startsWith('az-') || id.startsWith('dp-') || id.startsWith('ai-')) return 'azure';
-        // AWS exams: clf-*, saa-*, dva-*, soa-*, dea-*, mla-*, aif-*, aip-*
-        if (id.startsWith('clf-') || id.startsWith('saa-') || id.startsWith('dva-') ||
-            id.startsWith('soa-') || id.startsWith('dea-') || id.startsWith('mla-') ||
-            id.startsWith('aif-') || id.startsWith('aip-')) return 'aws';
+        // Azure exams: az-*, dp-*, ai-*, sc-*
+        if (id.startsWith('az-') || id.startsWith('dp-') || id.startsWith('ai-') ||
+            id.startsWith('sc-')) return 'azure';
+        // AWS exams: clf-*, saa-*, sap-*, dva-*, soa-*, dea-*, mla-*, aif-*, aip-*
+        if (id.startsWith('clf-') || id.startsWith('saa-') || id.startsWith('sap-') ||
+            id.startsWith('dva-') || id.startsWith('soa-') || id.startsWith('dea-') ||
+            id.startsWith('mla-') || id.startsWith('aif-') || id.startsWith('aip-')) return 'aws';
         // GCP exams: gcp-*, cloud-data-engineer, gen-ai-leader, pro-ml-eng
         if (id.startsWith('gcp-') || id === 'cloud-data-engineer' ||
             id === 'gen-ai-leader' || id === 'pro-ml-eng') return 'gcp';
@@ -47,6 +52,14 @@ export function getProviderFromExam(examId, metaProvider) {
             id.startsWith('core') || id.startsWith('pt0-') || id.startsWith('cs0-')) return 'comptia';
         // ISC2 exams: cissp, ccsp, sscp, cap
         if (id === 'cissp' || id === 'ccsp' || id === 'sscp' || id === 'cap') return 'isc2';
+        // GitHub exams: gh-*
+        if (id.startsWith('gh-')) return 'github';
+        // Databricks exams: db-*
+        if (id.startsWith('db-')) return 'databricks';
+        // NVIDIA exams: nv-*
+        if (id.startsWith('nv-')) return 'nvidia';
+        // Cisco exams: 810-*, aitech
+        if (id.startsWith('810-') || id === 'aitech') return 'cisco';
     }
 
     return 'azure'; // Default fallback
@@ -124,7 +137,8 @@ export class QuizApp {
             prevQuestion: document.getElementById('prev-question'),
             nextQuestion: document.getElementById('next-question'),
             correctAnswerDisplay: document.getElementById('correct-answer-display'),
-            correctAnswerLetter: document.getElementById('correct-answer-letter')
+            correctAnswerLetter: document.getElementById('correct-answer-letter'),
+            certOrgLink: document.getElementById('cert-org-link')
         };
 
         this.selectedAnswer = null; // Track currently selected answer for toggle behavior
@@ -252,7 +266,11 @@ export class QuizApp {
             gcp: 'gcp.html',
             anthropic: 'anthropic.html',
             comptia: 'comptia.html',
-            isc2: 'isc2.html'
+            isc2: 'isc2.html',
+            github: 'github.html',
+            databricks: 'databricks.html',
+            nvidia: 'nvidia.html',
+            cisco: 'cisco.html'
         };
         const backUrl = providerPages[provider] || 'index.html';
 
@@ -292,7 +310,11 @@ export class QuizApp {
             gcp: 'gcp.html',
             anthropic: 'anthropic.html',
             comptia: 'comptia.html',
-            isc2: 'isc2.html'
+            isc2: 'isc2.html',
+            github: 'github.html',
+            databricks: 'databricks.html',
+            nvidia: 'nvidia.html',
+            cisco: 'cisco.html'
         };
         const providerNames = {
             azure: 'Azure',
@@ -300,11 +322,34 @@ export class QuizApp {
             gcp: 'Google Cloud',
             anthropic: 'Anthropic',
             comptia: 'CompTIA',
-            isc2: 'ISC2'
+            isc2: 'ISC2',
+            github: 'GitHub',
+            databricks: 'Databricks',
+            nvidia: 'NVIDIA',
+            cisco: 'Cisco'
+        };
+
+        const certOrgUrls = {
+            aws: 'https://aws.amazon.com/certification/',
+            azure: 'https://learn.microsoft.com/en-us/credentials/certifications/',
+            gcp: 'https://cloud.google.com/learn/certification',
+            comptia: 'https://www.comptia.org/certifications',
+            isc2: 'https://www.isc2.org/certifications',
+            github: 'https://docs.github.com/en/get-started/showcase-your-expertise-with-github-certifications',
+            databricks: 'https://www.databricks.com/learn/certification',
+            nvidia: 'https://academy.nvidia.com',
+            cisco: 'https://www.cisco.com/site/us/en/learn/training-certifications/index.html'
         };
 
         this.elements.backLink.href = providerPages[provider] || 'index.html';
         document.title = `${meta.examCode} Quiz - ${providerNames[provider] || ''} Study Guide`;
+
+        // Set certification org link if element exists and URL is known
+        if (this.elements.certOrgLink && certOrgUrls[provider]) {
+            this.elements.certOrgLink.href = certOrgUrls[provider];
+            this.elements.certOrgLink.textContent = `${providerNames[provider] || provider} Certifications`;
+            this.elements.certOrgLink.hidden = false;
+        }
     }
 
     getProviderFromExam(examId, metaProvider) {
