@@ -377,12 +377,12 @@ export class QuizApp {
             // Azure (new)
             'ai-901': 'https://learn.microsoft.com/en-us/credentials/certifications/exams/ai-901/',
             'ai-103': 'https://learn.microsoft.com/en-us/credentials/certifications/exams/ai-103/',
-            'ai-200': 'https://learn.microsoft.com/en-us/credentials/certifications/exams/ai-200/',
+            'ai-200': 'https://learn.microsoft.com/en-us/training/paths/deploy-cloud-native-applications-to-azure-container-apps/',
             'sc-500': 'https://learn.microsoft.com/en-us/credentials/certifications/exams/sc-500/',
             // GitHub
             'gh-300': 'https://docs.github.com/en/get-started/showcase-your-expertise-with-github-certifications',
             // Databricks
-            'db-genai': 'https://www.databricks.com/learn/certification/generative-ai-engineer-associate',
+            'db-genai': 'https://www.databricks.com/resources/learn/training/generative-ai-fundamentals',
             'db-ml': 'https://www.databricks.com/learn/certification/machine-learning-associate',
             // NVIDIA
             'nv-genai': 'https://academy.nvidia.com/en/course/generative-ai-llm-associate/',
