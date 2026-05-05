@@ -1,0 +1,1772 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<certification-exam xmlns="http://certification.study/schema/v1" version="1.0">
+  <metadata>
+    <exam-code>DB-GenAI</exam-code>
+    <exam-title>Databricks Certified Generative AI Engineer Associate</exam-title>
+    <provider>Databricks</provider>
+    <description>Scenario-Based Study Guide for the Databricks Certified Generative AI Engineer Associate exam - validates proficiency in building, deploying, and evaluating generative AI solutions on the Databricks platform.</description>
+    <total-questions>50</total-questions>
+    <created-date>2026-05-05</created-date>
+    <last-modified>2026-05-05T00:00:00Z</last-modified>
+    <categories>
+      <category id="cat-design">Solution Design and Architecture</category>
+      <category id="cat-rag">Retrieval-Augmented Generation</category>
+      <category id="cat-models">Model Selection and Serving</category>
+      <category id="cat-tools">Tools and Agents</category>
+      <category id="cat-data">Data Pipelines for GenAI</category>
+      <category id="cat-eval">Evaluation and Monitoring</category>
+    </categories>
+  </metadata>
+
+  <questions>
+    <question id="1" category-ref="cat-design" difficulty="basic">
+      <title>LLM Application Architecture on Databricks</title>
+      <scenario>A data team is starting their first generative AI project on Databricks. They need to build a customer-facing chatbot that answers questions about product documentation. The team wants to use the simplest possible architecture.</scenario>
+      <question-text>Which Databricks feature provides the most straightforward way to serve a foundation model for a chatbot application?</question-text>
+      <choices>
+        <choice letter="A">Foundation Model APIs with pay-per-token billing</choice>
+        <choice letter="B">Custom-trained model deployed to a GPU cluster</choice>
+        <choice letter="C">External model proxy through a third-party gateway</choice>
+        <choice letter="D">Fine-tuned model exported and hosted outside Databricks</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Consider which option requires the least infrastructure setup and is purpose-built for quick adoption of foundation models.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Foundation Model APIs provide instant access to curated foundation models (like DBRX, Llama, Mixtral) through a simple REST API with pay-per-token pricing. There is no cluster provisioning, no model deployment pipeline, and no infrastructure management required. This is the fastest path to serving an LLM on Databricks for teams starting out.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Foundation Model APIs are accessible via the /serving-endpoints REST API and are OpenAI-compatible, making migration from other providers straightforward.</li>
+              <li>Pay-per-token billing means you only pay for what you use, unlike provisioned throughput which requires capacity planning.</li>
+              <li>For production workloads with predictable traffic, provisioned throughput endpoints offer better cost efficiency and guaranteed latency.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Foundation Model APIs</tag>
+        <tag>Architecture</tag>
+        <tag>Model Serving</tag>
+      </tags>
+    </question>
+
+    <question id="2" category-ref="cat-design" difficulty="intermediate">
+      <title>Prompt Engineering for Structured Output</title>
+      <scenario>An engineer is building a pipeline that extracts product attributes from unstructured reviews. The downstream system requires a strict JSON schema with fields for sentiment, features_mentioned, and rating_estimate. The LLM occasionally returns malformed JSON.</scenario>
+      <question-text>Which prompt engineering technique is most effective at ensuring the LLM consistently returns valid, schema-compliant JSON?</question-text>
+      <choices>
+        <choice letter="A">Adding a system message that says "always return valid JSON"</choice>
+        <choice letter="B">Providing a concrete JSON example in the prompt with the exact schema and instructing the model to follow it precisely</choice>
+        <choice letter="C">Increasing the temperature parameter to explore more output formats</choice>
+        <choice letter="D">Using a longer context window to give the model more room for reasoning</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Think about which technique gives the model the clearest structural template to follow, reducing ambiguity in the expected output format.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Few-shot prompting with a concrete JSON example (including the exact field names and value types) is the most reliable way to get consistent structured output. The model can pattern-match against the example, reducing schema drift. A vague instruction like "return valid JSON" gives no structural guidance. Increasing temperature increases randomness, making format compliance worse. Context window length does not affect output formatting.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>For maximum reliability, combine few-shot examples with response_format={"type": "json_object"} when the serving endpoint supports it.</li>
+              <li>Chain-of-thought prompting can improve extraction accuracy but should place reasoning before the JSON block to avoid corrupting the structured output.</li>
+              <li>Guardrails or Pydantic-based output parsers can validate and retry on malformed responses as a defense-in-depth layer.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Prompt Engineering</tag>
+        <tag>Structured Output</tag>
+        <tag>JSON</tag>
+      </tags>
+    </question>
+
+    <question id="3" category-ref="cat-design" difficulty="intermediate">
+      <title>Compound AI System Design</title>
+      <scenario>A financial services company wants to build a system that can answer complex regulatory compliance questions. The system must cite specific regulation sections, cross-reference multiple documents, and explain reasoning step by step. A single LLM call is insufficient for the task.</scenario>
+      <question-text>Which architectural pattern best addresses the need for multi-step reasoning with source attribution?</question-text>
+      <choices>
+        <choice letter="A">A single large-context model with all regulations concatenated into the prompt</choice>
+        <choice letter="B">A fine-tuned model trained on regulation question-answer pairs</choice>
+        <choice letter="C">A compound AI system combining retrieval, chain-of-thought prompting, and citation generation in a multi-step pipeline</choice>
+        <choice letter="D">A batch inference job that pre-generates answers for all possible questions</choice>
+      </choices>
+      <correct-answer>C</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Consider which approach decomposes the problem into specialized steps rather than relying on a single model call to do everything.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>A compound AI system orchestrates multiple components: a retriever finds relevant regulation sections, a chain-of-thought prompt guides the LLM through step-by-step reasoning, and a citation generator maps claims back to source documents. This modular approach outperforms a single monolithic call because each stage can be independently optimized and debugged. Stuffing all regulations into context exceeds token limits and degrades accuracy. Fine-tuning alone cannot guarantee citation accuracy. Pre-generating answers is infeasible for open-ended questions.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Compound AI systems are a core Databricks pattern — Mosaic AI Agent Framework is built around this concept of orchestrating retrieval, generation, and tool use.</li>
+              <li>Each component in the pipeline can be evaluated independently: retrieval precision, reasoning correctness, and citation faithfulness are separate metrics.</li>
+              <li>This architecture also enables hybrid approaches where different LLMs handle different stages based on cost-performance trade-offs.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Compound AI</tag>
+        <tag>Architecture</tag>
+        <tag>Multi-step Reasoning</tag>
+      </tags>
+    </question>
+
+    <question id="4" category-ref="cat-design" difficulty="advanced">
+      <title>Governance with Unity Catalog for GenAI</title>
+      <scenario>An enterprise is deploying multiple GenAI applications across departments. Each department has its own data, models, and serving endpoints. The security team requires centralized access control, lineage tracking, and auditability across all GenAI assets.</scenario>
+      <question-text>Which Databricks capability provides unified governance over models, vector indexes, serving endpoints, and training data for GenAI workloads?</question-text>
+      <choices>
+        <choice letter="A">Workspace-level access control lists applied to each notebook</choice>
+        <choice letter="B">Separate IAM policies configured in the cloud provider console</choice>
+        <choice letter="C">A custom metadata catalog built on Delta tables</choice>
+        <choice letter="D">Unity Catalog with its centralized permission model and lineage tracking</choice>
+      </choices>
+      <correct-answer>D</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Think about which Databricks service provides a single governance layer across all data and AI assets, not just tables.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Unity Catalog extends governance to all GenAI assets: registered models, vector search indexes, model serving endpoints, feature tables, and training datasets. It provides a centralized permission model (GRANT/REVOKE) across workspaces, automatic lineage tracking from data to model to endpoint, and full audit logging. Workspace-level ACLs are too granular and don't span workspaces. Cloud IAM is external and doesn't understand Databricks-specific asset types. A custom metadata catalog would require building governance from scratch.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Unity Catalog tracks lineage from source tables through feature engineering, model training, and deployment — critical for compliance and debugging.</li>
+              <li>Model aliases in Unity Catalog (Champion/Challenger) enable safe model promotion workflows without changing serving endpoint configurations.</li>
+              <li>Row-level and column-level security in Unity Catalog can restrict what training data different teams can access, supporting data minimization principles.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Unity Catalog</tag>
+        <tag>Governance</tag>
+        <tag>Security</tag>
+      </tags>
+    </question>
+
+    <question id="5" category-ref="cat-design" difficulty="basic">
+      <title>Selecting a GenAI Use Case</title>
+      <scenario>A retail company is evaluating several potential GenAI projects. The team has limited ML experience and wants to start with a use case that delivers quick value with minimal risk. They are considering customer support automation, autonomous inventory management, product description generation, and real-time fraud detection with LLMs.</scenario>
+      <question-text>Which use case is the best starting point for a team new to generative AI?</question-text>
+      <choices>
+        <choice letter="A">Product description generation from structured catalog data, which has low risk and easily verifiable output</choice>
+        <choice letter="B">Autonomous inventory management decisions without human review</choice>
+        <choice letter="C">Real-time fraud detection powered entirely by an LLM</choice>
+        <choice letter="D">Fully automated customer support replacing all human agents</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Consider which use case has the lowest consequences for errors and produces output that humans can easily review before publishing.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Product description generation is ideal for a first GenAI project: the input (structured catalog data) is clean, the output (marketing text) is easily reviewed by humans, errors are low-stakes (a bad description can be edited), and success is straightforward to measure. Autonomous inventory management and fraud detection carry high financial risk if the model errs. Fully replacing human support agents requires sophisticated guardrails and escalation paths that a new team is unlikely to build correctly.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Databricks recommends a crawl-walk-run approach: start with human-in-the-loop use cases, then gradually increase automation as confidence and tooling mature.</li>
+              <li>Content generation use cases also produce natural training data for evaluation — each human edit becomes a preference signal for future improvement.</li>
+              <li>High-risk use cases like fraud detection are better served by traditional ML models that produce calibrated probabilities rather than by generative models.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Use Case Selection</tag>
+        <tag>Risk Assessment</tag>
+        <tag>GenAI Strategy</tag>
+      </tags>
+    </question>
+
+    <question id="6" category-ref="cat-design" difficulty="intermediate">
+      <title>System Prompt Design for Safety</title>
+      <scenario>A healthcare company is deploying a patient-facing chatbot that answers questions about medication side effects. The chatbot must never provide dosage recommendations, must always include a disclaimer to consult a physician, and must refuse to answer questions outside its scope.</scenario>
+      <question-text>Which approach best enforces these behavioral constraints in the chatbot?</question-text>
+      <choices>
+        <choice letter="A">Training users to only ask appropriate questions</choice>
+        <choice letter="B">A structured system prompt with explicit behavioral rules, refusal instructions, and mandatory disclaimer templates</choice>
+        <choice letter="C">Post-processing all responses with regex to remove dosage numbers</choice>
+        <choice letter="D">Limiting the context window so the model cannot generate long responses</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Think about where behavioral rules should be defined so they apply to every interaction, regardless of what the user asks.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>A well-structured system prompt is the primary mechanism for constraining LLM behavior. By explicitly listing prohibited actions (no dosage advice), required elements (always include disclaimer), and scope boundaries (refuse off-topic questions), the model receives clear instructions on every request. User training is unreliable. Regex post-processing is brittle and misses paraphrased dosages. Context window limits affect length, not content quality.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Defense-in-depth is best practice: combine system prompts with output guardrails (Mosaic AI Guardrails) and input classifiers to catch prompt injection attacks.</li>
+              <li>System prompts should be tested adversarially — red-teaming with jailbreak attempts helps identify gaps before deployment.</li>
+              <li>Databricks AI Playground allows rapid iteration on system prompts with side-by-side model comparison before committing to a production configuration.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>System Prompt</tag>
+        <tag>Safety</tag>
+        <tag>Guardrails</tag>
+      </tags>
+    </question>
+
+    <question id="7" category-ref="cat-design" difficulty="intermediate">
+      <title>Multi-tenant GenAI Architecture</title>
+      <scenario>A SaaS company needs to serve different LLM configurations to different customers from a shared Databricks workspace. Each tenant has unique system prompts, retrieval sources, and usage quotas. The architecture must prevent data leakage between tenants while keeping infrastructure costs shared.</scenario>
+      <question-text>Which design pattern ensures tenant isolation in a shared GenAI serving infrastructure?</question-text>
+      <choices>
+        <choice letter="A">A single prompt template with the tenant name injected as a variable</choice>
+        <choice letter="B">Separate Databricks workspaces for every tenant</choice>
+        <choice letter="C">Tenant-scoped configurations routed through a shared serving endpoint, with Unity Catalog enforcing data-level access control per tenant</choice>
+        <choice letter="D">A dedicated GPU cluster per tenant running independent model copies</choice>
+      </choices>
+      <correct-answer>C</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Consider which approach balances cost efficiency from shared infrastructure with data isolation enforced at the governance layer.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Routing tenant-specific configurations (system prompts, retrieval indexes, quotas) through a shared serving endpoint keeps infrastructure costs low. Unity Catalog enforces data-level isolation so tenant A's retrieval sources are never accessible to tenant B's queries. Simply injecting tenant names provides no real isolation. Separate workspaces or dedicated GPU clusters per tenant are cost-prohibitive and operationally complex for a SaaS product.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>The routing layer should resolve tenant context from the authentication token and inject the correct system prompt and vector search index before the LLM call.</li>
+              <li>Unity Catalog's row-level security can partition a shared vector index by tenant_id, enabling physical resource sharing with logical data isolation.</li>
+              <li>Rate limiting and token quotas per tenant can be implemented at the API gateway layer using Databricks Model Serving's built-in rate limiting or an external gateway.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Multi-tenant</tag>
+        <tag>Architecture</tag>
+        <tag>Isolation</tag>
+      </tags>
+    </question>
+
+    <question id="8" category-ref="cat-design" difficulty="basic">
+      <title>Temperature Parameter in LLM Inference</title>
+      <scenario>An engineer is configuring an LLM endpoint for two different tasks: a creative marketing copy generator and a factual Q&A system for internal documentation. Both use the same underlying model but need different output characteristics.</scenario>
+      <question-text>How should the temperature parameter differ between these two use cases?</question-text>
+      <choices>
+        <choice letter="A">Both should use a temperature of 1.0 for consistency</choice>
+        <choice letter="B">The marketing copy generator should use a lower temperature than the Q&A system</choice>
+        <choice letter="C">Temperature has no effect on output variability</choice>
+        <choice letter="D">The marketing copy generator should use a higher temperature for creativity, while the Q&A system should use a lower temperature for factual precision</choice>
+      </choices>
+      <correct-answer>D</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Think about how temperature controls randomness — one task benefits from variety while the other needs determinism.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Temperature controls the randomness of token selection during generation. A higher temperature (e.g., 0.7-1.0) increases diversity and creativity, which benefits marketing copy that should be varied and engaging. A lower temperature (e.g., 0.0-0.3) makes output more deterministic and focused, which is essential for factual Q&A where consistency and accuracy matter more than novelty. Using the same temperature for both ignores their fundamentally different requirements.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Temperature of 0 makes the model greedy (always picks the highest-probability token), which maximizes consistency but can lead to repetitive output.</li>
+              <li>top_p (nucleus sampling) is often used alongside temperature — for factual tasks, low temperature with top_p=0.9 balances accuracy with natural phrasing.</li>
+              <li>Databricks Model Serving endpoints allow per-request temperature overrides, so a single endpoint can serve both use cases with different parameters.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Temperature</tag>
+        <tag>Inference Parameters</tag>
+        <tag>LLM Configuration</tag>
+      </tags>
+    </question>
+
+    <question id="9" category-ref="cat-rag" difficulty="basic">
+      <title>RAG Overview and Purpose</title>
+      <scenario>A legal firm wants their LLM to answer questions using the firm's proprietary case law database, which is updated weekly. The LLM's training data does not include this proprietary information and cannot be retrained weekly.</scenario>
+      <question-text>Which technique allows the LLM to use the firm's proprietary data without retraining the model?</question-text>
+      <choices>
+        <choice letter="A">Retrieval-Augmented Generation, which fetches relevant documents at query time and includes them in the LLM's context</choice>
+        <choice letter="B">Increasing the model's parameter count to store more knowledge</choice>
+        <choice letter="C">Using a higher temperature to encourage the model to generate novel legal interpretations</choice>
+        <choice letter="D">Caching all previous LLM responses for reuse</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Consider which approach dynamically injects external knowledge into the model's context at inference time rather than baking it into model weights.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Retrieval-Augmented Generation (RAG) retrieves relevant documents from an external knowledge base at query time and includes them in the LLM's prompt context. This allows the model to answer based on up-to-date proprietary data without retraining. The knowledge base can be refreshed independently of the model. Increasing parameter count doesn't add specific proprietary knowledge. Higher temperature increases randomness, not knowledge. Response caching doesn't help with novel questions.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>RAG decouples knowledge from model parameters — the model provides reasoning capability while the retrieval system provides factual grounding.</li>
+              <li>On Databricks, RAG pipelines typically use Databricks Vector Search for retrieval, which integrates with Delta tables for automatic index synchronization.</li>
+              <li>RAG is preferred over fine-tuning when the knowledge base changes frequently because updating an index is much cheaper and faster than retraining a model.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>RAG</tag>
+        <tag>Retrieval</tag>
+        <tag>Knowledge Base</tag>
+      </tags>
+    </question>
+
+    <question id="10" category-ref="cat-rag" difficulty="intermediate">
+      <title>Databricks Vector Search Configuration</title>
+      <scenario>A team is setting up Databricks Vector Search for their RAG application. Their source documents are stored in a Delta table that receives daily updates. They need the vector index to stay synchronized with the Delta table without manual reindexing.</scenario>
+      <question-text>Which Databricks Vector Search index type automatically stays synchronized with its source Delta table?</question-text>
+      <choices>
+        <choice letter="A">A direct vector access index where embeddings are pre-computed externally</choice>
+        <choice letter="B">A Delta Sync Index, which automatically syncs with the source Delta table as data changes</choice>
+        <choice letter="C">A batch-refreshed index that requires a manual trigger after each update</choice>
+        <choice letter="D">A streaming index built on Structured Streaming that requires a separate cluster</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Look for the index type that has built-in synchronization with Delta table change feeds, requiring no manual intervention.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>A Delta Sync Index in Databricks Vector Search automatically stays current with its source Delta table using Delta's Change Data Feed (CDF). When rows are inserted, updated, or deleted in the source table, the index reflects those changes without manual reindexing. A direct vector access index requires you to manage embeddings and updates yourself. There is no separate "batch-refreshed" or "streaming" index type — Delta Sync handles synchronization natively.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Delta Sync Indexes can be configured as either "triggered" (sync on demand) or "continuous" (near real-time sync with sub-second latency).</li>
+              <li>The index can compute embeddings automatically using a specified embedding model endpoint, or you can provide a pre-computed embedding column.</li>
+              <li>Unity Catalog governs access to vector search indexes — query permissions are inherited from the source table's ACLs.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Vector Search</tag>
+        <tag>Delta Sync</tag>
+        <tag>Indexing</tag>
+      </tags>
+    </question>
+
+    <question id="11" category-ref="cat-rag" difficulty="intermediate">
+      <title>Chunking Strategy for Technical Documentation</title>
+      <scenario>A software company is building a RAG system over their API documentation. The documents contain code examples interspersed with explanatory text. When chunks split a code block from its explanation, the retrieved context is incomplete and the LLM generates incorrect code.</scenario>
+      <question-text>Which chunking strategy best preserves the relationship between code blocks and their explanations?</question-text>
+      <choices>
+        <choice letter="A">Fixed-size chunking with 512-token windows</choice>
+        <choice letter="B">Character-level splitting at every newline</choice>
+        <choice letter="C">Semantic or structure-aware chunking that keeps code blocks and their surrounding explanatory text together as a unit</choice>
+        <choice letter="D">Sentence-level chunking that splits at every period</choice>
+      </choices>
+      <correct-answer>C</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Think about which strategy uses the document's own structure to determine chunk boundaries rather than arbitrary token or character counts.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Semantic or structure-aware chunking respects document structure by using headings, code fences, and paragraph boundaries to define chunks. This keeps a code block and its explanatory text in the same chunk, preserving the context the LLM needs to generate accurate responses. Fixed-size chunking blindly cuts at token boundaries, often splitting code mid-function. Character or sentence splitting is even more granular and will fragment code blocks further.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Recursive character text splitting (from LangChain) can approximate structure-aware chunking by splitting on markdown headers first, then paragraphs, then sentences.</li>
+              <li>Overlap between chunks (e.g., 10-20% of chunk size) helps preserve context at boundaries but does not substitute for structure-aware splitting.</li>
+              <li>For API docs specifically, splitting by endpoint or section header and including the full endpoint signature in each chunk provides the best retrieval relevance.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Chunking</tag>
+        <tag>RAG Pipeline</tag>
+        <tag>Document Processing</tag>
+      </tags>
+    </question>
+
+    <question id="12" category-ref="cat-rag" difficulty="advanced">
+      <title>Embedding Model Selection</title>
+      <scenario>A multinational company needs their RAG system to support queries in English, Spanish, French, and German. Their current embedding model was trained only on English text, causing poor retrieval for non-English queries even when relevant documents exist in those languages.</scenario>
+      <question-text>What is the most effective way to improve cross-lingual retrieval quality?</question-text>
+      <choices>
+        <choice letter="A">Translating all queries to English before embedding them</choice>
+        <choice letter="B">Using separate vector indexes for each language</choice>
+        <choice letter="C">Increasing the number of retrieved chunks to compensate for lower relevance</choice>
+        <choice letter="D">Switching to a multilingual embedding model that maps semantically similar text across languages into nearby vector space regions</choice>
+      </choices>
+      <correct-answer>D</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Consider which approach handles multilingual semantics natively in the embedding space rather than working around the limitation.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>A multilingual embedding model (such as multilingual-e5 or BGE-M3) is trained to produce vectors where semantically equivalent text in different languages maps to similar regions. A Spanish query about "machine learning" will be near an English document about the same topic. Translation adds latency and loses nuance. Separate indexes per language prevent cross-lingual discovery. Retrieving more chunks wastes context on irrelevant results.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Databricks Model Serving can host open-source multilingual embedding models like BGE-M3 or multilingual-e5-large on GPU endpoints.</li>
+              <li>When evaluating multilingual embeddings, test retrieval recall separately for each language pair — performance often varies significantly between high-resource and low-resource language pairs.</li>
+              <li>Hybrid search (combining vector similarity with BM25 keyword matching) can improve multilingual retrieval by catching cognates and technical terms that embed poorly but match lexically.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Embeddings</tag>
+        <tag>Multilingual</tag>
+        <tag>Retrieval Quality</tag>
+      </tags>
+    </question>
+
+    <question id="13" category-ref="cat-rag" difficulty="basic">
+      <title>Vector Search Similarity Metrics</title>
+      <scenario>An engineer is configuring Databricks Vector Search for a document retrieval system. They need to choose a similarity metric. The documents are embedded using a model that produces normalized vectors (unit length). The engineer wants the most common and effective metric for this scenario.</scenario>
+      <question-text>Which similarity metric is most appropriate for normalized embedding vectors in Databricks Vector Search?</question-text>
+      <choices>
+        <choice letter="A">Cosine similarity, which measures the angle between vectors and is equivalent to dot product for normalized vectors</choice>
+        <choice letter="B">Euclidean distance, which measures straight-line distance in embedding space</choice>
+        <choice letter="C">Jaccard similarity, which compares set overlap between token lists</choice>
+        <choice letter="D">Manhattan distance, which sums absolute coordinate differences</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>For normalized vectors (unit length), think about which metric focuses on directional similarity rather than magnitude.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Cosine similarity measures the cosine of the angle between two vectors, making it purely directional. When vectors are normalized to unit length, cosine similarity and dot product produce identical rankings. This is the standard metric for text embedding retrieval because most modern embedding models produce normalized vectors. Euclidean distance is valid but less common for text embeddings. Jaccard similarity operates on sets, not dense vectors. Manhattan distance is rarely used for embedding similarity.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Databricks Vector Search supports cosine similarity, dot product, and L2 (Euclidean) distance as configurable metrics at index creation time.</li>
+              <li>For normalized vectors, cosine similarity and dot product give the same ranking order, but dot product is computationally cheaper since it skips the normalization step.</li>
+              <li>The choice of metric should match the embedding model's training objective — models trained with contrastive loss on cosine similarity should be queried with cosine similarity.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Vector Search</tag>
+        <tag>Similarity Metrics</tag>
+        <tag>Cosine Similarity</tag>
+      </tags>
+    </question>
+
+    <question id="14" category-ref="cat-rag" difficulty="intermediate">
+      <title>Hybrid Search for RAG</title>
+      <scenario>A customer support RAG system retrieves help articles using vector search. However, users frequently search for specific error codes (like ERR-4012) and product SKUs that embed poorly because they are arbitrary identifiers, not semantic concepts. Relevant articles exist but are not retrieved.</scenario>
+      <question-text>What retrieval improvement would best address poor recall for keyword-specific queries like error codes?</question-text>
+      <choices>
+        <choice letter="A">Increasing the embedding model's dimension size</choice>
+        <choice letter="B">Adding hybrid search that combines vector similarity with BM25 keyword matching to catch exact identifier matches</choice>
+        <choice letter="C">Re-embedding the entire corpus with a larger chunk size</choice>
+        <choice letter="D">Adding more few-shot examples to the retrieval query</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Think about which technique supplements semantic search with exact keyword matching for terms that don't carry semantic meaning.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Hybrid search combines vector (semantic) retrieval with BM25 (keyword) retrieval and merges the results. Error codes and SKUs are arbitrary strings that don't carry semantic meaning, so they embed poorly. BM25 excels at exact and partial keyword matches, catching these identifiers reliably. Increasing embedding dimensions doesn't help with non-semantic tokens. Larger chunks don't improve identifier embedding quality. Few-shot examples apply to generation, not retrieval.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Databricks Vector Search supports hybrid search by combining vector similarity scores with keyword match scores using reciprocal rank fusion (RRF).</li>
+              <li>Metadata filters in Vector Search can further narrow results by product category or document type before similarity ranking, improving precision for structured queries.</li>
+              <li>An alternative approach is to store error codes as metadata fields and use filtered search (vector search + metadata filter) rather than relying on embedding them.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Hybrid Search</tag>
+        <tag>BM25</tag>
+        <tag>Retrieval</tag>
+      </tags>
+    </question>
+
+    <question id="15" category-ref="cat-rag" difficulty="advanced">
+      <title>RAG Context Window Management</title>
+      <scenario>A RAG pipeline retrieves 20 document chunks for each query to maximize recall. However, the LLM's responses have degraded — it frequently ignores relevant chunks positioned in the middle of the context and sometimes contradicts information from the retrieved documents.</scenario>
+      <question-text>What is the most likely cause of the LLM ignoring relevant retrieved content?</question-text>
+      <choices>
+        <choice letter="A">The embedding model is producing low-quality vectors</choice>
+        <choice letter="B">The LLM's tokenizer is truncating the input</choice>
+        <choice letter="C">The "lost in the middle" effect, where LLMs attend less to information positioned in the middle of long contexts</choice>
+        <choice letter="D">The vector search index is returning duplicate chunks</choice>
+      </choices>
+      <correct-answer>C</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Consider the well-documented attention pattern where LLMs focus on the beginning and end of their context window, underweighting middle content.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>The "lost in the middle" phenomenon is a well-studied LLM behavior where models attend strongly to the beginning and end of the context window but underweight information in the middle. With 20 retrieved chunks, the most relevant chunk might land in position 8-15, where it receives less attention. Mitigation strategies include retrieving fewer but higher-quality chunks, reranking to place the most relevant content at the beginning, or summarizing retrieved content before injection.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>A reranker (like a cross-encoder) can score each chunk against the query and reorder them by relevance before context injection, placing the best chunks at the beginning.</li>
+              <li>Reducing the number of retrieved chunks from 20 to 5-10 high-quality ones often improves answer quality because it reduces noise and keeps content in the attended window region.</li>
+              <li>Map-reduce strategies process each chunk independently (map) and then synthesize the results (reduce), eliminating the lost-in-the-middle problem at the cost of additional LLM calls.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Context Window</tag>
+        <tag>Lost in the Middle</tag>
+        <tag>RAG Quality</tag>
+      </tags>
+    </question>
+
+    <question id="16" category-ref="cat-rag" difficulty="intermediate">
+      <title>Query Transformation for RAG</title>
+      <scenario>Users of a RAG-powered research assistant frequently ask vague questions like "tell me about the new feature" without specifying which product or feature. The retriever returns irrelevant results because the query lacks sufficient specificity for effective embedding similarity matching.</scenario>
+      <question-text>Which technique improves retrieval quality for vague or underspecified user queries?</question-text>
+      <choices>
+        <choice letter="A">Increasing the number of returned results from 5 to 50</choice>
+        <choice letter="B">Disabling the retrieval step and relying on the LLM's parametric knowledge</choice>
+        <choice letter="C">Reducing chunk sizes to capture more granular information</choice>
+        <choice letter="D">Query expansion or rewriting, where the LLM reformulates the vague query into a more specific search query before retrieval</choice>
+      </choices>
+      <correct-answer>D</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Think about adding a preprocessing step that transforms the user's query into a better search query before it reaches the retriever.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Query expansion (or rewriting) uses the LLM to reformulate a vague user query into a more specific search query before retrieval. For example, "tell me about the new feature" might become "describe the latest release features for Product X based on Q4 2025 changelog." This produces a more specific embedding that retrieves relevant documents. Returning more results amplifies noise. Disabling retrieval defeats the purpose of RAG. Smaller chunks increase fragmentation without addressing query quality.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>HyDE (Hypothetical Document Embedding) is an advanced query transformation that generates a hypothetical answer and uses its embedding for retrieval, often outperforming direct query embedding.</li>
+              <li>Multi-query retrieval generates multiple reformulations of the original query, retrieves for each, and merges results — increasing recall at the cost of additional LLM and retrieval calls.</li>
+              <li>Conversation history can provide context for query expansion — the LLM can resolve "the new feature" by referencing the product discussed in prior turns.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Query Expansion</tag>
+        <tag>Query Rewriting</tag>
+        <tag>RAG Pipeline</tag>
+      </tags>
+    </question>
+
+    <question id="17" category-ref="cat-rag" difficulty="basic">
+      <title>RAG vs Fine-Tuning Decision</title>
+      <scenario>A company needs their LLM to use a knowledge base of 10,000 internal policy documents that change monthly. They are debating whether to fine-tune a model on these documents or implement a RAG pipeline. Budget and turnaround time are constrained.</scenario>
+      <question-text>Why is RAG a better fit than fine-tuning for this use case?</question-text>
+      <choices>
+        <choice letter="A">RAG avoids costly retraining by updating the knowledge base independently of the model, and changes are reflected immediately</choice>
+        <choice letter="B">Fine-tuning is always superior to RAG for domain-specific knowledge</choice>
+        <choice letter="C">RAG does not require any LLM at all</choice>
+        <choice letter="D">RAG requires a larger upfront compute investment but is more accurate long-term</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Consider which approach decouples the knowledge from the model so that monthly document changes don't require retraining.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>RAG separates knowledge (stored in a vector index) from reasoning (the LLM). When documents change monthly, only the vector index needs updating — a fast, inexpensive operation compared to fine-tuning. Fine-tuning bakes knowledge into model weights, requiring full retraining cycles every time documents change. RAG also provides source attribution, letting users verify answers against the original documents. Fine-tuning is not always superior — it excels at style and format adaptation but is expensive for frequently changing factual knowledge.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>RAG and fine-tuning are complementary, not mutually exclusive — you can fine-tune a model to better follow RAG-specific instructions while using retrieval for factual grounding.</li>
+              <li>Databricks Delta Sync Indexes update automatically when source Delta tables change, making the RAG knowledge update fully automated.</li>
+              <li>Fine-tuning is better suited for teaching the model a new output format, domain-specific terminology, or stylistic preferences that don't change frequently.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>RAG</tag>
+        <tag>Fine-tuning</tag>
+        <tag>Architecture Decision</tag>
+      </tags>
+    </question>
+
+    <question id="18" category-ref="cat-models" difficulty="intermediate">
+      <title>Model Serving Endpoint Types</title>
+      <scenario>A team needs to deploy an LLM for a production application that handles 500 concurrent users with strict latency requirements of under 200ms per token. The traffic is predictable during business hours but drops to near zero overnight.</scenario>
+      <question-text>Which Databricks Model Serving configuration best balances cost and performance for this traffic pattern?</question-text>
+      <choices>
+        <choice letter="A">Pay-per-token Foundation Model APIs with no dedicated compute</choice>
+        <choice letter="B">Provisioned throughput endpoint with scale-to-zero configured during off-peak hours</choice>
+        <choice letter="C">A static always-on cluster sized for peak traffic</choice>
+        <choice letter="D">Batch inference jobs scheduled hourly to pre-generate responses</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Look for the option that guarantees dedicated compute during peak hours but avoids paying for idle capacity overnight.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Provisioned throughput endpoints provide dedicated GPU compute with guaranteed latency SLAs, meeting the 200ms/token requirement during business hours. Configuring scale-to-zero allows the endpoint to shut down overnight when traffic drops, eliminating idle compute costs. Pay-per-token APIs don't guarantee latency at high concurrency. A static cluster wastes money overnight. Batch inference can't serve real-time interactive users.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Provisioned throughput is measured in tokens per second and auto-scales horizontally within configured min/max concurrency limits.</li>
+              <li>Scale-to-zero has a cold-start penalty (typically 2-5 minutes for GPU endpoints), so applications should implement a warm-up mechanism or accept initial latency spikes.</li>
+              <li>For hybrid traffic patterns, a small always-on baseline with autoscaling for bursts balances responsiveness with cost better than pure scale-to-zero.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Model Serving</tag>
+        <tag>Provisioned Throughput</tag>
+        <tag>Scaling</tag>
+      </tags>
+    </question>
+
+    <question id="19" category-ref="cat-models" difficulty="basic">
+      <title>Foundation Model APIs on Databricks</title>
+      <scenario>A data scientist wants to quickly prototype a text summarization feature. They do not want to manage model downloads, GPU clusters, or deployment pipelines. They want an API they can call immediately from a notebook.</scenario>
+      <question-text>Which Databricks feature lets the data scientist call a foundation model instantly without any deployment setup?</question-text>
+      <choices>
+        <choice letter="A">Custom model training on a Spark cluster</choice>
+        <choice letter="B">Downloading a model from Hugging Face and deploying it manually</choice>
+        <choice letter="C">Foundation Model APIs, which provide instant access to pre-deployed models through a REST API</choice>
+        <choice letter="D">Creating a Docker container with the model and registering it as a service</choice>
+      </choices>
+      <correct-answer>C</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Look for the zero-setup option that provides immediate API access to curated models without infrastructure management.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Foundation Model APIs on Databricks provide instant access to curated foundation models (DBRX, Llama, Mixtral, and others) through a simple REST API or Python SDK. No model download, GPU provisioning, or deployment pipeline is needed — the models are pre-deployed and ready to call from any notebook. This is the fastest path from idea to working prototype. Custom training, manual HuggingFace deployment, and Docker containerization all require significant setup.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Foundation Model APIs are OpenAI-compatible, so existing code using the OpenAI SDK can be pointed at Databricks endpoints with minimal changes.</li>
+              <li>Available model classes include chat completion, embedding, and text completion — covering the most common GenAI tasks.</li>
+              <li>For prototyping, AI Playground in the Databricks UI provides a no-code interface to test models and system prompts before writing any code.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Foundation Model APIs</tag>
+        <tag>Prototyping</tag>
+        <tag>Pay-per-token</tag>
+      </tags>
+    </question>
+
+    <question id="20" category-ref="cat-models" difficulty="intermediate">
+      <title>External Model Integration</title>
+      <scenario>A company uses GPT-4 from OpenAI for their production chatbot but wants to route all LLM calls through Databricks for centralized logging, access control, and cost tracking. They do not want to change their application code significantly.</scenario>
+      <question-text>Which Databricks feature enables routing external LLM calls through Databricks for governance without changing the underlying model provider?</question-text>
+      <choices>
+        <choice letter="A">Fine-tuning a Databricks-hosted model to match GPT-4 behavior</choice>
+        <choice letter="B">Rewriting the application to use Databricks SQL instead of LLM calls</choice>
+        <choice letter="C">Deploying a local copy of GPT-4 on Databricks infrastructure</choice>
+        <choice letter="D">External Models in Model Serving, which proxies calls to external providers like OpenAI through a Databricks endpoint</choice>
+      </choices>
+      <correct-answer>D</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Look for the feature that acts as a managed proxy, forwarding requests to external providers while adding Databricks governance.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>External Models in Databricks Model Serving create a Databricks endpoint that proxies requests to external providers (OpenAI, Anthropic, Cohere, etc.). The application calls the Databricks endpoint using the same OpenAI-compatible API, and Databricks forwards the request to the external provider. This enables centralized access control via Unity Catalog, request/response logging for audit, rate limiting, and cost tracking — all without changing the underlying model or significantly modifying application code.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>External model endpoints support AI Gateway features: rate limiting, usage tracking, guardrails, and request/response logging to an inference table.</li>
+              <li>API keys for external providers are stored securely in Databricks Secrets, not in application code or environment variables.</li>
+              <li>Because external models use the same serving endpoint interface, you can A/B test a Databricks-hosted model against an external model by routing traffic between two endpoints.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>External Models</tag>
+        <tag>AI Gateway</tag>
+        <tag>Proxy</tag>
+      </tags>
+    </question>
+
+    <question id="21" category-ref="cat-models" difficulty="advanced">
+      <title>Model Selection Trade-offs</title>
+      <scenario>An engineering team is choosing between three models for a production customer service application: a 70B parameter open-source model, a 7B parameter open-source model, and a proprietary API model (like GPT-4). Their requirements include data privacy (no data leaving their cloud), low inference cost, and acceptable quality for handling common support tickets.</scenario>
+      <question-text>Which model choice best satisfies all three requirements simultaneously?</question-text>
+      <choices>
+        <choice letter="A">The 7B parameter open-source model deployed on Databricks Model Serving with provisioned throughput</choice>
+        <choice letter="B">The proprietary API model for maximum quality regardless of cost</choice>
+        <choice letter="C">The 70B model for maximum quality with data privacy</choice>
+        <choice letter="D">Using no LLM and relying entirely on rule-based keyword matching</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Consider which option keeps data on your infrastructure (privacy), has the lowest compute cost per inference, and still delivers acceptable quality for routine support tasks.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>The 7B model deployed on Databricks satisfies all three constraints: data stays within the company's cloud (privacy), smaller models have lower inference cost per token (cost), and modern 7B models (like Llama 3.1 8B or Mistral 7B) handle common support tasks well (quality). The 70B model meets privacy needs but has much higher inference cost. The proprietary API sends data to a third party, violating the privacy requirement. Rule-based matching lacks the flexibility to handle natural language support queries.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Databricks Mosaic AI supports optimized serving for smaller models with techniques like quantization (INT8, INT4) that further reduce cost while maintaining quality.</li>
+              <li>A cascading approach can use the 7B model for common queries and escalate to the 70B model for complex cases, optimizing cost across the distribution of query difficulty.</li>
+              <li>Evaluation against a domain-specific test set is essential — benchmark scores don't always predict production performance for specialized support domains.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Model Selection</tag>
+        <tag>Trade-offs</tag>
+        <tag>Cost Optimization</tag>
+      </tags>
+    </question>
+
+    <question id="22" category-ref="cat-models" difficulty="intermediate">
+      <title>MLflow for LLM Experiment Tracking</title>
+      <scenario>A team is experimenting with different prompt templates, retrieval configurations, and model parameters for their RAG application. They need to track which combinations produce the best evaluation scores and reproduce successful experiments.</scenario>
+      <question-text>How should the team use MLflow to manage their GenAI experiments on Databricks?</question-text>
+      <choices>
+        <choice letter="A">Only use MLflow for traditional ML models, not for LLM experiments</choice>
+        <choice letter="B">Log prompt templates, retrieval parameters, model configurations, and evaluation metrics as MLflow runs to compare experiments systematically</choice>
+        <choice letter="C">Store experiment results in a spreadsheet shared via email</choice>
+        <choice letter="D">Rely on notebook version history to track experiment variations</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Think about which approach provides structured, queryable tracking of all experiment parameters and results in a single system of record.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>MLflow on Databricks supports LLM experiment tracking natively. Teams can log prompt templates as parameters, retrieval configuration (chunk size, top-k, embedding model) as parameters, model name and temperature as parameters, and evaluation metrics (faithfulness, relevance, latency) as metrics — all within MLflow runs. The MLflow UI enables side-by-side comparison of runs, identification of best-performing configurations, and full reproducibility. Spreadsheets lack structure and versioning. Notebook history is not designed for systematic experiment comparison.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>MLflow's LLM evaluation APIs (mlflow.evaluate()) compute built-in metrics like toxicity, faithfulness, and answer relevance using judge models.</li>
+              <li>MLflow Tracing captures the full execution graph of a compound AI system — retrieval, prompt assembly, LLM call, post-processing — enabling root cause analysis of quality issues.</li>
+              <li>Registered models in Unity Catalog can be linked to the MLflow runs that produced them, providing end-to-end lineage from experiment to production.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>MLflow</tag>
+        <tag>Experiment Tracking</tag>
+        <tag>LLM</tag>
+      </tags>
+    </question>
+
+    <question id="23" category-ref="cat-models" difficulty="basic">
+      <title>Mosaic AI Model Serving Overview</title>
+      <scenario>A product manager asks the engineering team to explain Mosaic AI Model Serving. They want to understand what types of models can be deployed and how scaling works.</scenario>
+      <question-text>Which statement accurately describes Mosaic AI Model Serving?</question-text>
+      <choices>
+        <choice letter="A">It only supports models trained on Databricks and cannot serve external models</choice>
+        <choice letter="B">It requires manual cluster management and does not support auto-scaling</choice>
+        <choice letter="C">It is a fully managed service that serves foundation models, custom models, and external models with automatic scaling</choice>
+        <choice letter="D">It is limited to batch inference and cannot serve real-time requests</choice>
+      </choices>
+      <correct-answer>C</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Look for the description that covers all model types and highlights the managed, auto-scaling nature of the service.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Mosaic AI Model Serving is a fully managed, serverless service that can serve foundation models (via Foundation Model APIs), custom models (trained and registered in MLflow/Unity Catalog), and external models (proxied from providers like OpenAI and Anthropic). It auto-scales based on traffic, supports scale-to-zero for cost savings, and provides built-in monitoring. It serves both real-time and batch inference workloads, not just batch. It is not limited to Databricks-trained models.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Model Serving endpoints expose an OpenAI-compatible REST API, enabling seamless integration with tools and frameworks that support the OpenAI standard.</li>
+              <li>Inference tables automatically log all request/response pairs to a Delta table for monitoring, debugging, and compliance.</li>
+              <li>GPU serving supports optimized inference runtimes with continuous batching and paged attention for efficient LLM serving at scale.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Mosaic AI</tag>
+        <tag>Model Serving</tag>
+        <tag>Managed Service</tag>
+      </tags>
+    </question>
+
+    <question id="24" category-ref="cat-models" difficulty="advanced">
+      <title>Optimizing LLM Inference Throughput</title>
+      <scenario>A production serving endpoint for a 13B parameter LLM is hitting throughput limits during peak hours. The P99 latency exceeds the SLA. The team has a fixed GPU budget and cannot add more hardware. They need to serve more requests per second on the same infrastructure.</scenario>
+      <question-text>Which inference optimization technique would most effectively increase throughput within the existing GPU budget?</question-text>
+      <choices>
+        <choice letter="A">Switching from greedy decoding to beam search for higher quality</choice>
+        <choice letter="B">Increasing the maximum sequence length to give the model more room</choice>
+        <choice letter="C">Disabling logging and monitoring to free up compute resources</choice>
+        <choice letter="D">Applying model quantization (e.g., INT8 or INT4) to reduce memory footprint and increase batch size per GPU</choice>
+      </choices>
+      <correct-answer>D</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Consider which technique reduces the model's memory footprint per GPU, enabling more concurrent requests on the same hardware.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Model quantization (INT8 or INT4) reduces the precision of model weights from 16-bit floats to 8-bit or 4-bit integers. This dramatically reduces GPU memory usage, allowing larger batch sizes and higher throughput on the same hardware. Modern quantization techniques (like GPTQ, AWQ, or bitsandbytes) maintain acceptable quality for most applications. Beam search increases compute per request, reducing throughput. Increasing sequence length uses more memory. Disabling monitoring is negligible and loses observability.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Continuous batching (also called iteration-level batching) dynamically fills GPU capacity as requests finish, significantly improving throughput compared to static batching.</li>
+              <li>PagedAttention (used in vLLM) optimizes KV-cache memory allocation, reducing memory waste and enabling higher concurrency for long-context requests.</li>
+              <li>Speculative decoding uses a smaller draft model to predict multiple tokens that the larger model then verifies in parallel, improving throughput by 2-3x for some workloads.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Quantization</tag>
+        <tag>Inference Optimization</tag>
+        <tag>Throughput</tag>
+      </tags>
+    </question>
+
+    <question id="25" category-ref="cat-models" difficulty="basic">
+      <title>Databricks AI Playground</title>
+      <scenario>A new team member wants to test how different LLMs respond to the same prompt before writing any code. They want a visual interface to compare models side by side with different system prompts and parameters.</scenario>
+      <question-text>Which Databricks tool provides a no-code interface for interactively testing and comparing foundation models?</question-text>
+      <choices>
+        <choice letter="A">Databricks AI Playground, which allows interactive model comparison with configurable system prompts and parameters</choice>
+        <choice letter="B">MLflow Model Registry's model comparison view</choice>
+        <choice letter="C">A Databricks SQL dashboard with LLM metrics</choice>
+        <choice letter="D">The Databricks CLI with model-specific flags</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Look for the purpose-built interactive UI that lets you chat with multiple models simultaneously without writing code.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Databricks AI Playground is a no-code, web-based interface that lets users interact with foundation models in real time. Users can select different models, configure system prompts and parameters (temperature, max tokens), and compare responses side by side. This is ideal for prompt engineering, model evaluation, and rapid prototyping before committing to code. MLflow Registry tracks model versions but is not an interactive chat interface. SQL dashboards and CLI tools are not designed for interactive model comparison.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>AI Playground supports all models available through Foundation Model APIs and custom model serving endpoints, including external models.</li>
+              <li>Conversations from AI Playground can be exported as Python code for integration into notebooks and applications.</li>
+              <li>AI Playground also supports tool/function calling testing, allowing developers to prototype agent behaviors visually before implementing them programmatically.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>AI Playground</tag>
+        <tag>Model Comparison</tag>
+        <tag>No-code</tag>
+      </tags>
+    </question>
+
+    <question id="26" category-ref="cat-tools" difficulty="intermediate">
+      <title>Function Calling with LLMs</title>
+      <scenario>An LLM-powered assistant needs to check real-time inventory levels, process refund requests, and look up customer order status. These operations require calling specific backend APIs with structured parameters. The LLM cannot perform these actions through text generation alone.</scenario>
+      <question-text>Which capability enables the LLM to invoke backend APIs with structured parameters?</question-text>
+      <choices>
+        <choice letter="A">Increasing the model's context window to include API documentation</choice>
+        <choice letter="B">Function calling (tool use), where the LLM generates structured function calls that the application executes against backend APIs</choice>
+        <choice letter="C">Training the LLM to output curl commands as plain text</choice>
+        <choice letter="D">Pre-generating all possible API responses and storing them in the context</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Think about the mechanism where the LLM decides which function to call and with what arguments, while the application handles actual execution.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Function calling (also called tool use) allows the LLM to generate structured function call requests (function name + JSON arguments) based on user intent. The application intercepts these requests, executes the corresponding backend API calls, and returns the results to the LLM for incorporation into its response. This keeps the LLM in a reasoning/planning role while the application handles execution. Including API docs in context doesn't enable execution. Outputting curl commands is fragile and unsafe. Pre-generating responses is infeasible for real-time data.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Databricks Model Serving endpoints support function calling through the OpenAI-compatible /chat/completions API with a tools parameter.</li>
+              <li>Tool definitions include the function name, description, and parameter JSON schema — the LLM uses these to select the right tool and format arguments correctly.</li>
+              <li>Parallel function calling allows the LLM to request multiple tool calls in a single response, reducing round trips for queries that need data from multiple sources.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Function Calling</tag>
+        <tag>Tool Use</tag>
+        <tag>APIs</tag>
+      </tags>
+    </question>
+
+    <question id="27" category-ref="cat-tools" difficulty="intermediate">
+      <title>Databricks SQL as an Agent Tool</title>
+      <scenario>A business analyst wants to ask an AI assistant natural language questions about sales data stored in Databricks. The assistant should translate questions into SQL queries, execute them against Unity Catalog tables, and return results in natural language. The data schema is well-documented.</scenario>
+      <question-text>Which approach enables the AI assistant to query live business data using natural language?</question-text>
+      <choices>
+        <choice letter="A">Pre-computing all possible report summaries and storing them as static text</choice>
+        <choice letter="B">Training the LLM on raw CSV exports of the database</choice>
+        <choice letter="C">Configuring Databricks SQL as a tool that the agent can call to generate and execute SQL queries against Unity Catalog tables</choice>
+        <choice letter="D">Copying all database tables into the LLM's context window</choice>
+      </choices>
+      <correct-answer>C</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Consider which approach gives the agent the ability to dynamically query structured data at runtime using the SQL warehouse.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Configuring Databricks SQL as a tool lets the AI agent generate SQL queries based on natural language questions, execute them against Unity Catalog tables through a SQL warehouse, and return the results. The agent receives the table schema as context, generates appropriate SQL, and the tool executes it safely. Unity Catalog permissions ensure the agent can only access authorized tables. Pre-computing reports can't handle ad-hoc questions. Training on CSVs doesn't provide live data access. Tables are too large for context windows.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Mosaic AI Agent Framework natively supports SQL tools backed by Unity Catalog, with automatic schema discovery and permission enforcement.</li>
+              <li>Table and column comments in Unity Catalog serve as natural language metadata that helps the LLM understand the schema and generate accurate SQL.</li>
+              <li>Query validation and execution sandboxing prevent destructive SQL (DROP, DELETE, UPDATE) from being executed, limiting the tool to read-only queries.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Databricks SQL</tag>
+        <tag>Text-to-SQL</tag>
+        <tag>Agent Tool</tag>
+      </tags>
+    </question>
+
+    <question id="28" category-ref="cat-tools" difficulty="advanced">
+      <title>Agent Architecture with Planning</title>
+      <scenario>A research assistant agent must handle complex multi-step tasks like "find recent papers on quantum computing published by MIT, summarize their methods sections, and compare them in a table." This requires decomposing the task into subtasks, executing them in sequence with dependencies, and synthesizing results.</scenario>
+      <question-text>Which agent architecture pattern is most suitable for complex multi-step tasks with dependencies between steps?</question-text>
+      <choices>
+        <choice letter="A">A simple prompt that asks the LLM to do everything in a single response</choice>
+        <choice letter="B">A round-robin tool caller that invokes each tool once in a fixed order</choice>
+        <choice letter="C">Running all tools in parallel and concatenating their outputs</choice>
+        <choice letter="D">A ReAct-style agent with a planning step that decomposes the task into a dependency graph and executes subtasks iteratively with reasoning at each step</choice>
+      </choices>
+      <correct-answer>D</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Look for the pattern that combines reasoning about what to do next with action execution in an iterative loop, handling dependencies between steps.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>A ReAct (Reasoning + Acting) agent interleaves reasoning (what should I do next and why?) with action (execute a tool call) in a loop. For complex tasks, a planning step first decomposes the request into subtasks with dependencies (search papers -> for each paper, extract methods -> compile comparison table). The agent then executes each subtask, using the output of previous steps as input to subsequent ones. A single prompt can't reliably handle multi-step tasks. Fixed-order or parallel execution can't handle dependencies between steps.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Mosaic AI Agent Framework supports ReAct-style agents with configurable tool sets, conversation memory, and built-in tracing for debugging agent decision paths.</li>
+              <li>Plan-and-execute patterns (generate full plan, then execute) are faster but more brittle than ReAct (plan one step, execute, observe, plan next) for tasks where early results change the plan.</li>
+              <li>Agent evaluations should test both the final output quality and the trace quality (did the agent take reasonable steps?), since agents can arrive at correct answers through unreliable paths.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>ReAct Agent</tag>
+        <tag>Planning</tag>
+        <tag>Multi-step</tag>
+      </tags>
+    </question>
+
+    <question id="29" category-ref="cat-tools" difficulty="basic">
+      <title>AI Agent Concept</title>
+      <scenario>A product team is learning about AI agents. They understand that LLMs can generate text, but they are unclear on what makes an "agent" different from a simple chatbot. They want a clear explanation of the core capability that distinguishes an agent.</scenario>
+      <question-text>What core capability distinguishes an AI agent from a simple LLM chatbot?</question-text>
+      <choices>
+        <choice letter="A">An agent can autonomously decide which tools to call and take actions in external systems based on the conversation, while a chatbot only generates text responses</choice>
+        <choice letter="B">An agent uses a larger model than a chatbot</choice>
+        <choice letter="C">An agent can only respond with pre-written templates</choice>
+        <choice letter="D">An agent does not use an LLM at all</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Think about the key difference: one generates text only, while the other can reason about and invoke actions in the real world.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>An AI agent extends an LLM with the ability to take actions: it can decide which tools to call (database queries, API calls, file operations), execute those actions, observe the results, and continue reasoning. A simple chatbot generates text responses without interacting with external systems. The distinction is about agency — the ability to act on the world, not just describe it. Agents typically use the same LLMs as chatbots; the difference is the tool-use orchestration layer, not model size.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>The agent loop (reason -> select tool -> execute -> observe -> reason again) is the fundamental pattern, whether implemented as ReAct, function-calling chains, or custom orchestration.</li>
+              <li>Databricks Mosaic AI Agent Framework provides the scaffolding for building agents with tool definitions, memory, guardrails, and evaluation — avoiding the need to build the loop from scratch.</li>
+              <li>Agent safety requires careful tool permission design — an agent should only have access to the minimum set of tools needed for its purpose, following the principle of least privilege.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>AI Agents</tag>
+        <tag>Tool Use</tag>
+        <tag>Concepts</tag>
+      </tags>
+    </question>
+
+    <question id="30" category-ref="cat-tools" difficulty="intermediate">
+      <title>Agent Guardrails and Safety</title>
+      <scenario>An AI agent has access to tools that can read customer data, execute SQL queries, and send emails. During testing, the agent was tricked by a prompt injection in a customer record to send an email with sensitive data to an external address. The team needs to prevent this class of attack.</scenario>
+      <question-text>Which combination of safeguards most effectively prevents prompt injection attacks from causing the agent to take harmful actions?</question-text>
+      <choices>
+        <choice letter="A">Blocking all special characters in user input</choice>
+        <choice letter="B">Input guardrails that detect injection patterns, tool-level permissions that restrict email recipients to approved domains, and output guardrails that flag sensitive data in outbound actions</choice>
+        <choice letter="C">Training users to avoid including suspicious text in customer records</choice>
+        <choice letter="D">Reducing the agent's context window to limit how much injected text it can process</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Consider a defense-in-depth approach that applies checks at multiple layers: input validation, tool-level restrictions, and output inspection.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Defense-in-depth is essential for agent safety: input guardrails use classifiers to detect prompt injection attempts in both user messages and retrieved content; tool-level permissions restrict what actions the agent can take (e.g., emails only to approved domains); output guardrails inspect outbound actions for sensitive data patterns (PII, credentials) before execution. No single layer is sufficient — injection detection has false negatives, so tool-level and output restrictions act as backstops. Blocking special characters breaks legitimate input. User training is unreliable. Context window limits don't prevent injection.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Mosaic AI Guardrails provides configurable input/output filters for toxicity, PII, prompt injection, and custom safety rules that can be attached to any serving endpoint.</li>
+              <li>Human-in-the-loop approval for high-risk actions (sending emails, modifying data, executing payments) is a critical safety layer for production agents.</li>
+              <li>Indirect prompt injection (injection via retrieved documents or tool outputs, not direct user input) is especially dangerous because it bypasses input-only defenses.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Guardrails</tag>
+        <tag>Prompt Injection</tag>
+        <tag>Agent Safety</tag>
+      </tags>
+    </question>
+
+    <question id="31" category-ref="cat-tools" difficulty="basic">
+      <title>Tool Definition Best Practices</title>
+      <scenario>A developer is defining tools for an AI agent. The agent has access to a tool called "query_database" but keeps calling it with incorrect parameters, causing errors. The tool definition has a vague description and no parameter schema.</scenario>
+      <question-text>What is the most important improvement to help the agent call tools correctly?</question-text>
+      <choices>
+        <choice letter="A">Increasing the agent's temperature to explore more parameter combinations</choice>
+        <choice letter="B">Removing the tool and having the agent generate SQL directly</choice>
+        <choice letter="C">Providing clear, detailed tool descriptions with precise parameter names, types, constraints, and examples in the JSON schema</choice>
+        <choice letter="D">Adding more tools so the agent has alternatives if one fails</choice>
+      </choices>
+      <correct-answer>C</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>The LLM selects tools and fills parameters based on their descriptions and schemas — better descriptions lead to better tool use.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Clear tool descriptions and precise parameter JSON schemas are the primary way the LLM understands how to use a tool. The description should explain what the tool does and when to use it. Each parameter should have a name, type, description, required/optional status, and constraints (enums, ranges, formats). Examples in the description further reduce ambiguity. Increasing temperature increases randomness, worsening parameter accuracy. Removing the tool doesn't solve the problem. Adding alternatives increases complexity without fixing the root cause.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Enum constraints in the parameter schema are especially effective — they limit the LLM to valid values rather than relying on it to generate valid strings from a description.</li>
+              <li>Tool descriptions should include negative examples ("do NOT use this for...") to help the LLM avoid common misuse patterns.</li>
+              <li>Databricks Agent Framework validates tool calls against their JSON schemas before execution, providing clear error messages the agent can use to self-correct.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Tool Definition</tag>
+        <tag>JSON Schema</tag>
+        <tag>Best Practices</tag>
+      </tags>
+    </question>
+
+    <question id="32" category-ref="cat-tools" difficulty="advanced">
+      <title>Multi-Agent System Design</title>
+      <scenario>A complex enterprise workflow involves three stages: gathering requirements from a ticket system, designing a technical solution based on architectural guidelines, and writing implementation code. A single agent struggles with all three stages because each requires different expertise, tools, and prompt strategies.</scenario>
+      <question-text>Which architectural pattern best handles this multi-stage workflow?</question-text>
+      <choices>
+        <choice letter="A">A single agent with a very long system prompt containing all instructions</choice>
+        <choice letter="B">Three independent chatbots with no communication between them</choice>
+        <choice letter="C">Removing the AI and using manual processes</choice>
+        <choice letter="D">A multi-agent system with specialized agents for each stage, coordinated by an orchestrator agent that routes tasks and manages handoffs</choice>
+      </choices>
+      <correct-answer>D</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Consider the pattern where each stage is handled by a specialist agent and a coordinator manages the flow between them.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>A multi-agent system assigns each stage to a specialized agent with its own tools, system prompt, and model configuration optimized for that task. An orchestrator agent coordinates the workflow: it routes the initial request to the requirements-gathering agent, passes the output to the design agent, and finally to the implementation agent. This division of labor improves quality because each agent has a focused scope. A single agent with everything in one prompt suffers from attention dilution. Independent chatbots can't pass context between stages.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Mosaic AI Agent Framework supports composing agents where one agent's output becomes another's input through a defined handoff protocol.</li>
+              <li>Each sub-agent can use a different model optimized for its task — a smaller, faster model for requirements extraction and a more capable model for code generation.</li>
+              <li>Evaluating multi-agent systems requires both end-to-end metrics (does the final output meet requirements?) and per-agent metrics (did each agent perform its stage correctly?).</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Multi-Agent</tag>
+        <tag>Orchestration</tag>
+        <tag>Workflow</tag>
+      </tags>
+    </question>
+
+    <question id="33" category-ref="cat-tools" difficulty="intermediate">
+      <title>Retrieval Tool for Agents</title>
+      <scenario>An AI agent answers HR policy questions. It has access to a vector search tool connected to the company's policy document index. The agent sometimes calls the tool with overly broad queries, retrieves irrelevant documents, and generates inaccurate answers. Other times it skips retrieval entirely and hallucinates policies that don't exist.</scenario>
+      <question-text>What is the best approach to improve the agent's retrieval tool usage?</question-text>
+      <choices>
+        <choice letter="A">Add explicit instructions in the system prompt that the agent must always consult the retrieval tool for policy questions and should formulate specific search queries based on the user's question</choice>
+        <choice letter="B">Force the agent to always retrieve exactly 50 documents for every question</choice>
+        <choice letter="C">Remove the retrieval tool and rely on the LLM's training knowledge for HR policies</choice>
+        <choice letter="D">Replace the vector search with a keyword search engine</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Think about how system prompt instructions can guide the agent's decision to use the retrieval tool and improve the quality of its search queries.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Explicit system prompt instructions should tell the agent when it must use the retrieval tool (always for policy questions — never rely on training knowledge) and how to formulate effective queries (extract the specific policy topic from the user's question rather than passing the raw question). This addresses both problems: skipping retrieval and using overly broad queries. Removing retrieval guarantees hallucination. Forcing 50 documents always wastes context. Keyword search doesn't fix the query formulation problem.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Mandatory tool use can be enforced at the framework level — Mosaic AI Agent Framework supports "required" tool annotations that prevent the agent from generating a response without first consulting specified tools.</li>
+              <li>Query decomposition instructions (e.g., "break complex questions into individual policy topics and retrieve for each") improve recall for multi-part questions.</li>
+              <li>Logging retrieval queries alongside user questions enables analysis of query drift — cases where the agent's reformulated query diverges semantically from the user's intent.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Retrieval Tool</tag>
+        <tag>Agent Behavior</tag>
+        <tag>System Prompt</tag>
+      </tags>
+    </question>
+
+    <question id="34" category-ref="cat-data" difficulty="intermediate">
+      <title>Delta Tables for Knowledge Bases</title>
+      <scenario>A team is building a knowledge base for their RAG application. They need to store processed documents with their text content, metadata, and embedding vectors. The data must support ACID transactions, time travel for debugging, and efficient updates when documents are modified.</scenario>
+      <question-text>Which Databricks storage format is best suited for storing the RAG knowledge base?</question-text>
+      <choices>
+        <choice letter="A">Plain text files stored in cloud object storage</choice>
+        <choice letter="B">Delta tables, which provide ACID transactions, time travel, and efficient upserts for document management</choice>
+        <choice letter="C">JSON files in a mounted filesystem</choice>
+        <choice letter="D">A relational database outside of Databricks</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Consider which storage format is native to Databricks and provides transactional guarantees, versioning, and schema enforcement.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Delta tables are the native storage format on Databricks, providing ACID transactions (safe concurrent reads and writes), time travel (query previous versions for debugging or rollback), schema enforcement (prevent corrupt data from entering the knowledge base), and efficient MERGE operations for upserting modified documents. They integrate seamlessly with Vector Search through Delta Sync Indexes. Plain text and JSON files lack transactions and schema enforcement. An external relational database adds unnecessary complexity and doesn't integrate with Databricks ecosystem features.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Delta tables with Change Data Feed (CDF) enabled allow Vector Search Delta Sync Indexes to incrementally process only changed rows, avoiding full reindexing.</li>
+              <li>Liquid clustering in Delta tables optimizes data layout for common query patterns (e.g., filtering by document category or date), improving retrieval performance.</li>
+              <li>Time travel enables A/B comparisons of RAG quality before and after knowledge base updates by querying the vector index at different versions.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Delta Tables</tag>
+        <tag>Knowledge Base</tag>
+        <tag>Storage</tag>
+      </tags>
+    </question>
+
+    <question id="35" category-ref="cat-data" difficulty="intermediate">
+      <title>Document Ingestion Pipeline</title>
+      <scenario>A company has thousands of PDF, Word, and HTML documents that need to be ingested into a RAG knowledge base. The pipeline must extract text, split into chunks, generate embeddings, and store the results in a Delta table with a synchronized vector index. New documents arrive daily.</scenario>
+      <question-text>Which Databricks-native approach builds a reliable, incremental document ingestion pipeline?</question-text>
+      <choices>
+        <choice letter="A">A manual notebook that re-processes all documents daily</choice>
+        <choice letter="B">Exporting all documents to a third-party ETL tool outside Databricks</choice>
+        <choice letter="C">A medallion architecture pipeline using Auto Loader for incremental file ingestion, Delta tables for each processing stage, and Delta Sync for automatic vector index updates</choice>
+        <choice letter="D">A cron job that copies files directly into the vector index without processing</choice>
+      </choices>
+      <correct-answer>C</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Look for the approach that uses Databricks-native tools for incremental ingestion, structured processing stages, and automatic vector synchronization.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>A medallion architecture pipeline processes documents through stages: Auto Loader incrementally detects and ingests new files from cloud storage (bronze), text extraction and chunking transform raw documents into structured chunks (silver), embedding generation enriches chunks with vectors (gold), and Delta Sync automatically updates the vector search index. Each stage is a Delta table, providing checkpoints, schema enforcement, and recoverability. Manual re-processing is wasteful and error-prone. External ETL adds complexity. Direct file copying skips essential processing.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Auto Loader uses cloud-native file notification (AWS SNS/SQS, Azure Event Grid, GCP Pub/Sub) for efficient file discovery without directory listing.</li>
+              <li>The bronze-to-silver transformation can use Spark UDFs for text extraction (with libraries like pypdf, python-docx, or unstructured) parallelized across the cluster.</li>
+              <li>Embedding generation at the silver-to-gold stage can call a Model Serving embedding endpoint using ai_query() in Spark SQL or batch inference with mlflow.pyfunc.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Data Pipeline</tag>
+        <tag>Auto Loader</tag>
+        <tag>Medallion Architecture</tag>
+      </tags>
+    </question>
+
+    <question id="36" category-ref="cat-data" difficulty="intermediate">
+      <title>Data Quality for GenAI</title>
+      <scenario>A RAG application is producing incorrect answers. Investigation reveals that the knowledge base contains duplicate documents, outdated versions alongside current versions, and chunks with garbled text from failed PDF extraction. The vector index faithfully represents this noisy data.</scenario>
+      <question-text>Which step should be prioritized to improve RAG answer quality?</question-text>
+      <choices>
+        <choice letter="A">Switching to a more powerful LLM to compensate for data quality issues</choice>
+        <choice letter="B">Increasing the number of retrieved chunks to 100</choice>
+        <choice letter="C">Adding more documents to dilute the impact of bad ones</choice>
+        <choice letter="D">Implementing data quality checks in the ingestion pipeline: deduplication, version management, and text extraction validation before indexing</choice>
+      </choices>
+      <correct-answer>D</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Garbage in, garbage out — the root cause is data quality, not model capability or retrieval quantity.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Data quality is the foundation of RAG performance. Deduplication removes redundant content that wastes retrieval slots. Version management ensures only the current version of each document is indexed. Text extraction validation catches garbled content before it enters the knowledge base. These fixes address the root cause. A more powerful LLM cannot reason correctly about contradictory or garbled source material. More chunks amplify noise. Adding more documents doesn't fix existing problems.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Databricks Delta Lake expectations (constraints) can enforce data quality rules at write time — reject or quarantine rows that fail validation (e.g., empty text, below minimum chunk length).</li>
+              <li>MinHash or SimHash near-duplicate detection can identify semantically similar documents that differ only in formatting or minor edits.</li>
+              <li>A metadata column tracking document version and source enables filtering the vector index to only current documents, without physically deleting historical versions from the Delta table.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Data Quality</tag>
+        <tag>Deduplication</tag>
+        <tag>Pipeline Validation</tag>
+      </tags>
+    </question>
+
+    <question id="37" category-ref="cat-data" difficulty="basic">
+      <title>Embedding Generation at Scale</title>
+      <scenario>A team has 5 million document chunks that need to be embedded for a vector search index. Running the embedding model on each chunk sequentially from a single notebook would take days. They need to parallelize the embedding computation.</scenario>
+      <question-text>What is the most efficient way to generate embeddings for millions of chunks on Databricks?</question-text>
+      <choices>
+        <choice letter="A">Using Spark's distributed processing with a UDF that calls a Model Serving embedding endpoint, parallelizing across cluster workers</choice>
+        <choice letter="B">Processing chunks one at a time in a Python for-loop</choice>
+        <choice letter="C">Exporting all chunks to CSV and processing them on a local laptop</choice>
+        <choice letter="D">Manually splitting the data and running separate notebooks for each split</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Think about leveraging Spark's distributed compute to parallelize embedding API calls across many workers simultaneously.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Spark's distributed processing naturally parallelizes work across cluster workers. A Spark UDF (or ai_query() SQL function) can call a Model Serving embedding endpoint from each worker partition, processing thousands of chunks concurrently. This scales linearly with cluster size and can embed millions of chunks in hours rather than days. Sequential processing in a for-loop is single-threaded and extremely slow. Local laptop processing is limited by local compute and network bandwidth. Manual splitting is error-prone and doesn't leverage Spark's fault tolerance.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Spark UDFs should batch chunks into groups (e.g., 100 per API call) using pandas_udf to minimize per-request overhead and maximize throughput.</li>
+              <li>Rate limiting on the embedding endpoint must be accounted for — configure the Spark job's parallelism to match the endpoint's provisioned throughput to avoid throttling.</li>
+              <li>For very large corpora, pre-compute embeddings and store them as a column in the Delta table, then use a "direct vector access" index type that skips embedding computation at sync time.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Embeddings</tag>
+        <tag>Spark</tag>
+        <tag>Scale</tag>
+      </tags>
+    </question>
+
+    <question id="38" category-ref="cat-data" difficulty="advanced">
+      <title>Incremental Data Processing for GenAI</title>
+      <scenario>A knowledge base Delta table receives continuous updates: new documents are inserted, existing documents are modified, and obsolete documents are deleted. The vector search index must reflect these changes with minimal latency. Full reindexing after every change is too expensive.</scenario>
+      <question-text>Which Databricks feature enables the vector index to incrementally process only the changed rows from the source Delta table?</question-text>
+      <choices>
+        <choice letter="A">Scheduled full-table scans using a batch notebook job</choice>
+        <choice letter="B">Delta Change Data Feed (CDF), which captures row-level insert, update, and delete changes that the Delta Sync Index consumes incrementally</choice>
+        <choice letter="C">Manual change tracking using a separate audit log table</choice>
+        <choice letter="D">File-level timestamps to detect modified Parquet files</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Look for the Delta Lake feature that produces a stream of row-level changes (inserts, updates, deletes) that downstream consumers can process incrementally.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Delta Change Data Feed (CDF) records row-level changes (inserts, updates, deletes) as they happen in a Delta table. Delta Sync Indexes consume this change feed incrementally, processing only the changed rows rather than re-scanning the entire table. This provides near real-time index updates at a fraction of the cost of full reindexing. Scheduled full scans are expensive and high-latency. Manual audit logs require custom code and are error-prone. File-level timestamps are too coarse for row-level changes.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>CDF must be enabled on the Delta table (delta.enableChangeDataFeed = true) before changes can be tracked — it does not retroactively capture past changes.</li>
+              <li>Continuous sync mode in Delta Sync Index processes CDF changes in near real-time (sub-second latency), while triggered sync processes changes on demand.</li>
+              <li>CDF integrates with Structured Streaming, enabling complex incremental transformations (re-chunking, re-embedding) before the final Delta table that feeds the vector index.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Change Data Feed</tag>
+        <tag>Incremental Processing</tag>
+        <tag>Delta Sync</tag>
+      </tags>
+    </question>
+
+    <question id="39" category-ref="cat-data" difficulty="intermediate">
+      <title>Unity Catalog for GenAI Data Governance</title>
+      <scenario>A regulated financial institution uses Databricks for GenAI. Their compliance team requires that all training data, embedding models, vector indexes, and serving endpoints are governed under a single access control framework with full audit trails. Different teams should only access data and models relevant to their department.</scenario>
+      <question-text>Which Databricks feature provides unified governance across all GenAI data and model assets?</question-text>
+      <choices>
+        <choice letter="A">Workspace-level folder permissions applied to notebooks</choice>
+        <choice letter="B">Cloud provider IAM policies configured outside Databricks</choice>
+        <choice letter="C">Unity Catalog, which provides centralized access control, lineage tracking, and auditing across tables, models, vector indexes, and serving endpoints</choice>
+        <choice letter="D">A custom permissions database maintained by the compliance team</choice>
+      </choices>
+      <correct-answer>C</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Think about which single Databricks service governs all asset types — data, models, indexes, and endpoints — under one permission framework.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Unity Catalog provides a single governance layer for all Databricks assets relevant to GenAI: Delta tables (training data, knowledge bases), registered models, vector search indexes, model serving endpoints, and feature tables. Access control uses standard SQL GRANT/REVOKE syntax. Lineage tracking shows how data flows from source tables through models to serving endpoints. Audit logging captures all access events for compliance. Workspace-level permissions are too narrow. Cloud IAM doesn't understand Databricks-specific assets. Custom solutions are expensive to build and maintain.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Unity Catalog's three-level namespace (catalog.schema.asset) enables department-level isolation: each department gets its own catalog with independent permissions.</li>
+              <li>Dynamic views in Unity Catalog can implement row-level security on training data, ensuring different teams see only their authorized data subsets.</li>
+              <li>Unity Catalog audit logs integrate with cloud-native SIEM solutions for centralized security monitoring across the entire GenAI infrastructure.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Unity Catalog</tag>
+        <tag>Governance</tag>
+        <tag>Compliance</tag>
+      </tags>
+    </question>
+
+    <question id="40" category-ref="cat-data" difficulty="intermediate">
+      <title>Structured vs Unstructured Data for GenAI</title>
+      <scenario>A team is designing a GenAI application that needs to answer questions about both structured data (sales figures in Delta tables) and unstructured data (product manuals in PDF format). They want a unified approach to serve both data types.</scenario>
+      <question-text>What is the recommended approach for handling both structured and unstructured data in a GenAI application?</question-text>
+      <choices>
+        <choice letter="A">Convert all structured data into unstructured text documents</choice>
+        <choice letter="B">Ignore unstructured data and only use structured queries</choice>
+        <choice letter="C">Use a single vector index for everything regardless of data type</choice>
+        <choice letter="D">Use SQL tools (text-to-SQL) for structured data queries and vector search (RAG) for unstructured document retrieval, with the agent selecting the appropriate tool based on the question</choice>
+      </choices>
+      <correct-answer>D</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Different data types benefit from different retrieval mechanisms — think about matching the tool to the data type.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Structured data (tables with rows and columns) is best queried with SQL, which provides exact, aggregatable results. Unstructured data (documents, manuals) is best served through vector search and RAG. An agent equipped with both a SQL tool and a retrieval tool can determine which data source to query based on the user's question: "What were Q4 sales?" goes to SQL, while "How do I install the product?" goes to RAG. Converting structured data to text loses precision. Ignoring unstructured data misses valuable knowledge. A single vector index cannot efficiently handle structured queries like aggregations.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Mosaic AI Agent Framework supports multi-tool agents that can dynamically select between SQL, vector search, API calls, and other tools based on the query.</li>
+              <li>For ambiguous questions that span both types ("How did the new installation process affect Q4 support tickets?"), the agent can call both tools and synthesize results.</li>
+              <li>Table metadata and column descriptions in Unity Catalog help the agent's text-to-SQL tool understand the schema without requiring the full table in context.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Structured Data</tag>
+        <tag>Unstructured Data</tag>
+        <tag>Multi-tool</tag>
+      </tags>
+    </question>
+
+    <question id="41" category-ref="cat-data" difficulty="intermediate">
+      <title>Feature Engineering for GenAI</title>
+      <scenario>A recommendation agent uses customer purchase history, product descriptions, and real-time session context to generate personalized suggestions. The purchase history and product features are pre-computed nightly, but session context (current page, cart contents) changes in real time. The agent needs all three data sources with consistent freshness guarantees.</scenario>
+      <question-text>Which Databricks feature is designed to serve both pre-computed and real-time features to models and agents with point-in-time correctness?</question-text>
+      <choices>
+        <choice letter="A">Databricks Feature Serving, which can serve both batch-computed features from Feature Store tables and on-demand features computed at request time</choice>
+        <choice letter="B">Caching all historical data in the LLM's context window</choice>
+        <choice letter="C">A manual join across three separate Delta tables at query time</choice>
+        <choice letter="D">A separate Redis cache managed outside Databricks</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Look for the purpose-built Databricks service that unifies batch features (pre-computed) and on-demand features (computed at request time) in a single serving layer.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Databricks Feature Serving (part of Mosaic AI) serves features from Unity Catalog Feature Store tables alongside on-demand features computed by user-defined functions at request time. Batch features (purchase history, product attributes) are pre-computed and stored in Feature Store tables. On-demand features (session context transforms) are computed by registered Python functions when a serving request arrives. This unified layer ensures point-in-time consistency and eliminates training-serving skew. Manual joins are fragile. Context window caching wastes tokens. External Redis adds operational overhead.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Feature Serving endpoints auto-scale independently of model serving endpoints, allowing feature computation to handle traffic spikes without affecting model latency.</li>
+              <li>Feature Store tables in Unity Catalog support time-series features with point-in-time lookups, preventing future data leakage during training and evaluation.</li>
+              <li>On-demand feature functions can call other model serving endpoints, enabling feature cascades where one model's output is another model's input feature.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Feature Serving</tag>
+        <tag>Feature Store</tag>
+        <tag>Real-time Features</tag>
+      </tags>
+    </question>
+
+    <question id="42" category-ref="cat-eval" difficulty="intermediate">
+      <title>LLM Evaluation Metrics</title>
+      <scenario>A team has deployed a RAG-based Q&A system and needs to evaluate its quality. They want to measure whether the generated answers are factually grounded in the retrieved documents, whether the answers are relevant to the user's question, and whether the answers contain harmful content.</scenario>
+      <question-text>Which set of evaluation metrics directly addresses all three quality dimensions?</question-text>
+      <choices>
+        <choice letter="A">Perplexity, BLEU score, and word count</choice>
+        <choice letter="B">Faithfulness (grounding in retrieved context), answer relevance (alignment with the question), and toxicity detection</choice>
+        <choice letter="C">Model parameter count, inference latency, and GPU utilization</choice>
+        <choice letter="D">User satisfaction surveys collected monthly</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Map each quality dimension to its corresponding metric: factual grounding, question alignment, and harmful content detection.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Faithfulness measures whether claims in the answer are supported by the retrieved documents (factual grounding). Answer relevance measures whether the response actually addresses the user's question (relevance). Toxicity detection identifies harmful, biased, or inappropriate content (safety). These three metrics directly cover the stated quality dimensions. Perplexity and BLEU measure language model quality, not RAG-specific quality. Parameter count and latency are operational metrics, not quality metrics. Monthly surveys are too slow for iterative improvement.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>MLflow's mlflow.evaluate() function computes these metrics automatically using LLM judges — a separate LLM scores faithfulness, relevance, and toxicity for each response.</li>
+              <li>Faithfulness evaluation requires both the generated answer and the retrieved context as inputs, while relevance evaluation requires the answer and the original question.</li>
+              <li>Custom LLM judge metrics can be defined for domain-specific quality dimensions (e.g., regulatory compliance, medical accuracy) beyond the built-in metrics.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Evaluation Metrics</tag>
+        <tag>Faithfulness</tag>
+        <tag>Toxicity</tag>
+      </tags>
+    </question>
+
+    <question id="43" category-ref="cat-eval" difficulty="basic">
+      <title>Human Evaluation vs Automated Evaluation</title>
+      <scenario>A team is deciding how to evaluate their GenAI application before production launch. They have limited budget for human evaluators but need thorough quality assessment. They want to understand when automated evaluation is sufficient and when human evaluation is necessary.</scenario>
+      <question-text>When is human evaluation most critical for GenAI applications?</question-text>
+      <choices>
+        <choice letter="A">Human evaluation is never needed — automated metrics are always sufficient</choice>
+        <choice letter="B">Human evaluation should replace all automated metrics</choice>
+        <choice letter="C">Human evaluation is critical for subjective quality dimensions like tone, helpfulness, and nuanced correctness that automated metrics cannot reliably capture</choice>
+        <choice letter="D">Human evaluation is only needed for spelling and grammar checks</choice>
+      </choices>
+      <correct-answer>C</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Consider which quality aspects require human judgment because they involve subjective assessments that metrics cannot fully automate.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Automated metrics (faithfulness, toxicity, relevance scores) are efficient for consistent, scalable evaluation but struggle with subjective dimensions: Is the tone appropriate for the audience? Is the explanation genuinely helpful? Is a technically correct answer misleadingly incomplete? Human evaluation fills these gaps. The best approach combines automated metrics for scalable regression testing with targeted human evaluation for subjective quality and edge cases. Neither approach alone is sufficient, and human evaluation certainly addresses more than spelling.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Databricks supports human feedback collection through review applications built with Mosaic AI Agent Evaluation, where reviewers rate agent responses on configurable rubrics.</li>
+              <li>Inter-annotator agreement metrics (like Cohen's kappa) measure consistency between human evaluators, ensuring evaluation quality.</li>
+              <li>Human evaluation data can be used to fine-tune LLM judges, creating automated metrics that better approximate human judgment for domain-specific tasks.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Human Evaluation</tag>
+        <tag>Automated Evaluation</tag>
+        <tag>Quality Assessment</tag>
+      </tags>
+    </question>
+
+    <question id="44" category-ref="cat-eval" difficulty="intermediate">
+      <title>Inference Table Monitoring</title>
+      <scenario>A production GenAI application has been running for three months. The team notices that user satisfaction has been declining, but the model and prompts haven't changed. They suspect that the nature of user queries has shifted over time, causing the model to encounter questions outside its training distribution.</scenario>
+      <question-text>Which Databricks feature helps detect this kind of input distribution drift in a production GenAI application?</question-text>
+      <choices>
+        <choice letter="A">Manually reviewing a random sample of queries each week</choice>
+        <choice letter="B">Retraining the model weekly regardless of drift</choice>
+        <choice letter="C">Increasing the model's context window to handle new topics</choice>
+        <choice letter="D">Inference tables with Lakehouse Monitoring, which logs all requests and responses and can detect statistical drift in input distributions over time</choice>
+      </choices>
+      <correct-answer>D</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Look for the feature that automatically logs all production requests and provides statistical monitoring to detect changes in input patterns.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Inference tables automatically log every request and response from Model Serving endpoints to a Delta table. Lakehouse Monitoring analyzes this data over time, detecting statistical drift in input distributions (new topics, changing query patterns, novel vocabulary). This enables proactive identification of the root cause: queries are shifting away from what the model handles well. Manual review is not scalable. Weekly retraining is wasteful and doesn't target the actual problem. Context window size doesn't address distribution drift.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Monitoring profiles can track text statistics (query length, language distribution, topic clusters) and flag anomalies when distributions shift beyond configured thresholds.</li>
+              <li>Embedding-based drift detection clusters query embeddings over time and alerts when new clusters emerge that don't match the training distribution.</li>
+              <li>Combining drift detection with automated evaluation (running LLM judges on flagged requests) creates a closed-loop quality monitoring system.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Inference Tables</tag>
+        <tag>Monitoring</tag>
+        <tag>Distribution Drift</tag>
+      </tags>
+    </question>
+
+    <question id="45" category-ref="cat-eval" difficulty="basic">
+      <title>A/B Testing GenAI Models</title>
+      <scenario>A team wants to compare their current production RAG model (Model A) against a new model (Model B) that uses a different prompt template and retrieval configuration. They need statistical confidence that Model B is actually better before fully switching over.</scenario>
+      <question-text>What is the recommended approach for comparing two GenAI model configurations in production?</question-text>
+      <choices>
+        <choice letter="A">A/B testing with traffic splitting, where a percentage of production traffic is routed to Model B while the rest continues to Model A, and evaluation metrics are compared with statistical significance testing</choice>
+        <choice letter="B">Testing Model B in a notebook with 10 sample queries and comparing outputs manually</choice>
+        <choice letter="C">Deploying Model B to all users immediately and rolling back if complaints increase</choice>
+        <choice letter="D">Comparing Model A and Model B on a benchmark dataset only, without production traffic</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Think about which approach tests the new model on real production traffic while controlling risk and measuring results statistically.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>A/B testing splits production traffic between Model A and Model B (e.g., 90/10 or 50/50), collects evaluation metrics (faithfulness, relevance, latency, user satisfaction) for both, and uses statistical significance tests to determine whether Model B is genuinely better. This tests on real user behavior, not synthetic benchmarks. A 10-query notebook test is statistically meaningless. Full deployment without testing risks quality regression for all users. Benchmark-only testing misses production-specific patterns like query distribution and real-world edge cases.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Databricks Model Serving supports traffic splitting natively — you can route configurable percentages of traffic to different model versions behind a single endpoint.</li>
+              <li>Inference tables capture which model version served each request, enabling post-hoc analysis of A/B test results using Databricks SQL.</li>
+              <li>Guardrails should be applied to both variants equally to ensure the comparison measures model quality, not safety filtering differences.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>A/B Testing</tag>
+        <tag>Traffic Splitting</tag>
+        <tag>Statistical Testing</tag>
+      </tags>
+    </question>
+
+    <question id="46" category-ref="cat-eval" difficulty="intermediate">
+      <title>MLflow LLM Evaluation</title>
+      <scenario>A team has built a RAG pipeline and needs to run automated evaluation across 500 test cases. For each test case, they have the question, retrieved context, generated answer, and a ground-truth reference answer. They want to compute faithfulness, relevance, and correctness scores automatically.</scenario>
+      <question-text>Which MLflow feature automates LLM evaluation at scale with built-in metrics?</question-text>
+      <choices>
+        <choice letter="A">MLflow's manual model comparison UI</choice>
+        <choice letter="B">mlflow.evaluate() with the "text" model type, which computes LLM-judged metrics like faithfulness, relevance, and correctness across the entire evaluation dataset</choice>
+        <choice letter="C">Custom Python scripts that call the LLM to evaluate itself</choice>
+        <choice letter="D">Exporting results to a spreadsheet for manual scoring</choice>
+      </choices>
+      <correct-answer>B</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Look for the MLflow function that takes an evaluation dataset and automatically computes GenAI-specific quality metrics.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>mlflow.evaluate() accepts a dataset of questions, contexts, generated answers, and optional reference answers, then automatically computes LLM-judged metrics including faithfulness (is the answer grounded in context?), answer relevance (does it address the question?), and correctness (does it match the reference?). It logs results as an MLflow run with per-example scores and aggregate statistics. The manual comparison UI doesn't run automated evaluations. Custom scripts duplicate built-in functionality without MLflow's logging and comparison capabilities. Spreadsheet scoring doesn't scale.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>mlflow.evaluate() uses configurable judge models — you can use Foundation Model APIs, external models, or custom-hosted judges to compute scores.</li>
+              <li>The evaluation result includes a per-example scores table that identifies the worst-performing cases, enabling targeted debugging of the RAG pipeline.</li>
+              <li>Custom metrics can be added alongside built-in ones by defining a metric function that takes (prediction, context, reference) and returns a score.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>MLflow</tag>
+        <tag>Evaluation</tag>
+        <tag>LLM Judge</tag>
+      </tags>
+    </question>
+
+    <question id="47" category-ref="cat-eval" difficulty="advanced">
+      <title>Evaluation of Agent Quality</title>
+      <scenario>An AI agent with multiple tools (SQL, vector search, API calls) is deployed for customer support. The team needs to evaluate not just the final answer quality but also whether the agent chose the right tools, called them with correct parameters, and followed an efficient execution path. Some correct final answers were reached through unreliable reasoning paths.</scenario>
+      <question-text>Which evaluation approach captures both final answer quality and intermediate reasoning quality for an agent?</question-text>
+      <choices>
+        <choice letter="A">Only evaluating the final text response with BLEU score</choice>
+        <choice letter="B">Counting the total number of tool calls as a quality proxy</choice>
+        <choice letter="C">Trace-level evaluation using MLflow Tracing, which captures the full execution graph (tool selections, parameters, intermediate results) and evaluates each step alongside the final answer</choice>
+        <choice letter="D">Comparing the agent's response to a keyword checklist</choice>
+      </choices>
+      <correct-answer>C</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Think about the evaluation approach that inspects the full execution path — not just the destination — to ensure the agent's reasoning is reliable.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>MLflow Tracing captures the complete execution graph of an agent: which tools were selected, what parameters were passed, what intermediate results were returned, and how the agent reasoned at each step. Trace-level evaluation scores each step (was the right tool chosen? were parameters correct? was the intermediate result used appropriately?) alongside the final answer. This catches unreliable reasoning paths that happen to produce correct answers — a critical safety concern for production agents. BLEU scores ignore reasoning. Tool call counts don't measure correctness. Keyword checklists are too coarse.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Mosaic AI Agent Evaluation provides built-in trace evaluation that scores tool selection accuracy, parameter correctness, and reasoning coherence using LLM judges.</li>
+              <li>Expected tool call sequences can be defined in test cases, enabling automated comparison of the agent's actual execution path against the expected path.</li>
+              <li>Trace evaluation enables regression testing at the reasoning level — ensuring that prompt or model changes don't break the agent's decision-making even if final answers appear unchanged.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Agent Evaluation</tag>
+        <tag>MLflow Tracing</tag>
+        <tag>Trace Analysis</tag>
+      </tags>
+    </question>
+
+    <question id="48" category-ref="cat-eval" difficulty="advanced">
+      <title>Cost Monitoring for GenAI</title>
+      <scenario>A GenAI platform team manages 15 serving endpoints across the organization. Monthly costs have been increasing steadily, but they lack visibility into which endpoints, teams, and use cases are driving the cost growth. They need granular cost attribution and trend analysis.</scenario>
+      <question-text>Which Databricks capability provides granular cost tracking and attribution for Model Serving endpoints?</question-text>
+      <choices>
+        <choice letter="A">The cloud provider's general compute billing dashboard</choice>
+        <choice letter="B">Manual tracking of endpoint uptime in a spreadsheet</choice>
+        <choice letter="C">Reducing all endpoints to the smallest size to cap costs</choice>
+        <choice letter="D">System tables and billing APIs that log per-endpoint token usage, compute hours, and cost, queryable via Databricks SQL for attribution analysis</choice>
+      </choices>
+      <correct-answer>D</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Look for the Databricks-native data source that records per-endpoint usage metrics in a queryable format for cost attribution.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Databricks system tables and billing APIs log detailed per-endpoint metrics: token counts (input and output), compute hours, and associated costs. These are stored as Delta tables queryable via Databricks SQL, enabling dashboards that break down costs by endpoint, team (using tags), time period, and use case. This provides the granular attribution needed to identify cost drivers. Cloud billing dashboards show total Databricks spend but not per-endpoint breakdowns. Manual tracking is error-prone and not scalable. Reducing endpoint sizes may break SLAs.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Endpoint tags (key-value pairs) enable cost attribution by team, project, or environment (dev/staging/prod) when queried against billing system tables.</li>
+              <li>Token-level cost tracking distinguishes between input tokens (cheaper) and output tokens (more expensive), enabling optimization of prompt length vs. response length.</li>
+              <li>Cost anomaly alerts can be built using Lakehouse Monitoring on billing system tables, flagging unexpected cost spikes before they accumulate over a billing period.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Cost Monitoring</tag>
+        <tag>System Tables</tag>
+        <tag>Billing</tag>
+      </tags>
+    </question>
+
+    <question id="49" category-ref="cat-eval" difficulty="basic">
+      <title>Regression Testing for GenAI</title>
+      <scenario>A team is updating the system prompt for their production chatbot. They want to ensure the new prompt does not degrade quality on any of the known use cases. They have a curated set of 100 golden question-answer pairs representing critical scenarios.</scenario>
+      <question-text>What is the best practice for validating that a prompt change does not cause quality regression?</question-text>
+      <choices>
+        <choice letter="A">Running the golden test set against both the old and new prompts, comparing evaluation metrics, and only deploying if the new prompt matches or exceeds the old prompt's scores</choice>
+        <choice letter="B">Testing the new prompt with one question and deploying if it looks good</choice>
+        <choice letter="C">Deploying the new prompt immediately and monitoring for user complaints</choice>
+        <choice letter="D">Asking a colleague to read the new prompt and approve it based on intuition</choice>
+      </choices>
+      <correct-answer>A</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Think about the systematic approach that uses a curated test set to compare old vs. new performance before any production change.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Regression testing with a golden dataset is the standard practice for validating GenAI changes. Running the same 100 question-answer pairs through both the old and new prompt configurations, computing evaluation metrics (faithfulness, relevance, correctness) for each, and comparing the results provides objective evidence of improvement or degradation. Only deploy if the new prompt matches or exceeds the old prompt's aggregate scores. A single test is statistically meaningless. Deploying without testing risks production quality. Intuition-based review misses subtle regressions.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>MLflow's evaluation comparison view lets you diff two runs side by side, highlighting per-example score changes and identifying specific cases where the new prompt regresses.</li>
+              <li>Golden test sets should be version-controlled and expanded over time — every production bug should become a new test case to prevent recurrence.</li>
+              <li>CI/CD pipelines can automate regression testing, blocking deployment if evaluation scores drop below configured thresholds on the golden dataset.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Regression Testing</tag>
+        <tag>Golden Dataset</tag>
+        <tag>Quality Assurance</tag>
+      </tags>
+    </question>
+
+    <question id="50" category-ref="cat-eval" difficulty="intermediate">
+      <title>Mosaic AI Agent Evaluation Framework</title>
+      <scenario>A team has built an AI agent using Mosaic AI Agent Framework and needs to evaluate it comprehensively before production deployment. They want to assess retrieval quality, response quality, and safety across diverse test scenarios. They need both automated scoring and a mechanism for human reviewers to provide feedback.</scenario>
+      <question-text>Which Databricks tool provides an integrated evaluation framework for AI agents that combines automated LLM-judged metrics with human review capabilities?</question-text>
+      <choices>
+        <choice letter="A">A custom evaluation notebook written from scratch</choice>
+        <choice letter="B">Third-party evaluation tools running outside Databricks</choice>
+        <choice letter="C">Mosaic AI Agent Evaluation, which provides automated LLM-judged metrics (retrieval precision, response quality, safety) alongside a review application for human evaluator feedback</choice>
+        <choice letter="D">Production monitoring alone, without pre-deployment evaluation</choice>
+      </choices>
+      <correct-answer>C</correct-answer>
+      <hints>
+        <hint level="1" label="Brief Hint">
+          <content>Look for the Databricks-native evaluation tool designed specifically for AI agents that covers both automated metrics and human review workflows.</content>
+        </hint>
+        <hint level="2" label="Complete Explanation">
+          <content>Mosaic AI Agent Evaluation is purpose-built for evaluating AI agents on Databricks. It provides automated LLM-judged metrics including retrieval precision (did the agent find the right documents?), response quality (is the answer correct, relevant, and well-formatted?), and safety checks (toxicity, PII exposure, harmful content). It also includes a review application where human evaluators rate agent responses on configurable rubrics. The combination of automated and human evaluation provides comprehensive coverage. Custom notebooks duplicate built-in functionality. Third-party tools lack Databricks integration. Monitoring without pre-deployment evaluation is risky.</content>
+        </hint>
+        <hint level="3" label="Deep Knowledge">
+          <content>
+            <ul>
+              <li>Agent Evaluation supports parameterized evaluation sets — the same test cases can evaluate the agent with different configurations (models, prompts, retrieval settings) for systematic comparison.</li>
+              <li>The review application tracks inter-annotator agreement and reviewer throughput, providing quality metrics for the evaluation process itself.</li>
+              <li>Evaluation results integrate with MLflow, enabling comparison across agent versions and identification of quality trends over the development lifecycle.</li>
+            </ul>
+          </content>
+        </hint>
+      </hints>
+      <tags>
+        <tag>Agent Evaluation</tag>
+        <tag>Mosaic AI</tag>
+        <tag>Human Review</tag>
+      </tags>
+    </question>
+  </questions>
+</certification-exam>

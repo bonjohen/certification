@@ -371,7 +371,23 @@ export class QuizApp {
             // CompTIA
             'sy0-701': 'https://www.comptia.org/certifications/security',
             // ISC2
-            'cissp': 'https://www.isc2.org/certifications/cissp'
+            'cissp': 'https://www.isc2.org/certifications/cissp',
+            // AWS (new)
+            'soa-c03': 'https://aws.amazon.com/certification/certified-sysops-admin-associate/',
+            // Azure (new)
+            'ai-901': 'https://learn.microsoft.com/en-us/credentials/certifications/exams/ai-901/',
+            'ai-103': 'https://learn.microsoft.com/en-us/credentials/certifications/exams/ai-103/',
+            'ai-200': 'https://learn.microsoft.com/en-us/credentials/certifications/exams/ai-200/',
+            'sc-500': 'https://learn.microsoft.com/en-us/credentials/certifications/exams/sc-500/',
+            // GitHub
+            'gh-300': 'https://docs.github.com/en/get-started/showcase-your-expertise-with-github-certifications',
+            // Databricks
+            'db-genai': 'https://www.databricks.com/learn/certification/generative-ai-engineer-associate',
+            'db-ml': 'https://www.databricks.com/learn/certification/machine-learning-associate',
+            // NVIDIA
+            'nv-genai': 'https://academy.nvidia.com/en/course/generative-ai-llm-associate/',
+            // Cisco
+            '810-110': 'https://www.cisco.com/site/us/en/learn/training-certifications/certifications/ai-technical-practitioner/index.html'
         };
 
         this.elements.backLink.href = providerPages[provider] || 'index.html';
