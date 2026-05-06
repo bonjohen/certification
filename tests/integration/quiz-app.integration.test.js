@@ -112,7 +112,7 @@ function createWiredApp() {
     app.engine = new QuizEngine(examData);
     app.categories = examData.metadata.categories || {};
     // Use a no-op tracker to avoid localStorage in integration tests
-    app.tracker = { save: vi.fn(), load: () => null, clear: vi.fn() };
+    app.tracker = { save: vi.fn(), load: () => null, clear: vi.fn(), saveResults: vi.fn() };
 
     return { app, elements, examData };
 }

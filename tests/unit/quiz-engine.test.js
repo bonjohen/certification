@@ -279,7 +279,8 @@ describe('QuizEngine', () => {
             expect(results.score).toBe(1);
             expect(results.percentage).toBe(100);
             expect(results.timestamp).toBeDefined();
-            expect(results.details).toHaveLength(1);
+            expect(results.details).toHaveLength(3); // all questions, not just answered
+            expect(results.details.filter(d => d.selected !== null)).toHaveLength(1);
         });
 
         it('should calculate percentage correctly', () => {
@@ -294,7 +295,8 @@ describe('QuizEngine', () => {
         it('should handle zero attempts', () => {
             const results = engine.exportResults();
             expect(results.percentage).toBe(0);
-            expect(results.details).toHaveLength(0);
+            expect(results.details).toHaveLength(3); // all questions included, all unanswered
+            expect(results.details.every(d => d.selected === null)).toBe(true);
         });
     });
 

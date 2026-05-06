@@ -173,6 +173,7 @@ describe('XMLParser → QuizEngine data flow', () => {
         expect(results.attempted).toBe(2);
         expect(results.score).toBe(1);
         expect(results.percentage).toBe(50);
-        expect(results.details.length).toBe(2);
+        expect(results.details.length).toBe(3); // all questions; 2 answered, 1 unanswered
+        expect(results.details.filter(d => d.selected !== null).length).toBe(2);
     });
 });

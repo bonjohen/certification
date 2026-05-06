@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://esm.sh; connect-src 'self' https://esm.sh; style-src 'self' 'unsafe-inline'; img-src 'self' data:;">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📝</text></svg>">
+    <title>Results - Study Guide</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/results.css">
+</head>
+<body>
+    <header class="results-header">
+        <div class="header-left">
+            <a href="index.html" class="back-link" id="back-link">&#8592; Back</a>
+            <div class="exam-info">
+                <span id="exam-code" class="exam-badge"></span>
+                <span id="exam-title"></span>
+            </div>
+        </div>
+        <div class="header-right">
+            <button id="print-btn" class="btn btn-sm" title="Print Results">Print</button>
+            <button id="export-btn" class="btn btn-sm" title="Export Results JSON">Export JSON</button>
+            <a id="back-to-quiz-btn" class="btn btn-sm" href="#">Back to Quiz</a>
+        </div>
+    </header>
+
+    <main class="results-main">
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p>Loading results...</p>
+        </div>
+
+        <div id="error" class="error-message" hidden>
+            <h2>No Results Found</h2>
+            <p id="error-text">No saved progress was found for this exam.</p>
+            <a href="index.html" class="btn btn-primary" id="error-back-link">Back to Exams</a>
+        </div>
+
+        <div id="results-content" hidden>
+            <!-- Congratulations Banner -->
+            <section class="results-banner" id="results-banner">
+                <div class="banner-provider" id="banner-provider"></div>
+                <h1>Congratulations!</h1>
+                <p class="banner-exam" id="banner-exam"></p>
+                <div class="banner-score" id="banner-score"></div>
+                <div class="banner-timestamp" id="banner-timestamp"></div>
+            </section>
+
+            <!-- Summary Stats -->
+            <section class="results-summary">
+                <div class="summary-card">
+                    <span class="summary-value" id="stat-total"></span>
+                    <span class="summary-label">Total Questions</span>
+                </div>
+                <div class="summary-card correct">
+                    <span class="summary-value" id="stat-correct"></span>
+                    <span class="summary-label">Correct</span>
+                </div>
+                <div class="summary-card incorrect">
+                    <span class="summary-value" id="stat-incorrect"></span>
+                    <span class="summary-label">Incorrect</span>
+                </div>
+                <div class="summary-card unanswered">
+                    <span class="summary-value" id="stat-unanswered"></span>
+                    <span class="summary-label">Unanswered</span>
+                </div>
+                <div class="summary-card hint-l1">
+                    <span class="summary-value" id="stat-hints-l1"></span>
+                    <span class="summary-label">L1 Hints</span>
+                </div>
+                <div class="summary-card hint-l2">
+                    <span class="summary-value" id="stat-hints-l2"></span>
+                    <span class="summary-label">L2 Hints</span>
+                </div>
+                <div class="summary-card hint-l3">
+                    <span class="summary-value" id="stat-hints-l3"></span>
+                    <span class="summary-label">L3 Hints</span>
+                </div>
+            </section>
+
+            <!-- Category Breakdown -->
+            <section class="results-section">
+                <h2>Category Breakdown</h2>
+                <div class="table-wrapper">
+                    <table class="results-category-table" id="category-table">
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Questions</th>
+                                <th>Correct</th>
+                                <th>Incorrect</th>
+                                <th>Unanswered</th>
+                                <th>Score</th>
+                                <th>L1</th>
+                                <th>L2</th>
+                                <th>L3</th>
+                            </tr>
+                        </thead>
+                        <tbody id="category-tbody"></tbody>
+                        <tfoot id="category-tfoot"></tfoot>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Difficulty Breakdown -->
+            <section class="results-section">
+                <h2>Difficulty Breakdown</h2>
+                <div class="results-difficulty" id="difficulty-cards"></div>
+            </section>
+
+            <!-- Timeline -->
+            <section class="results-section">
+                <h2>Timeline</h2>
+                <div class="results-timeline" id="timeline"></div>
+            </section>
+
+            <!-- Per-Question Detail -->
+            <section class="results-section">
+                <div class="detail-header">
+                    <h2>Question Details</h2>
+                    <button class="btn btn-sm" id="toggle-details">Show Details</button>
+                </div>
+                <div class="detail-filter-bar" id="filter-bar" hidden>
+                    <button class="filter-btn active" data-filter="all">All</button>
+                    <button class="filter-btn" data-filter="correct">Correct</button>
+                    <button class="filter-btn" data-filter="incorrect">Incorrect</button>
+                    <button class="filter-btn" data-filter="unanswered">Unanswered</button>
+                    <button class="filter-btn" data-filter="hints">Used Hints</button>
+                    <span class="filter-separator">|</span>
+                    <label class="sort-label">Sort:
+                        <select id="sort-select">
+                            <option value="number">Question #</option>
+                            <option value="time">Time to Answer</option>
+                            <option value="category">Category</option>
+                        </select>
+                    </label>
+                </div>
+                <div class="detail-list" id="detail-list" hidden></div>
+            </section>
+
+            <!-- Footer -->
+            <section class="results-footer">
+                <a id="footer-provider-link" class="btn btn-primary" href="index.html">Return to Exams</a>
+                <a id="footer-new-attempt" class="btn btn-secondary" href="#">Start New Attempt</a>
+                <button id="footer-export-btn" class="btn btn-secondary">Export Results JSON</button>
+            </section>
+        </div>
+    </main>
+
+    <script type="module" src="js/results-app.js"></script>
+</body>
+</html>

@@ -138,7 +138,11 @@ export class QuizApp {
             nextQuestion: document.getElementById('next-question'),
             correctAnswerDisplay: document.getElementById('correct-answer-display'),
             correctAnswerLetter: document.getElementById('correct-answer-letter'),
-            certOrgLink: document.getElementById('cert-org-link')
+            certOrgLink: document.getElementById('cert-org-link'),
+            viewResultsBtn: document.getElementById('view-results-btn'),
+            exportProgressBtn: document.getElementById('export-progress-btn'),
+            importProgressBtn: document.getElementById('import-progress-btn'),
+            importFileInput: document.getElementById('import-file-input')
         };
 
         this.selectedAnswer = null; // Track currently selected answer for toggle behavior
@@ -251,6 +255,11 @@ export class QuizApp {
         this.renderQuestion();
         this.showQuiz();
         this.quizActive = true;
+
+        // If all questions already answered (restored complete session), show View Results button
+        if (this.engine.attemptedCount === this.engine.totalQuestions && this.elements.viewResultsBtn) {
+            this.elements.viewResultsBtn.hidden = false;
+        }
     }
 
     getExamIdFromUrl() {
@@ -425,12 +434,56 @@ export class QuizApp {
             if (e.key === 'ArrowLeft') this.navigatePrevious();
             if (e.key === 'ArrowRight') this.navigateNext();
         });
+
+        // View Results button
+        if (this.elements.viewResultsBtn) {
+            const examId = this.getExamIdFromUrl();
+            this.elements.viewResultsBtn.addEventListener('click', () => {
+                window.location.href = `results.html?exam=${encodeURIComponent(examId)}`;
+            });
+        }
+
+        // Export/Import progress
+        if (this.elements.exportProgressBtn) {
+            this.elements.exportProgressBtn.addEventListener('click', () => {
+                this.tracker.exportProgressFile(this.engine);
+            });
+        }
+        if (this.elements.importProgressBtn && this.elements.importFileInput) {
+            this.elements.importProgressBtn.addEventListener('click', () => {
+                this.elements.importFileInput.click();
+            });
+            this.elements.importFileInput.addEventListener('change', async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                try {
+                    const state = await ProgressTracker.importProgressFile(file);
+                    const examId = this.getExamIdFromUrl();
+                    if (state.examCode && state.examCode.toLowerCase() !== examId.toLowerCase()) {
+                        alert(`This progress file is for exam "${state.examCode}", not "${examId}".`);
+                        return;
+                    }
+                    this.engine.restoreState(state);
+                    this.tracker.save(this.engine);
+                    this.renderQuestion();
+                    this.updateScoreDisplay();
+                } catch (err) {
+                    alert(`Import failed: ${err.message}`);
+                } finally {
+                    e.target.value = '';
+                }
+            });
+        }
     }
 
     renderQuestion() {
         const question = this.engine.currentQuestion;
         const answer = this.engine.getAnswer(question.id);
         const isAnswered = this.engine.hasAnswered(question.id);
+
+        // Record first-display timestamp
+        this.engine.recordQuestionDisplayed(question.id);
+        this.tracker.save(this.engine);
 
         // Update question info
         this.elements.currentNum.textContent = this.engine.currentQuestionNumber;
@@ -569,6 +622,35 @@ export class QuizApp {
         this.elements.submitAnswer.hidden = true;
         this.showFeedback(answer);
         this.updateScoreDisplay();
+
+        // Check if all questions answered — show completion overlay
+        if (this.engine.attemptedCount === this.engine.totalQuestions) {
+            this.tracker.saveResults(this.engine.exportResults());
+            this.showCompletionOverlay();
+        }
+    }
+
+    showCompletionOverlay() {
+        const examId = this.getExamIdFromUrl();
+        const score = this.engine.score;
+        const total = this.engine.totalQuestions;
+        const pct = Math.round((score / total) * 100);
+
+        // Show "View Results" button in header
+        if (this.elements.viewResultsBtn) {
+            this.elements.viewResultsBtn.hidden = false;
+        }
+
+        const overlay = document.getElementById('completion-overlay');
+        if (!overlay) return;
+
+        overlay.querySelector('.overlay-score').textContent = `${score}/${total} (${pct}%)`;
+        overlay.querySelector('.overlay-view-results').href = `results.html?exam=${encodeURIComponent(examId)}`;
+        overlay.hidden = false;
+
+        overlay.querySelector('.overlay-continue').addEventListener('click', () => {
+            overlay.hidden = true;
+        });
     }
 
     showFeedback(answer) {

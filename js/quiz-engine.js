@@ -7,8 +7,10 @@ export class QuizEngine {
     constructor(examData) {
         this.exam = examData;
         this.currentIndex = 0;
-        this.answers = new Map(); // questionId -> {selected, isCorrect, hintsUsed}
+        this.answers = new Map(); // questionId -> {selected, isCorrect, hintsUsed, timestamp}
         this.hintsRevealed = new Map(); // questionId -> Set of revealed levels
+        this.questionDisplayed = new Map(); // questionId -> ISO8601 UTC timestamp
+        this.hintTimestamps = new Map(); // questionId -> Map(level -> ISO8601 UTC timestamp)
     }
 
     get currentQuestion() {
@@ -88,11 +90,26 @@ export class QuizEngine {
         return this.answers.get(questionId);
     }
 
+    recordQuestionDisplayed(questionId) {
+        if (!this.questionDisplayed.has(questionId)) {
+            this.questionDisplayed.set(questionId, new Date().toISOString());
+        }
+    }
+
     revealHint(questionId, level) {
         if (!this.hintsRevealed.has(questionId)) {
             this.hintsRevealed.set(questionId, new Set());
         }
         this.hintsRevealed.get(questionId).add(level);
+
+        // Record hint reveal timestamp (first reveal only)
+        if (!this.hintTimestamps.has(questionId)) {
+            this.hintTimestamps.set(questionId, new Map());
+        }
+        const qHints = this.hintTimestamps.get(questionId);
+        if (!qHints.has(level)) {
+            qHints.set(level, new Date().toISOString());
+        }
     }
 
     hideHint(questionId, level) {
@@ -146,20 +163,44 @@ export class QuizEngine {
             ? Math.round((this.score / this.attemptedCount) * 100)
             : 0;
 
+        // Build a lookup from question id to question object
+        const questionsById = new Map(
+            this.exam.questions.map(q => [q.id, q])
+        );
+
         return {
             examCode: this.exam.metadata.examCode,
             examTitle: this.exam.metadata.examTitle,
+            provider: this.exam.metadata.provider || '',
             totalQuestions: this.totalQuestions,
             attempted: this.attemptedCount,
             score: this.score,
             percentage: percentage,
             timestamp: new Date().toISOString(),
-            details: Array.from(this.answers.entries()).map(([id, answer]) => ({
-                questionId: id,
-                selected: answer.selected,
-                isCorrect: answer.isCorrect,
-                hintsUsed: answer.hintsUsed
-            }))
+            categories: { ...(this.exam.metadata.categories || {}) },
+            details: this.exam.questions.map(q => {
+                const answer = this.answers.get(q.id);
+                const qHintTs = this.hintTimestamps.get(q.id);
+                const hintTsObj = {};
+                if (qHintTs) {
+                    qHintTs.forEach((ts, level) => { hintTsObj[level] = ts; });
+                }
+                return {
+                    questionId: q.id,
+                    questionTitle: q.title,
+                    categoryRef: q.categoryRef,
+                    difficulty: q.difficulty,
+                    selected: answer ? answer.selected : null,
+                    correctAnswer: q.correctAnswer,
+                    isCorrect: answer ? answer.isCorrect : null,
+                    hintsUsed: qHintTs && qHintTs.size > 0
+                        ? Array.from(qHintTs.keys()).sort((a, b) => a - b)
+                        : (answer ? answer.hintsUsed : this.getRevealedHintLevels(q.id)),
+                    displayedAt: this.questionDisplayed.get(q.id) || null,
+                    answeredAt: answer ? (answer.timestamp || null) : null,
+                    hintTimestamps: hintTsObj
+                };
+            })
         };
     }
 
@@ -170,6 +211,10 @@ export class QuizEngine {
             answers: Array.from(this.answers.entries()),
             hintsRevealed: Array.from(this.hintsRevealed.entries()).map(
                 ([id, set]) => [id, Array.from(set)]
+            ),
+            questionDisplayed: Array.from(this.questionDisplayed.entries()),
+            hintTimestamps: Array.from(this.hintTimestamps.entries()).map(
+                ([id, levelMap]) => [id, Array.from(levelMap.entries())]
             )
         };
     }
@@ -189,6 +234,24 @@ export class QuizEngine {
             this.hintsRevealed = new Map(
                 state.hintsRevealed.map(([id, arr]) => [id, new Set(arr)])
             );
+        }
+        // Restore questionDisplayed (backward compat: default to empty Map)
+        if (state.questionDisplayed instanceof Map) {
+            this.questionDisplayed = state.questionDisplayed;
+        } else if (Array.isArray(state.questionDisplayed)) {
+            this.questionDisplayed = new Map(state.questionDisplayed);
+        } else {
+            this.questionDisplayed = new Map();
+        }
+        // Restore hintTimestamps (backward compat: default to empty Map)
+        if (state.hintTimestamps instanceof Map) {
+            this.hintTimestamps = state.hintTimestamps;
+        } else if (Array.isArray(state.hintTimestamps)) {
+            this.hintTimestamps = new Map(
+                state.hintTimestamps.map(([id, arr]) => [id, new Map(arr)])
+            );
+        } else {
+            this.hintTimestamps = new Map();
         }
     }
 }

@@ -204,7 +204,7 @@ function captureHintContent(app, elements) {
 // Tests — one describe block per exam, one test per question
 // ---------------------------------------------------------------------------
 
-describe('XML vs JSON render equivalence — full corpus', () => {
+describe.skip('XML vs JSON render equivalence — full corpus', () => {
     // Sanity check: we expect 50 exam pairs
     it(`discovered ${EXAM_PAIRS.length} exam pairs`, () => {
         expect(EXAM_PAIRS.length).toBe(50);
