@@ -126,15 +126,15 @@ Open  -->  Started  -->  Completed
 
 | Task | Status | Started (PST) | Completed (PST) | Description |
 |------|--------|---------------|------------------|-------------|
-| 4.1 | Open | | | Create `data/github/gh-200.xml` — 50 questions covering GitHub Actions workflows, YAML syntax, runners, events/triggers, secrets management, reusable workflows, composite actions, CI/CD pipelines, artifact management, environments, deployment strategies |
-| 4.2 | Open | | | `github.html` — Convert GH-200 coming-soon `<div>` to active `<a href="quiz.html?exam=gh-200" class="exam-card new-exam">`, update meta to "50 Questions / Associate" |
-| 4.3 | Open | | | `js/app.js` — Add `'gh-200'` to `examUrls` map |
-| 4.4 | Open | | | Run `node scripts/validate-xml.js` on new file |
-| 4.5 | Open | | | Stage and commit |
+| 4.1 | Completed | 2026-05-05 09:33 AM | 2026-05-05 09:45 AM | Create `data/github/gh-200.xml` — 50 questions covering GitHub Actions workflows, YAML syntax, runners, events/triggers, secrets management, reusable workflows, composite actions, CI/CD pipelines, artifact management, environments, deployment strategies |
+| 4.2 | Completed | 2026-05-05 09:45 AM | 2026-05-05 09:46 AM | `github.html` — Convert GH-200 coming-soon `<div>` to active `<a href="quiz.html?exam=gh-200" class="exam-card new-exam">`, update meta to "50 Questions / Associate" |
+| 4.3 | Completed | 2026-05-05 09:46 AM | 2026-05-05 09:46 AM | `js/app.js` — Add `'gh-200'` to `examUrls` map |
+| 4.4 | Completed | 2026-05-05 09:46 AM | 2026-05-05 09:47 AM | Run `node scripts/validate-xml.js` on new file |
+| 4.5 | Completed | 2026-05-05 09:47 AM | 2026-05-05 09:47 AM | Stage and commit |
 
 ### Phase 4 Summary
 
-- **Changes:** TBD
+- **Changes:** Created `data/github/gh-200.xml` (50 questions), activated card in `github.html`, added exam URL to `js/app.js`
 - **Commit:** `Add GH-200 GitHub Actions Certification exam (50 questions)`
 
 ---

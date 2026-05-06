@@ -384,6 +384,7 @@ export class QuizApp {
             'sc-500': 'https://learn.microsoft.com/en-us/credentials/certifications/exams/sc-500/',
             // GitHub
             'gh-300': 'https://docs.github.com/en/get-started/showcase-your-expertise-with-github-certifications',
+            'gh-200': 'https://docs.github.com/en/get-started/showcase-your-expertise-with-github-certifications',
             // Databricks
             'db-genai': 'https://www.databricks.com/resources/learn/training/generative-ai-fundamentals',
             'db-ml': 'https://www.databricks.com/learn/certification/machine-learning-associate',
