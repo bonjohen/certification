@@ -86,15 +86,15 @@ Open  -->  Started  -->  Completed
 
 | Task | Status | Started (PST) | Completed (PST) | Description |
 |------|--------|---------------|------------------|-------------|
-| 2.1 | Open | | | Create `data/azure/dp-600.xml` — 50 questions covering Microsoft Fabric, data lakehouse, data pipelines, dataflows, semantic models, Power BI integration, data warehousing, real-time analytics, OneLake, data governance |
-| 2.2 | Open | | | `azure.html` — Convert DP-600 coming-soon `<div>` to active `<a href="quiz.html?exam=dp-600" class="exam-card new-exam">`, update meta to "50 Questions / Associate" |
-| 2.3 | Open | | | `js/app.js` — Add `'dp-600'` to `examUrls` map |
-| 2.4 | Open | | | Run `node scripts/validate-xml.js` on new file |
-| 2.5 | Open | | | Stage and commit |
+| 2.1 | Completed | 2026-05-05 09:08 AM | 2026-05-05 09:15 AM | Create `data/azure/dp-600.xml` — 50 questions covering Microsoft Fabric, data lakehouse, data pipelines, dataflows, semantic models, Power BI integration, data warehousing, real-time analytics, OneLake, data governance |
+| 2.2 | Completed | 2026-05-05 09:15 AM | 2026-05-05 09:16 AM | `azure.html` — Convert DP-600 coming-soon `<div>` to active `<a href="quiz.html?exam=dp-600" class="exam-card new-exam">`, update meta to "50 Questions / Associate" |
+| 2.3 | Completed | 2026-05-05 09:16 AM | 2026-05-05 09:16 AM | `js/app.js` — Add `'dp-600'` to `examUrls` map |
+| 2.4 | Completed | 2026-05-05 09:16 AM | 2026-05-05 09:17 AM | Run `node scripts/validate-xml.js` on new file |
+| 2.5 | Completed | 2026-05-05 09:17 AM | 2026-05-05 09:17 AM | Stage and commit |
 
 ### Phase 2 Summary
 
-- **Changes:** TBD
+- **Changes:** Created `data/azure/dp-600.xml` (50 questions), activated card in `azure.html`, added exam URL to `js/app.js`
 - **Commit:** `Add DP-600 Fabric Analytics Engineer Associate exam (50 questions)`
 
 ---

@@ -364,6 +364,7 @@ export class QuizApp {
             'az-400': 'https://learn.microsoft.com/en-us/credentials/certifications/exams/az-400/',
             'az-500': 'https://learn.microsoft.com/en-us/credentials/certifications/exams/az-500/',
             'dp-900': 'https://learn.microsoft.com/en-us/credentials/certifications/exams/dp-900/',
+            'dp-600': 'https://learn.microsoft.com/en-us/credentials/certifications/exams/dp-600/',
             'ai-900': 'https://learn.microsoft.com/en-us/credentials/certifications/exams/ai-900/',
             // GCP certifications
             'cloud-data-engineer': 'https://cloud.google.com/learn/certification/data-engineer',
