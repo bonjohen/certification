@@ -15,12 +15,20 @@ Open  ──>  Started  ──>  Completed
 - **Completed**: Done and verified. Record the completion datetime (PST).
 - **Blocked**: Cannot proceed; note the blocker in the description.
 
+### Phase Start Protocol
+
+1. Run `/compact atlas redesign phase N` to reclaim context.
+2. Read `docs/startup.md` to reload project context.
+3. Read the plan file to find the next Open phase.
+4. Begin work on the first Open row.
+
 ### Commit Protocol
 
 1. Work through all tasks in a phase.
 2. When every task reaches Completed, write the Phase Summary.
-3. Stage and commit all changes for the phase. Do not push.
-4. Proceed immediately to the next phase.
+3. Update `docs/startup.md` with any new information discovered during the phase (new constraints, gotchas, file changes, token additions, etc.) so the next phase start has accurate context.
+4. Stage and commit all changes for the phase (including the updated startup.md). Do not push.
+5. Proceed immediately to the next phase (starting with the Phase Start Protocol).
 
 ## Technology Stack (Additive)
 
@@ -41,15 +49,15 @@ Open  ──>  Started  ──>  Completed
 
 | # | Status | Started (PST) | Completed (PST) | Description |
 |---|--------|---------------|------------------|-------------|
-| 1.1 | Open | | | Add missing provider colors to `system/tokens.css`: `--p-github: #1F2328`, `--p-databricks: #FF3621`, `--p-nvidia: #76B900`, `--p-isc2: #003366` |
-| 1.2 | Open | | | Rebuild `index.html` using Atlas system: site-nav, hero with display title + stats, 5-column provider grid (.pcard pattern from redesign deck), theme toggle, responsive breakpoints |
-| 1.3 | Open | | | Verify: all 10 provider cards link correctly, dark mode works, responsive at 768px/480px |
-| 1.4 | Open | | | Stage and commit Phase 1 |
+| 1.1 | Completed | 2026-05-06 03:45 PM | 2026-05-06 03:47 PM | Add missing provider colors to `system/tokens.css`: `--p-github: #1F2328`, `--p-databricks: #FF3621`, `--p-nvidia: #76B900`, `--p-isc2: #003366` |
+| 1.2 | Completed | 2026-05-06 03:47 PM | 2026-05-06 03:52 PM | Rebuild `index.html` using Atlas system: site-nav, hero with display title + stats, 5-column provider grid (.pcard pattern from redesign deck), theme toggle, responsive breakpoints |
+| 1.3 | Completed | 2026-05-06 03:52 PM | 2026-05-06 03:54 PM | Verify: all 10 provider cards link correctly, dark mode works, responsive at 768px/480px |
+| 1.4 | Started | 2026-05-06 03:54 PM | | Stage and commit Phase 1 |
 
 ### Phase 1 Summary
 
-- **Changes:** TBD
-- **Changes hosted at:** TBD
+- **Changes:** Added 4 missing provider color tokens (github, databricks, nvidia, isc2) to `system/tokens.css` and pchip selectors to `system/system.css`. Rebuilt `index.html` with Atlas site-nav, hero with stats, 5-column provider grid (10 cards), theme toggle, and responsive breakpoints at 768px/480px.
+- **Changes hosted at:** `index.html`, `system/tokens.css`, `system/system.css`
 - **Commit:** `Port landing page to Atlas design system with provider grid`
 
 ---

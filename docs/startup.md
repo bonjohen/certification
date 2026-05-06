@@ -2,15 +2,21 @@
 
 Read this if you're resuming the Atlas redesign rollout after a `/clear` or new session.
 
+## How This Document Is Used
+
+- **At the start of each phase:** After running `/compact`, read this file to reload project context before beginning work.
+- **Before each commit:** Update this file with anything learned during the phase — new constraints, gotchas, file changes, token additions, corrections to assumptions. This keeps it accurate for the next session.
+- **This file is committed with every phase.** It is a living document, not a static reference.
+
 ## What This Is
 
 A multi-provider certification exam study site being redesigned under the "Atlas" design system. The site serves browser-based practice quizzes backed by JSON question banks. 10 providers, ~50 exams, ~2500 questions.
 
 ## Current State
 
-- **azure.html** and **quiz.html** are already rebuilt with Atlas styling (the reference implementations)
-- **9 provider pages** + **index.html** + **results.html** still use the legacy `css/styles.css`
-- The design system files are complete and committed: `system/tokens.css` (114 lines) + `system/system.css` (302 lines)
+- **azure.html**, **quiz.html**, and **index.html** are rebuilt with Atlas styling
+- **9 provider pages** + **results.html** still use the legacy `css/styles.css`
+- The design system files are complete and committed: `system/tokens.css` (118 lines) + `system/system.css` (306 lines)
 - The JS engine (`js/app.js`, `js/quiz-engine.js`, `js/progress-tracker.js`, `js/exam-loader.js`) is unchanged by this work — it uses element IDs, not CSS classes
 
 ## Key Files
@@ -39,10 +45,11 @@ Every provider page follows the same template (azure.html):
 ```
 --p-aws: #FF9900      --p-azure: #0078D4     --p-gcp: #4285F4
 --p-cisco: #1BA0D7    --p-anthropic: #D97757  --p-comptia: #C8202F
---p-pmi: #0F4C97      --p-isaca: #0E5FA4
+--p-pmi: #0F4C97      --p-isaca: #0E5FA4     --p-github: #1F2328
+--p-databricks: #FF3621  --p-nvidia: #76B900  --p-isc2: #003366
 ```
 
-Note: tokens.css doesn't have variables for github, databricks, nvidia, isc2. These need to be added or handled inline.
+All 12 provider colors are now in tokens.css.
 
 ## Badge States
 
