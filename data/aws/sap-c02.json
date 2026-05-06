@@ -1,0 +1,2474 @@
+{
+  "version": "1.0",
+  "metadata": {
+    "examCode": "SAP-C02",
+    "examTitle": "AWS Certified Solutions Architect - Professional",
+    "provider": "Amazon Web Services",
+    "description": "Scenario-Based Study Guide for SAP-C02 certification - validates advanced skills in designing distributed systems and architectures on AWS, covering networking, security, cost optimization, migration, and multi-account strategies.",
+    "totalQuestions": 50,
+    "createdDate": "2026-05-05",
+    "lastModified": "2026-05-05T00:00:00Z",
+    "categories": {
+      "cat-design": "Design for Organizational Complexity",
+      "cat-new-solutions": "Design for New Solutions",
+      "cat-migration": "Migration Planning",
+      "cat-cost": "Cost Control",
+      "cat-continuous": "Continuous Improvement"
+    }
+  },
+  "questions": [
+    {
+      "id": 1,
+      "categoryRef": "cat-design",
+      "difficulty": "advanced",
+      "title": "Multi-Account Strategy",
+      "scenario": "A global enterprise is consolidating 50 AWS accounts acquired through mergers. They need centralized security policies, consolidated billing, and the ability to isolate workloads by business unit while sharing common services like DNS and logging.",
+      "questionText": "Which combination of services provides the best foundation for this multi-account strategy?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "A single account with IAM policies per business unit and VPC isolation"
+        },
+        {
+          "letter": "B",
+          "text": "AWS Organizations with SCPs, AWS Control Tower, and AWS RAM for shared resources"
+        },
+        {
+          "letter": "C",
+          "text": "Separate accounts with manual cross-account IAM roles and no centralized governance"
+        },
+        {
+          "letter": "D",
+          "text": "AWS Organizations with consolidated billing only and per-account security management"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Think about which services provide both governance at scale and resource sharing across accounts."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "AWS Organizations with Service Control Policies (SCPs) provides centralized governance. Control Tower adds automated account provisioning with guardrails. AWS Resource Access Manager (RAM) enables sharing of resources like Transit Gateway, subnets, and Route 53 Resolver rules across accounts without duplication."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>SCPs are preventive controls that limit what actions are available in member accounts regardless of IAM permissions.</li>\n              <li>Control Tower provides a landing zone with pre-configured multi-account structure, mandatory and elective guardrails.</li>\n              <li>RAM supports sharing of VPC subnets, Transit Gateways, License Manager configurations, and Route 53 Resolver rules.</li>\n              <li>This pattern follows the AWS multi-account strategy best practice of separating workloads for blast radius reduction.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Organizations",
+        "Multi-Account",
+        "Governance"
+      ]
+    },
+    {
+      "id": 2,
+      "categoryRef": "cat-new-solutions",
+      "difficulty": "advanced",
+      "title": "Global Application Routing",
+      "scenario": "A company runs a latency-sensitive trading application deployed in us-east-1 and eu-west-1. Users in Asia-Pacific experience 300ms+ latency. The architecture must route users to the nearest healthy region and failover within 30 seconds if a region goes down.",
+      "questionText": "Which architecture provides sub-30-second failover with optimal latency for global users?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "CloudFront with regional origin failover groups"
+        },
+        {
+          "letter": "B",
+          "text": "Route 53 latency-based routing with health checks set to 10-second intervals and 2 failure threshold"
+        },
+        {
+          "letter": "C",
+          "text": "Application Load Balancer with cross-region target groups"
+        },
+        {
+          "letter": "D",
+          "text": "Global Accelerator with endpoint groups in each region and health check threshold of 3"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Consider which service provides static anycast IPs and can failover traffic without DNS propagation delays."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "AWS Global Accelerator uses the AWS global network with static anycast IP addresses. It routes traffic to the nearest healthy endpoint and can failover in seconds (not dependent on DNS TTL). With health checks at 10-second intervals and a threshold of 3, failover occurs within 30 seconds. Route 53 depends on DNS TTL which can cause delays beyond 30 seconds."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Global Accelerator routes traffic over the AWS backbone network, reducing internet hops and improving latency by up to 60%.</li>\n              <li>Unlike Route 53, failover does not depend on DNS cache expiration at client resolvers.</li>\n              <li>ALB does not support cross-region target groups natively.</li>\n              <li>CloudFront is optimized for cacheable content, not real-time trading applications requiring persistent connections.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Global Accelerator",
+        "High Availability",
+        "Latency"
+      ]
+    },
+    {
+      "id": 3,
+      "categoryRef": "cat-migration",
+      "difficulty": "advanced",
+      "title": "Database Migration Strategy",
+      "scenario": "A company is migrating a 20TB Oracle database with complex PL/SQL stored procedures to AWS. The application has a maximum downtime window of 4 hours. The database uses Oracle-specific features like materialized views, database links, and advanced queuing.",
+      "questionText": "Which migration strategy minimizes risk while meeting the downtime requirement?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Lift-and-shift to Oracle on EC2 first, then modernize to Aurora in a subsequent phase"
+        },
+        {
+          "letter": "B",
+          "text": "Use AWS DMS with Schema Conversion Tool to migrate directly to Aurora PostgreSQL"
+        },
+        {
+          "letter": "C",
+          "text": "Use AWS DMS homogeneous migration to RDS Oracle, then replatform later"
+        },
+        {
+          "letter": "D",
+          "text": "Rebuild the application using Aurora Serverless and rewrite all stored procedures"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "With complex Oracle-specific features and tight downtime, consider a phased approach that reduces risk."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "A lift-and-shift to Oracle on EC2 preserves all Oracle-specific features (PL/SQL, materialized views, database links, advanced queuing) unchanged, minimizing migration risk and meeting the 4-hour window. Modernization to Aurora can happen in a subsequent phase with proper testing. Direct migration to PostgreSQL would require rewriting PL/SQL and potentially breaking functionality."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>The 6 Rs of migration: Rehost (lift-and-shift), Replatform, Repurchase, Refactor, Retire, Retain.</li>\n              <li>Oracle-specific features like database links, advanced queuing (AQ), and complex PL/SQL have no direct PostgreSQL equivalents.</li>\n              <li>AWS DMS supports ongoing replication for the cutover, keeping downtime within the 4-hour window for 20TB.</li>\n              <li>This two-phase approach follows the strangler fig pattern for database modernization.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Migration",
+        "Database",
+        "Oracle"
+      ]
+    },
+    {
+      "id": 4,
+      "categoryRef": "cat-cost",
+      "difficulty": "advanced",
+      "title": "Reserved Instance Strategy",
+      "scenario": "A company runs 200 m5.xlarge instances across 10 accounts in an AWS Organization. Usage is steady at 150 instances during business hours (12 hours/day) and 80 instances overnight. They want to optimize costs while maintaining flexibility for occasional spikes to 250 instances.",
+      "questionText": "Which purchasing strategy provides the best cost optimization?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Purchase 200 Reserved Instances to cover peak business-hours demand"
+        },
+        {
+          "letter": "B",
+          "text": "Purchase 80 Reserved Instances for baseline, use Savings Plans for 70 more, On-Demand for spikes"
+        },
+        {
+          "letter": "C",
+          "text": "Use only Compute Savings Plans for 150 instances"
+        },
+        {
+          "letter": "D",
+          "text": "Purchase 150 Reserved Instances and use Spot for overnight and spike capacity"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Consider the steady baseline versus variable demand and which pricing models best address each tier."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Purchasing 150 RIs covers the consistent business-hours baseline at maximum discount (up to 72% off). Spot Instances are ideal for the overnight workload (since reduced capacity is acceptable) and can handle spikes at up to 90% discount. The overnight 80 instances are still covered by the 150 RIs. Spikes beyond 150 use Spot with On-Demand fallback."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>RI benefits apply across an Organization with consolidated billing enabled (shared RIs).</li>\n              <li>3-year All Upfront RIs provide up to 72% savings versus On-Demand.</li>\n              <li>Spot Instances provide up to 90% discount but can be interrupted with 2-minute notice.</li>\n              <li>The combination of RIs for baseline + Spot for variable creates the optimal cost curve for this usage pattern.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Cost Optimization",
+        "Reserved Instances",
+        "Spot"
+      ]
+    },
+    {
+      "id": 5,
+      "categoryRef": "cat-continuous",
+      "difficulty": "advanced",
+      "title": "Disaster Recovery Architecture",
+      "scenario": "A healthcare company must achieve an RPO of 15 minutes and RTO of 1 hour for their patient records system. The primary region is us-east-1. They currently use Aurora MySQL with a 5TB database and an EKS cluster running 30 microservices.",
+      "questionText": "Which DR strategy meets the RPO/RTO requirements most cost-effectively?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Multi-site active-active with Aurora Global Database and EKS in both regions"
+        },
+        {
+          "letter": "B",
+          "text": "Pilot light with Aurora read replica in us-west-2 and EKS node group scaled to zero"
+        },
+        {
+          "letter": "C",
+          "text": "Backup and restore with automated Aurora snapshots copied cross-region every 15 minutes"
+        },
+        {
+          "letter": "D",
+          "text": "Warm standby with Aurora Global Database in us-west-2 and EKS cluster at 20% capacity"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Match the DR tier to the RPO/RTO requirements — which tier provides 15-min RPO and 1-hour RTO without over-provisioning?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Warm standby provides a scaled-down but functional copy of the production environment. Aurora Global Database replicates with less than 1-second lag (well within 15-min RPO). EKS at 20% capacity can scale up within the 1-hour RTO window. Active-active exceeds requirements and costs significantly more. Pilot light (scaled to zero) may not meet the 1-hour RTO for 30 microservices."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>DR tiers: Backup/Restore (hours RTO) &lt; Pilot Light (tens of minutes) &lt; Warm Standby (minutes) &lt; Active-Active (near-zero).</li>\n              <li>Aurora Global Database provides cross-region replication with typical lag under 1 second.</li>\n              <li>EKS Cluster Autoscaler or Karpenter can scale from 20% to 100% within 10-15 minutes.</li>\n              <li>Healthcare workloads (HIPAA) require documented DR plans with tested failover procedures.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Disaster Recovery",
+        "Aurora Global",
+        "EKS"
+      ]
+    },
+    {
+      "id": 6,
+      "categoryRef": "cat-design",
+      "difficulty": "advanced",
+      "title": "Transit Gateway Architecture",
+      "scenario": "An enterprise has 15 VPCs across 3 AWS accounts — 5 production VPCs, 5 development VPCs, and 5 shared-services VPCs. They need full connectivity between production and shared-services VPCs, between development and shared-services VPCs, but NO connectivity between production and development VPCs.",
+      "questionText": "Which Transit Gateway configuration achieves this segmentation?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Single Transit Gateway with three route tables: production, development, and shared-services, with appropriate route propagation"
+        },
+        {
+          "letter": "B",
+          "text": "Two Transit Gateways — one for production-to-shared and one for development-to-shared"
+        },
+        {
+          "letter": "C",
+          "text": "Single Transit Gateway with a single route table and NACLs to block production-to-development traffic"
+        },
+        {
+          "letter": "D",
+          "text": "VPC peering between each VPC pair that needs connectivity"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Transit Gateway route tables enable network segmentation — think about how route propagation controls which VPCs can communicate."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "A single Transit Gateway with multiple route tables provides network segmentation. The production route table propagates routes from production and shared-services VPCs only. The development route table propagates from development and shared-services VPCs only. The shared-services route table propagates from all VPCs. This ensures production and development cannot reach each other while both can reach shared services."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Each VPC attachment is associated with exactly one route table but can propagate its routes to multiple route tables.</li>\n              <li>This pattern is called \"shared services\" or \"hub-and-spoke with isolation\" in AWS networking.</li>\n              <li>VPC peering does not scale well beyond 10-15 VPCs (N*(N-1)/2 peering connections).</li>\n              <li>Transit Gateway supports up to 5,000 attachments and inter-region peering.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Transit Gateway",
+        "Network Segmentation",
+        "VPC"
+      ]
+    },
+    {
+      "id": 7,
+      "categoryRef": "cat-new-solutions",
+      "difficulty": "advanced",
+      "title": "Event-Driven Architecture",
+      "scenario": "An e-commerce platform processes 10,000 orders per minute during flash sales. Each order triggers inventory updates, payment processing, shipping label generation, and email notifications. The current synchronous architecture causes timeouts during peak load and any downstream failure causes the entire order to fail.",
+      "questionText": "Which architecture decouples these operations while ensuring no orders are lost?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Step Functions workflow orchestrating all four operations in parallel"
+        },
+        {
+          "letter": "B",
+          "text": "SNS topic with SQS queues for each downstream service, with dead-letter queues for failures"
+        },
+        {
+          "letter": "C",
+          "text": "EventBridge with rules routing to Lambda functions for each operation"
+        },
+        {
+          "letter": "D",
+          "text": "Kinesis Data Streams with separate consumers for each downstream service"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Consider fan-out patterns that decouple producers from consumers and handle failures independently per service."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "SNS-to-SQS fan-out publishes each order once to an SNS topic, which delivers to multiple SQS queues (one per downstream service). Each service processes independently — a payment failure does not block shipping label generation. Dead-letter queues capture failed messages for retry. SQS provides at-least-once delivery guaranteeing no orders are lost, and each queue buffers during spikes."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>SNS-to-SQS fan-out supports up to 12.5 million publishes per second per topic.</li>\n              <li>SQS Standard queues provide nearly unlimited throughput with at-least-once delivery.</li>\n              <li>Dead-letter queues with redrive policies enable automated retry after investigation.</li>\n              <li>Step Functions adds orchestration overhead and has a 25,000 state transitions/second soft limit per account.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Event-Driven",
+        "SNS",
+        "SQS",
+        "Decoupling"
+      ]
+    },
+    {
+      "id": 8,
+      "categoryRef": "cat-design",
+      "difficulty": "advanced",
+      "title": "Cross-Account Access Pattern",
+      "scenario": "A central security team needs to run AWS Config rules and SecurityHub findings across 200 member accounts in an Organization. They must aggregate findings in a single security account, deploy Config rules from a central location, and ensure member accounts cannot disable the security controls.",
+      "questionText": "Which approach provides centralized security governance that member accounts cannot override?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "CloudFormation StackSets deploying Config rules with termination protection"
+        },
+        {
+          "letter": "B",
+          "text": "Cross-account IAM roles in each member account that the security team assumes manually"
+        },
+        {
+          "letter": "C",
+          "text": "AWS Config aggregator with manual rule deployment in each account"
+        },
+        {
+          "letter": "D",
+          "text": "Delegated administrator for SecurityHub and Config with Organization-level SCPs preventing member account modifications"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Think about which combination provides both centralized deployment and preventive controls against tampering."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Delegated administrator accounts can manage SecurityHub and Config organization-wide, deploying rules and aggregating findings centrally. SCPs attached at the OU or root level prevent member accounts from disabling Config recording, removing SecurityHub, or modifying the delegated admin configuration. This combination provides both enforcement and visibility without relying on member account cooperation."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Delegated admin is supported by SecurityHub, Config, GuardDuty, Firewall Manager, and other services.</li>\n              <li>SCPs like denying config:StopConfigurationRecorder and securityhub:DisableSecurityHub prevent tampering.</li>\n              <li>Organization-level Config rules automatically deploy to new accounts when they join the Organization.</li>\n              <li>StackSets with service-managed permissions auto-deploy to new accounts but can be circumvented without SCPs.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Security",
+        "Organizations",
+        "Config"
+      ]
+    },
+    {
+      "id": 9,
+      "categoryRef": "cat-new-solutions",
+      "difficulty": "advanced",
+      "title": "Serverless Data Lake",
+      "scenario": "A media company ingests 5TB of clickstream data daily from their streaming platform. They need to run ad-hoc queries for analytics, build ML models on viewing patterns, and provide near-real-time dashboards for content recommendations. Data must be queryable within 5 minutes of generation.",
+      "questionText": "Which architecture meets the near-real-time ingestion and multi-purpose query requirements?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Kinesis Data Streams to Redshift Streaming Ingestion, with Redshift ML for modeling"
+        },
+        {
+          "letter": "B",
+          "text": "Direct S3 PUT from applications, with Redshift Spectrum for queries and SageMaker for ML"
+        },
+        {
+          "letter": "C",
+          "text": "Kinesis Data Streams to S3 via Firehose, with Athena for ad-hoc queries and SageMaker for ML"
+        },
+        {
+          "letter": "D",
+          "text": "MSK (Kafka) to EMR for processing, with Redshift for queries and SageMaker for ML"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Which combination provides sub-5-minute data availability with serverless querying and ML integration?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Kinesis Data Firehose can deliver data to S3 with buffering as low as 60 seconds, meeting the 5-minute requirement. Data lands in S3 (the data lake), where Athena provides serverless ad-hoc queries and SageMaker can directly access it for ML training. This is fully serverless with no cluster management. Firehose handles the conversion to Parquet/ORC for optimal query performance."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Firehose supports dynamic partitioning, Parquet/ORC conversion, and data transformation via Lambda.</li>\n              <li>Athena uses Presto/Trino engine and charges per TB scanned — columnar formats reduce cost by 30-90%.</li>\n              <li>SageMaker Pipe mode can stream directly from S3 for training without copying data.</li>\n              <li>The Lake Formation layer adds fine-grained access control across Athena and SageMaker.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Data Lake",
+        "Kinesis",
+        "Serverless"
+      ]
+    },
+    {
+      "id": 10,
+      "categoryRef": "cat-migration",
+      "difficulty": "advanced",
+      "title": "Hybrid DNS Architecture",
+      "scenario": "A company is migrating to AWS over 18 months. During migration, some services remain on-premises while others move to AWS. Both environments must resolve each other's private DNS names. The on-premises DNS uses Microsoft Active Directory DNS. AWS VPCs use Route 53 private hosted zones.",
+      "questionText": "Which architecture enables bidirectional DNS resolution between on-premises and AWS?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "DHCP option sets pointing VPC instances to on-premises DNS servers over VPN"
+        },
+        {
+          "letter": "B",
+          "text": "Route 53 Resolver with inbound endpoints (for on-prem to resolve AWS names) and outbound endpoints with forwarding rules (for AWS to resolve on-prem names)"
+        },
+        {
+          "letter": "C",
+          "text": "Route 53 public hosted zones with split-horizon DNS configuration"
+        },
+        {
+          "letter": "D",
+          "text": "EC2-hosted BIND DNS servers acting as forwarders in both directions"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Route 53 Resolver endpoints are purpose-built for hybrid DNS — one type for each direction of resolution."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Route 53 Resolver inbound endpoints accept DNS queries from on-premises networks (forwarded by AD DNS conditional forwarders) and resolve them against Route 53 private hosted zones. Outbound endpoints forward DNS queries from VPC resources to on-premises DNS servers based on forwarding rules. This provides native, managed bidirectional resolution without self-managed DNS infrastructure."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Inbound endpoints provide IP addresses in VPC subnets that on-premises DNS can forward to.</li>\n              <li>Outbound endpoints forward queries matching specific domains (e.g., corp.example.com) to on-premises DNS IPs.</li>\n              <li>Resolver rules can be shared across accounts using AWS RAM.</li>\n              <li>Each endpoint supports up to 10,000 queries per second per IP address.</li></ul>"
+        }
+      ],
+      "tags": [
+        "DNS",
+        "Hybrid",
+        "Route 53 Resolver"
+      ]
+    },
+    {
+      "id": 11,
+      "categoryRef": "cat-cost",
+      "difficulty": "advanced",
+      "title": "Data Transfer Cost Optimization",
+      "scenario": "A company spends $50,000/month on data transfer between us-east-1 and eu-west-1. They replicate a 100TB data warehouse hourly and serve API responses to European users from US-based services. The data warehouse uses Redshift and the APIs run on ECS behind an ALB.",
+      "questionText": "Which combination reduces cross-region data transfer costs the most?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Use AWS PrivateLink for all cross-region communication"
+        },
+        {
+          "letter": "B",
+          "text": "Use S3 Cross-Region Replication with lifecycle policies and VPC endpoints"
+        },
+        {
+          "letter": "C",
+          "text": "Enable Redshift cross-region snapshots and restore in eu-west-1 daily instead of hourly"
+        },
+        {
+          "letter": "D",
+          "text": "Deploy Redshift in eu-west-1 and replicate only changed data, use CloudFront for API responses to European users"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Attack the two biggest cost drivers: full hourly replication and API responses crossing the Atlantic."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Deploying Redshift in eu-west-1 with incremental replication (only changed data) dramatically reduces the hourly 100TB replication to just deltas. CloudFront caches API responses at European edge locations, eliminating repeated cross-region API calls. Together these address both major cost drivers. PrivateLink does not reduce cross-region transfer costs — it changes the routing but not the pricing."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Cross-region data transfer costs $0.02/GB (us-east-1 to eu-west-1), so 100TB/hour = $2,000/hour if fully replicated.</li>\n              <li>Redshift data sharing or RA3 nodes with managed storage can enable cross-region data sharing without full replication.</li>\n              <li>CloudFront data transfer to the internet is cheaper than direct from ALB ($0.085/GB vs $0.09/GB in EU) plus caching reduces origin fetches.</li>\n              <li>VPC endpoints reduce NAT Gateway costs but not cross-region transfer costs.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Cost Optimization",
+        "Data Transfer",
+        "Cross-Region"
+      ]
+    },
+    {
+      "id": 12,
+      "categoryRef": "cat-continuous",
+      "difficulty": "advanced",
+      "title": "Blue-Green Deployment Strategy",
+      "scenario": "A financial services company runs a mission-critical trading platform on EKS. They deploy updates weekly but recent deployments caused 5-minute outages during rollback. They need zero-downtime deployments with instant rollback capability and the ability to test with a subset of production traffic before full cutover.",
+      "questionText": "Which deployment strategy provides zero-downtime with instant rollback and traffic shifting?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "AWS App Mesh with virtual routers for weighted traffic shifting between blue and green EKS services"
+        },
+        {
+          "letter": "B",
+          "text": "EKS rolling update with readiness probes and PodDisruptionBudgets"
+        },
+        {
+          "letter": "C",
+          "text": "ALB weighted target groups with two EKS node groups and DNS failover"
+        },
+        {
+          "letter": "D",
+          "text": "CodeDeploy with ECS blue-green deployment type and automatic rollback triggers"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Which service provides fine-grained traffic splitting at the service mesh level with instant weight changes?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "AWS App Mesh provides a service mesh with virtual routers that can split traffic by weight between virtual nodes (blue and green service versions). Traffic shifting is instant (no DNS propagation), supports canary patterns (1% then 5% then 25% then 100%), and rollback is simply shifting weight back to 0% on the new version. This works at the application layer within EKS without changing the load balancer configuration."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>App Mesh uses Envoy sidecar proxies for traffic management, providing L7 routing and observability.</li>\n              <li>Virtual router route configurations can be updated via API in milliseconds for instant rollback.</li>\n              <li>Circuit breakers and outlier detection in App Mesh can automatically shift traffic away from unhealthy versions.</li>\n              <li>Alternative: Istio on EKS provides similar capabilities but with higher operational complexity.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Deployment",
+        "App Mesh",
+        "EKS"
+      ]
+    },
+    {
+      "id": 13,
+      "categoryRef": "cat-design",
+      "difficulty": "advanced",
+      "title": "Encryption Key Management",
+      "scenario": "A multinational bank stores customer data across 5 AWS regions. Regulatory requirements mandate that encryption keys for EU customer data must never leave the EU, keys must be rotated annually, and the bank must maintain full control over key material (not AWS). They also need to encrypt data at rest in S3, RDS, and EBS.",
+      "questionText": "Which KMS configuration satisfies these regulatory requirements?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "AWS KMS with multi-Region keys spanning all 5 regions"
+        },
+        {
+          "letter": "B",
+          "text": "Client-side encryption with keys stored in AWS Secrets Manager in EU regions"
+        },
+        {
+          "letter": "C",
+          "text": "AWS KMS with imported key material and automatic annual rotation enabled"
+        },
+        {
+          "letter": "D",
+          "text": "AWS CloudHSM clusters in EU regions with KMS custom key stores, single-Region keys only"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "The requirement for full control over key material and EU-only residency points to a specific KMS backing option."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "AWS CloudHSM provides hardware security modules where the bank controls the key material (AWS has no access). KMS custom key stores back KMS keys with CloudHSM, allowing use with S3, RDS, and EBS through standard KMS integration. Deploying CloudHSM clusters only in EU regions ensures keys never leave the EU. Single-Region KMS keys (not multi-Region) prevent key replication outside the EU."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>CloudHSM is FIPS 140-2 Level 3 validated; AWS KMS HSMs are Level 2 (Level 3 in some regions).</li>\n              <li>Custom key stores connect KMS to CloudHSM, enabling all AWS services that integrate with KMS to use CloudHSM-backed keys.</li>\n              <li>Multi-Region keys would violate the EU-only residency requirement by replicating key material.</li>\n              <li>Imported key material in KMS does not support automatic rotation — manual rotation is required.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Encryption",
+        "CloudHSM",
+        "KMS",
+        "Compliance"
+      ]
+    },
+    {
+      "id": 14,
+      "categoryRef": "cat-new-solutions",
+      "difficulty": "advanced",
+      "title": "Container Orchestration at Scale",
+      "scenario": "A SaaS company runs 500 microservices with highly variable load. Some services scale from 2 to 200 pods in minutes during peak. They need to minimize node provisioning latency, avoid paying for idle compute, and support both x86 and Graviton instances for cost optimization.",
+      "questionText": "Which EKS scaling approach minimizes both provisioning latency and idle cost?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Cluster Autoscaler with multiple node groups per instance type and overprovisioning pods"
+        },
+        {
+          "letter": "B",
+          "text": "Karpenter with provisioners specifying both x86 and Graviton instance families and consolidation enabled"
+        },
+        {
+          "letter": "C",
+          "text": "Fargate profiles for all workloads to eliminate node management entirely"
+        },
+        {
+          "letter": "D",
+          "text": "Managed node groups with predictive scaling based on CloudWatch metrics"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Which Kubernetes autoscaler can provision diverse instance types on-demand and remove underutilized nodes automatically?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Karpenter provisions right-sized nodes directly from EC2 fleet (not pre-defined node groups), launching instances in under 60 seconds. Provisioners can specify both x86 (m5, c5) and Graviton (m6g, c6g) families, and Karpenter selects the best fit based on pending pod requirements. Consolidation mode automatically replaces underutilized nodes with smaller ones, minimizing idle cost. Cluster Autoscaler is limited to pre-defined node groups and scales more slowly."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Karpenter provisions nodes in 30-60 seconds vs 3-5 minutes for Cluster Autoscaler with new node groups.</li>\n              <li>Consolidation detects when pods could fit on fewer/smaller nodes and gracefully migrates them.</li>\n              <li>Graviton instances offer 20-40% better price-performance than equivalent x86 for most workloads.</li>\n              <li>Fargate adds 30-60 seconds of scheduling latency per pod and costs 20-40% more than EC2 equivalent.</li></ul>"
+        }
+      ],
+      "tags": [
+        "EKS",
+        "Karpenter",
+        "Autoscaling"
+      ]
+    },
+    {
+      "id": 15,
+      "categoryRef": "cat-migration",
+      "difficulty": "advanced",
+      "title": "Large-Scale Data Migration",
+      "scenario": "A company needs to migrate 2PB of archival data from an on-premises tape library to S3 Glacier Deep Archive. Their internet connection is 10 Gbps but is fully utilized by production traffic. The migration must complete within 6 months and data must be encrypted in transit and at rest.",
+      "questionText": "Which migration approach meets the timeline and bandwidth constraints?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "AWS DataSync over the existing 10 Gbps connection during off-peak hours"
+        },
+        {
+          "letter": "B",
+          "text": "AWS Direct Connect dedicated 10 Gbps connection with DataSync"
+        },
+        {
+          "letter": "C",
+          "text": "Multiple AWS Snowball Edge devices in parallel with S3 lifecycle policies to transition to Glacier Deep Archive"
+        },
+        {
+          "letter": "D",
+          "text": "S3 Transfer Acceleration with multipart uploads from on-premises servers"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "2PB over 10 Gbps (even if available) would take months — consider offline transfer options designed for petabyte scale."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "AWS Snowball Edge devices each hold 80TB usable. For 2PB, approximately 25 devices running in parallel can transfer data via physical shipping. Each device encrypts data with KMS keys. Once ingested to S3, a lifecycle policy immediately transitions objects to Glacier Deep Archive. The existing network stays untouched. DataSync over 10 Gbps (if fully available) would take ~18 days for 2PB — but the link is already saturated by production."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Snowball Edge Storage Optimized: 80TB usable, 256-bit encryption, tamper-evident enclosure.</li>\n              <li>Typical Snowball turnaround: 1 week (ship + ingest + return). With 25 parallel devices rotated, 2PB in ~3-4 months.</li>\n              <li>S3 lifecycle rule: transition to Glacier Deep Archive on day 0 after upload (immediate transition).</li>\n              <li>For 2PB+, AWS Snowmobile (100PB truck) is also an option but has longer lead times and minimum engagement size.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Migration",
+        "Snowball",
+        "Data Transfer"
+      ]
+    },
+    {
+      "id": 16,
+      "categoryRef": "cat-cost",
+      "difficulty": "advanced",
+      "title": "Compute Right-Sizing",
+      "scenario": "A company's AWS bill analysis shows 40% of their EC2 instances average below 10% CPU utilization over the past 30 days. These include a mix of m5.2xlarge application servers, r5.xlarge database replicas, and c5.xlarge batch processing nodes. The team wants to reduce costs without impacting performance.",
+      "questionText": "Which approach provides the most accurate right-sizing recommendations while minimizing performance risk?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Use AWS Compute Optimizer recommendations and implement changes during the next maintenance window"
+        },
+        {
+          "letter": "B",
+          "text": "Immediately downsize all instances by one size (e.g., 2xlarge to xlarge) based on CPU metrics alone"
+        },
+        {
+          "letter": "C",
+          "text": "Migrate all low-utilization instances to burstable T3 instances with unlimited credits"
+        },
+        {
+          "letter": "D",
+          "text": "Terminate all instances below 10% utilization as they appear unused"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Which service analyzes multiple metrics (CPU, memory, network, disk) and considers workload patterns before recommending changes?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "AWS Compute Optimizer uses machine learning to analyze historical utilization across CPU, memory, network, and disk I/O — not just CPU. It provides specific instance type recommendations with projected performance risk ratings. Implementing during maintenance windows allows for validation. Downsizing based on CPU alone is risky as memory-optimized instances (r5) may have high memory utilization despite low CPU."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Compute Optimizer requires 30 hours minimum of CloudWatch metrics but performs best with 14 days of data.</li>\n              <li>It considers CPU, memory (via CloudWatch agent), network bandwidth, and disk IOPS/throughput.</li>\n              <li>Recommendations include risk levels: very low, low, medium, high — enabling graduated rollout.</li>\n              <li>For r5 instances, memory utilization from the CloudWatch agent is critical for accurate recommendations.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Cost Optimization",
+        "Compute Optimizer",
+        "Right-Sizing"
+      ]
+    },
+    {
+      "id": 17,
+      "categoryRef": "cat-continuous",
+      "difficulty": "advanced",
+      "title": "Observability Architecture",
+      "scenario": "A company runs 200 microservices across EKS and Lambda. They experience intermittent latency spikes that are difficult to diagnose because logs, metrics, and traces are in separate tools. They need correlated observability that links a slow API response to the specific downstream service call causing the delay.",
+      "questionText": "Which AWS-native observability stack provides correlated traces, metrics, and logs for both EKS and Lambda?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "CloudWatch Container Insights for EKS metrics, CloudWatch Logs for Lambda, and X-Ray for distributed tracing with trace-log correlation"
+        },
+        {
+          "letter": "B",
+          "text": "CloudWatch Application Insights with automatic anomaly detection across all services"
+        },
+        {
+          "letter": "C",
+          "text": "Third-party APM tool deployed as a DaemonSet on EKS with Lambda extensions"
+        },
+        {
+          "letter": "D",
+          "text": "CloudWatch Metrics with custom dashboards and CloudWatch Logs Insights queries"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Which combination provides the three pillars of observability (metrics, logs, traces) with native correlation between them?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Container Insights collects EKS metrics (pod, node, cluster level). CloudWatch Logs captures Lambda and EKS application logs. X-Ray provides distributed tracing across both EKS (via SDK/daemon) and Lambda (native integration). X-Ray trace IDs can be correlated with CloudWatch Logs using the trace ID field, linking a slow trace segment directly to the relevant log entries showing the root cause."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>X-Ray SDK automatically adds trace ID to log statements when using the AWS logging libraries.</li>\n              <li>CloudWatch ServiceLens combines X-Ray traces with CloudWatch metrics and logs in a unified view.</li>\n              <li>Lambda X-Ray integration requires only enabling \"Active tracing\" — no code changes needed.</li>\n              <li>OpenTelemetry Collector (ADOT) can send to X-Ray and CloudWatch simultaneously for EKS workloads.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Observability",
+        "X-Ray",
+        "CloudWatch"
+      ]
+    },
+    {
+      "id": 18,
+      "categoryRef": "cat-design",
+      "difficulty": "advanced",
+      "title": "API Gateway Architecture",
+      "scenario": "A company exposes 50 internal microservices to external partners via APIs. They need rate limiting per partner, API key management, request/response transformation, caching for read-heavy endpoints, and usage plans that bill partners based on API consumption. Peak traffic reaches 50,000 requests per second.",
+      "questionText": "Which API management architecture supports these requirements at scale?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Application Load Balancer with WAF rate limiting rules per IP"
+        },
+        {
+          "letter": "B",
+          "text": "API Gateway HTTP API with Lambda authorizers and CloudFront caching"
+        },
+        {
+          "letter": "C",
+          "text": "API Gateway REST API with usage plans, API keys, caching, and VPC Link to internal ALB"
+        },
+        {
+          "letter": "D",
+          "text": "CloudFront with Lambda@Edge for request transformation and origin caching"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Which API Gateway type natively supports usage plans, per-partner rate limiting, API keys, and built-in caching?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "API Gateway REST API (not HTTP API) provides usage plans with per-partner throttling and quota limits, API key management, built-in response caching (0.5GB to 237GB), and request/response mapping templates for transformation. VPC Link connects to internal services via NLB/ALB privately. HTTP API lacks usage plans, caching, and request transformation. REST API supports 10,000 RPS per account (soft limit, can be increased)."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>REST API usage plans support per-key throttle (rate + burst) and monthly quota — ideal for partner billing.</li>\n              <li>API Gateway caching reduces backend calls by serving cached responses for configurable TTLs (300s default).</li>\n              <li>VPC Link uses AWS PrivateLink (NLB endpoint) to reach private subnets without internet exposure.</li>\n              <li>For 50,000 RPS, a Regional REST API with edge-optimized distribution or CloudFront in front may be needed.</li></ul>"
+        }
+      ],
+      "tags": [
+        "API Gateway",
+        "Rate Limiting",
+        "Partner Management"
+      ]
+    },
+    {
+      "id": 19,
+      "categoryRef": "cat-new-solutions",
+      "difficulty": "advanced",
+      "title": "Multi-Region Active-Active",
+      "scenario": "A global e-commerce platform requires active-active deployment across us-east-1 and eu-west-1. Writes from either region must be visible in the other within 1 second. The application uses DynamoDB for product catalog (eventually consistent reads acceptable) and Aurora MySQL for order processing (strong consistency required for financial transactions).",
+      "questionText": "Which data layer architecture supports active-active writes with the consistency requirements for each workload?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "DynamoDB with cross-region replication via DynamoDB Streams and Lambda, Aurora multi-master"
+        },
+        {
+          "letter": "B",
+          "text": "DynamoDB Global Tables for both workloads with strong consistent reads"
+        },
+        {
+          "letter": "C",
+          "text": "Aurora Global Database for both workloads with managed planned failover"
+        },
+        {
+          "letter": "D",
+          "text": "DynamoDB Global Tables for product catalog, Aurora Global Database with write forwarding for orders"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Match each workload's consistency requirement to the service that best supports it in a multi-region active-active pattern."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "DynamoDB Global Tables provide active-active multi-region writes with sub-second replication — ideal for the product catalog where eventual consistency is acceptable. Aurora Global Database with write forwarding allows reads in both regions and forwards writes to the primary region — providing strong consistency for financial order transactions. True multi-master Aurora MySQL is not available; write forwarding is the closest active-active pattern."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>DynamoDB Global Tables replicate across regions in typically under 1 second with last-writer-wins conflict resolution.</li>\n              <li>Aurora write forwarding sends writes from secondary to primary region transparently — adds one round-trip latency.</li>\n              <li>Aurora Global Database provides sub-second replication for reads, and promotes secondaries in under 1 minute for failover.</li>\n              <li>For strict multi-region consistency without trade-offs, consider Amazon MemoryDB for Redis or CockroachDB/Spanner-style databases.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Multi-Region",
+        "DynamoDB Global Tables",
+        "Aurora Global"
+      ]
+    },
+    {
+      "id": 20,
+      "categoryRef": "cat-migration",
+      "difficulty": "advanced",
+      "title": "Application Modernization Strategy",
+      "scenario": "A company runs a monolithic Java application (2 million lines of code) on WebLogic servers. The application handles user authentication, order processing, inventory management, and reporting. They want to modernize to microservices but cannot afford more than 2 weeks of downtime for any individual component. The development team has 8 engineers.",
+      "questionText": "Which modernization approach balances risk, team capacity, and business continuity?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Full rewrite to microservices using a big-bang approach with feature parity testing"
+        },
+        {
+          "letter": "B",
+          "text": "Strangler fig pattern — extract one domain at a time starting with the least coupled component, routing traffic via API Gateway"
+        },
+        {
+          "letter": "C",
+          "text": "Use AWS App2Container to automatically decompose the monolith into microservices"
+        },
+        {
+          "letter": "D",
+          "text": "Containerize the monolith on ECS first, then decompose later when the team grows"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "With 8 engineers and 2M lines of code, consider the safest first step that delivers value without over-committing to decomposition."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Containerizing the monolith first (lift-and-shift to containers) provides immediate benefits: consistent deployment, scaling, resource efficiency — with minimal code changes and low risk. With only 8 engineers and 2M LOC, a strangler fig decomposition would take years and stretch the team thin. Containerization first establishes the deployment platform; decomposition can happen incrementally later as the team gains container expertise and grows."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>AWS App2Container can containerize Java/WebLogic apps with minimal changes — generates Dockerfile and ECS task definitions.</li>\n              <li>The monolith-in-a-container pattern provides: CI/CD pipeline, horizontal scaling, infrastructure as code benefits without decomposition risk.</li>\n              <li>Strangler fig is the right eventual pattern but premature decomposition with a small team leads to distributed monolith anti-pattern.</li>\n              <li>Martin Fowler's rule: \"Don't start with microservices\" unless you have a deep understanding of the domain boundaries.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Modernization",
+        "Containers",
+        "Microservices"
+      ]
+    },
+    {
+      "id": 21,
+      "categoryRef": "cat-design",
+      "difficulty": "advanced",
+      "title": "Service Mesh Security",
+      "scenario": "A financial institution runs 100 microservices on EKS. Compliance requires mutual TLS (mTLS) between all service-to-service communications, certificate rotation every 24 hours, and the ability to enforce authorization policies specifying which services can communicate with which other services. The team wants minimal application code changes.",
+      "questionText": "Which approach provides mTLS, automatic certificate rotation, and service-level authorization with minimal code changes?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Application-level TLS using AWS Certificate Manager private CA with SDK integration in each service"
+        },
+        {
+          "letter": "B",
+          "text": "Network Policies in EKS with Calico for service isolation and ALB with client certificates"
+        },
+        {
+          "letter": "C",
+          "text": "AWS App Mesh with mTLS enabled, backed by ACM Private CA for automatic certificate rotation, and virtual service access policies"
+        },
+        {
+          "letter": "D",
+          "text": "AWS PrivateLink endpoints for every service-to-service communication path"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Which service mesh solution handles mTLS transparently via sidecar proxies without modifying application code?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "AWS App Mesh with Envoy sidecar proxies handles mTLS transparently — applications communicate in plaintext to localhost while the sidecar encrypts/decrypts. ACM Private CA integrates with App Mesh for automatic certificate issuance and rotation (configurable down to hours). Virtual service access policies define which services can communicate. This requires zero application code changes — only sidecar injection configuration."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>App Mesh injects Envoy sidecar automatically via a mutating admission webhook in EKS.</li>\n              <li>ACM Private CA supports short-lived certificates (hours to days) with no manual rotation needed.</li>\n              <li>App Mesh backends define allowed upstream services — effectively an allowlist authorization model.</li>\n              <li>Alternative: Istio provides similar capabilities but requires managing Istio control plane separately from AWS.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Service Mesh",
+        "mTLS",
+        "Security"
+      ]
+    },
+    {
+      "id": 22,
+      "categoryRef": "cat-continuous",
+      "difficulty": "advanced",
+      "title": "Infrastructure as Code Strategy",
+      "scenario": "A company manages 500 AWS resources across 10 accounts using manually-created CloudFormation stacks. Drift detection shows 30% of stacks have drifted from their templates. Deployments take 2 hours due to serial stack updates. They want to reduce deployment time, eliminate drift, and enable developers to self-service infrastructure within guardrails.",
+      "questionText": "Which IaC strategy addresses drift, deployment speed, and developer self-service?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "AWS CDK with Pipelines for CI/CD, Service Catalog for self-service, and CloudFormation stack policies to prevent drift"
+        },
+        {
+          "letter": "B",
+          "text": "Add CloudFormation drift detection scheduled runs and manual remediation of drifted resources"
+        },
+        {
+          "letter": "C",
+          "text": "Migrate to Terraform with state locking, use Terraform Cloud for team collaboration and drift detection"
+        },
+        {
+          "letter": "D",
+          "text": "AWS Proton for developer self-service with environment templates managed by a platform team"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Which combination provides fast deployments (parallel), drift prevention, and governed self-service for developers?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "AWS CDK enables defining infrastructure in programming languages with constructs that enforce patterns. CDK Pipelines provides CI/CD for infrastructure with parallel deployments across accounts/regions. Service Catalog offers a governed self-service portal where developers provision pre-approved architectures. CloudFormation stack policies and SCPs prevent manual changes that cause drift. CDK's higher-level abstractions also reduce template size and deployment time."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>CDK Pipelines can deploy to multiple accounts/regions in parallel, reducing 2-hour serial deployments dramatically.</li>\n              <li>Stack policies can deny Update:Delete and Update:Replace on critical resources, preventing destructive drift.</li>\n              <li>Service Catalog supports launch constraints (IAM role assumed during provisioning) and tag constraints for governance.</li>\n              <li>CDK Aspects enable organization-wide policies (e.g., all S3 buckets must have encryption) as code.</li></ul>"
+        }
+      ],
+      "tags": [
+        "IaC",
+        "CDK",
+        "Service Catalog"
+      ]
+    },
+    {
+      "id": 23,
+      "categoryRef": "cat-new-solutions",
+      "difficulty": "advanced",
+      "title": "Real-Time Analytics Pipeline",
+      "scenario": "A ride-sharing company needs to process 1 million GPS events per second from driver devices. They need to calculate surge pricing in real-time (within 5 seconds), display driver positions on a map updated every 2 seconds, and store all events for historical analysis. The system must handle 3x spikes during rush hour without data loss.",
+      "questionText": "Which architecture handles the ingestion rate, real-time processing, and durability requirements?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "API Gateway to Lambda for processing, DynamoDB for state, S3 for archival"
+        },
+        {
+          "letter": "B",
+          "text": "Kinesis Data Streams (with enhanced fan-out) for ingestion, Apache Flink on Kinesis Analytics for real-time computation, DynamoDB for state, S3 for archival"
+        },
+        {
+          "letter": "C",
+          "text": "SQS FIFO queues for ordered event processing, ElastiCache for real-time state, RDS for storage"
+        },
+        {
+          "letter": "D",
+          "text": "IoT Core for device ingestion, IoT Analytics for processing, Timestream for storage"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "At 1M events/second with sub-5-second processing, which streaming service provides the throughput and which compute provides windowed aggregations?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Kinesis Data Streams with enhanced fan-out supports millions of records per second across shards with dedicated throughput per consumer. Apache Flink (via Kinesis Data Analytics) provides sub-second windowed aggregations for surge pricing calculations and position updates. DynamoDB stores current driver positions with single-digit millisecond reads for the map display. S3 via Firehose archives all events for historical analysis. Enhanced fan-out prevents consumer contention during 3x spikes."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Kinesis enhanced fan-out provides 2MB/s/shard per consumer (vs shared 2MB/s across all consumers without it).</li>\n              <li>Apache Flink sliding windows enable surge pricing recalculation every N seconds over M-second windows.</li>\n              <li>Kinesis automatically retains data for 24 hours (configurable to 365 days) providing replay capability.</li>\n              <li>SQS FIFO is limited to 3,000 messages/second with batching — insufficient for 1M events/second.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Streaming",
+        "Kinesis",
+        "Real-Time"
+      ]
+    },
+    {
+      "id": 24,
+      "categoryRef": "cat-cost",
+      "difficulty": "advanced",
+      "title": "Storage Tiering Strategy",
+      "scenario": "A genomics research company stores 500TB of sequencing data in S3 Standard. Analysis shows: 5% is accessed daily (active research), 15% is accessed monthly (recent projects), 30% is accessed yearly (publications/audits), and 50% has not been accessed in 3 years but must be retained for 10 years due to compliance.",
+      "questionText": "Which S3 storage configuration minimizes cost while maintaining access patterns?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "S3 Intelligent-Tiering for all data with Archive Access and Deep Archive Access tiers enabled"
+        },
+        {
+          "letter": "B",
+          "text": "S3 Standard for 5%, S3 Standard-IA for 15%, S3 Glacier Instant Retrieval for 30%, S3 Glacier Deep Archive for 50%"
+        },
+        {
+          "letter": "C",
+          "text": "Move everything to S3 Glacier Deep Archive and restore on demand"
+        },
+        {
+          "letter": "D",
+          "text": "S3 One Zone-IA for all infrequently accessed data to minimize cost"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Match each access pattern tier to the storage class that optimizes cost for that specific frequency."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Manual tiering based on known access patterns provides optimal cost: S3 Standard ($0.023/GB) for daily-access data, Standard-IA ($0.0125/GB) for monthly access, Glacier Instant Retrieval ($0.004/GB) for yearly access with millisecond retrieval, and Glacier Deep Archive ($0.00099/GB) for compliance retention rarely accessed. This saves ~85% compared to all-Standard. Intelligent-Tiering adds monitoring cost per object that is unnecessary when patterns are well-known."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Glacier Instant Retrieval: same millisecond access as Standard-IA but 68% cheaper storage — ideal for once-per-quarter access.</li>\n              <li>Deep Archive: $0.00099/GB/month with 12-hour retrieval — perfect for 10-year compliance retention.</li>\n              <li>Intelligent-Tiering charges $0.0025/1000 objects/month for monitoring — at 500TB of genomic files this adds up significantly.</li>\n              <li>S3 Object Lock in Governance or Compliance mode can enforce the 10-year retention policy for auditors.</li></ul>"
+        }
+      ],
+      "tags": [
+        "S3",
+        "Storage Tiering",
+        "Cost Optimization"
+      ]
+    },
+    {
+      "id": 25,
+      "categoryRef": "cat-design",
+      "difficulty": "advanced",
+      "title": "Network Security Architecture",
+      "scenario": "A company hosts sensitive workloads in a VPC that must have no internet access. However, these workloads need to access S3, DynamoDB, SQS, KMS, and CloudWatch. Security requires that all traffic remains on the AWS network and that access to these services is restricted to specific resources (e.g., only certain S3 buckets).",
+      "questionText": "Which network design ensures private-only connectivity with fine-grained service access control?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "NAT Gateway in a private subnet with security groups blocking internet-bound traffic"
+        },
+        {
+          "letter": "B",
+          "text": "VPC endpoints (Gateway for S3/DynamoDB, Interface for SQS/KMS/CloudWatch) with endpoint policies restricting access to specific resources"
+        },
+        {
+          "letter": "C",
+          "text": "AWS PrivateLink with service-specific endpoints and IAM policies for access control"
+        },
+        {
+          "letter": "D",
+          "text": "VPN connection to an internet-connected VPC that proxies AWS service calls"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "VPC endpoints keep traffic on the AWS network — which endpoint types work for these specific services and how do you restrict resource access?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Gateway endpoints (free) handle S3 and DynamoDB — traffic routes through the VPC route table without leaving AWS. Interface endpoints (powered by PrivateLink) provide private access to SQS, KMS, and CloudWatch via ENIs in the VPC. Endpoint policies on both types restrict which specific resources (buckets, queues, keys) can be accessed through that endpoint. No internet gateway or NAT is needed, ensuring true network isolation."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Gateway endpoints are free; Interface endpoints cost $0.01/hour/AZ plus $0.01/GB data processed.</li>\n              <li>Endpoint policies use IAM policy syntax: \"Resource\": \"arn:aws:s3:::specific-bucket/*\" restricts to one bucket.</li>\n              <li>S3 bucket policies can include a condition \"aws:sourceVpce\" to deny access from any path except the VPC endpoint.</li>\n              <li>Interface endpoints create private DNS entries that override public service endpoints automatically.</li></ul>"
+        }
+      ],
+      "tags": [
+        "VPC Endpoints",
+        "Network Security",
+        "PrivateLink"
+      ]
+    },
+    {
+      "id": 26,
+      "categoryRef": "cat-new-solutions",
+      "difficulty": "advanced",
+      "title": "Machine Learning Pipeline",
+      "scenario": "A retail company wants to build a recommendation engine that retrains daily on 10TB of purchase history. The model must serve predictions with p99 latency under 50ms for 10,000 requests/second. They need A/B testing capability to gradually roll out new model versions. The ML team uses PyTorch and wants to focus on model development, not infrastructure.",
+      "questionText": "Which architecture supports daily retraining, low-latency serving, and A/B testing?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Lambda with provisioned concurrency for serving, Step Functions for training orchestration, and API Gateway canary deployments"
+        },
+        {
+          "letter": "B",
+          "text": "EMR cluster for training, EC2 instances with TensorRT for serving, and Route 53 weighted routing for A/B testing"
+        },
+        {
+          "letter": "C",
+          "text": "SageMaker Pipelines for retraining, SageMaker Real-time Endpoints with production variants for A/B testing, and auto-scaling"
+        },
+        {
+          "letter": "D",
+          "text": "EKS with KubeFlow for training and Seldon Core for serving with Istio traffic splitting"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Which managed service handles the full ML lifecycle (train, deploy, A/B test) with minimal infrastructure management?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "SageMaker Pipelines automates the daily retraining workflow (data processing, training, evaluation, registration). Real-time endpoints with production variants enable A/B testing by routing a percentage of traffic to the new model version. Auto-scaling handles 10,000 RPS with GPU instances achieving sub-50ms p99 latency. The ML team uses familiar PyTorch with SageMaker's managed training — no cluster management. This is the most managed, lowest-operational-overhead solution."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>SageMaker production variants support arbitrary traffic splits (e.g., 90/10) with independent auto-scaling per variant.</li>\n              <li>ml.g5.xlarge instances with PyTorch serve recommendations at sub-10ms p50 latency for typical models.</li>\n              <li>SageMaker Pipelines integrates with Model Registry for version tracking and approval workflows.</li>\n              <li>For 10TB daily retraining, SageMaker distributed training on ml.p4d instances with data parallelism completes in hours.</li></ul>"
+        }
+      ],
+      "tags": [
+        "SageMaker",
+        "Machine Learning",
+        "A/B Testing"
+      ]
+    },
+    {
+      "id": 27,
+      "categoryRef": "cat-migration",
+      "difficulty": "advanced",
+      "title": "Hybrid Connectivity Architecture",
+      "scenario": "A company requires highly available connectivity between their on-premises data center and AWS. They need 5 Gbps of sustained throughput, sub-10ms latency, and the connection must survive the failure of any single component (router, fiber, Direct Connect location). Current production traffic cannot tolerate more than 30 seconds of failover time.",
+      "questionText": "Which connectivity architecture provides the required resilience and performance?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Single 10 Gbps Direct Connect connection with VPN backup over the internet"
+        },
+        {
+          "letter": "B",
+          "text": "AWS Site-to-Site VPN with two tunnels across different Availability Zones"
+        },
+        {
+          "letter": "C",
+          "text": "Two Direct Connect connections at the same location with link aggregation (LAG)"
+        },
+        {
+          "letter": "D",
+          "text": "Dual Direct Connect connections at two separate DX locations with LAG at each, and BGP failover"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "For true high availability, consider what survives the failure of an entire Direct Connect location, not just a single link."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Dual Direct Connect connections at separate physical locations provides maximum resilience — surviving the failure of an entire DX facility (fire, power outage, fiber cut). LAG (Link Aggregation Group) at each location provides link-level redundancy and bandwidth aggregation. BGP failover between the two locations ensures traffic shifts within seconds (BGP hold timer). Single-location solutions fail if that location has a physical event."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>AWS recommends \"maximum resiliency\" architecture: connections at 2+ DX locations for critical workloads.</li>\n              <li>BGP with BFD (Bidirectional Forwarding Detection) achieves sub-second failover between DX connections.</li>\n              <li>LAG bundles up to 4 connections of the same speed (e.g., 4x10Gbps) at a single location.</li>\n              <li>VPN over internet cannot guarantee sub-10ms latency or sustained 5 Gbps throughput.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Direct Connect",
+        "Hybrid",
+        "High Availability"
+      ]
+    },
+    {
+      "id": 28,
+      "categoryRef": "cat-cost",
+      "difficulty": "advanced",
+      "title": "Serverless Cost Optimization",
+      "scenario": "A company's Lambda functions process 50 million invocations per month. Analysis shows: functions average 500ms duration at 1024MB memory, but profiling reveals most functions complete in 200ms and only use 256MB of memory. The remaining 300ms and 768MB are wasted. Monthly Lambda cost is $45,000.",
+      "questionText": "Which optimization approach provides the greatest cost reduction?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Use AWS Lambda Power Tuning to find the optimal memory/duration balance per function, then apply Graviton (arm64) runtime"
+        },
+        {
+          "letter": "B",
+          "text": "Reduce memory to 256MB for all functions since that is the measured usage"
+        },
+        {
+          "letter": "C",
+          "text": "Migrate all functions to Fargate tasks for better resource utilization"
+        },
+        {
+          "letter": "D",
+          "text": "Enable provisioned concurrency to reduce cold starts and improve average duration"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Lambda pricing is memory-duration (GB-seconds) — consider that reducing memory may increase duration, and a tool exists to find the optimum."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Lambda Power Tuning (open-source Step Functions workflow) tests each function at various memory settings and finds the cost-optimal or speed-optimal configuration. Simply reducing memory to 256MB would likely increase duration (Lambda allocates CPU proportional to memory), potentially increasing cost. Additionally, Graviton/arm64 Lambda provides 20% lower cost at equivalent performance. The combination of right-sized memory + Graviton provides 40-60% cost reduction."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Lambda CPU scales linearly with memory: 1769MB = 1 vCPU. At 256MB you get ~15% of a vCPU.</li>\n              <li>Reducing memory from 1024MB to 256MB would quadruple duration for CPU-bound functions — same or higher cost.</li>\n              <li>Lambda arm64 (Graviton2) charges $0.0000133334/GB-second vs $0.0000166667 for x86 — a 20% discount.</li>\n              <li>Power Tuning tests the function at 128, 256, 512, 1024, 2048, 3008MB and charts cost vs speed for each.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Lambda",
+        "Cost Optimization",
+        "Graviton"
+      ]
+    },
+    {
+      "id": 29,
+      "categoryRef": "cat-continuous",
+      "difficulty": "advanced",
+      "title": "Compliance Automation",
+      "scenario": "A company must maintain PCI-DSS compliance across 50 AWS accounts. They need continuous compliance monitoring, automated remediation of common violations (unencrypted volumes, public S3 buckets, open security groups), compliance reporting for auditors, and the ability to prevent non-compliant resources from being created.",
+      "questionText": "Which combination of services provides preventive controls, detective controls, and automated remediation?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "GuardDuty for detection, WAF for prevention, EventBridge to Lambda for remediation, and CloudWatch dashboards for reporting"
+        },
+        {
+          "letter": "B",
+          "text": "CloudTrail for detection, IAM policies for prevention, Lambda for remediation, and manual quarterly reports"
+        },
+        {
+          "letter": "C",
+          "text": "AWS Config rules for detection, SCPs for prevention, Systems Manager Automation for remediation, and Security Hub for reporting"
+        },
+        {
+          "letter": "D",
+          "text": "Trusted Advisor for detection, Control Tower guardrails for prevention, manual remediation, and Config Compliance Timeline for reporting"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Map each requirement (prevent, detect, remediate, report) to the purpose-built AWS service for that function."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "SCPs prevent non-compliant actions before they occur (e.g., deny creating unencrypted EBS volumes). AWS Config managed rules continuously evaluate resources against compliance standards and detect violations. Systems Manager Automation runbooks automatically remediate findings (encrypt volumes, make buckets private, close security groups). Security Hub aggregates findings with PCI-DSS compliance standard dashboards for auditor reporting."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Security Hub supports PCI-DSS v3.2.1 compliance standard with automated checks mapped to specific controls.</li>\n              <li>Config auto-remediation triggers SSM Automation documents when a rule evaluates as NON_COMPLIANT.</li>\n              <li>SCPs can deny ec2:CreateVolume unless aws:RequestedRegion and encryption conditions are met.</li>\n              <li>This implements the \"defense in depth\" model: prevent &gt; detect &gt; respond &gt; report for each control.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Compliance",
+        "PCI-DSS",
+        "Automation"
+      ]
+    },
+    {
+      "id": 30,
+      "categoryRef": "cat-design",
+      "difficulty": "advanced",
+      "title": "Data Residency Architecture",
+      "scenario": "A multinational company must comply with data residency laws: EU customer data must stay in eu-west-1, US data in us-east-1, and APAC data in ap-southeast-1. The application is a single global service where users can interact with customers from any region. The backend must route requests to the correct regional data store based on the customer's residency, not the user's location.",
+      "questionText": "Which architecture enforces data residency while providing a unified global application experience?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Global API Gateway with Lambda functions that determine customer residency and proxy requests to the correct regional backend"
+        },
+        {
+          "letter": "B",
+          "text": "Three separate applications — one per region — with users manually selecting which region to access"
+        },
+        {
+          "letter": "C",
+          "text": "DynamoDB Global Tables with table-level region restriction per customer record"
+        },
+        {
+          "letter": "D",
+          "text": "Single-region deployment in us-east-1 with S3 Object Lock preventing cross-region access"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "The routing decision must be based on customer metadata (residency), not user location — which layer can make this determination dynamically?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "A global API Gateway receives all requests. A routing Lambda checks the customer's residency attribute (from a lightweight global metadata lookup) and forwards the request to the appropriate regional backend (eu-west-1, us-east-1, or ap-southeast-1). Each regional backend only stores and processes data for residents of that region. Users get a single endpoint regardless of their location, but data never leaves the designated region."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>The global metadata store (DynamoDB Global Table or ElastiCache) holds only customer-to-region mapping — no regulated data.</li>\n              <li>Regional backends are isolated: VPCs with no cross-region replication of customer data.</li>\n              <li>SCPs can enforce that certain resource types cannot be created outside designated regions as an additional safeguard.</li>\n              <li>AWS Outposts or Local Zones can extend this pattern to specific countries without full region availability.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Data Residency",
+        "Compliance",
+        "Global Architecture"
+      ]
+    },
+    {
+      "id": 31,
+      "categoryRef": "cat-new-solutions",
+      "difficulty": "advanced",
+      "title": "Microservices Communication Pattern",
+      "scenario": "A company has microservices that need to communicate across three different patterns: synchronous request-response for user-facing APIs (sub-100ms), asynchronous command processing for background tasks (minutes), and event notification for system-wide state changes that multiple services subscribe to. Each pattern has different reliability and latency requirements.",
+      "questionText": "Which combination of services best addresses all three communication patterns?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "API Gateway for all three patterns with different timeout configurations"
+        },
+        {
+          "letter": "B",
+          "text": "ALB for synchronous, SQS for async commands, SNS for event notifications"
+        },
+        {
+          "letter": "C",
+          "text": "gRPC on EKS for synchronous, Kinesis for async commands, SNS for events"
+        },
+        {
+          "letter": "D",
+          "text": "App Mesh for synchronous service-to-service, SQS for async commands, EventBridge for event notifications with schema registry"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Match each communication pattern to the AWS service purpose-built for it: mesh routing, queue processing, and event bus."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "App Mesh provides service-to-service routing with retries, timeouts, and circuit breakers for synchronous calls — ideal for sub-100ms requirements. SQS decouples async command processing with guaranteed delivery and backpressure. EventBridge provides a serverless event bus with content-based routing rules, dead-letter queues, and schema registry for system-wide events — superior to SNS for complex event routing with multiple subscribers that need different event subsets."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>App Mesh circuit breakers prevent cascading failures in synchronous call chains — critical for sub-100ms SLA.</li>\n              <li>SQS provides exactly-once processing (FIFO) or at-least-once (Standard) depending on command idempotency requirements.</li>\n              <li>EventBridge schema registry auto-discovers event schemas and generates code bindings for type-safe consumers.</li>\n              <li>EventBridge supports up to 300 rules per bus and 5 targets per rule — more flexible than SNS topic subscriptions.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Microservices",
+        "Event-Driven",
+        "Communication Patterns"
+      ]
+    },
+    {
+      "id": 32,
+      "categoryRef": "cat-migration",
+      "difficulty": "advanced",
+      "title": "Windows Workload Migration",
+      "scenario": "A company runs 200 Windows Server 2019 VMs on VMware with SQL Server 2019 Enterprise. They have 500 Microsoft licenses with Software Assurance and want to bring their own licenses (BYOL) to AWS. Some workloads require dedicated hardware for license compliance. The migration must maintain Active Directory integration and existing Group Policy Objects.",
+      "questionText": "Which migration approach optimizes license utilization while maintaining Windows ecosystem integration?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "RDS for SQL Server with BYOL and AD Connector to on-premises Active Directory"
+        },
+        {
+          "letter": "B",
+          "text": "Standard EC2 instances with SQL Server License Included AMIs and Simple AD for authentication"
+        },
+        {
+          "letter": "C",
+          "text": "EC2 Dedicated Hosts for SQL Server BYOL, AWS Managed Microsoft AD for directory services, and AWS License Manager for tracking"
+        },
+        {
+          "letter": "D",
+          "text": "EC2 with License Included Windows and SQL Server, plus AWS Directory Service AD Connector"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "SQL Server Enterprise BYOL requires specific EC2 tenancy — which host type and which directory service provides full GPO support?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "EC2 Dedicated Hosts provide the single-tenant hardware required for SQL Server Enterprise BYOL (per Microsoft licensing terms). AWS License Manager tracks license consumption across accounts and prevents over-allocation. AWS Managed Microsoft AD is a full Microsoft Active Directory (not just LDAP) that supports Group Policy Objects, trust relationships with on-premises AD, and all Windows-native authentication. This maximizes license value while maintaining the Windows management ecosystem."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>SQL Server Enterprise per-core licensing on Dedicated Hosts allows unlimited VMs on the host with allocated cores.</li>\n              <li>AWS License Manager enforces host affinity rules and prevents launching more instances than licenses allow.</li>\n              <li>Managed AD supports GPOs, RADIUS (for VPN MFA), and two-way forest trusts with on-premises AD.</li>\n              <li>Simple AD is Samba-based and does not support GPOs, trust relationships, or SQL Server Windows auth.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Windows Migration",
+        "Licensing",
+        "Active Directory"
+      ]
+    },
+    {
+      "id": 33,
+      "categoryRef": "cat-cost",
+      "difficulty": "advanced",
+      "title": "Multi-Account Cost Governance",
+      "scenario": "A company with 100 AWS accounts spends $2M monthly. Each business unit manages its own accounts but the CFO requires: consolidated cost visibility, budget alerts before overspend, automatic enforcement of tagging standards for cost allocation, and the ability to charge back costs to individual business units with 95% allocation accuracy.",
+      "questionText": "Which cost governance architecture achieves visibility, control, and accurate chargeback?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "CloudWatch billing alarms per account with SNS notifications and manual Excel-based chargeback"
+        },
+        {
+          "letter": "B",
+          "text": "AWS Cost Explorer, AWS Budgets with actions, Tag Policies via Organizations, and Cost and Usage Reports with Athena for chargeback analysis"
+        },
+        {
+          "letter": "C",
+          "text": "Third-party FinOps tool for all cost management and governance"
+        },
+        {
+          "letter": "D",
+          "text": "AWS Billing Conductor for custom pricing and Cost Explorer for visibility only"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Map each requirement (visibility, alerting, tagging enforcement, chargeback) to the specific AWS service that addresses it natively."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Cost Explorer provides consolidated multi-account visibility with filtering by account, service, tag, and region. AWS Budgets with actions can automatically alert and even restrict spending (via SCPs or IAM policies). Organization Tag Policies enforce mandatory tags (cost-center, project) at creation time. Cost and Usage Reports (CUR) provide line-item detail queryable via Athena — enabling 95%+ allocation accuracy when combined with enforced tags and account-level segregation."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>AWS Budgets Actions can apply IAM policies or SCPs to prevent new resource creation when budget exceeds threshold.</li>\n              <li>Tag Policies enforce tag key capitalization, allowed values, and resource types — but do not block creation (use SCPs for that).</li>\n              <li>CUR provides hourly/daily granularity with resource-level cost allocation — the most detailed AWS billing data available.</li>\n              <li>Athena queries on CUR enable custom chargeback reports: \"cost per business unit per service per month\" with tag-based allocation.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Cost Governance",
+        "FinOps",
+        "Organizations"
+      ]
+    },
+    {
+      "id": 34,
+      "categoryRef": "cat-continuous",
+      "difficulty": "advanced",
+      "title": "CI/CD Pipeline Security",
+      "scenario": "A development team of 50 engineers deploys to production 20 times per day. They need: secrets management in pipelines without hardcoding, container image vulnerability scanning before deployment, infrastructure drift detection before apply, and the ability to gate deployments on security approval for changes to IAM policies or security groups.",
+      "questionText": "Which CI/CD security architecture addresses all four requirements?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Jenkins with HashiCorp Vault, Aqua Security scanning, CloudFormation drift detection, and Jenkins role-based approvals"
+        },
+        {
+          "letter": "B",
+          "text": "GitHub Actions with encrypted secrets, Trivy scanning, terraform plan for drift, and CODEOWNERS for security team approval"
+        },
+        {
+          "letter": "C",
+          "text": "CodePipeline with Secrets Manager for secrets, ECR image scanning, Config rules for drift, and manual approval actions for security-sensitive changes"
+        },
+        {
+          "letter": "D",
+          "text": "CodePipeline with Parameter Store for secrets, third-party scanning in CodeBuild, and no deployment gates"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Which AWS-native pipeline provides built-in integration with secrets, scanning, configuration compliance, and approval workflows?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "CodePipeline integrates natively with Secrets Manager (dynamic secret rotation, never in code). ECR image scanning (powered by Inspector) detects vulnerabilities at push time and can block deployment. AWS Config continuously evaluates drift and can trigger pipeline notifications. Manual approval actions in CodePipeline gate deployments — the security team must approve before changes to IAM/SG resources proceed to production. All stays within the AWS security boundary."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Secrets Manager supports automatic rotation for RDS, Redshift, DocumentDB credentials — never stale in pipelines.</li>\n              <li>ECR Enhanced Scanning (Inspector) provides continuous scanning, not just at push time, with CVE severity filtering.</li>\n              <li>CodePipeline approval actions can include a custom URL for reviewers showing the diff/plan for context.</li>\n              <li>EventBridge rules can trigger pipeline gates when Config detects drift in security-sensitive resources.</li></ul>"
+        }
+      ],
+      "tags": [
+        "CI/CD",
+        "Security",
+        "DevSecOps"
+      ]
+    },
+    {
+      "id": 35,
+      "categoryRef": "cat-design",
+      "difficulty": "advanced",
+      "title": "Lake Formation Data Governance",
+      "scenario": "A company's data lake on S3 has 500TB across 10,000 tables registered in the Glue Data Catalog. Five teams (analytics, ML, marketing, finance, compliance) need different access levels: some teams can see all columns, others must have PII columns masked, and the compliance team needs cell-level audit trails of all data access. Current S3/IAM policies have become unmanageable at this scale.",
+      "questionText": "Which data governance approach provides column-level security, data masking, and access auditing at scale?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Lake Formation with tag-based access control, column-level permissions, data filters for row/cell masking, and CloudTrail Lake for audit"
+        },
+        {
+          "letter": "B",
+          "text": "S3 bucket policies with prefix-based access per team and Macie for PII detection"
+        },
+        {
+          "letter": "C",
+          "text": "Glue Data Catalog resource policies with per-table IAM conditions and custom Lambda authorizers"
+        },
+        {
+          "letter": "D",
+          "text": "Separate S3 buckets per team with ETL jobs creating masked copies for restricted teams"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Which service provides centralized, fine-grained data lake permissions that go beyond IAM/S3 policies?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Lake Formation provides centralized governance for data lakes with: tag-based access control (LF-Tags) that scales to thousands of tables without per-resource policies, column-level permissions to restrict PII columns, data filters for row and cell-level masking, and integration with CloudTrail for comprehensive access auditing. This replaces complex S3/IAM policies with a single governance layer. Teams query through Athena or Redshift Spectrum and see only what they are authorized to see."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>LF-Tags enable attribute-based access: tag tables/columns with \"sensitivity=high\" and grant access based on tag expressions.</li>\n              <li>Data filters combine column-level and row-level restrictions into reusable permission sets.</li>\n              <li>Lake Formation centralizes the authorization model — Athena, Redshift Spectrum, and EMR all respect LF permissions.</li>\n              <li>CloudTrail Lake stores structured audit events queryable via SQL for compliance reporting.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Lake Formation",
+        "Data Governance",
+        "Security"
+      ]
+    },
+    {
+      "id": 36,
+      "categoryRef": "cat-new-solutions",
+      "difficulty": "advanced",
+      "title": "IoT Fleet Management",
+      "scenario": "A logistics company deploys 100,000 GPS trackers on delivery vehicles. Each device sends location data every 10 seconds. They need: real-time fleet visibility on a map, geofence alerts when vehicles leave designated routes, predictive maintenance based on vehicle telemetry patterns, and device management (firmware updates, certificate rotation) at scale.",
+      "questionText": "Which architecture handles 100K devices at 10-second intervals with real-time processing and fleet management?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "API Gateway WebSocket for device connections, Lambda for processing, DynamoDB for state"
+        },
+        {
+          "letter": "B",
+          "text": "IoT Core for device connectivity and management, IoT Events for geofence detection, Kinesis for stream processing to SageMaker for predictive maintenance, and IoT Device Management for fleet operations"
+        },
+        {
+          "letter": "C",
+          "text": "Direct MQTT to EC2-hosted broker, Kafka for stream processing, and custom fleet management portal"
+        },
+        {
+          "letter": "D",
+          "text": "IoT Core only with basic rules engine actions to S3 and batch processing in EMR"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "At 100K devices with real-time requirements, which managed IoT services handle connectivity, event detection, and fleet operations?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "IoT Core handles MQTT device connectivity with built-in X.509 certificate authentication supporting millions of concurrent connections. IoT Events models geofence logic as detector models — triggering alerts when GPS coordinates exit defined boundaries. Kinesis ingests the stream for real-time processing, and SageMaker provides predictive maintenance models on telemetry patterns. IoT Device Management handles fleet-wide firmware updates (OTA), certificate rotation, and device organization at scale."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>IoT Core supports millions of concurrent MQTT connections with QoS 0 and QoS 1 delivery.</li>\n              <li>100K devices at 10-second intervals = 10,000 messages/second — well within IoT Core limits.</li>\n              <li>IoT Device Management supports phased OTA deployments with automatic rollback on failure thresholds.</li>\n              <li>IoT Events detector models maintain state per device and evaluate conditions against incoming telemetry.</li></ul>"
+        }
+      ],
+      "tags": [
+        "IoT",
+        "Fleet Management",
+        "Real-Time"
+      ]
+    },
+    {
+      "id": 37,
+      "categoryRef": "cat-migration",
+      "difficulty": "advanced",
+      "title": "SAP on AWS Architecture",
+      "scenario": "A manufacturing company is migrating their SAP ERP system (SAP S/4HANA on HANA database, 4TB) to AWS. The system requires: certified instance types for SAP workloads, high availability within a region with automatic failover, near-zero RPO for the HANA database, and integration with existing SAP transport management system across development, QA, and production landscapes.",
+      "questionText": "Which architecture meets SAP certification requirements with high availability and near-zero RPO?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "RDS for SAP HANA in Multi-AZ configuration with automated backups"
+        },
+        {
+          "letter": "B",
+          "text": "EC2 x2idn instances with HANA System Replication (synchronous) across AZs, Pacemaker cluster for automatic failover, and EFS for shared transport directory"
+        },
+        {
+          "letter": "C",
+          "text": "EC2 m5.metal instances with EBS snapshots for backup and manual failover procedures"
+        },
+        {
+          "letter": "D",
+          "text": "EC2 with HANA database on instance store for performance and cross-region replication for DR"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "SAP on AWS requires certified instance types and HANA System Replication for near-zero RPO — which clustering solution provides automatic failover?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "EC2 x2idn instances are SAP-certified for HANA workloads with up to 2TB RAM. HANA System Replication (HSR) in synchronous mode between two AZs provides near-zero RPO (data committed in both locations before acknowledging). Linux Pacemaker cluster manages automatic failover — detecting primary failure and promoting the secondary within minutes. EFS provides the shared /usr/sap/trans directory needed for SAP transport management across landscapes."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>SAP-certified instances: x2idn (Intel), x2gd (Graviton), u-* (high memory up to 24TB) for production HANA.</li>\n              <li>HSR synchronous mode guarantees zero data loss; performance mode allows slight lag for better throughput.</li>\n              <li>AWS Launch Wizard for SAP automates the deployment of HA HANA with Pacemaker and overlay IP routing.</li>\n              <li>No \"RDS for HANA\" exists — HANA on AWS is always self-managed on EC2 (IaaS model).</li></ul>"
+        }
+      ],
+      "tags": [
+        "SAP",
+        "HANA",
+        "High Availability"
+      ]
+    },
+    {
+      "id": 38,
+      "categoryRef": "cat-cost",
+      "difficulty": "advanced",
+      "title": "NAT Gateway Cost Reduction",
+      "scenario": "A company spends $15,000/month on NAT Gateway data processing charges. Analysis shows 60% of traffic is to S3 and DynamoDB, 20% is to other AWS services (SQS, KMS, CloudWatch), and only 20% is genuine internet-bound traffic (third-party APIs). All outbound traffic currently routes through NAT Gateways in each AZ.",
+      "questionText": "Which architecture change provides the greatest NAT Gateway cost reduction?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Replace NAT Gateways with NAT instances on smaller EC2 types"
+        },
+        {
+          "letter": "B",
+          "text": "Add S3 and DynamoDB Gateway endpoints (free) and Interface endpoints for SQS, KMS, and CloudWatch to eliminate 80% of NAT traffic"
+        },
+        {
+          "letter": "C",
+          "text": "Consolidate to a single NAT Gateway shared across all AZs"
+        },
+        {
+          "letter": "D",
+          "text": "Move all workloads to public subnets with security groups restricting inbound traffic"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "80% of traffic goes to AWS services that support VPC endpoints — endpoints bypass NAT entirely."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Gateway endpoints for S3 and DynamoDB are free and route traffic directly via the AWS network, eliminating 60% of NAT data processing charges. Interface endpoints for SQS, KMS, and CloudWatch ($0.01/GB vs $0.045/GB NAT processing) eliminate another 20%. Only the 20% genuine internet traffic remains on NAT Gateways, reducing the bill from $15K to approximately $3K/month — an 80% reduction."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>NAT Gateway charges $0.045/GB processed regardless of direction — expensive for high-volume AWS service calls.</li>\n              <li>S3 Gateway endpoints: free, no data processing charges, no bandwidth limits.</li>\n              <li>Interface endpoints: $0.01/hour/AZ + $0.01/GB — significantly cheaper than NAT for AWS service traffic.</li>\n              <li>VPC flow logs can identify which destinations consume NAT bandwidth to prioritize endpoint creation.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Cost Optimization",
+        "NAT Gateway",
+        "VPC Endpoints"
+      ]
+    },
+    {
+      "id": 39,
+      "categoryRef": "cat-continuous",
+      "difficulty": "advanced",
+      "title": "Auto-Scaling Architecture",
+      "scenario": "An e-commerce platform experiences predictable traffic spikes every day at 9 AM and 6 PM, plus unpredictable flash sale events that can 10x normal traffic within 2 minutes. Current auto-scaling based on CPU takes 5 minutes to respond, causing degraded performance during the first minutes of any spike. Pre-warming with oversized instances is too expensive.",
+      "questionText": "Which scaling strategy handles both predictable and unpredictable spikes with minimal response time?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Target tracking on CPU with aggressive scale-out cooldown reduced to 30 seconds"
+        },
+        {
+          "letter": "B",
+          "text": "Scheduled scaling for predictable peaks, combined with predictive scaling and step scaling on request count for flash sales with warm pools"
+        },
+        {
+          "letter": "C",
+          "text": "Over-provisioning with Reserved Instances sized for peak traffic at all times"
+        },
+        {
+          "letter": "D",
+          "text": "Lambda with provisioned concurrency for all workloads to achieve instant scaling"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Predictable patterns benefit from proactive scaling; unpredictable spikes need pre-warmed capacity ready to join immediately."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Scheduled scaling adds capacity before known 9 AM/6 PM peaks. Predictive scaling uses ML to anticipate patterns and pre-scale. For flash sales, step scaling on request count (not CPU) reacts faster as load increases. EC2 warm pools maintain pre-initialized instances in a stopped/hibernated state — they can join the ASG in under 30 seconds versus 3-5 minutes for cold launches. This combination handles both predictable and unpredictable scenarios cost-effectively."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Warm pools keep instances in Stopped or Hibernated state — Stopped instances incur only EBS costs; Hibernated preserve memory state.</li>\n              <li>Predictive scaling analyzes 14 days of CloudWatch data and creates scheduled actions 24 hours ahead.</li>\n              <li>Step scaling with RequestCountPerTarget metric responds to load faster than CPU (which lags by the monitoring period).</li>\n              <li>Combining scheduled + predictive + reactive with warm pools provides sub-minute response at minimal idle cost.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Auto Scaling",
+        "Warm Pools",
+        "Predictive Scaling"
+      ]
+    },
+    {
+      "id": 40,
+      "categoryRef": "cat-design",
+      "difficulty": "advanced",
+      "title": "Zero Trust Network Architecture",
+      "scenario": "A company is implementing zero trust architecture for their AWS workloads. Requirements: no implicit trust between any services regardless of network location, all access decisions based on identity verification, continuous authentication, and the ability to enforce device posture checks for human users accessing AWS resources via the console and CLI.",
+      "questionText": "Which architecture implements zero trust principles for both service-to-service and human access?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "VPC security groups for all network segmentation and IAM roles for service identity"
+        },
+        {
+          "letter": "B",
+          "text": "AWS Verified Access for human users with device posture integration, IAM Roles Anywhere for service identity, VPC Lattice for service-to-service authentication, and CloudTrail for continuous monitoring"
+        },
+        {
+          "letter": "C",
+          "text": "AWS SSO with MFA for human access and API keys for service authentication"
+        },
+        {
+          "letter": "D",
+          "text": "AWS Network Firewall with deep packet inspection and centralized proxy for all traffic"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Zero trust requires identity-based access for both humans and services — which AWS services provide identity verification at each layer?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "AWS Verified Access provides zero-trust access to applications without a VPN, integrating with identity providers and device management solutions (CrowdStrike, Jamf) for posture checks. IAM Roles Anywhere extends IAM roles to on-premises and hybrid workloads using X.509 certificates. VPC Lattice provides service-to-service networking with built-in authentication and authorization. CloudTrail provides continuous monitoring of all API activity for the \"never trust, always verify\" principle."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Verified Access evaluates trust policies on each request: user identity + device trust + application-specific rules.</li>\n              <li>VPC Lattice auth policies use IAM conditions including source VPC, account, and organization for service identity.</li>\n              <li>IAM Roles Anywhere maps X.509 certificate attributes to IAM roles without long-lived credentials.</li>\n              <li>Zero trust on AWS: identity everywhere (IAM), encrypt everywhere (TLS/KMS), log everything (CloudTrail/VPC Flow Logs).</li></ul>"
+        }
+      ],
+      "tags": [
+        "Zero Trust",
+        "Security",
+        "Verified Access"
+      ]
+    },
+    {
+      "id": 41,
+      "categoryRef": "cat-new-solutions",
+      "difficulty": "advanced",
+      "title": "Multi-Tenant SaaS Architecture",
+      "scenario": "A B2B SaaS company serves 500 tenants ranging from 10-user startups to 10,000-user enterprises. They need: tenant data isolation, per-tenant resource quotas, the ability to offer dedicated infrastructure to enterprise tenants, shared infrastructure for smaller tenants for cost efficiency, and a single code deployment that serves all tiers.",
+      "questionText": "Which multi-tenant architecture balances isolation, cost, and operational simplicity?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Separate AWS accounts per tenant with shared deployment pipeline"
+        },
+        {
+          "letter": "B",
+          "text": "Single account with tenant ID in every database record and application-level isolation only"
+        },
+        {
+          "letter": "C",
+          "text": "Pool model for small tenants (shared DynamoDB with tenant partition key, shared EKS namespace), silo model for enterprise tenants (dedicated DynamoDB tables, dedicated EKS namespace with resource quotas), with tenant routing in API Gateway"
+        },
+        {
+          "letter": "D",
+          "text": "Separate databases per tenant in a single RDS Multi-AZ instance with schema isolation"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "The tiered approach (pool for small, silo for large) is the standard SaaS pattern — how do you implement it on AWS?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "The hybrid pool/silo model optimizes cost for small tenants (shared infrastructure with logical isolation via partition keys and namespaces) while providing strong isolation for enterprise tenants (dedicated tables, dedicated compute with resource quotas). API Gateway with a tenant context Lambda determines the routing tier. A single EKS deployment serves all tenants — Kubernetes namespaces with ResourceQuotas provide compute isolation for enterprise tenants. DynamoDB partition keys provide data isolation in the pooled model."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>DynamoDB leading partition key = tenant ID ensures data is physically co-located and tenant-scoped queries are efficient.</li>\n              <li>EKS ResourceQuotas and LimitRanges enforce per-namespace CPU/memory limits for enterprise tenants.</li>\n              <li>API Gateway usage plans can provide per-tenant rate limiting and throttling.</li>\n              <li>AWS SaaS Factory reference architecture provides this pattern with terraform modules and reference implementations.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Multi-Tenant",
+        "SaaS",
+        "Architecture"
+      ]
+    },
+    {
+      "id": 42,
+      "categoryRef": "cat-migration",
+      "difficulty": "advanced",
+      "title": "VMware to AWS Migration",
+      "scenario": "A company runs 500 VMs on VMware vSphere 7 with vSAN storage. They want to migrate to AWS with minimal re-architecture. Phase 1 requires running VMware workloads natively on AWS (lift-and-shift), and Phase 2 will selectively modernize workloads to native AWS services. They need vMotion capability during Phase 1 for gradual migration without downtime.",
+      "questionText": "Which service enables native VMware workload execution on AWS with vMotion migration capability?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "VMware Cloud on AWS (VMC) with HCX for vMotion migration from on-premises"
+        },
+        {
+          "letter": "B",
+          "text": "EC2 instances with VMware Workstation nested virtualization"
+        },
+        {
+          "letter": "C",
+          "text": "AWS Application Migration Service (MGN) for all 500 VMs simultaneously"
+        },
+        {
+          "letter": "D",
+          "text": "AWS Outposts with VMware vSphere installed locally"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Which AWS service runs actual vSphere on dedicated hardware with migration tooling that supports live vMotion?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "VMware Cloud on AWS (VMC) runs a full VMware SDDC (vSphere, vSAN, NSX, vCenter) on dedicated AWS bare-metal infrastructure. VMware HCX provides bulk migration, vMotion (live migration without downtime), and network extension between on-premises vSphere and VMC. This enables Phase 1 (lift-and-shift with zero re-architecture) and Phase 2 (selective modernization by migrating individual VMs from VMC to native EC2 using AWS services). Existing VMware tools, scripts, and operations remain unchanged."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>VMC minimum is 2 hosts (i3.metal) with linear scaling; HCX supports live vMotion across 100+ ms latency.</li>\n              <li>VMC VMs can access native AWS services (S3, RDS, Lambda) via ENI connectivity to the connected VPC.</li>\n              <li>HCX supports bulk migration (100+ VMs simultaneously), live vMotion (zero downtime), and cold migration.</li>\n              <li>Phase 2 modernization uses VM Import/Export or Application Migration Service to move from VMC to native EC2.</li></ul>"
+        }
+      ],
+      "tags": [
+        "VMware",
+        "Migration",
+        "Hybrid"
+      ]
+    },
+    {
+      "id": 43,
+      "categoryRef": "cat-cost",
+      "difficulty": "advanced",
+      "title": "EBS Optimization Strategy",
+      "scenario": "A company's monthly EBS costs are $200,000. The bill breakdown shows: 40% is gp3 volumes (many at default 3000 IOPS/125 MBps), 30% is io2 volumes for databases, 20% is snapshot storage (5PB across 10,000 snapshots), and 10% is unused/detached volumes. Average gp3 utilization is 15% of provisioned IOPS.",
+      "questionText": "Which optimization strategy provides the greatest overall EBS cost reduction?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Convert all io2 volumes to gp3 with increased IOPS"
+        },
+        {
+          "letter": "B",
+          "text": "Enable EBS volume auto-scaling to dynamically adjust size based on usage"
+        },
+        {
+          "letter": "C",
+          "text": "Move all workloads to instance store volumes for zero EBS cost"
+        },
+        {
+          "letter": "D",
+          "text": "Delete detached volumes, implement EBS Snapshot Archive for snapshots older than 90 days, right-size gp3 volume sizes, and evaluate io2 Block Express for consolidation"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Address each cost segment: unused volumes (easy wins), snapshot sprawl (archive tier), volume right-sizing (reduce waste)."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Multi-pronged approach: Delete the 10% detached volumes (immediate $20K/month savings). Snapshot Archive costs 75% less than standard snapshots — archiving the 90%+ that are rarely accessed saves significant cost on the 5PB snapshot storage. Right-sizing gp3 volumes (reducing sizes where 85% of IOPS capacity is unused) reduces the 40% gp3 spend. Evaluating io2 Block Express may allow consolidating database IOPS requirements on fewer, larger volumes. This addresses all four cost segments systematically."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>EBS Snapshot Archive: $0.0125/GB/month vs standard $0.05/GB/month — 75% savings, with 24-72 hour restore time.</li>\n              <li>gp3 charges separately for size ($0.08/GB), IOPS above 3000 ($0.005/IOPS), and throughput above 125 MBps ($0.04/MBps).</li>\n              <li>io2 Block Express supports up to 256,000 IOPS and 4,000 MBps — may replace multiple smaller io2 volumes.</li>\n              <li>AWS Trusted Advisor and Cost Explorer provide recommendations for unattached EBS volumes and underutilized volumes.</li></ul>"
+        }
+      ],
+      "tags": [
+        "EBS",
+        "Cost Optimization",
+        "Storage"
+      ]
+    },
+    {
+      "id": 44,
+      "categoryRef": "cat-continuous",
+      "difficulty": "advanced",
+      "title": "Chaos Engineering Implementation",
+      "scenario": "A company wants to validate their application's resilience by systematically testing failure scenarios: AZ failures, service dependency outages, network latency injection, and resource exhaustion. They need controlled experiments that automatically abort if customer-impacting metrics breach thresholds, with findings documented for improvement.",
+      "questionText": "Which approach implements controlled chaos engineering experiments on AWS?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "AWS Fault Injection Service (FIS) with experiment templates targeting specific resources, CloudWatch alarm-based stop conditions, and automated finding reports"
+        },
+        {
+          "letter": "B",
+          "text": "Manually terminating EC2 instances and observing behavior through CloudWatch dashboards"
+        },
+        {
+          "letter": "C",
+          "text": "Netflix Chaos Monkey deployed on EKS for random pod termination only"
+        },
+        {
+          "letter": "D",
+          "text": "Load testing with Artillery to simulate high traffic and observe breaking points"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Which AWS service provides managed chaos engineering with safety controls (stop conditions) built in?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "AWS Fault Injection Service (FIS) provides managed experiment templates that inject faults: AZ disruption, network latency/packet loss, CPU/memory stress, service API errors, and instance termination. Stop conditions linked to CloudWatch alarms automatically abort experiments when error rates or latency exceed thresholds — preventing customer impact. Experiment templates are versioned and reusable, supporting regular game days with documented findings for resilience improvement."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>FIS supports: EC2 (terminate, stop, reboot), EKS (pod/node disruption), RDS (failover), Network (latency, packet loss, blackhole).</li>\n              <li>Stop conditions evaluate every 10 seconds — experiments halt within 10-20 seconds of threshold breach.</li>\n              <li>FIS integrates with Systems Manager documents for custom fault injection actions.</li>\n              <li>Best practice: start with single-instance experiments, progress to AZ-level, then simulate region impairment.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Chaos Engineering",
+        "Resilience",
+        "FIS"
+      ]
+    },
+    {
+      "id": 45,
+      "categoryRef": "cat-design",
+      "difficulty": "advanced",
+      "title": "Secrets Management at Scale",
+      "scenario": "A company runs 300 microservices that collectively use 2,000 secrets (database credentials, API keys, certificates). Secrets must rotate automatically without application downtime, applications in different accounts need cross-account secret access, and the security team requires audit trails showing which service accessed which secret and when. Current approach uses environment variables in ECS task definitions.",
+      "questionText": "Which secrets management architecture provides rotation, cross-account access, and comprehensive auditing?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "HashiCorp Vault on EC2 with auto-unseal using KMS and audit backend to CloudWatch Logs"
+        },
+        {
+          "letter": "B",
+          "text": "Parameter Store SecureString parameters with KMS encryption and IAM policies for access control"
+        },
+        {
+          "letter": "C",
+          "text": "AWS Secrets Manager with automatic rotation Lambda functions, resource-based policies for cross-account access, and CloudTrail for audit logging"
+        },
+        {
+          "letter": "D",
+          "text": "Encrypted environment variables in ECS task definitions with manual rotation procedures"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Which AWS service provides native automatic rotation, cross-account sharing, and full API-level audit logging?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Secrets Manager provides automatic rotation via Lambda functions (built-in support for RDS, Redshift, DocumentDB — custom Lambda for others). Resource-based policies enable cross-account access without credential copying. Integration with ECS/EKS references secrets at container startup without embedding in task definitions. CloudTrail logs every GetSecretValue call with source identity, enabling the security team to track exactly which service accessed which secret and when."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Secrets Manager rotation uses a 4-step Lambda: createSecret, setSecret, testSecret, finishSecret — enabling zero-downtime rotation.</li>\n              <li>ECS integrates natively with Secrets Manager — secrets are injected at task launch, and tasks get new values on next launch after rotation.</li>\n              <li>Resource policies support condition keys like aws:PrincipalOrgID for organization-wide access without listing each account.</li>\n              <li>Secrets Manager costs $0.40/secret/month + $0.05/10K API calls vs Parameter Store Advanced at $0.05/parameter/month.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Secrets Manager",
+        "Security",
+        "Rotation"
+      ]
+    },
+    {
+      "id": 46,
+      "categoryRef": "cat-new-solutions",
+      "difficulty": "advanced",
+      "title": "GraphQL API Architecture",
+      "scenario": "A social media application needs a GraphQL API that aggregates data from 8 different backend services (user profiles, posts, comments, likes, notifications, media, recommendations, analytics). Each resolver may need data from 2-3 services per query. Peak traffic is 100,000 GraphQL queries per second with complex nested resolves. The team wants to avoid managing GraphQL servers.",
+      "questionText": "Which architecture provides managed GraphQL with efficient multi-source resolution at this scale?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "AWS AppSync with pipeline resolvers, resolver-level caching, and VTL/JavaScript resolvers connecting to DynamoDB, Lambda, and HTTP data sources"
+        },
+        {
+          "letter": "B",
+          "text": "EC2 instances running Apollo Server with DataLoader for batching and caching"
+        },
+        {
+          "letter": "C",
+          "text": "API Gateway with Lambda resolvers implementing GraphQL schema manually"
+        },
+        {
+          "letter": "D",
+          "text": "EKS with graphql-yoga and Redis caching layer for resolver results"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Which AWS service provides fully managed GraphQL with built-in resolver caching and multiple data source types?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "AWS AppSync is a fully managed GraphQL service that eliminates server management. Pipeline resolvers chain multiple data sources in a single field resolution — enabling aggregation from 2-3 services per resolve without custom orchestration code. Server-side caching at the resolver level reduces backend calls. AppSync supports DynamoDB, Lambda, HTTP, RDS, and OpenSearch as data sources — covering all 8 backend services. It auto-scales to handle 100K+ queries/second."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Pipeline resolvers execute a sequence of functions (AppSync Functions), each calling a different data source, passing context between them.</li>\n              <li>AppSync caching supports per-resolver TTLs and cache keys based on query arguments.</li>\n              <li>JavaScript resolvers (GA) replace VTL with familiar syntax for request/response mapping.</li>\n              <li>AppSync Merged APIs allow teams to own their portion of the schema independently and merge into a single endpoint.</li></ul>"
+        }
+      ],
+      "tags": [
+        "AppSync",
+        "GraphQL",
+        "Serverless"
+      ]
+    },
+    {
+      "id": 47,
+      "categoryRef": "cat-continuous",
+      "difficulty": "advanced",
+      "title": "Database Performance Optimization",
+      "scenario": "A company's Aurora MySQL database handles 50,000 read queries and 5,000 write queries per second. Read latency has increased from 2ms to 15ms as the dataset grew to 2TB. The primary instance (r6g.4xlarge) shows 85% CPU utilization and 90% of the buffer pool is used. Adding read replicas has not improved latency for the most expensive queries which involve complex JOINs across 5 tables.",
+      "questionText": "Which optimization strategy addresses the root cause of read latency degradation?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Scale up to r6g.8xlarge for more CPU and memory"
+        },
+        {
+          "letter": "B",
+          "text": "Add more Aurora read replicas to distribute the read load"
+        },
+        {
+          "letter": "C",
+          "text": "Implement read-through caching with ElastiCache for frequently accessed join results, add Aurora parallel query for complex analytics, and optimize indexes for the JOIN patterns"
+        },
+        {
+          "letter": "D",
+          "text": "Migrate to Aurora Serverless v2 for automatic scaling"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Read replicas didn't help because the expensive queries are complex JOINs — the issue is query execution cost, not simple read distribution."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "The root cause is complex JOIN queries hitting a buffer pool that cannot hold the working set of 5-table joins for a 2TB dataset. ElastiCache caches computed JOIN results — avoiding repeated expensive queries. Aurora Parallel Query offloads analytical queries to the storage layer, scanning data in parallel without consuming buffer pool. Proper composite indexes for the JOIN patterns (covering the WHERE, JOIN, and ORDER BY columns) reduce the data pages scanned. Read replicas have the same limitation — same data, same expensive query execution."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Aurora Parallel Query pushes predicate evaluation to the storage nodes — 5-table JOINs with WHERE clauses benefit massively.</li>\n              <li>ElastiCache read-through: cache key = query hash, value = result set. TTL based on data freshness requirements.</li>\n              <li>Buffer pool at 90% with 2TB data means significant page eviction — covering indexes reduce pages needed in memory.</li>\n              <li>Performance Insights can identify exactly which queries contribute most to load for targeted optimization.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Aurora",
+        "Performance",
+        "Caching"
+      ]
+    },
+    {
+      "id": 48,
+      "categoryRef": "cat-design",
+      "difficulty": "advanced",
+      "title": "Compliance Boundary Architecture",
+      "scenario": "A government contractor must deploy applications meeting FedRAMP High requirements. Workloads process controlled unclassified information (CUI) and must be deployed only in GovCloud regions. They need to prevent accidental deployment to commercial regions, ensure all data is encrypted with FIPS 140-2 validated modules, and maintain continuous compliance evidence for annual audits.",
+      "questionText": "Which architecture enforces FedRAMP High compliance boundaries?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Commercial AWS with encryption enabled and compliance documentation maintained manually"
+        },
+        {
+          "letter": "B",
+          "text": "AWS GovCloud accounts with SCPs restricting actions to GovCloud regions only, FIPS endpoints enforced via IAM conditions, Config conformance packs for FedRAMP High, and Audit Manager for evidence collection"
+        },
+        {
+          "letter": "C",
+          "text": "AWS GovCloud with manual compliance checks performed quarterly by the security team"
+        },
+        {
+          "letter": "D",
+          "text": "Commercial AWS with a dedicated Organization and Control Tower for governance"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "FedRAMP High requires GovCloud plus FIPS endpoints plus continuous monitoring — which combination enforces all three?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "AWS GovCloud is the FedRAMP High authorized environment. SCPs prevent any API calls to non-GovCloud regions (preventing data leakage to commercial). IAM conditions requiring aws:SecureTransport and FIPS endpoint usage ensure all API calls use FIPS 140-2 validated TLS modules. Config conformance packs continuously evaluate resources against FedRAMP High controls. Audit Manager automates evidence collection, mapping controls to AWS Config findings for the annual audit package."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>GovCloud FIPS endpoints: use fips.{service}.{region}.amazonaws.com for all API calls.</li>\n              <li>SCP condition \"aws:RequestedRegion\" can restrict to us-gov-west-1 and us-gov-east-1 only.</li>\n              <li>Config conformance packs include pre-built FedRAMP templates with 100+ rules mapped to NIST 800-53 controls.</li>\n              <li>Audit Manager custom frameworks can map to specific FedRAMP High control families (AC, AU, CM, IA, SC, etc.).</li></ul>"
+        }
+      ],
+      "tags": [
+        "FedRAMP",
+        "GovCloud",
+        "Compliance"
+      ]
+    },
+    {
+      "id": 49,
+      "categoryRef": "cat-new-solutions",
+      "difficulty": "advanced",
+      "title": "Edge Computing Architecture",
+      "scenario": "A manufacturing company has 50 factories worldwide. Each factory generates 10GB of sensor data daily that must be processed locally for sub-millisecond control loop decisions. Only aggregated summaries (1% of raw data) should be sent to the cloud for global analytics. Factories have intermittent internet connectivity and must continue operating during outages lasting up to 48 hours.",
+      "questionText": "Which architecture provides local processing with cloud integration and offline resilience?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "AWS IoT Greengrass on local servers for edge ML inference and local processing, with store-and-forward to IoT Core when connectivity resumes, and S3 for global analytics"
+        },
+        {
+          "letter": "B",
+          "text": "AWS Outposts rack in each factory for full AWS service availability locally"
+        },
+        {
+          "letter": "C",
+          "text": "Direct Connect to each factory with all processing in the nearest AWS region"
+        },
+        {
+          "letter": "D",
+          "text": "Snowball Edge devices permanently deployed for local compute with manual data shipping monthly"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Which edge computing service provides local ML inference, operates during connectivity loss, and syncs to the cloud when connectivity returns?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "IoT Greengrass v2 runs on local servers, providing: local Lambda/container execution for sub-millisecond processing, ML inference using SageMaker Neo-compiled models, MQTT message broker for local device communication without cloud connectivity, and store-and-forward capability that queues messages during outages and syncs when connectivity resumes. Only aggregated summaries (configured via stream manager) are sent to IoT Core/S3. Outposts is overkill and requires reliable connectivity; Snowball Edge is designed for offline batch, not real-time control loops."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Greengrass stream manager handles local buffering with configurable retention (48+ hours) and bandwidth-aware upload policies.</li>\n              <li>Greengrass ML inference supports TensorFlow Lite, Apache MXNet, and PyTorch models compiled with SageMaker Neo.</li>\n              <li>Local MQTT broker enables device-to-device communication at microsecond latency without cloud round-trips.</li>\n              <li>Greengrass components are modular — deploy only needed capabilities (ML, stream manager, secret manager) per factory.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Edge Computing",
+        "IoT Greengrass",
+        "Offline"
+      ]
+    },
+    {
+      "id": 50,
+      "categoryRef": "cat-migration",
+      "difficulty": "advanced",
+      "title": "Mainframe Modernization",
+      "scenario": "A bank runs a COBOL-based core banking system on an IBM mainframe processing 10 million transactions daily. They want to reduce mainframe MIPS costs by 60%. The application has 5 million lines of COBOL code. Complete rewrite is not feasible (estimated 5 years). They need to maintain transaction integrity (ACID) and existing batch processing schedules during migration.",
+      "questionText": "Which modernization approach achieves 60% cost reduction while preserving transaction integrity?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Complete rewrite of all COBOL to Java microservices on EKS over 5 years"
+        },
+        {
+          "letter": "B",
+          "text": "AWS Mainframe Modernization service with automated refactoring to convert COBOL to Java, running on managed runtime with existing batch schedules preserved"
+        },
+        {
+          "letter": "C",
+          "text": "AWS Mainframe Modernization with replatform pattern — run COBOL code as-is on a Micro Focus runtime on AWS, reducing MIPS cost while preserving all existing logic and batch schedules"
+        },
+        {
+          "letter": "D",
+          "text": "Keep the mainframe and optimize MIPS usage through workload redistribution only"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "With 5M lines of COBOL and no feasible rewrite, which approach runs existing code on cheaper infrastructure while preserving behavior?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "AWS Mainframe Modernization with the replatform pattern runs existing COBOL code on Micro Focus (OpenFrame) runtime on AWS — no code changes required. This eliminates mainframe MIPS charges (60%+ cost reduction) while preserving all transaction integrity, batch schedules, and existing application behavior. The COBOL code, JCL batch jobs, CICS transactions, and DB2 calls continue working as-is. This is the lowest-risk path that achieves the cost target without a multi-year rewrite."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>AWS Mainframe Modernization supports two patterns: Replatform (run COBOL as-is on Micro Focus) and Refactor (convert to Java via Blu Age).</li>\n              <li>Replatform preserves: COBOL programs, JCL batch jobs, CICS transaction processing, IMS/DB2 data access — all running on EC2.</li>\n              <li>Typical mainframe MIPS cost: $1,500-3,000/MIPS/year vs AWS equivalent compute at 60-80% less.</li>\n              <li>Batch scheduling is preserved using BMC Control-M or AWS Step Functions replacing mainframe job schedulers.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Mainframe",
+        "Modernization",
+        "COBOL"
+      ]
+    }
+  ],
+  "glossary": {}
+}

@@ -1,0 +1,2521 @@
+{
+  "version": "1.0",
+  "metadata": {
+    "examCode": "DEA-C01",
+    "examTitle": "AWS Certified Data Engineer - Associate",
+    "provider": "Amazon Web Services",
+    "description": "Validates expertise in designing, building, and managing data processing systems on AWS, including data pipelines, data lakes, and analytics solutions.",
+    "totalQuestions": 50,
+    "createdDate": "2026-01-21",
+    "lastModified": "2026-01-21T00:00:00Z",
+    "categories": {
+      "data-ingestion": "Data Ingestion and Transformation",
+      "data-store": "Data Store Management",
+      "data-operations": "Data Operations and Support",
+      "data-security": "Data Security and Governance"
+    }
+  },
+  "questions": [
+    {
+      "id": 1,
+      "categoryRef": "data-ingestion",
+      "difficulty": "intermediate",
+      "title": "Real-Time Streaming Data Ingestion",
+      "scenario": "A retail company wants to capture clickstream data from their e-commerce website in real-time. The data should be processed within seconds and made available for real-time analytics dashboards. Peak traffic can reach 100,000 events per second during flash sales.",
+      "questionText": "Which AWS service combination provides the most cost-effective solution for ingesting and processing this high-volume streaming data?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Amazon MSK (Managed Streaming for Apache Kafka) with Kafka Streams"
+        },
+        {
+          "letter": "B",
+          "text": "Amazon Kinesis Data Firehose with direct S3 delivery"
+        },
+        {
+          "letter": "C",
+          "text": "Amazon Kinesis Data Streams with AWS Lambda consumers"
+        },
+        {
+          "letter": "D",
+          "text": "Amazon SQS with EC2-based consumers"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Consider which service provides native real-time processing with automatic scaling for variable workloads."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Amazon Kinesis Data Streams with Lambda consumers is ideal for this scenario. Kinesis Data Streams can handle 100,000+ records per second with on-demand capacity mode. Lambda consumers process data in near real-time (sub-second latency) and scale automatically with the stream. This combination is cost-effective because you pay only for actual usage. MSK requires more management overhead and fixed capacity. Kinesis Firehose has minimum 60-second buffering, not suitable for sub-second requirements. SQS is not designed for ordered streaming analytics."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Kinesis Data Streams on-demand mode automatically scales from thousands to millions of records per second</li>\n            <li>Lambda Enhanced Fan-Out provides dedicated throughput of 2 MB/second per consumer</li>\n            <li>Kinesis processes records in order within each shard, essential for clickstream analysis</li>\n            <li>Lambda concurrent executions scale with number of shards for parallel processing</li>\n            <li>Consider Kinesis Data Analytics for complex real-time SQL or Apache Flink processing</li></ul>"
+        }
+      ],
+      "tags": [
+        "Kinesis",
+        "Lambda",
+        "real-time",
+        "streaming"
+      ]
+    },
+    {
+      "id": 2,
+      "categoryRef": "data-store",
+      "difficulty": "intermediate",
+      "title": "Data Lake Storage Architecture",
+      "scenario": "A media company stores 500 TB of video metadata and user interaction logs. Analytics teams run daily batch queries analyzing viewing patterns, while data scientists need ad-hoc queries for ML feature engineering. Query patterns vary significantly, with some queries scanning entire datasets and others targeting specific date ranges.",
+      "questionText": "Which storage format and partitioning strategy optimizes query performance and cost for this data lake?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Store data in CSV format partitioned by video_id"
+        },
+        {
+          "letter": "B",
+          "text": "Store data in Apache Avro format partitioned by user_id"
+        },
+        {
+          "letter": "C",
+          "text": "Store data in JSON format with no partitioning for flexibility"
+        },
+        {
+          "letter": "D",
+          "text": "Store data in Apache Parquet format partitioned by date with Snappy compression"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "What type of storage format best supports queries that read a few columns across many rows?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Apache Parquet with date partitioning and Snappy compression is optimal for this scenario. Parquet is a columnar format that enables efficient column pruning and predicate pushdown, reducing data scanned. Date partitioning aligns with daily batch queries and time-range ad-hoc queries, enabling partition pruning. Snappy compression provides a good balance between compression ratio and query speed. CSV lacks columnar benefits, JSON is inefficient for analytics, and user_id partitioning would create too many small partitions and not align with query patterns."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Parquet stores data in row groups with column chunks, enabling parallel column reads</li>\n            <li>Parquet min/max statistics in footer enable predicate pushdown without reading data</li>\n            <li>Date partitioning creates S3 prefixes like s3://bucket/year=2024/month=01/day=15/</li>\n            <li>Athena and Redshift Spectrum leverage partition pruning to skip irrelevant partitions</li>\n            <li>Consider Apache Iceberg or Delta Lake for ACID transactions and time travel capabilities</li></ul>"
+        }
+      ],
+      "tags": [
+        "Parquet",
+        "S3",
+        "data-lake",
+        "partitioning"
+      ]
+    },
+    {
+      "id": 3,
+      "categoryRef": "data-ingestion",
+      "difficulty": "advanced",
+      "title": "CDC Pipeline Architecture",
+      "scenario": "A financial services company needs to replicate transaction data from an on-premises Oracle database to AWS for analytics. The source database processes 50,000 transactions per hour and requires near real-time replication with minimal impact on source database performance. Data must be available in both a data warehouse and a data lake.",
+      "questionText": "Which architecture provides the most efficient change data capture (CDC) pipeline?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Custom application reading Oracle redo logs and writing to SQS"
+        },
+        {
+          "letter": "B",
+          "text": "AWS DMS with CDC directly to both Redshift and S3 simultaneously"
+        },
+        {
+          "letter": "C",
+          "text": "AWS DMS with CDC to Kinesis Data Streams, then Lambda to write to Redshift and S3"
+        },
+        {
+          "letter": "D",
+          "text": "Scheduled full table exports using AWS DMS every 15 minutes"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Consider how to efficiently fan out CDC events to multiple destinations while maintaining order."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "AWS DMS with CDC to Kinesis Data Streams provides the best architecture. DMS reads Oracle redo logs with minimal source impact. Kinesis acts as a durable buffer enabling multiple consumers. Lambda can transform and route events to both Redshift and S3 independently. This decouples producers from consumers and handles backpressure gracefully. Direct DMS to multiple targets increases source load and complexity. Custom redo log parsing is error-prone. Full exports every 15 minutes create high latency and source load."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>DMS uses Oracle LogMiner or Binary Reader for low-impact CDC from redo logs</li>\n            <li>Kinesis preserves transaction ordering within shards using primary key as partition key</li>\n            <li>Consider Kinesis Data Firehose for S3 delivery with automatic batching and Parquet conversion</li>\n            <li>Use Redshift Streaming Ingestion for sub-second latency to Redshift from Kinesis</li>\n            <li>DMS validation feature ensures data integrity between source and target</li></ul>"
+        }
+      ],
+      "tags": [
+        "DMS",
+        "CDC",
+        "Kinesis",
+        "Oracle"
+      ]
+    },
+    {
+      "id": 4,
+      "categoryRef": "data-operations",
+      "difficulty": "intermediate",
+      "title": "ETL Workflow Orchestration",
+      "scenario": "A healthcare analytics company runs 200+ daily ETL jobs with complex dependencies. Jobs include Glue ETL, EMR Spark jobs, Redshift stored procedures, and Lambda functions. Some job chains take 6 hours to complete and require automatic retry logic with exponential backoff. The team needs visibility into job status and alerting on failures.",
+      "questionText": "Which orchestration solution best meets these requirements?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "AWS Glue Workflows with triggers and CloudWatch Events"
+        },
+        {
+          "letter": "B",
+          "text": "Amazon MWAA (Managed Workflows for Apache Airflow)"
+        },
+        {
+          "letter": "C",
+          "text": "AWS Step Functions with state machines"
+        },
+        {
+          "letter": "D",
+          "text": "Cron jobs on EC2 instances with custom dependency tracking"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "With 200+ jobs spanning multiple AWS compute services, what kind of orchestration model handles cross-service dependencies best?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Amazon MWAA (Managed Airflow) is ideal for complex ETL orchestration. Airflow provides DAG-based dependency management, native operators for Glue, EMR, Redshift, and Lambda, built-in retry with exponential backoff, and a web UI for monitoring. With 200+ jobs and 6-hour chains, Airflow's scheduling and dependency features are essential. Glue Workflows only orchestrate Glue jobs. Step Functions can orchestrate but DAG definition and monitoring are less intuitive for ETL teams. EC2 cron lacks dependency management and reliability."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>MWAA uses Airflow's Directed Acyclic Graph (DAG) model for dependency definition</li>\n            <li>Airflow sensors enable waiting for external events like S3 file arrival</li>\n            <li>MWAA integrates with Secrets Manager for secure credential management</li>\n            <li>Task-level retry configuration with max_retries and retry_delay parameters</li>\n            <li>CloudWatch integration provides metrics and log aggregation for DAG runs</li></ul>"
+        }
+      ],
+      "tags": [
+        "MWAA",
+        "Airflow",
+        "orchestration",
+        "ETL"
+      ]
+    },
+    {
+      "id": 5,
+      "categoryRef": "data-security",
+      "difficulty": "intermediate",
+      "title": "Data Lake Security and Governance",
+      "scenario": "A pharmaceutical company is building a data lake containing clinical trial data. Different research teams need access to specific datasets based on their projects. Some columns contain personally identifiable information (PII) that should be masked for certain users. All data access must be audited for regulatory compliance.",
+      "questionText": "Which service combination provides the most comprehensive data governance solution?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Amazon Macie for data discovery with manual access controls"
+        },
+        {
+          "letter": "B",
+          "text": "Glue Data Catalog with resource-based policies"
+        },
+        {
+          "letter": "C",
+          "text": "AWS Lake Formation with column-level security and data filters"
+        },
+        {
+          "letter": "D",
+          "text": "S3 bucket policies with IAM roles per team"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "What granularity of access control does PII masking for specific users require — bucket, table, or finer?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "AWS Lake Formation provides comprehensive data lake governance. It offers column-level security to restrict PII access, data filters for row-level security, centralized permission management across Glue, Athena, and Redshift Spectrum, and CloudTrail integration for audit logging. Lake Formation simplifies governance compared to managing individual S3 and IAM policies. S3 bucket policies lack column-level control. Glue Data Catalog alone doesn't provide column masking. Macie discovers sensitive data but doesn't control access."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Lake Formation Tag-Based Access Control (LF-TBAC) enables attribute-based permissions</li>\n            <li>Data filters create virtual views that mask or exclude rows based on user context</li>\n            <li>Lake Formation governed tables provide ACID transactions for data lakes</li>\n            <li>Cross-account data sharing with Lake Formation maintains governance controls</li>\n            <li>Integration with AWS RAM enables sharing data catalog resources across accounts</li></ul>"
+        }
+      ],
+      "tags": [
+        "Lake Formation",
+        "governance",
+        "security",
+        "PII"
+      ]
+    },
+    {
+      "id": 6,
+      "categoryRef": "data-ingestion",
+      "difficulty": "basic",
+      "title": "Batch Data Ingestion from Multiple Sources",
+      "scenario": "A logistics company needs to ingest daily CSV files from 50 different suppliers. Files arrive at various times throughout the day in different S3 buckets. Each file needs validation, format standardization, and loading into a central data warehouse. The team wants a serverless solution with minimal operational overhead.",
+      "questionText": "Which approach provides the most efficient batch ingestion pipeline?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "EMR cluster running continuous Spark Streaming jobs"
+        },
+        {
+          "letter": "B",
+          "text": "S3 event notifications triggering AWS Glue ETL jobs for each file"
+        },
+        {
+          "letter": "C",
+          "text": "AWS Data Pipeline with scheduled activities"
+        },
+        {
+          "letter": "D",
+          "text": "Scheduled Lambda functions polling each S3 bucket hourly"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Consider event-driven architecture for processing files as they arrive without polling overhead."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "S3 event notifications triggering Glue ETL jobs provides an efficient serverless solution. When files land in S3, events automatically trigger Glue jobs for validation and transformation. Glue is serverless, scales automatically, and integrates with the Glue Data Catalog for schema management. This event-driven approach processes files immediately without polling. Lambda polling adds complexity and cost. Data Pipeline is being deprecated. EMR requires cluster management and is overkill for batch CSV processing."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Use S3 Event Notifications with EventBridge for advanced filtering and routing</li>\n            <li>Glue crawlers can automatically infer schemas from incoming CSV files</li>\n            <li>Glue job bookmarks track processed files to prevent reprocessing</li>\n            <li>Consider Glue workflows to chain validation, transformation, and loading jobs</li>\n            <li>Glue DataBrew provides visual data preparation for non-technical users</li></ul>"
+        }
+      ],
+      "tags": [
+        "Glue",
+        "S3",
+        "batch",
+        "serverless"
+      ]
+    },
+    {
+      "id": 7,
+      "categoryRef": "data-store",
+      "difficulty": "advanced",
+      "title": "Data Warehouse Optimization",
+      "scenario": "A retail analytics team uses Amazon Redshift with 10 TB of sales data. Queries analyzing recent 90-day data run frequently and need sub-second response times. Historical queries beyond 90 days run occasionally for annual reports. Storage costs are a concern, and the team wants to optimize both performance and cost.",
+      "questionText": "Which Redshift configuration optimizes this workload pattern?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Use RA3 nodes with managed storage and Redshift Spectrum for historical data in S3"
+        },
+        {
+          "letter": "B",
+          "text": "Use DC2 nodes with all data stored locally"
+        },
+        {
+          "letter": "C",
+          "text": "Use Redshift Serverless for all queries"
+        },
+        {
+          "letter": "D",
+          "text": "Store all data in S3 and use only Redshift Spectrum"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Consider separating hot and cold data tiers for cost optimization while maintaining performance."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "RA3 nodes with managed storage and Redshift Spectrum provide optimal cost-performance balance. RA3 nodes automatically tier frequently accessed data to fast local SSD cache while storing bulk data in S3-backed managed storage. Recent 90-day hot data stays cached for sub-second queries. Historical data beyond 90 days can be stored in S3 and queried via Spectrum, reducing storage costs significantly. DC2 local storage is expensive at scale. Serverless may have cold start latency. Spectrum-only lacks the performance for frequent queries."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>RA3 managed storage costs approximately $0.024/GB/month vs local SSD at higher cost</li>\n            <li>Automatic workload management (WLM) prioritizes short queries for interactive use</li>\n            <li>Materialized views can pre-aggregate common query patterns for faster response</li>\n            <li>AQUA (Advanced Query Accelerator) pushes filtering to storage layer on RA3</li>\n            <li>Data sharing enables separating compute and storage across Redshift clusters</li></ul>"
+        }
+      ],
+      "tags": [
+        "Redshift",
+        "Spectrum",
+        "optimization",
+        "cost"
+      ]
+    },
+    {
+      "id": 8,
+      "categoryRef": "data-operations",
+      "difficulty": "intermediate",
+      "title": "Data Quality Monitoring",
+      "scenario": "An insurance company processes claims data through multiple ETL stages. Data quality issues in upstream systems have caused incorrect analytics reports. The team needs automated data quality checks that validate completeness, accuracy, and freshness at each pipeline stage, with alerting when issues are detected.",
+      "questionText": "Which approach provides comprehensive automated data quality monitoring?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Custom SQL validation queries scheduled in Athena"
+        },
+        {
+          "letter": "B",
+          "text": "AWS Glue Data Quality with rules defined in Glue ETL jobs"
+        },
+        {
+          "letter": "C",
+          "text": "Amazon Macie for data classification and quality"
+        },
+        {
+          "letter": "D",
+          "text": "CloudWatch custom metrics with manual threshold alerts"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Should quality checks run inside the pipeline or as a separate post-processing step? Think about where rules catch issues earliest."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "AWS Glue Data Quality provides native integration with Glue ETL jobs for automated quality checks. You define rules using Data Quality Definition Language (DQDL) for completeness, uniqueness, accuracy, and freshness validations. Rules run automatically during ETL execution with pass/fail results and detailed metrics. Failed quality checks can halt pipelines or trigger alerts via EventBridge and SNS. Custom SQL requires manual integration and lacks built-in alerting. Macie focuses on sensitive data discovery. CloudWatch metrics require custom instrumentation."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>DQDL supports rules like Completeness, Uniqueness, ColumnValues, and CustomSql</li>\n            <li>Glue Data Quality evaluates rules and generates quality scores (0-100%)</li>\n            <li>Integration with Glue Data Catalog enables quality metrics in data lineage</li>\n            <li>Anomaly detection rules identify statistical deviations from historical patterns</li>\n            <li>Quality results publish to CloudWatch for dashboards and trend analysis</li></ul>"
+        }
+      ],
+      "tags": [
+        "Glue",
+        "data-quality",
+        "monitoring",
+        "ETL"
+      ]
+    },
+    {
+      "id": 9,
+      "categoryRef": "data-security",
+      "difficulty": "advanced",
+      "title": "Data Encryption Architecture",
+      "scenario": "A government contractor must implement encryption for data at rest and in transit across their data platform. They require customer-managed encryption keys with annual rotation, separate keys for different data classifications, and the ability to audit all key usage. Data flows between S3, Redshift, and EMR.",
+      "questionText": "Which encryption architecture meets these requirements?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "AWS managed keys (SSE-S3) for all services with CloudTrail logging"
+        },
+        {
+          "letter": "B",
+          "text": "Client-side encryption with keys stored in Secrets Manager"
+        },
+        {
+          "letter": "C",
+          "text": "S3 bucket keys with default encryption only"
+        },
+        {
+          "letter": "D",
+          "text": "AWS KMS customer managed keys (CMKs) with key policies and automatic rotation"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Who should control the encryption keys — the service, the customer, or a third party? What does that choice imply for auditing?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "AWS KMS with customer managed keys (CMKs) provides the required encryption architecture. CMKs support automatic annual rotation, key policies for access control, and complete CloudTrail audit logging of all key operations. Different CMKs can be created for each data classification (e.g., secret, confidential, public). S3, Redshift, and EMR all integrate natively with KMS for transparent encryption. SSE-S3 lacks customer control. Client-side encryption adds complexity. S3 bucket keys optimize cost but don't address multi-service requirements."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>KMS automatic key rotation creates new key material annually while retaining old material for decryption</li>\n            <li>Key policies define which IAM principals can use or manage each CMK</li>\n            <li>KMS grants provide temporary access to keys for specific services like EMR</li>\n            <li>Redshift uses envelope encryption with CMK protecting data encryption keys</li>\n            <li>CloudTrail logs every KMS API call including Encrypt, Decrypt, and GenerateDataKey</li></ul>"
+        }
+      ],
+      "tags": [
+        "KMS",
+        "encryption",
+        "security",
+        "compliance"
+      ]
+    },
+    {
+      "id": 10,
+      "categoryRef": "data-ingestion",
+      "difficulty": "intermediate",
+      "title": "IoT Data Ingestion at Scale",
+      "scenario": "An energy company monitors 500,000 smart meters that send readings every 15 minutes. Each reading includes meter ID, timestamp, energy consumption, and voltage metrics. Data must be stored for 7 years with the ability to run both real-time anomaly detection and historical trend analysis.",
+      "questionText": "Which architecture handles this IoT data ingestion and storage requirement?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "API Gateway with Lambda processing each meter reading individually"
+        },
+        {
+          "letter": "B",
+          "text": "Direct MQTT to EC2 fleet with custom processing and RDS storage"
+        },
+        {
+          "letter": "C",
+          "text": "AWS IoT Core to Kinesis Data Streams, with Kinesis Data Analytics for anomalies and Firehose to S3 for storage"
+        },
+        {
+          "letter": "D",
+          "text": "AWS IoT Core directly to DynamoDB with DynamoDB Streams for processing"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "The scenario needs both real-time anomaly detection and cheap long-term storage. How many layers does that require?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "AWS IoT Core to Kinesis provides optimal IoT data architecture. IoT Core handles MQTT connections from 500,000 devices with automatic scaling. Kinesis Data Streams buffers the 2 million readings per hour reliably. Kinesis Data Analytics (Apache Flink) enables real-time anomaly detection using statistical algorithms. Kinesis Data Firehose delivers data to S3 in Parquet format for cost-effective 7-year storage. This separates real-time processing from historical storage. EC2 fleet requires management. API Gateway has request limits. DynamoDB is expensive for 7-year retention at this scale."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>IoT Core rules engine can route messages to multiple destinations simultaneously</li>\n            <li>Kinesis Data Analytics supports tumbling, sliding, and session windows for aggregation</li>\n            <li>Firehose automatic Parquet conversion reduces storage costs by 80% vs JSON</li>\n            <li>S3 Intelligent-Tiering automatically moves old data to cheaper storage classes</li>\n            <li>Consider Amazon Timestream for time-series specific queries and automatic tiering</li></ul>"
+        }
+      ],
+      "tags": [
+        "IoT",
+        "Kinesis",
+        "streaming",
+        "time-series"
+      ]
+    },
+    {
+      "id": 11,
+      "categoryRef": "data-store",
+      "difficulty": "intermediate",
+      "title": "Data Lake Table Format Selection",
+      "scenario": "A financial services firm is modernizing their data lake. They need ACID transactions for concurrent writes, time travel for regulatory audits, schema evolution for changing requirements, and efficient upserts for slowly changing dimensions. The solution should work with Athena, EMR, and Redshift Spectrum.",
+      "questionText": "Which table format best addresses these requirements?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Apache Iceberg tables in AWS Glue Data Catalog"
+        },
+        {
+          "letter": "B",
+          "text": "Standard Parquet files with Hive-style partitioning"
+        },
+        {
+          "letter": "C",
+          "text": "Delta Lake with custom metadata management"
+        },
+        {
+          "letter": "D",
+          "text": "Apache ORC files with manual versioning"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "The scenario demands ACID updates and time travel on a data lake. Which choices even support transactional semantics?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Apache Iceberg provides all required capabilities with excellent AWS integration. Iceberg supports ACID transactions through optimistic concurrency control, time travel via snapshot isolation for audit queries, schema evolution without rewriting data, and efficient merge-on-read for upserts. AWS Glue Data Catalog natively supports Iceberg metadata, enabling seamless access from Athena, EMR, and Redshift Spectrum. Standard Parquet lacks transactions and time travel. Delta Lake has limited AWS native support. ORC requires manual version management."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Iceberg maintains metadata in manifest files tracking all data files and their statistics</li>\n            <li>Time travel uses snapshot IDs: SELECT * FROM table FOR VERSION AS OF snapshot_id</li>\n            <li>Schema evolution supports add, drop, rename, and reorder columns without rewrite</li>\n            <li>Merge operations use copy-on-write or merge-on-read strategies based on workload</li>\n            <li>Iceberg compaction optimizes file sizes and removes deleted data from storage</li></ul>"
+        }
+      ],
+      "tags": [
+        "Iceberg",
+        "data-lake",
+        "ACID",
+        "Glue"
+      ]
+    },
+    {
+      "id": 12,
+      "categoryRef": "data-operations",
+      "difficulty": "basic",
+      "title": "Schema Discovery and Management",
+      "scenario": "A media company receives data from content partners in various formats including JSON, CSV, and Parquet. New data sources are added monthly, and schemas frequently change. The analytics team needs to quickly discover schemas and query data using SQL without manual schema definition.",
+      "questionText": "Which service combination automates schema discovery and enables immediate SQL querying?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Manual schema definition in Hive Metastore with EMR Hive"
+        },
+        {
+          "letter": "B",
+          "text": "Amazon Macie for schema discovery with Redshift queries"
+        },
+        {
+          "letter": "C",
+          "text": "AWS Glue Crawlers with Glue Data Catalog and Amazon Athena"
+        },
+        {
+          "letter": "D",
+          "text": "Lambda functions parsing files and storing schemas in DynamoDB"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Thousands of datasets in mixed formats need schemas discovered automatically. Is manual definition realistic at that scale?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Glue Crawlers with Data Catalog and Athena provides automated schema discovery. Crawlers automatically infer schemas from JSON, CSV, Parquet, and other formats, storing metadata in the Glue Data Catalog. When schemas change, crawlers detect and update catalog entries. Athena immediately queries data using catalog schemas without data movement. This combination requires no manual schema definition and handles new sources automatically. Manual Hive schemas don't auto-update. Macie discovers sensitive data, not schemas. Custom Lambda adds complexity."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Crawlers use classifiers to identify data formats and infer column types</li>\n            <li>Schema versioning in Data Catalog tracks changes and enables compatibility checks</li>\n            <li>Custom classifiers handle proprietary formats using grok patterns or JSON paths</li>\n            <li>Crawler scheduling ensures schemas stay current with source data changes</li>\n            <li>Data Catalog APIs enable programmatic schema management and integration</li></ul>"
+        }
+      ],
+      "tags": [
+        "Glue",
+        "Athena",
+        "schema",
+        "crawler"
+      ]
+    },
+    {
+      "id": 13,
+      "categoryRef": "data-security",
+      "difficulty": "intermediate",
+      "title": "Cross-Account Data Sharing",
+      "scenario": "A conglomerate has separate AWS accounts for each business unit. The central analytics team needs to query data from all business units without copying data. Each business unit must retain control over their data and approve access requests. Data governance and audit trails must be maintained.",
+      "questionText": "Which approach enables secure cross-account data sharing with governance?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Copy all data to a central S3 bucket with cross-account IAM roles"
+        },
+        {
+          "letter": "B",
+          "text": "AWS DataSync scheduled copies between accounts"
+        },
+        {
+          "letter": "C",
+          "text": "S3 bucket policies allowing cross-account access"
+        },
+        {
+          "letter": "D",
+          "text": "AWS Lake Formation cross-account sharing with LF-Tags"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Does sharing data across accounts require copying it, or can permissions be granted in place? What about governance overhead?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "AWS Lake Formation cross-account sharing with LF-Tags enables governed data sharing. Business units register their data in Lake Formation and define access using LF-Tags (e.g., department=finance, sensitivity=confidential). The central team requests access, and business units grant permissions through Lake Formation. Data remains in original accounts with no copying. All access is logged via CloudTrail. LF-Tags enable attribute-based access control across accounts. Data copying wastes storage and creates sync issues. S3 bucket policies lack fine-grained governance. DataSync creates duplicate data."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Lake Formation uses AWS Resource Access Manager (RAM) for cross-account sharing</li>\n            <li>LF-Tags enable policy-based access: grant access to all tables tagged department=sales</li>\n            <li>Named resources sharing allows granting access to specific databases and tables</li>\n            <li>Central governance account can coordinate permissions across the organization</li>\n            <li>Hybrid access mode enables gradual migration from IAM to Lake Formation permissions</li></ul>"
+        }
+      ],
+      "tags": [
+        "Lake Formation",
+        "cross-account",
+        "governance",
+        "sharing"
+      ]
+    },
+    {
+      "id": 14,
+      "categoryRef": "data-ingestion",
+      "difficulty": "advanced",
+      "title": "Real-Time Data Transformation",
+      "scenario": "A gaming company streams player events at 1 million events per second during peak hours. Events need real-time enrichment with player profile data from DynamoDB, aggregation into 1-minute windows for leaderboards, and anomaly detection for fraud. Latency must be under 5 seconds from event to insight.",
+      "questionText": "Which stream processing architecture meets these latency and throughput requirements?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "EMR Spark Structured Streaming with batch DynamoDB queries"
+        },
+        {
+          "letter": "B",
+          "text": "Lambda functions consuming from Kinesis with DynamoDB lookups"
+        },
+        {
+          "letter": "C",
+          "text": "Kinesis Data Analytics for Apache Flink with async I/O for DynamoDB enrichment"
+        },
+        {
+          "letter": "D",
+          "text": "Kinesis Data Firehose with Lambda transformation"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Enriching each event from an external store while computing sliding-window aggregations — is a simple consumer enough, or do you need a full processing framework?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Kinesis Data Analytics for Apache Flink provides the required capabilities. Flink's async I/O enables non-blocking DynamoDB lookups during enrichment without reducing throughput. Native windowing operators support 1-minute tumbling windows for aggregations. Flink's CEP (Complex Event Processing) library enables pattern-based anomaly detection. With proper parallelism, Flink handles millions of events per second with sub-second latency. Lambda has concurrency limits at this scale. Spark Structured Streaming has higher latency. Firehose has minimum 60-second buffering."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Flink async I/O batches DynamoDB requests for efficient throughput during enrichment</li>\n            <li>Flink maintains exactly-once semantics with Kinesis checkpointing</li>\n            <li>Application autoscaling adjusts parallelism based on Kinesis shard count</li>\n            <li>Flink state backends (RocksDB) enable large state for sessionization and aggregation</li>\n            <li>Side outputs route anomalies to separate Kinesis streams for alerting</li></ul>"
+        }
+      ],
+      "tags": [
+        "Flink",
+        "Kinesis",
+        "real-time",
+        "enrichment"
+      ]
+    },
+    {
+      "id": 15,
+      "categoryRef": "data-store",
+      "difficulty": "intermediate",
+      "title": "Time-Series Data Architecture",
+      "scenario": "A manufacturing company collects sensor data from 10,000 machines across 50 factories. Each sensor reports metrics every second, generating 500 million data points daily. Engineers need to query recent data (last 7 days) with millisecond response times for dashboards and analyze historical trends over years for predictive maintenance models.",
+      "questionText": "Which storage architecture optimizes both real-time queries and historical analysis?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Amazon RDS PostgreSQL with TimescaleDB extension"
+        },
+        {
+          "letter": "B",
+          "text": "Single DynamoDB table with TTL for data expiration"
+        },
+        {
+          "letter": "C",
+          "text": "Amazon Timestream with memory store for recent data and magnetic store for historical"
+        },
+        {
+          "letter": "D",
+          "text": "Elasticsearch with index lifecycle management"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "The data has a clear hot/cold pattern over time. Should you build tiering yourself or look for a storage engine designed for that access pattern?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Amazon Timestream is purpose-built for this time-series workload. The memory store provides millisecond query latency for recent data (configurable retention, e.g., 7 days). Data automatically moves to the magnetic store for cost-effective long-term retention. Built-in time-series functions (interpolation, smoothing, approximation) accelerate analytics. Automatic data lifecycle management eliminates manual tiering. Timestream handles 500M+ daily records with serverless scaling. DynamoDB requires complex design for time-series. RDS doesn't scale to this volume. Elasticsearch is expensive for long-term storage."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Memory store uses in-memory caching with SSD backing for sub-millisecond reads</li>\n            <li>Magnetic store uses columnar storage optimized for time-series aggregation queries</li>\n            <li>Scheduled queries pre-aggregate data for dashboard performance optimization</li>\n            <li>Multi-measure records reduce storage cost by grouping related measurements</li>\n            <li>Timestream integrates with Grafana for real-time visualization dashboards</li></ul>"
+        }
+      ],
+      "tags": [
+        "Timestream",
+        "time-series",
+        "IoT",
+        "sensor"
+      ]
+    },
+    {
+      "id": 16,
+      "categoryRef": "data-operations",
+      "difficulty": "advanced",
+      "title": "Data Pipeline Cost Optimization",
+      "scenario": "A SaaS company's data pipeline processes 50 TB daily using EMR clusters for Spark jobs. Current costs are $200,000/month. Jobs run during business hours with 80% of processing between 9 AM and 5 PM. Some jobs are latency-sensitive (30-minute SLA), while batch jobs can tolerate delays. The team wants to reduce costs by 40% without impacting SLAs.",
+      "questionText": "Which combination of strategies achieves the cost reduction target?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Migrate all workloads to AWS Glue with standard workers"
+        },
+        {
+          "letter": "B",
+          "text": "Use EMR Serverless for all workloads regardless of latency requirements"
+        },
+        {
+          "letter": "C",
+          "text": "Use EMR on EKS with Spot instances for batch jobs, Graviton instances, and intelligent auto-scaling"
+        },
+        {
+          "letter": "D",
+          "text": "Use EMR on EC2 with 100% On-Demand instances and larger cluster sizes"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Consider combining instance pricing strategies with right-sizing and auto-scaling based on workload characteristics."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "EMR on EKS with strategic optimizations achieves 40%+ cost reduction. Spot instances for batch jobs (which tolerate interruption) save 60-90% on compute. Graviton (ARM) instances provide 20% better price-performance. EKS enables fine-grained pod scaling and bin-packing efficiency. Intelligent auto-scaling matches capacity to the 9-5 peak pattern. Reserve On-Demand or Savings Plans for latency-sensitive SLA jobs. This combination optimizes each workload type appropriately. 100% On-Demand wastes money. Glue may not match EMR performance. Serverless has startup latency concerns for SLA jobs."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>EMR on EKS enables Kubernetes-native autoscaling with Karpenter for rapid scaling</li>\n            <li>Instance fleets diversify across multiple Spot pools for availability</li>\n            <li>Graviton3 processors optimize Spark workloads with 40% better performance</li>\n            <li>Managed scaling analyzes executor utilization for automatic cluster sizing</li>\n            <li>Consider Savings Plans for predictable baseline capacity during business hours</li></ul>"
+        }
+      ],
+      "tags": [
+        "EMR",
+        "cost-optimization",
+        "Spot",
+        "Graviton"
+      ]
+    },
+    {
+      "id": 17,
+      "categoryRef": "data-security",
+      "difficulty": "basic",
+      "title": "Data Classification and Discovery",
+      "scenario": "A healthcare company is migrating data to AWS and needs to discover and classify sensitive information including Protected Health Information (PHI), Social Security numbers, and credit card data across their S3 data lake. They require automated scanning, classification reports, and alerts when sensitive data is detected in unauthorized locations.",
+      "questionText": "Which service automates sensitive data discovery and classification?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Amazon Inspector scanning S3 objects"
+        },
+        {
+          "letter": "B",
+          "text": "AWS Config rules checking S3 bucket configurations"
+        },
+        {
+          "letter": "C",
+          "text": "Manual review using S3 Inventory reports"
+        },
+        {
+          "letter": "D",
+          "text": "Amazon Macie with custom data identifiers and automated discovery"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Scanning petabytes for unknown PII patterns requires more than regex. What approach scales for discovery across many buckets?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Amazon Macie provides automated sensitive data discovery. Macie uses machine learning and pattern matching to identify PHI, PII, financial data, and credentials in S3. Custom data identifiers extend detection to organization-specific patterns. Automated discovery jobs scan buckets on schedule. Findings include data location, type, and severity. EventBridge integration enables alerts when sensitive data appears in unauthorized buckets. AWS Config monitors configurations, not data content. Inspector focuses on vulnerabilities. Manual review doesn't scale."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Macie managed data identifiers cover 100+ sensitive data types globally</li>\n            <li>Custom data identifiers use regex patterns for organization-specific data</li>\n            <li>Allow lists reduce false positives for known safe patterns like test data</li>\n            <li>Automated discovery provides statistical sampling for cost-effective scanning</li>\n            <li>Security Hub integration aggregates Macie findings with other security alerts</li></ul>"
+        }
+      ],
+      "tags": [
+        "Macie",
+        "security",
+        "PII",
+        "compliance"
+      ]
+    },
+    {
+      "id": 18,
+      "categoryRef": "data-ingestion",
+      "difficulty": "intermediate",
+      "title": "API Data Integration",
+      "scenario": "A marketing analytics company needs to ingest data from 30 different SaaS platforms (Salesforce, HubSpot, Google Analytics, etc.) into their data lake. Each API has different authentication methods, rate limits, and data formats. Ingestion should run daily with automatic retry on failures and schema change detection.",
+      "questionText": "Which approach provides the most maintainable solution for multi-source API ingestion?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Single EMR cluster running custom Python scripts"
+        },
+        {
+          "letter": "B",
+          "text": "Amazon AppFlow with scheduled flows for supported connectors"
+        },
+        {
+          "letter": "C",
+          "text": "AWS Glue Python Shell jobs with requests library"
+        },
+        {
+          "letter": "D",
+          "text": "Custom Lambda functions for each API with Step Functions orchestration"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Building and maintaining custom API connectors for each SaaS vendor is expensive. Is there a way to avoid that per-vendor work?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Amazon AppFlow provides managed SaaS data integration. AppFlow offers pre-built connectors for Salesforce, HubSpot, Google Analytics, and 50+ other platforms, handling authentication (OAuth, API keys), rate limiting, and pagination automatically. Scheduled flows run daily with automatic retry logic. Built-in data transformation and validation catches schema changes. Flow logs provide visibility into transfer status. This eliminates connector maintenance burden. Custom Lambda requires building and maintaining each integration. EMR adds unnecessary complexity. Glue Python Shell has limited connector support."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>AppFlow private flows use AWS PrivateLink for data transfer without internet exposure</li>\n            <li>Field mapping and transformation apply during transfer without additional processing</li>\n            <li>Incremental transfer tracks changes using source timestamps or watermarks</li>\n            <li>Custom connectors extend AppFlow for proprietary APIs using Connector SDK</li>\n            <li>EventBridge triggers enable downstream processing when flows complete</li></ul>"
+        }
+      ],
+      "tags": [
+        "AppFlow",
+        "SaaS",
+        "integration",
+        "API"
+      ]
+    },
+    {
+      "id": 19,
+      "categoryRef": "data-store",
+      "difficulty": "advanced",
+      "title": "Graph Database for Relationship Analytics",
+      "scenario": "A social media company needs to analyze user relationships, content sharing patterns, and influence networks. Queries include finding shortest paths between users, detecting communities, and identifying influential nodes. The graph has 100 million nodes and 1 billion edges. Query latency must be under 100 milliseconds for interactive features.",
+      "questionText": "Which database architecture supports these graph analytics requirements?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Amazon Neptune with Gremlin queries and read replicas"
+        },
+        {
+          "letter": "B",
+          "text": "Amazon DynamoDB with adjacency list pattern"
+        },
+        {
+          "letter": "C",
+          "text": "Amazon DocumentDB with embedded relationship arrays"
+        },
+        {
+          "letter": "D",
+          "text": "Amazon Redshift with recursive CTEs for graph traversal"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Traversing multi-hop relationships (friend-of-friend, etc.) is the core workload. Are relational joins efficient for that pattern?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Amazon Neptune is the purpose-built graph database for this workload. Neptune uses index-free adjacency for O(1) edge traversal, essential for 100ms latency on path queries. Gremlin query language supports shortest path (shortestPath step), community detection, and centrality algorithms natively. Read replicas handle high query throughput for interactive features. Neptune scales to billions of edges. DynamoDB adjacency lists require multiple queries for traversals. Redshift CTEs are slow for deep traversals. DocumentDB embedded arrays don't scale for high-degree nodes."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Neptune's storage layer is optimized for triple/quad storage patterns</li>\n            <li>Gremlin's shortestPath() step uses breadth-first search with configurable depth limits</li>\n            <li>Neptune ML enables graph neural networks for link prediction and node classification</li>\n            <li>Bulk loading via Neptune Loader handles billions of edges from S3</li>\n            <li>Neptune Streams enable CDC for real-time graph updates to downstream systems</li></ul>"
+        }
+      ],
+      "tags": [
+        "Neptune",
+        "graph",
+        "Gremlin",
+        "analytics"
+      ]
+    },
+    {
+      "id": 20,
+      "categoryRef": "data-operations",
+      "difficulty": "intermediate",
+      "title": "Data Lineage and Cataloging",
+      "scenario": "A financial institution needs to track data lineage across their entire data platform for regulatory compliance. Auditors require documentation showing how data flows from source systems through transformations to final reports. The lineage must be automatically captured without requiring developers to manually document every pipeline.",
+      "questionText": "Which approach provides automated data lineage tracking?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Manual documentation in Confluence updated by developers"
+        },
+        {
+          "letter": "B",
+          "text": "Custom metadata tables tracking source-target relationships"
+        },
+        {
+          "letter": "C",
+          "text": "AWS Glue Data Catalog with Glue ETL job lineage and Amazon DataZone"
+        },
+        {
+          "letter": "D",
+          "text": "CloudTrail logs analyzed for data access patterns"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Manual lineage tracking breaks down at scale. Think about where lineage metadata should be captured — during execution or after?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "AWS Glue Data Catalog with Glue ETL lineage and Amazon DataZone provides comprehensive automated lineage. Glue automatically captures column-level lineage during ETL job execution, tracking how each output column derives from inputs. DataZone provides a data portal for discovering lineage, business glossaries, and data quality information. The combination satisfies audit requirements without manual documentation. Lineage updates automatically as pipelines evolve. Manual documentation becomes outdated. Custom tables require integration work. CloudTrail shows access, not transformation lineage."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Glue captures lineage at column granularity showing transformation logic</li>\n            <li>DataZone business data catalog links technical lineage to business context</li>\n            <li>OpenLineage integration enables lineage from non-Glue processing (Spark, Airflow)</li>\n            <li>Lineage visualization shows upstream sources and downstream consumers</li>\n            <li>Impact analysis identifies affected reports when source schemas change</li></ul>"
+        }
+      ],
+      "tags": [
+        "Glue",
+        "DataZone",
+        "lineage",
+        "governance"
+      ]
+    },
+    {
+      "id": 21,
+      "categoryRef": "data-security",
+      "difficulty": "intermediate",
+      "title": "Network Security for Data Platform",
+      "scenario": "A data platform processes sensitive financial data across multiple VPCs. EMR clusters in a processing VPC need to access Redshift in a data warehouse VPC, S3 in another region, and on-premises databases via Direct Connect. All traffic must stay on private networks without internet exposure. Network traffic must be logged for security audits.",
+      "questionText": "Which network architecture ensures private connectivity with audit logging?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "AWS PrivateLink for all service connections"
+        },
+        {
+          "letter": "B",
+          "text": "VPC Peering between all VPCs with NAT Gateway for S3 access"
+        },
+        {
+          "letter": "C",
+          "text": "Internet Gateway with security groups restricting traffic"
+        },
+        {
+          "letter": "D",
+          "text": "Transit Gateway connecting VPCs, S3 Gateway Endpoints, and VPC Flow Logs"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Multiple VPCs need to communicate, and data services should stay off the public internet. How do you centralize connectivity?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Transit Gateway with S3 Gateway Endpoints and VPC Flow Logs provides the required architecture. Transit Gateway acts as a hub connecting multiple VPCs and Direct Connect for on-premises access. S3 Gateway Endpoints route S3 traffic through AWS private network without internet. Cross-region S3 access uses Transit Gateway inter-region peering. VPC Flow Logs capture all network traffic for security audits. This keeps all traffic private with full visibility. VPC Peering doesn't scale with many VPCs. NAT Gateway exposes traffic to internet. Internet Gateway violates private network requirement."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Transit Gateway route tables control traffic flow between attachments</li>\n            <li>S3 Gateway Endpoints are free and support bucket policies for access control</li>\n            <li>Interface Endpoints (PrivateLink) required for other services like KMS and Glue</li>\n            <li>VPC Flow Logs v5 includes direction, packets, and account ID fields</li>\n            <li>Transit Gateway Flow Logs provide visibility into cross-VPC traffic patterns</li></ul>"
+        }
+      ],
+      "tags": [
+        "VPC",
+        "Transit Gateway",
+        "networking",
+        "security"
+      ]
+    },
+    {
+      "id": 22,
+      "categoryRef": "data-ingestion",
+      "difficulty": "basic",
+      "title": "File Transfer Automation",
+      "scenario": "A company receives daily data files from partners via SFTP. Currently, an on-premises SFTP server requires manual file handling. The company wants to migrate to AWS with automated file processing, eliminating manual intervention. Files should be automatically validated and moved to appropriate S3 locations based on file naming patterns.",
+      "questionText": "Which service automates SFTP file ingestion with workflow automation?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "EC2 instance running SFTP server with cron scripts"
+        },
+        {
+          "letter": "B",
+          "text": "AWS Transfer Family with managed workflows"
+        },
+        {
+          "letter": "C",
+          "text": "Amazon S3 with pre-signed URLs for partner uploads"
+        },
+        {
+          "letter": "D",
+          "text": "AWS DataSync with scheduled transfers"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Partners require standard file transfer protocols they already use. Should you build or buy that protocol endpoint?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "AWS Transfer Family provides fully managed SFTP with automation. Partners continue using SFTP protocol with no client changes. Managed workflows execute automatically on file upload, enabling validation (file size, format checks), tagging, and routing to different S3 paths based on file names. This eliminates manual handling while maintaining partner compatibility. Identity provider integration supports existing user management. EC2 SFTP requires server management. Pre-signed URLs change partner workflows. DataSync is for data migration, not ongoing SFTP."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Transfer Family supports SFTP, FTPS, FTP, and AS2 protocols</li>\n            <li>Managed workflows can invoke Lambda for custom validation logic</li>\n            <li>Custom hostname with Route 53 maintains existing DNS for partners</li>\n            <li>Directory service integration enables Active Directory authentication</li>\n            <li>Logical directories map user home folders to different S3 paths</li></ul>"
+        }
+      ],
+      "tags": [
+        "Transfer Family",
+        "SFTP",
+        "automation",
+        "S3"
+      ]
+    },
+    {
+      "id": 23,
+      "categoryRef": "data-store",
+      "difficulty": "intermediate",
+      "title": "Hybrid Data Warehouse Architecture",
+      "scenario": "A company has 500 TB of historical data in an on-premises data warehouse they cannot migrate immediately. New data lands in AWS S3 daily. Analysts need to run queries joining on-premises and cloud data seamlessly. The long-term plan is full cloud migration over 18 months.",
+      "questionText": "Which architecture enables seamless hybrid queries during the migration period?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Daily ETL copying on-premises data to Redshift"
+        },
+        {
+          "letter": "B",
+          "text": "EMR Presto with on-premises and S3 data sources"
+        },
+        {
+          "letter": "C",
+          "text": "Athena with JDBC connector to on-premises databases"
+        },
+        {
+          "letter": "D",
+          "text": "Redshift with Federated Query to on-premises PostgreSQL and Spectrum for S3"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Can you query on-premises data without moving it first? Think about which approaches avoid full data migration."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Redshift Federated Query with Spectrum provides seamless hybrid architecture. Federated Query enables Redshift to query on-premises PostgreSQL/MySQL directly via JDBC. Spectrum queries S3 data lake without loading. Analysts write standard SQL joining all three sources (Redshift tables, on-premises via federation, S3 via Spectrum). As migration progresses, shift queries from federation to local Redshift tables. This avoids data copying during transition. Daily ETL creates data latency and duplication. Athena federation has limited performance. EMR Presto requires more management."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Federated Query uses Secrets Manager for secure on-premises credential storage</li>\n            <li>Query pushdown sends filtering to remote sources for efficiency</li>\n            <li>External schemas define remote database structures in Redshift catalog</li>\n            <li>Spectrum external tables can reference Iceberg format for transactional data lake access</li>\n            <li>Consider AWS DMS for incremental migration of on-premises data during the 18 months</li></ul>"
+        }
+      ],
+      "tags": [
+        "Redshift",
+        "federated",
+        "hybrid",
+        "migration"
+      ]
+    },
+    {
+      "id": 24,
+      "categoryRef": "data-operations",
+      "difficulty": "advanced",
+      "title": "Data Pipeline Observability",
+      "scenario": "A data platform runs 500+ daily jobs across Glue, EMR, and Lambda. Operations teams struggle to identify root causes when downstream reports show incorrect data. They need end-to-end visibility into job execution, data quality metrics, and the ability to trace data issues back to source jobs. Alert fatigue from too many notifications is also a problem.",
+      "questionText": "Which observability architecture provides actionable insights for data operations?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "CloudWatch dashboards with metrics from each service independently"
+        },
+        {
+          "letter": "B",
+          "text": "CloudWatch Container Insights with custom metrics and anomaly detection alarms"
+        },
+        {
+          "letter": "C",
+          "text": "Amazon Managed Service for Prometheus with Grafana for unified metrics, tracing with X-Ray, and intelligent alerting"
+        },
+        {
+          "letter": "D",
+          "text": "Third-party monitoring tool with agents on all compute resources"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Metrics alone show symptoms, not causes. What additional observability signal helps trace a slow record through the pipeline?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Amazon Managed Prometheus with Grafana, X-Ray, and intelligent alerting provides comprehensive observability. Prometheus collects metrics from Glue, EMR, and Lambda with PromQL for unified querying. Grafana dashboards correlate job performance with data quality outcomes. X-Ray distributed tracing shows request flow across services for root cause analysis. CloudWatch anomaly detection with composite alarms reduces alert noise by grouping related issues. This combination enables end-to-end visibility. Independent CloudWatch dashboards lack correlation. Container Insights is container-focused. Third-party tools add cost and complexity."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Prometheus remote write from CloudWatch enables unified metric collection</li>\n            <li>Grafana alerting rules can evaluate complex conditions across multiple metrics</li>\n            <li>X-Ray service map visualizes dependencies between data pipeline components</li>\n            <li>CloudWatch Logs Insights queries correlate logs across services by trace ID</li>\n            <li>Composite alarms aggregate related alerts into single actionable notifications</li></ul>"
+        }
+      ],
+      "tags": [
+        "observability",
+        "monitoring",
+        "Prometheus",
+        "X-Ray"
+      ]
+    },
+    {
+      "id": 25,
+      "categoryRef": "data-security",
+      "difficulty": "basic",
+      "title": "Row-Level Security Implementation",
+      "scenario": "A SaaS analytics platform serves multiple customers from a shared data warehouse. Each customer should only see their own data when running queries. Customer data is identified by a tenant_id column in all tables. The solution must work with Redshift and prevent any possibility of cross-tenant data access.",
+      "questionText": "Which approach implements secure multi-tenant row-level security?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Redshift row-level security policies with session variables"
+        },
+        {
+          "letter": "B",
+          "text": "Views per customer filtering to their tenant_id"
+        },
+        {
+          "letter": "C",
+          "text": "Application-layer filtering adding WHERE tenant_id = X to all queries"
+        },
+        {
+          "letter": "D",
+          "text": "Separate schemas per customer with schema-level permissions"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Consider database-enforced security that cannot be bypassed by query manipulation."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Redshift row-level security (RLS) policies provide database-enforced tenant isolation. RLS policies automatically filter rows based on the current session's context (set via session variables like current_setting('app.tenant_id')). This filtering happens at the database engine level and cannot be bypassed by query manipulation. Policies apply to all queries including direct SQL, BI tools, and ad-hoc access. Application-layer filtering can be bypassed. Separate schemas don't scale with many tenants. Customer views require management and can be queried incorrectly."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>RLS policies use CREATE RLS POLICY with USING clause for row filtering</li>\n            <li>Session variables set tenant context: SET app.tenant_id = 'customer123'</li>\n            <li>Policies can reference lookup tables for complex permission logic</li>\n            <li>RLS works with Redshift data sharing maintaining security across clusters</li>\n            <li>Performance impact is minimal as filters integrate into query execution plan</li></ul>"
+        }
+      ],
+      "tags": [
+        "Redshift",
+        "RLS",
+        "multi-tenant",
+        "security"
+      ]
+    },
+    {
+      "id": 26,
+      "categoryRef": "data-ingestion",
+      "difficulty": "intermediate",
+      "title": "Exactly-Once Processing Semantics",
+      "scenario": "A payment processing company streams transaction data through Kinesis. Each transaction must be processed exactly once to prevent duplicate charges or missed payments. The consumer writes to both DynamoDB (for real-time balance) and S3 (for audit trail). System failures and retries should not cause data inconsistencies.",
+      "questionText": "Which architecture ensures exactly-once processing semantics?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "KCL consumer with simple DynamoDB writes and S3 puts"
+        },
+        {
+          "letter": "B",
+          "text": "Lambda consumer with Kinesis as event source, using DynamoDB conditional writes with transaction IDs"
+        },
+        {
+          "letter": "C",
+          "text": "Kinesis Data Firehose direct delivery to both destinations"
+        },
+        {
+          "letter": "D",
+          "text": "EC2 consumer application with manual checkpoint management"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Consider idempotent write patterns that handle duplicates at the destination level."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Lambda with DynamoDB conditional writes provides exactly-once semantics. Kinesis may deliver records multiple times during failures. Lambda's Kinesis integration handles checkpointing automatically. DynamoDB conditional writes (ConditionExpression checking transaction_id doesn't exist) make writes idempotent - duplicates fail silently. S3 writes using transaction_id as key are naturally idempotent (overwrites identical data). This combination achieves exactly-once outcomes despite at-least-once delivery. Simple writes without conditions cause duplicates. Firehose has at-least-once semantics. Manual checkpointing is error-prone."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Lambda's Kinesis poller uses enhanced fan-out for dedicated throughput per consumer</li>\n            <li>DynamoDB condition: attribute_not_exists(transaction_id) prevents duplicate writes</li>\n            <li>DynamoDB transactions can atomically write to multiple tables for consistency</li>\n            <li>Consider Kinesis exactly-once with Apache Flink for complex multi-stage pipelines</li>\n            <li>Dead letter queues capture failed records for investigation without blocking processing</li></ul>"
+        }
+      ],
+      "tags": [
+        "Kinesis",
+        "Lambda",
+        "exactly-once",
+        "idempotent"
+      ]
+    },
+    {
+      "id": 27,
+      "categoryRef": "data-store",
+      "difficulty": "advanced",
+      "title": "Data Lakehouse Architecture",
+      "scenario": "An e-commerce company wants to combine the flexibility of a data lake with the performance of a data warehouse. They need to support BI dashboards with sub-second queries, data science notebooks with raw data access, and streaming updates from order events. The solution should avoid data duplication between lake and warehouse.",
+      "questionText": "Which architecture implements a data lakehouse eliminating data duplication?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "S3 with Parquet files and hourly Redshift COPY commands"
+        },
+        {
+          "letter": "B",
+          "text": "Separate S3 data lake and Redshift cluster with ETL synchronization"
+        },
+        {
+          "letter": "C",
+          "text": "S3 data lake with Apache Iceberg tables, accessed via Redshift Spectrum and Athena"
+        },
+        {
+          "letter": "D",
+          "text": "Redshift with AQUA for all data storage and processing"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "A lakehouse merges warehouse features (ACID, schema enforcement) with lake economics. Which choices bridge that gap?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "S3 with Apache Iceberg creates a data lakehouse architecture. Iceberg provides ACID transactions, schema evolution, and time travel on S3 storage. Redshift Spectrum queries Iceberg tables with warehouse-like performance using predicate pushdown and column pruning. Athena provides serverless queries for data science exploration. Kinesis or Spark Streaming writes to Iceberg with transactional guarantees for real-time updates. Single copy of data serves all use cases. Separate lake and warehouse creates duplication. Redshift-only loses data lake flexibility. Parquet lacks streaming update support."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Iceberg's merge-on-read enables efficient streaming upserts without compaction delay</li>\n            <li>Redshift Spectrum auto-copy incrementally loads Iceberg data for faster queries</li>\n            <li>Iceberg manifest caching in Spectrum improves repeated query performance</li>\n            <li>Compaction jobs optimize file sizes for query performance without locking</li>\n            <li>Iceberg branching enables isolated environments for data science experimentation</li></ul>"
+        }
+      ],
+      "tags": [
+        "lakehouse",
+        "Iceberg",
+        "Redshift",
+        "Spectrum"
+      ]
+    },
+    {
+      "id": 28,
+      "categoryRef": "data-operations",
+      "difficulty": "intermediate",
+      "title": "Disaster Recovery for Data Platform",
+      "scenario": "A financial services company requires their data platform to survive regional failures with RPO of 1 hour and RTO of 4 hours. The platform includes S3 data lake (100 TB), Redshift cluster (20 TB), and Glue Data Catalog. Budget constraints require cost-effective recovery rather than active-active deployment.",
+      "questionText": "Which disaster recovery architecture meets RPO/RTO requirements cost-effectively?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "AWS Backup with cross-region copy for all services"
+        },
+        {
+          "letter": "B",
+          "text": "Daily S3 Batch Operations copy to secondary region"
+        },
+        {
+          "letter": "C",
+          "text": "S3 Cross-Region Replication, Redshift cross-region snapshots, and Glue Data Catalog replication"
+        },
+        {
+          "letter": "D",
+          "text": "Active Redshift cluster in secondary region with continuous synchronization"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Consider continuous replication mechanisms that meet 1-hour RPO without running duplicate infrastructure."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "S3 CRR, Redshift snapshots, and Glue replication provide cost-effective DR meeting requirements. S3 Cross-Region Replication continuously copies new objects with sub-hour latency (meeting 1-hour RPO). Redshift automated snapshots copy to the secondary region every 8 hours (configure to 1 hour for RPO). Glue Data Catalog exports/imports preserve metadata. During failover, create Redshift cluster from snapshot in secondary region (within 4-hour RTO). No running infrastructure cost in secondary region. Daily batch copy exceeds RPO. Active-active doubles cost. AWS Backup doesn't support all services optimally."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>S3 Replication Time Control (RTC) guarantees 15-minute replication SLA</li>\n            <li>Redshift cross-region snapshot copy can be configured to run hourly</li>\n            <li>Restoring 20 TB Redshift cluster from snapshot takes approximately 2-3 hours</li>\n            <li>Glue Data Catalog can export to S3 and import in secondary region</li>\n            <li>Route 53 health checks automate DNS failover to secondary region endpoints</li></ul>"
+        }
+      ],
+      "tags": [
+        "disaster-recovery",
+        "replication",
+        "S3",
+        "Redshift"
+      ]
+    },
+    {
+      "id": 29,
+      "categoryRef": "data-security",
+      "difficulty": "advanced",
+      "title": "Data Masking for Non-Production Environments",
+      "scenario": "A bank needs to provide realistic data in development and testing environments without exposing actual customer PII. Production data includes names, SSNs, account numbers, and transaction history. Masked data must maintain referential integrity across tables and preserve statistical distributions for accurate testing.",
+      "questionText": "Which approach provides production-like masked data for non-production environments?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "AWS Glue with custom PySpark transformations using Faker library for realistic data generation"
+        },
+        {
+          "letter": "B",
+          "text": "Production database read replicas with IAM restrictions"
+        },
+        {
+          "letter": "C",
+          "text": "Manual data anonymization by developers"
+        },
+        {
+          "letter": "D",
+          "text": "Randomly generated synthetic data unrelated to production"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Consider deterministic masking that preserves data relationships while replacing sensitive values."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Glue with PySpark transformations provides deterministic data masking. Faker library generates realistic replacement values (names, SSNs, addresses) that look authentic for testing. Deterministic hashing ensures the same input always produces the same masked output, preserving referential integrity across tables (customer_id references remain valid). Statistical bucketing preserves distributions for transaction amounts and dates. Glue jobs automate regular refresh from production. Manual masking is inconsistent and slow. Read replicas expose real data. Random synthetic data lacks realistic patterns and relationships."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Format-preserving encryption maintains data format (SSN remains XXX-XX-XXXX pattern)</li>\n            <li>Deterministic masking: hash(customer_name + salt) seeds Faker for consistent names</li>\n            <li>Preserve statistical distributions using percentile-based bucketing for amounts</li>\n            <li>Consider AWS DMS with transformation rules for continuous masked replication</li>\n            <li>Data subsetting reduces non-production data volume while maintaining coverage</li></ul>"
+        }
+      ],
+      "tags": [
+        "data-masking",
+        "Glue",
+        "PII",
+        "testing"
+      ]
+    },
+    {
+      "id": 30,
+      "categoryRef": "data-ingestion",
+      "difficulty": "intermediate",
+      "title": "Semi-Structured Data Processing",
+      "scenario": "A mobile app generates JSON event logs with nested structures and arrays. Schema varies across app versions and event types. The data team needs to flatten these nested structures for SQL analysis while handling schema variations gracefully. Daily volume is 500 GB of compressed JSON.",
+      "questionText": "Which approach efficiently processes semi-structured JSON data at scale?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "EMR Hive with JSON SerDe for each schema version"
+        },
+        {
+          "letter": "B",
+          "text": "AWS Glue with DynamicFrame schema inference and Relationalize transform"
+        },
+        {
+          "letter": "C",
+          "text": "Athena queries using JSON functions on raw files"
+        },
+        {
+          "letter": "D",
+          "text": "Lambda functions parsing JSON with custom flattening logic"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Deeply nested JSON with evolving schemas is hard to query directly. What step converts it to a flat, queryable structure?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Glue DynamicFrame with Relationalize efficiently handles semi-structured JSON. DynamicFrame automatically infers schemas from JSON without predefined definitions, handling schema variations across records. The Relationalize transform flattens nested structures and arrays into relational tables with foreign keys maintaining relationships. This handles 500 GB efficiently with Spark distributed processing. Glue crawlers can track schema evolution over time. Lambda doesn't scale for 500 GB. Athena JSON functions are slow for complex nesting. Hive requires schema definitions per version."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>DynamicFrame's ResolveChoice handles type conflicts in schema variations</li>\n            <li>Relationalize creates root table and separate tables for each array with join keys</li>\n            <li>Glue Schema Registry validates schemas and tracks compatibility</li>\n            <li>Unbox transform extracts specific nested structures without full flattening</li>\n            <li>Output to Parquet with Snappy compression reduces storage by 90% vs JSON</li></ul>"
+        }
+      ],
+      "tags": [
+        "Glue",
+        "JSON",
+        "semi-structured",
+        "DynamicFrame"
+      ]
+    },
+    {
+      "id": 31,
+      "categoryRef": "data-store",
+      "difficulty": "basic",
+      "title": "Choosing the Right Analytics Database",
+      "scenario": "A startup needs to analyze user behavior data. Current volume is 100 GB growing 10 GB monthly. The two-person data team wants minimal operational overhead. Queries are ad-hoc exploration and weekly reports. Budget is limited, and they want to pay only for queries executed rather than provisioned capacity.",
+      "questionText": "Which analytics service best fits these requirements?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Amazon Athena with data stored in S3"
+        },
+        {
+          "letter": "B",
+          "text": "Amazon Redshift provisioned cluster"
+        },
+        {
+          "letter": "C",
+          "text": "Amazon EMR with Presto"
+        },
+        {
+          "letter": "D",
+          "text": "Amazon RDS PostgreSQL with analytics extensions"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Usage is unpredictable — some weeks heavy, others idle. What pricing model avoids paying for idle capacity?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Amazon Athena provides the ideal fit for this startup scenario. Athena is serverless with zero infrastructure management, perfect for a two-person team. Pay-per-query pricing (per TB scanned) aligns with limited, ad-hoc usage patterns. At 100 GB, query costs are minimal. Data stays in S3 with low storage costs. No provisioned capacity means no payment during idle periods. Queries run immediately without cluster warm-up. Redshift requires capacity planning and ongoing costs. EMR requires cluster management. RDS isn't optimized for analytical queries."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Athena costs $5 per TB scanned; Parquet reduces scanned data by 90%</li>\n            <li>Partitioning on common filter columns (date, user_id) reduces scan costs</li>\n            <li>Athena workgroups enable query cost controls and monitoring per team</li>\n            <li>Consider Athena provisioned capacity when workload becomes predictable</li>\n            <li>S3 Intelligent-Tiering optimizes storage costs as data ages</li></ul>"
+        }
+      ],
+      "tags": [
+        "Athena",
+        "serverless",
+        "cost",
+        "analytics"
+      ]
+    },
+    {
+      "id": 32,
+      "categoryRef": "data-operations",
+      "difficulty": "intermediate",
+      "title": "Incremental Data Processing",
+      "scenario": "A data pipeline processes order data that arrives continuously in S3. Initial loads took 6 hours for the full dataset. The team needs to reduce processing time by only handling new and changed records. Orders can be updated (status changes, cancellations) for up to 30 days after creation.",
+      "questionText": "Which approach implements efficient incremental processing?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "AWS Glue job bookmarks with S3 event notifications for new files, and watermark-based change detection for updates"
+        },
+        {
+          "letter": "B",
+          "text": "Full dataset processing on every run with timestamp filtering"
+        },
+        {
+          "letter": "C",
+          "text": "Manual tracking of processed files in DynamoDB"
+        },
+        {
+          "letter": "D",
+          "text": "Lambda triggered on every S3 object creation"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Re-processing the entire dataset on every run is wasteful. How can the pipeline remember where it left off?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Glue job bookmarks with watermark-based change detection provides efficient incremental processing. Job bookmarks automatically track processed S3 paths, processing only new files on subsequent runs. S3 event notifications trigger jobs immediately when new data arrives. For updates within 30 days, maintain a watermark (last_processed_timestamp) and query records with modified_date &gt; watermark. This combination handles both new files and updated records efficiently. Full processing wastes resources. Manual tracking adds complexity. Lambda per-object doesn't handle updates or batch efficiently."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Job bookmarks store state in Glue service, surviving job failures</li>\n            <li>Bookmarks track by file path, so reprocessing requires bookmark reset</li>\n            <li>Watermark pattern: SELECT * FROM source WHERE modified_date BETWEEN @watermark AND @current</li>\n            <li>Consider Apache Iceberg incremental reads for efficient change tracking</li>\n            <li>Glue job parameters can pass watermarks between orchestrated job runs</li></ul>"
+        }
+      ],
+      "tags": [
+        "Glue",
+        "incremental",
+        "bookmark",
+        "ETL"
+      ]
+    },
+    {
+      "id": 33,
+      "categoryRef": "data-security",
+      "difficulty": "intermediate",
+      "title": "Secrets Management for Data Pipelines",
+      "scenario": "Data pipelines connect to various sources including databases, APIs, and SFTP servers using credentials. Credentials are currently stored in configuration files, creating security risks. The team needs centralized credential management with automatic rotation, audit logging, and secure access from Glue jobs and Lambda functions.",
+      "questionText": "Which service provides secure credential management for data pipelines?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "AWS Secrets Manager with rotation lambdas and IAM-based access"
+        },
+        {
+          "letter": "B",
+          "text": "Parameter Store SecureString with manual rotation"
+        },
+        {
+          "letter": "C",
+          "text": "Environment variables encrypted with KMS"
+        },
+        {
+          "letter": "D",
+          "text": "HashiCorp Vault on EC2 instances"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Credentials that never rotate are a ticking clock. Which approach handles rotation automatically without pipeline downtime?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "AWS Secrets Manager provides comprehensive credential management. Automatic rotation using Lambda functions updates credentials on schedule without application changes. Native integration with RDS, Redshift, and DocumentDB enables seamless database credential rotation. Glue connections reference Secrets Manager directly. Lambda and Glue access secrets via IAM policies without embedding credentials. CloudTrail logs all secret access for auditing. Parameter Store lacks automatic rotation. Environment variables aren't centrally managed. Self-managed Vault adds operational complexity."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Secrets Manager rotation templates exist for RDS, Redshift, and generic secrets</li>\n            <li>Glue connections support Secrets Manager ARN for credential retrieval</li>\n            <li>Resource policies control cross-account secret access</li>\n            <li>Secrets Manager caches secrets in SDK to reduce API calls</li>\n            <li>Multi-Region secrets enable disaster recovery for credential access</li></ul>"
+        }
+      ],
+      "tags": [
+        "Secrets Manager",
+        "security",
+        "rotation",
+        "credentials"
+      ]
+    },
+    {
+      "id": 34,
+      "categoryRef": "data-ingestion",
+      "difficulty": "advanced",
+      "title": "Log Analytics Pipeline",
+      "scenario": "A company generates 10 TB of application logs daily from 1000 servers. Logs must be searchable within 5 minutes for troubleshooting, retained searchable for 30 days, and archived for 7 years for compliance. Different teams need different access: operations need real-time alerts, developers need log search, and auditors need historical access.",
+      "questionText": "Which architecture meets all retention and access requirements cost-effectively?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "CloudWatch Logs for all retention periods"
+        },
+        {
+          "letter": "B",
+          "text": "All logs directly to OpenSearch with index lifecycle management"
+        },
+        {
+          "letter": "C",
+          "text": "Kinesis Data Firehose to OpenSearch for 30-day search, with S3 lifecycle to Glacier for archive"
+        },
+        {
+          "letter": "D",
+          "text": "S3 with Athena queries for all use cases"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Consider tiered storage that balances search performance with long-term archive costs."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Kinesis Firehose to OpenSearch with S3 lifecycle provides optimal cost-performance. Firehose buffers and delivers logs to OpenSearch within 60 seconds (meeting 5-minute SLA). OpenSearch provides full-text search and real-time alerting for 30 days. Firehose simultaneously writes to S3 for long-term storage. S3 lifecycle transitions data to Glacier after 30 days for 7-year archive at minimal cost. Auditors access archived logs via Athena or Glacier retrieval. OpenSearch alone is expensive for 7-year retention. CloudWatch Logs pricing doesn't scale. S3-only lacks real-time search."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>OpenSearch Index State Management automates index rollover and deletion</li>\n            <li>UltraWarm tier in OpenSearch reduces hot storage costs for aging indices</li>\n            <li>Firehose dynamic partitioning organizes S3 data by hour/source for efficient queries</li>\n            <li>OpenSearch alerting integrates with SNS for operations notifications</li>\n            <li>S3 Glacier Instant Retrieval enables quick access to archived compliance data</li></ul>"
+        }
+      ],
+      "tags": [
+        "OpenSearch",
+        "Kinesis",
+        "logging",
+        "archive"
+      ]
+    },
+    {
+      "id": 35,
+      "categoryRef": "data-store",
+      "difficulty": "intermediate",
+      "title": "Data Versioning and Reproducibility",
+      "scenario": "A quantitative research team runs experiments on financial datasets. They need to reproduce past analyses exactly, even when underlying data has been corrected or updated. Researchers must be able to query data as it existed at any past point in time. The solution should integrate with their existing S3 data lake.",
+      "questionText": "Which approach enables data versioning for reproducible analytics?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Daily full copies of datasets to dated folders"
+        },
+        {
+          "letter": "B",
+          "text": "S3 versioning with version ID tracking"
+        },
+        {
+          "letter": "C",
+          "text": "Database triggers logging all changes to audit tables"
+        },
+        {
+          "letter": "D",
+          "text": "Apache Iceberg time travel with snapshot retention"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Reproducing a query result from last Tuesday requires the data as it existed then. Which approaches support querying historical snapshots?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Apache Iceberg time travel enables querying data at any historical snapshot. Iceberg maintains snapshots (metadata pointing to data file versions) that capture table state at each write operation. Researchers query specific snapshots using AS OF TIMESTAMP or AS OF VERSION syntax. This works with existing S3 storage and integrates with Athena, Spark, and Trino. Snapshot retention policies balance history depth with metadata storage. S3 versioning operates at object level, not table level, making point-in-time queries complex. Full copies waste storage. Audit tables don't support direct querying."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Iceberg snapshots are lightweight metadata; only changed files are new</li>\n            <li>Query syntax: SELECT * FROM table FOR SYSTEM_TIME AS OF TIMESTAMP '2024-01-01'</li>\n            <li>Snapshot expiration removes old metadata while retaining data files still referenced</li>\n            <li>Branching creates isolated table copies for experimentation without duplication</li>\n            <li>Rollback operations revert tables to previous snapshots atomically</li></ul>"
+        }
+      ],
+      "tags": [
+        "Iceberg",
+        "time-travel",
+        "versioning",
+        "reproducibility"
+      ]
+    },
+    {
+      "id": 36,
+      "categoryRef": "data-operations",
+      "difficulty": "basic",
+      "title": "Data Pipeline Testing",
+      "scenario": "A data engineering team wants to implement testing for their Glue ETL jobs. They need to validate transformation logic before deployment, test with sample data without affecting production, and catch schema changes that could break downstream processes. The testing should integrate with their CI/CD pipeline.",
+      "questionText": "Which approach provides comprehensive ETL testing capabilities?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Manual testing in production with careful monitoring"
+        },
+        {
+          "letter": "B",
+          "text": "Duplicate production environment for each test run"
+        },
+        {
+          "letter": "C",
+          "text": "AWS Glue local development with pytest, using Glue Data Quality for schema validation"
+        },
+        {
+          "letter": "D",
+          "text": "Code review only without automated testing"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Testing in production is risky, and duplicating the full environment is expensive. What middle ground lets you iterate quickly?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Glue local development with pytest provides comprehensive testing. AWS Glue Docker containers enable running Glue jobs locally or in CI/CD pipelines without AWS resources. Pytest validates transformation logic with unit tests using sample data. Glue Data Quality rules verify output schemas and data quality constraints. Tests run on every commit, catching issues before production deployment. This approach is cost-effective and fast. Production testing risks data issues. Duplicate environments are expensive. Code review alone misses logic errors."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Glue container images available for local Spark development and testing</li>\n            <li>pytest fixtures create test DynamicFrames from sample data files</li>\n            <li>Glue Data Quality DQDL rules validate schema compatibility: ColumnExists, ColumnType</li>\n            <li>GitHub Actions or CodePipeline integrates local Glue tests in CI/CD</li>\n            <li>Test data generators create representative samples for edge case testing</li></ul>"
+        }
+      ],
+      "tags": [
+        "Glue",
+        "testing",
+        "CI/CD",
+        "data-quality"
+      ]
+    },
+    {
+      "id": 37,
+      "categoryRef": "data-security",
+      "difficulty": "advanced",
+      "title": "Compliance Framework Implementation",
+      "scenario": "A healthcare organization must implement HIPAA compliance for their data platform. Requirements include encryption at rest and in transit, access logging, minimum necessary access, audit trails, and breach notification capabilities. They use S3, Redshift, and Glue for their data workloads.",
+      "questionText": "Which configuration ensures HIPAA compliance across the data platform?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "VPC isolation only with no additional controls"
+        },
+        {
+          "letter": "B",
+          "text": "Default S3 encryption with standard IAM policies"
+        },
+        {
+          "letter": "C",
+          "text": "KMS encryption for S3/Redshift, SSL/TLS enforcement, Lake Formation access control, CloudTrail logging, and GuardDuty threat detection"
+        },
+        {
+          "letter": "D",
+          "text": "Third-party compliance tool scanning resources periodically"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "HIPAA compliance touches multiple domains — encryption, access control, auditing, threat detection. Which option addresses all of them?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "The complete security stack addresses all HIPAA requirements. KMS CMKs provide encryption at rest with key management and audit logging. SSL/TLS enforcement (S3 bucket policies requiring aws:SecureTransport, Redshift require_ssl) ensures encryption in transit. Lake Formation implements minimum necessary access with fine-grained permissions. CloudTrail logs all API calls for audit trails. GuardDuty detects anomalous access patterns for breach notification. AWS Config rules verify compliance continuously. Default encryption lacks key management. VPC alone doesn't meet requirements. Periodic scanning misses real-time threats."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>S3 bucket policy: \"Condition\": {\"Bool\": {\"aws:SecureTransport\": \"false\"}} denies HTTP</li>\n            <li>Redshift parameter group: require_ssl = true enforces encrypted connections</li>\n            <li>Lake Formation data filters implement minimum necessary PHI access</li>\n            <li>CloudTrail data events log S3 object-level access for detailed auditing</li>\n            <li>AWS Artifact provides BAA documentation required for HIPAA compliance</li></ul>"
+        }
+      ],
+      "tags": [
+        "HIPAA",
+        "compliance",
+        "encryption",
+        "security"
+      ]
+    },
+    {
+      "id": 38,
+      "categoryRef": "data-ingestion",
+      "difficulty": "intermediate",
+      "title": "Database Migration Strategy",
+      "scenario": "A company is migrating a 5 TB Oracle data warehouse to Amazon Redshift. The migration must complete within a 48-hour maintenance window with minimal downtime. After migration, ongoing changes must sync until cutover. Schema conversion is needed as Oracle uses PL/SQL procedures.",
+      "questionText": "Which migration approach meets these requirements?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Oracle GoldenGate replication to Redshift"
+        },
+        {
+          "letter": "B",
+          "text": "AWS SCT for schema conversion, DMS for full load and CDC, with Redshift as target"
+        },
+        {
+          "letter": "C",
+          "text": "Manual schema recreation and data export/import via S3"
+        },
+        {
+          "letter": "D",
+          "text": "AWS DataSync for database file transfer"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Migrating from Oracle to Redshift involves two problems: converting the schema and moving the data. Can both be solved together?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "AWS SCT and DMS together provide the complete migration solution. Schema Conversion Tool (SCT) converts Oracle schemas and PL/SQL to Redshift-compatible SQL, flagging manual conversion needs. DMS performs the 5 TB full load within the maintenance window using parallel threads. CDC (Change Data Capture) continues syncing changes after full load until cutover, minimizing downtime. DMS validates data integrity between source and target. Manual migration is error-prone and slow. GoldenGate doesn't target Redshift natively. DataSync is for file storage, not databases."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>SCT extension packs convert PL/SQL to AWS Lambda functions where direct conversion isn't possible</li>\n            <li>DMS parallel load with multiple tables maximizes throughput for large datasets</li>\n            <li>CDC uses Oracle LogMiner or Binary Reader for minimal source impact</li>\n            <li>DMS validation compares row counts and checksums between source and target</li>\n            <li>Consider DMS Serverless for automatic scaling during peak migration load</li></ul>"
+        }
+      ],
+      "tags": [
+        "DMS",
+        "SCT",
+        "migration",
+        "Oracle"
+      ]
+    },
+    {
+      "id": 39,
+      "categoryRef": "data-store",
+      "difficulty": "advanced",
+      "title": "Multi-Model Database Requirements",
+      "scenario": "A content management platform stores articles with rich metadata, user relationships, and access patterns including full-text search, graph traversals for recommendations, and key-value lookups for sessions. Currently using three separate databases, they want to consolidate to reduce operational complexity while maintaining performance.",
+      "questionText": "Which database architecture balances consolidation with performance requirements?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Amazon Neptune for graph with OpenSearch for search and DynamoDB for key-value (keep separate)"
+        },
+        {
+          "letter": "B",
+          "text": "Amazon DocumentDB with full-text search indexes and graph queries via aggregation"
+        },
+        {
+          "letter": "C",
+          "text": "Single DynamoDB table with GSIs and OpenSearch integration"
+        },
+        {
+          "letter": "D",
+          "text": "Amazon Aurora PostgreSQL with pg_trgm for search, Apache AGE for graph, and caching layer"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Consider that specialized databases often outperform multi-model compromises for distinct access patterns."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Keeping specialized databases (Neptune, OpenSearch, DynamoDB) is actually optimal here despite seeming like more complexity. Each database excels at its pattern: Neptune provides native graph traversal for recommendations with millisecond latency, OpenSearch delivers full-text search with relevance ranking, and DynamoDB offers single-digit millisecond key-value access for sessions. Consolidation attempts compromise performance. DocumentDB graph queries don't match Neptune's efficiency. DynamoDB search requires OpenSearch anyway. PostgreSQL extensions add complexity without matching specialized performance."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Neptune's index-free adjacency makes multi-hop traversals O(1) per hop</li>\n            <li>OpenSearch relevance scoring (BM25) optimizes content search quality</li>\n            <li>DynamoDB DAX provides microsecond caching for session lookups</li>\n            <li>Data synchronization via DynamoDB Streams to Neptune and OpenSearch</li>\n            <li>Consider operational consolidation via infrastructure-as-code rather than database consolidation</li></ul>"
+        }
+      ],
+      "tags": [
+        "Neptune",
+        "OpenSearch",
+        "DynamoDB",
+        "multi-model"
+      ]
+    },
+    {
+      "id": 40,
+      "categoryRef": "data-operations",
+      "difficulty": "intermediate",
+      "title": "Resource Tagging Strategy",
+      "scenario": "A data platform spans multiple AWS accounts with resources including S3 buckets, Glue jobs, EMR clusters, and Redshift. Finance needs cost allocation by project and team. Operations needs to identify resource owners. Security needs to track data classification levels. Current tagging is inconsistent across teams.",
+      "questionText": "Which approach ensures consistent tagging across the data platform?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Documentation requesting teams tag resources voluntarily"
+        },
+        {
+          "letter": "B",
+          "text": "AWS Organizations Tag Policies with mandatory tags, enforced via Service Control Policies"
+        },
+        {
+          "letter": "C",
+          "text": "Periodic manual audits of resource tags"
+        },
+        {
+          "letter": "D",
+          "text": "Post-deployment Lambda functions adding missing tags"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Is it better to fix missing tags after the fact or prevent untagged resources from being created in the first place?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "AWS Organizations Tag Policies with SCP enforcement ensures consistent tagging. Tag Policies define mandatory tags (project, team, data-classification) and allowed values across the organization. SCPs can deny resource creation without required tags, preventing untagged resources. AWS Config rules detect and report non-compliant resources for remediation. Cost Explorer uses tags for accurate allocation. Resource Groups organize resources by tags for operations. Documentation alone leads to inconsistency. Manual audits are reactive. Post-deployment fixes allow gaps."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Tag Policies enforce tag key capitalization and allowed values organization-wide</li>\n            <li>SCP condition: \"Condition\": {\"Null\": {\"aws:RequestTag/project\": \"true\"}} denies untagged creation</li>\n            <li>AWS Config rule: required-tags checks existing resources for compliance</li>\n            <li>Cost Allocation Tags must be activated in Billing console for Cost Explorer</li>\n            <li>Tag Editor enables bulk tag updates across multiple resources and regions</li></ul>"
+        }
+      ],
+      "tags": [
+        "tagging",
+        "governance",
+        "Organizations",
+        "cost"
+      ]
+    },
+    {
+      "id": 41,
+      "categoryRef": "data-security",
+      "difficulty": "basic",
+      "title": "IAM Best Practices for Data Teams",
+      "scenario": "A data engineering team of 15 people needs access to Glue, S3, and Athena. Currently, all team members share a single IAM user with admin access. The security team requires individual accountability, least privilege access, and MFA enforcement. Some team members need read-only access while others need full development permissions.",
+      "questionText": "Which IAM structure implements security best practices?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Continue sharing credentials with stronger password"
+        },
+        {
+          "letter": "B",
+          "text": "Single IAM role assumed by all team members"
+        },
+        {
+          "letter": "C",
+          "text": "Create 15 IAM users each with individual inline policies"
+        },
+        {
+          "letter": "D",
+          "text": "Individual IAM users in groups (DataEngineers-ReadOnly, DataEngineers-Developer) with role-based policies and MFA requirement"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "How do you balance individual accountability with manageable permission assignments for 15 people?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Individual IAM users in permission-based groups provides proper access control. Each team member has their own IAM user enabling individual accountability via CloudTrail logs. Groups (DataEngineers-ReadOnly, DataEngineers-Developer) apply appropriate permission policies based on job function. MFA is enforced via IAM policy conditions. This implements least privilege - read-only users can't modify resources. Managed policies attached to groups simplify administration. Shared credentials eliminate accountability. Individual inline policies are unmanageable. Single role lacks differentiated access."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>IAM policy condition: \"Bool\": {\"aws:MultiFactorAuthPresent\": \"true\"} requires MFA</li>\n            <li>Permission boundaries limit maximum permissions even for administrators</li>\n            <li>AWS SSO with Identity Center provides centralized access with automatic MFA</li>\n            <li>CloudTrail logs show specific IAM user for each API call</li>\n            <li>Consider attribute-based access control (ABAC) for dynamic permissions based on tags</li></ul>"
+        }
+      ],
+      "tags": [
+        "IAM",
+        "security",
+        "MFA",
+        "least-privilege"
+      ]
+    },
+    {
+      "id": 42,
+      "categoryRef": "data-ingestion",
+      "difficulty": "advanced",
+      "title": "Event-Driven Architecture for Data",
+      "scenario": "A supply chain platform needs to react to inventory events in real-time. When stock levels drop, purchasing workflows should trigger. When shipments arrive, warehouse systems should update. Events come from multiple sources (ERP, WMS, IoT sensors) in different formats. The architecture should be loosely coupled and scalable.",
+      "questionText": "Which architecture implements event-driven data processing?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Amazon EventBridge with schema registry, rules routing to Lambda/Step Functions targets"
+        },
+        {
+          "letter": "B",
+          "text": "Shared database with polling for changes"
+        },
+        {
+          "letter": "C",
+          "text": "Message queue with single consumer processing all events"
+        },
+        {
+          "letter": "D",
+          "text": "Direct point-to-point API integrations between systems"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Adding a new downstream system should not require changes to the upstream producer. What architectural pattern achieves that?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Amazon EventBridge provides enterprise event-driven architecture. EventBridge accepts events from multiple sources (custom applications, AWS services, SaaS partners) into a central bus. Schema registry discovers and validates event formats from different systems. Rules route events based on content (event type, attribute values) to appropriate targets. Lambda handles simple transformations while Step Functions orchestrate complex workflows. This decouples systems - producers don't know consumers. Point-to-point creates tight coupling. Database polling adds latency. Single consumer becomes a bottleneck."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>EventBridge rules use event patterns for content-based filtering (JSONPath-like)</li>\n            <li>Schema registry auto-discovers schemas from events for documentation</li>\n            <li>Archive and replay enables reprocessing historical events for recovery</li>\n            <li>Input transformers modify event payloads before delivery to targets</li>\n            <li>Cross-account event delivery enables organization-wide event mesh</li></ul>"
+        }
+      ],
+      "tags": [
+        "EventBridge",
+        "event-driven",
+        "serverless",
+        "integration"
+      ]
+    },
+    {
+      "id": 43,
+      "categoryRef": "data-store",
+      "difficulty": "intermediate",
+      "title": "Search and Analytics Integration",
+      "scenario": "An e-commerce platform needs product search with faceted filtering, autocomplete suggestions, and relevance tuning based on sales data. Search results should incorporate real-time inventory status. The catalog contains 5 million products with 100 attributes each. Search latency must be under 200 milliseconds.",
+      "questionText": "Which search architecture meets these requirements?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Relational database with full-text indexes"
+        },
+        {
+          "letter": "B",
+          "text": "Amazon Kendra for enterprise search"
+        },
+        {
+          "letter": "C",
+          "text": "Amazon OpenSearch with DynamoDB Streams for real-time inventory sync"
+        },
+        {
+          "letter": "D",
+          "text": "ElastiCache with pre-computed search results"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Faceted search with filters across many dimensions is a specific workload. Is a general-purpose database the right fit for it?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Amazon OpenSearch provides the required search capabilities. OpenSearch supports faceted aggregations for filtering by category, brand, price ranges. Completion suggester enables fast autocomplete. Function score queries blend relevance with sales data for ranking. DynamoDB Streams with Lambda keeps inventory status synchronized in near real-time. OpenSearch handles 5M documents with sub-200ms latency on appropriately sized clusters. Relational databases don't scale for complex faceted search. Kendra is for document search, not product catalogs. Pre-computed results can't handle dynamic facet combinations."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>OpenSearch aggregations support nested facets (category &gt; subcategory &gt; brand)</li>\n            <li>Completion suggester uses FST (finite state transducer) for fast prefix matching</li>\n            <li>Function score: multiply(_score, log1p(sales_count)) boosts popular products</li>\n            <li>Index aliases enable zero-downtime reindexing for schema changes</li>\n            <li>UltraWarm nodes reduce storage costs for less frequently accessed products</li></ul>"
+        }
+      ],
+      "tags": [
+        "OpenSearch",
+        "search",
+        "e-commerce",
+        "DynamoDB"
+      ]
+    },
+    {
+      "id": 44,
+      "categoryRef": "data-operations",
+      "difficulty": "advanced",
+      "title": "CI/CD for Data Infrastructure",
+      "scenario": "A data platform team manages 50+ Glue jobs, 20 Step Functions, and associated IAM roles across dev, staging, and production environments. Currently, infrastructure changes are manual and error-prone. The team wants infrastructure-as-code with automated testing and promotion between environments.",
+      "questionText": "Which approach implements CI/CD for data infrastructure?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Shell scripts creating resources via AWS CLI"
+        },
+        {
+          "letter": "B",
+          "text": "Manual CloudFormation template updates through console"
+        },
+        {
+          "letter": "C",
+          "text": "AWS CDK with CodePipeline, environment-specific stacks, and integration tests"
+        },
+        {
+          "letter": "D",
+          "text": "Terraform Cloud with separate state per resource"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "How do you promote infrastructure changes through dev, staging, and production with confidence and rollback capability?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "AWS CDK with CodePipeline provides comprehensive infrastructure CI/CD. CDK defines infrastructure in familiar programming languages (TypeScript, Python) with high-level constructs for Glue, Step Functions. Environment-specific stacks use CDK's stage concept for dev/staging/prod deployments. CodePipeline automates promotion: commit triggers build, unit tests validate constructs, deploy to dev, run integration tests, promote to staging/prod with approvals. CDK synth generates CloudFormation for drift detection. Manual templates don't scale with 50+ resources. CLI scripts lack state management. Terraform works but CDK has deeper AWS integration."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>CDK Pipelines construct simplifies multi-stage deployment with built-in best practices</li>\n            <li>CDK assertions library enables unit testing infrastructure constructs</li>\n            <li>CDK aspects apply cross-cutting concerns like tagging across all resources</li>\n            <li>Feature flags in CDK enable gradual rollout of infrastructure changes</li>\n            <li>CDK context values parameterize environment-specific configuration</li></ul>"
+        }
+      ],
+      "tags": [
+        "CDK",
+        "CI/CD",
+        "CodePipeline",
+        "IaC"
+      ]
+    },
+    {
+      "id": 45,
+      "categoryRef": "data-security",
+      "difficulty": "intermediate",
+      "title": "Data Retention and Deletion",
+      "scenario": "A company must implement data retention policies for GDPR compliance. Customer data must be deleted upon request within 30 days. Transaction records must be retained for 7 years for financial regulations. Some data spans multiple systems (S3, Redshift, DynamoDB). The deletion process must be auditable.",
+      "questionText": "Which approach implements compliant data retention and deletion?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Manual deletion by administrators when requested"
+        },
+        {
+          "letter": "B",
+          "text": "S3 Lifecycle policies for retention, Lambda orchestration for cross-system deletion with CloudTrail audit"
+        },
+        {
+          "letter": "C",
+          "text": "Anonymization only without actual deletion"
+        },
+        {
+          "letter": "D",
+          "text": "Single database with built-in retention policies"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Consider automated lifecycle management combined with orchestrated deletion workflows."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "S3 Lifecycle with Lambda orchestration provides compliant retention management. S3 Lifecycle rules automatically delete objects after 7 years or transition to Glacier for cost-effective retention. For deletion requests, Step Functions orchestrates deletion across S3, Redshift (DELETE queries), and DynamoDB (DeleteItem) with the customer identifier. Lambda functions execute deletions with error handling and retry logic. CloudTrail logs all delete operations for audit proof. DynamoDB TTL handles automatic expiration where applicable. Manual processes don't scale and lack audit trails. Single database doesn't reflect multi-system reality. Anonymization may not satisfy GDPR's right to erasure."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>S3 Object Lock compliance mode prevents deletion even by root for retention periods</li>\n            <li>Redshift DELETE with customer_id uses sort key for efficient targeted deletion</li>\n            <li>DynamoDB TTL automatically deletes expired items without provisioned capacity</li>\n            <li>Step Functions provides execution history as deletion audit trail</li>\n            <li>Consider data catalog tracking which systems contain each customer's data</li></ul>"
+        }
+      ],
+      "tags": [
+        "GDPR",
+        "retention",
+        "compliance",
+        "deletion"
+      ]
+    },
+    {
+      "id": 46,
+      "categoryRef": "data-ingestion",
+      "difficulty": "basic",
+      "title": "Message Queue Selection",
+      "scenario": "An order processing system needs to decouple order placement from fulfillment processing. Orders must be processed exactly once to prevent duplicate shipments. Processing can take up to 10 minutes per order. During peak sales, order volume increases 10x. The system should handle failures gracefully with retry capability.",
+      "questionText": "Which messaging service meets these requirements?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Amazon SQS FIFO queue with visibility timeout and dead-letter queue"
+        },
+        {
+          "letter": "B",
+          "text": "Amazon SNS for pub/sub notification"
+        },
+        {
+          "letter": "C",
+          "text": "Amazon MQ with ActiveMQ"
+        },
+        {
+          "letter": "D",
+          "text": "Amazon Kinesis Data Streams"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Order processing cannot tolerate duplicates or reordering. What messaging guarantee does this workload require?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Amazon SQS FIFO queue provides exactly-once processing for order workflows. FIFO queues deduplicate messages within a 5-minute window preventing duplicate orders. Message group IDs ensure related messages process in order. Visibility timeout (set to 10+ minutes) prevents other consumers from processing during fulfillment. Dead-letter queues capture failed messages for investigation. SQS scales automatically with 10x traffic without configuration. SNS doesn't provide queuing. Amazon MQ requires capacity management. Kinesis is for streaming analytics, not work queues."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>FIFO deduplication uses message deduplication ID or content-based deduplication</li>\n            <li>Message group ID partitions messages for parallel processing with ordering</li>\n            <li>Visibility timeout should exceed maximum processing time plus buffer</li>\n            <li>Dead-letter queue maxReceiveCount configures retry attempts before DLQ</li>\n            <li>SQS FIFO supports 3,000 messages/second with batching (300 without)</li></ul>"
+        }
+      ],
+      "tags": [
+        "SQS",
+        "FIFO",
+        "messaging",
+        "decoupling"
+      ]
+    },
+    {
+      "id": 47,
+      "categoryRef": "data-store",
+      "difficulty": "advanced",
+      "title": "Real-Time Analytics Architecture",
+      "scenario": "A ride-sharing company needs real-time dashboards showing driver locations, trip counts by zone, and surge pricing recommendations. Data updates every second from 100,000 active drivers. Dashboards must refresh every 5 seconds with sub-second query latency. Historical analysis of patterns over months is also required.",
+      "questionText": "Which architecture supports both real-time dashboards and historical analysis?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Kafka with consumer writing directly to dashboards"
+        },
+        {
+          "letter": "B",
+          "text": "All data to Redshift with materialized views"
+        },
+        {
+          "letter": "C",
+          "text": "Single PostgreSQL database for all queries"
+        },
+        {
+          "letter": "D",
+          "text": "Kinesis Data Analytics for real-time aggregation to DynamoDB/ElastiCache, with Firehose to S3 for historical Athena queries"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Consider lambda architecture with real-time and batch layers serving different query patterns."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Kinesis Data Analytics with dual output paths serves both requirements. KDA (Apache Flink) processes streaming driver locations, computing real-time aggregations (trips per zone, driver density). Results write to DynamoDB or ElastiCache for sub-second dashboard queries. Simultaneously, Kinesis Firehose delivers raw data to S3 in Parquet format for historical analysis via Athena. This lambda architecture separates real-time serving from batch analytics. Redshift can't achieve 5-second refresh at this scale. PostgreSQL can't handle the write volume. Direct Kafka-to-dashboard lacks aggregation and persistence."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Flink tumbling windows aggregate trips per zone per 5-second intervals</li>\n            <li>ElastiCache provides microsecond read latency for dashboard queries</li>\n            <li>Firehose dynamic partitioning organizes S3 data by hour/zone for efficient queries</li>\n            <li>Consider Amazon Managed Service for Apache Flink for fully managed streaming</li>\n            <li>Geospatial functions in Flink calculate zone membership from lat/long coordinates</li></ul>"
+        }
+      ],
+      "tags": [
+        "Kinesis",
+        "Flink",
+        "real-time",
+        "lambda-architecture"
+      ]
+    },
+    {
+      "id": 48,
+      "categoryRef": "data-operations",
+      "difficulty": "intermediate",
+      "title": "Performance Troubleshooting",
+      "scenario": "A Redshift cluster shows degraded query performance. Some queries that took 30 seconds now take 10 minutes. The cluster has grown from 500 GB to 5 TB over the past year. Disk usage is at 85%. Some tables haven't been vacuumed in months. The WLM shows queries waiting in queue.",
+      "questionText": "Which combination of actions addresses these performance issues?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Create more WLM queues"
+        },
+        {
+          "letter": "B",
+          "text": "Run VACUUM and ANALYZE on tables, resize cluster or enable concurrency scaling, review sort key effectiveness"
+        },
+        {
+          "letter": "C",
+          "text": "Restart the cluster to clear memory"
+        },
+        {
+          "letter": "D",
+          "text": "Delete old data to reduce disk usage"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Degraded performance after heavy writes often points to physical data organization. What routine maintenance addresses that?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "VACUUM, ANALYZE, and scaling address the performance issues systematically. VACUUM reclaims space from deleted rows and resorts data, critical for tables not maintained in months. ANALYZE updates statistics enabling the query planner to choose efficient execution plans. At 85% disk with 10x data growth, the cluster is undersized - resize to RA3 with managed storage or enable concurrency scaling for queue wait times. Review sort keys as data patterns may have changed. Restarting doesn't fix underlying issues. More WLM queues don't add capacity. Deleting data is a business decision, not a technical fix."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>VACUUM DELETE reclaims space; VACUUM SORT resorts rows for range queries</li>\n            <li>ANALYZE updates table statistics used by query planner for join strategies</li>\n            <li>Concurrency Scaling adds transient clusters for query queue overflow</li>\n            <li>STL_ALERT_EVENT_LOG shows inefficient queries needing optimization</li>\n            <li>SVV_TABLE_INFO shows vacuum status, sort percentage, and statistics staleness</li></ul>"
+        }
+      ],
+      "tags": [
+        "Redshift",
+        "performance",
+        "VACUUM",
+        "troubleshooting"
+      ]
+    },
+    {
+      "id": 49,
+      "categoryRef": "data-security",
+      "difficulty": "advanced",
+      "title": "Zero Trust Data Access",
+      "scenario": "A financial institution is implementing zero trust security for their data platform. Every data access request must be verified regardless of network location. Access decisions should consider user identity, device posture, data sensitivity, and access patterns. Anomalous access should trigger additional verification or blocking.",
+      "questionText": "Which architecture implements zero trust data access?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "IP allowlisting in security groups"
+        },
+        {
+          "letter": "B",
+          "text": "Shared service accounts with strong passwords"
+        },
+        {
+          "letter": "C",
+          "text": "IAM Identity Center with MFA, Lake Formation permissions, Amazon Verified Access, and GuardDuty for anomaly detection"
+        },
+        {
+          "letter": "D",
+          "text": "VPN with network-based access controls"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Zero trust means the network perimeter is not enough. What must be verified on every request instead?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "The combination of IAM Identity Center, Lake Formation, Verified Access, and GuardDuty implements zero trust principles. IAM Identity Center provides centralized identity with MFA for strong authentication regardless of network. Amazon Verified Access evaluates device posture and user context for application access decisions. Lake Formation enforces fine-grained data permissions based on identity and data sensitivity tags. GuardDuty detects anomalous access patterns (unusual data volumes, off-hours access) triggering alerts or blocking. This verifies every request. VPN trusts network location. IP allowlisting is perimeter-based. Shared accounts lack accountability."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Verified Access policies evaluate user groups, device trust, and request context</li>\n            <li>Lake Formation data filters restrict access based on user attributes (ABAC)</li>\n            <li>GuardDuty S3 protection detects unusual API calls and data access patterns</li>\n            <li>IAM Access Analyzer validates that policies don't grant unintended access</li>\n            <li>CloudWatch Logs Insights enables custom anomaly detection on access patterns</li></ul>"
+        }
+      ],
+      "tags": [
+        "zero-trust",
+        "security",
+        "IAM",
+        "GuardDuty"
+      ]
+    },
+    {
+      "id": 50,
+      "categoryRef": "data-ingestion",
+      "difficulty": "intermediate",
+      "title": "Data Catalog Strategy",
+      "scenario": "A data platform contains 10,000 datasets across S3, Redshift, and RDS. Data consumers struggle to find relevant datasets. Metadata is inconsistent - some datasets have descriptions, others don't. Business users need to discover data using business terms while technical users need schema details. Data stewards need to maintain quality and documentation.",
+      "questionText": "Which approach creates a comprehensive data catalog?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Documentation wiki maintained by data engineers"
+        },
+        {
+          "letter": "B",
+          "text": "Spreadsheet tracking all datasets manually"
+        },
+        {
+          "letter": "C",
+          "text": "Glue Data Catalog with crawlers only"
+        },
+        {
+          "letter": "D",
+          "text": "Amazon DataZone with Glue Data Catalog integration, business glossary, and data quality rules"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Technical metadata alone does not help business users find data. What layer bridges the gap between schema and business meaning?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Amazon DataZone with Glue integration provides comprehensive cataloging. DataZone creates a business data catalog portal where data consumers search and discover datasets. Business glossary maps technical terms to business concepts (e.g., \"customer_ltv\" = \"Customer Lifetime Value\"). Glue Data Catalog provides technical metadata (schemas, statistics) via crawlers. Data stewards define ownership, maintain documentation, and set quality rules within DataZone. Self-service subscription enables governed data access. Spreadsheets don't scale. Glue alone lacks business context. Wikis become outdated."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>DataZone domains organize datasets by business area with dedicated governance</li>\n            <li>Data products package related datasets with documentation and quality SLAs</li>\n            <li>Business glossary inheritance applies terms to matching columns automatically</li>\n            <li>Subscription workflows enable data consumers to request access with approvals</li>\n            <li>DataZone integrates lineage from Glue showing data flow across transformations</li></ul>"
+        }
+      ],
+      "tags": [
+        "DataZone",
+        "catalog",
+        "governance",
+        "discovery"
+      ]
+    }
+  ],
+  "glossary": {}
+}

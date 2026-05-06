@@ -1,0 +1,2472 @@
+{
+  "version": "1.0",
+  "metadata": {
+    "examCode": "DP-600",
+    "examTitle": "Microsoft Certified: Fabric Analytics Engineer Associate",
+    "provider": "Microsoft Azure",
+    "description": "Scenario-Based Study Guide for DP-600 certification - validates skills in implementing and managing enterprise-scale analytics solutions using Microsoft Fabric, including data lakehouses, pipelines, semantic models, and real-time analytics.",
+    "totalQuestions": 50,
+    "createdDate": "2026-05-05",
+    "lastModified": "2026-05-05T00:00:00Z",
+    "categories": {
+      "cat-lakehouse": "Plan, Implement, and Manage a Lakehouse",
+      "cat-transform": "Transform Data",
+      "cat-semantic": "Design and Build Semantic Models",
+      "cat-explore": "Explore and Analyze Data",
+      "cat-monitor": "Monitor and Optimize"
+    }
+  },
+  "questions": [
+    {
+      "id": 1,
+      "categoryRef": "cat-lakehouse",
+      "difficulty": "intermediate",
+      "title": "OneLake Architecture",
+      "scenario": "A retail company is migrating their data platform to Microsoft Fabric. They have data from 15 different source systems including SAP, Salesforce, and on-premises SQL Server databases. The data engineering team wants to establish a single storage layer that all Fabric workloads can access without data duplication. They need to organize data by business domain (sales, inventory, finance) with different access controls per domain.",
+      "questionText": "Which OneLake architecture best organizes multi-domain data with proper isolation?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "A single lakehouse with folders per domain and row-level security on all tables"
+        },
+        {
+          "letter": "B",
+          "text": "Separate workspaces per domain, each with their own lakehouse, using OneLake shortcuts for cross-domain access where authorized"
+        },
+        {
+          "letter": "C",
+          "text": "A single workspace with separate SQL endpoints per domain for access control"
+        },
+        {
+          "letter": "D",
+          "text": "Multiple Fabric capacities — one per domain — with no cross-access capability"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Think about how Fabric workspaces provide security boundaries and how shortcuts enable controlled cross-domain access."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Separate workspaces per domain provide workspace-level security boundaries with distinct role assignments (Admin, Member, Contributor, Viewer). Each workspace has its own lakehouse with domain-specific Delta tables. OneLake shortcuts create virtual references to data in other workspaces without copying — access is governed by the source workspace permissions. This provides domain isolation with controlled cross-domain analytics when authorized."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>OneLake is a single logical data lake for the entire organization — all Fabric items store data in OneLake automatically.</li>\n              <li>Shortcuts support references to: other lakehouses, Azure Data Lake Storage Gen2, AWS S3, and Google Cloud Storage.</li>\n              <li>Workspace roles cascade to all items within — separating domains into workspaces provides clean RBAC boundaries.</li>\n              <li>OneLake data access roles (preview) provide object-level security within a lakehouse for finer-grained control.</li></ul>"
+        }
+      ],
+      "tags": [
+        "OneLake",
+        "Architecture",
+        "Data Organization"
+      ]
+    },
+    {
+      "id": 2,
+      "categoryRef": "cat-transform",
+      "difficulty": "intermediate",
+      "title": "Dataflow Gen2 vs Pipeline",
+      "scenario": "A data engineering team needs to ingest data from a REST API that returns paginated JSON responses, transform the nested JSON into flattened tabular format, apply business logic (currency conversion, date normalization), and load the results into a lakehouse Delta table. The process runs every 4 hours and typically processes 500,000 records per batch.",
+      "questionText": "Which Fabric data movement approach is most appropriate for this scenario?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Data Pipeline with Copy Activity and mapping data flows for transformation"
+        },
+        {
+          "letter": "B",
+          "text": "Dataflow Gen2 with Power Query for extraction, transformation, and direct lakehouse destination"
+        },
+        {
+          "letter": "C",
+          "text": "Spark notebook triggered by a pipeline schedule for all steps"
+        },
+        {
+          "letter": "D",
+          "text": "Eventstream for real-time ingestion from the REST API"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Consider which tool handles paginated REST API extraction with complex transformation at the 500K record scale efficiently."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Data Pipeline with Copy Activity natively handles REST API pagination (supports both offset and cursor-based patterns) and can extract JSON at scale. Mapping data flows provide a visual transformation layer for flattening nested JSON, applying business logic, and writing to Delta tables — optimized for batch processing at scale. Dataflow Gen2 uses Power Query which is excellent for smaller datasets but less performant for 500K records with complex transformations. Pipelines also provide better orchestration, retry logic, and monitoring."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Copy Activity REST connector supports: pagination rules, request headers, OAuth2 authentication, and response flattening.</li>\n              <li>Mapping data flows run on Spark clusters under the hood — handling millions of records efficiently.</li>\n              <li>Dataflow Gen2 Power Query mashup engine is memory-bound — 500K records with complex transforms may hit limits.</li>\n              <li>Data Pipelines support parameterization, dynamic content expressions, and error handling patterns (retry, timeout, conditional paths).</li></ul>"
+        }
+      ],
+      "tags": [
+        "Data Pipeline",
+        "Transformation",
+        "REST API"
+      ]
+    },
+    {
+      "id": 3,
+      "categoryRef": "cat-semantic",
+      "difficulty": "intermediate",
+      "title": "Semantic Model Relationships",
+      "scenario": "A financial analyst is building a semantic model for sales analysis. The model has a fact table (Sales) with 100 million rows connected to dimensions: Date, Product, Store, and Customer. Some reports need to show sales by product category AND by customer segment simultaneously. The analyst notices that filtering by customer segment does not filter the product category totals correctly in a matrix visual.",
+      "questionText": "What is the most likely cause of the incorrect filtering behavior?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "The model uses Import mode instead of DirectQuery for the fact table"
+        },
+        {
+          "letter": "B",
+          "text": "The cross-filter direction on the Sales-to-Customer relationship is set to \"Single\" instead of \"Both\""
+        },
+        {
+          "letter": "C",
+          "text": "The fact table is missing a relationship to one of the dimension tables"
+        },
+        {
+          "letter": "D",
+          "text": "The relationships between dimensions are bidirectional, causing ambiguous filter paths"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "When multiple dimensions are filtered simultaneously through a fact table, consider how filter direction ambiguity can cause unexpected results."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Bidirectional relationships between dimensions create ambiguous filter propagation paths — a filter on Customer Segment can reach Product Category through multiple paths (Customer &gt; Sales &gt; Product vs. a potential direct dimension-to-dimension relationship). DAX evaluates ambiguous paths unpredictably. The correct pattern is single-direction relationships from dimensions to facts (many-to-one, single direction) which ensures filters flow cleanly through the star schema without ambiguity."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Star schema best practice: all relationships one-to-many from dimension to fact, single cross-filter direction.</li>\n              <li>Bidirectional relationships should be used sparingly — only when required for specific DAX patterns (e.g., many-to-many bridging).</li>\n              <li>Use CROSSFILTER() DAX function to temporarily modify filter direction in specific measures rather than setting bidirectional globally.</li>\n              <li>Performance impact: bidirectional relationships increase model complexity and can degrade query performance on large tables.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Semantic Model",
+        "Relationships",
+        "Star Schema"
+      ]
+    },
+    {
+      "id": 4,
+      "categoryRef": "cat-explore",
+      "difficulty": "intermediate",
+      "title": "SQL Analytics Endpoint",
+      "scenario": "A business analyst team needs to run ad-hoc SQL queries against lakehouse Delta tables without affecting data engineering workloads. They use tools like Azure Data Studio and SSMS. They need read-only access with T-SQL syntax support, including views for commonly used queries. The data engineering team does not want analysts to consume Spark compute capacity.",
+      "questionText": "Which Fabric feature provides SQL-based read access to lakehouse data without consuming Spark resources?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Creating a warehouse and importing data from the lakehouse"
+        },
+        {
+          "letter": "B",
+          "text": "The lakehouse SQL analytics endpoint with T-SQL views and warehouse-style compute"
+        },
+        {
+          "letter": "C",
+          "text": "A Spark notebook with spark.sql() queries shared with analysts"
+        },
+        {
+          "letter": "D",
+          "text": "A KQL queryset connected to the lakehouse via shortcuts"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Every Fabric lakehouse automatically has a companion endpoint that provides SQL-based access — what is it called?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "The SQL analytics endpoint is automatically created for every lakehouse in Fabric. It provides a read-only T-SQL interface over Delta tables using a SQL engine (not Spark) — consuming SQL compute capacity separately from Spark jobs. Analysts can connect via SSMS, Azure Data Studio, or any ODBC/JDBC tool. It supports creating views, stored procedures (read-only), and granting object-level permissions — perfect for analyst self-service without impacting engineering workloads."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>SQL analytics endpoint auto-syncs metadata from Delta tables — no manual schema refresh needed.</li>\n              <li>It supports T-SQL syntax including CTEs, window functions, and cross-database queries within the same workspace.</li>\n              <li>Compute is separate from Spark pools — SQL queries use the Fabric SQL engine with its own capacity allocation.</li>\n              <li>Object-level security (table/view permissions) and column-level security can be configured on the SQL endpoint independently.</li></ul>"
+        }
+      ],
+      "tags": [
+        "SQL Endpoint",
+        "Lakehouse",
+        "Analytics"
+      ]
+    },
+    {
+      "id": 5,
+      "categoryRef": "cat-monitor",
+      "difficulty": "intermediate",
+      "title": "Capacity Management",
+      "scenario": "A company purchased an F64 Fabric capacity shared across 5 workspaces. During month-end processing, the finance workspace consumes so much compute that other workspaces experience throttling and job failures. The platform team needs to prevent any single workspace from starving others while still allowing burst capacity when available.",
+      "questionText": "Which Fabric capacity management approach prevents workspace resource starvation?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Upgrade to F128 capacity to provide headroom for all workspaces"
+        },
+        {
+          "letter": "B",
+          "text": "Implement smoothing and throttling rules with capacity metrics monitoring and workspace-level compute caps"
+        },
+        {
+          "letter": "C",
+          "text": "Reduce the number of concurrent jobs in the finance workspace manually"
+        },
+        {
+          "letter": "D",
+          "text": "Move the finance workspace to a separate Fabric capacity with dedicated F32"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "When one workspace consistently needs guaranteed capacity that impacts others, the cleanest isolation is physical separation."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Assigning the finance workspace to its own dedicated F32 capacity provides guaranteed compute isolation — finance month-end processing cannot impact other workspaces regardless of load. The remaining workspaces share the original capacity without contention from finance jobs. Fabric capacities are the unit of compute isolation; within a single capacity, all workspaces compete for the same CU pool. This approach provides predictable performance for both finance and other teams."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Fabric capacities use CU (Capacity Units) — all workload types (Spark, SQL, Dataflow, Power BI) share the same CU pool.</li>\n              <li>Throttling occurs when background CU consumption exceeds the capacity limit — jobs are delayed or rejected.</li>\n              <li>Fabric capacity metrics app shows CU utilization, throttling events, and per-workspace consumption breakdowns.</li>\n              <li>Capacity smoothing spreads burst consumption over time (24-hour window) but cannot prevent sustained over-consumption.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Capacity",
+        "Performance",
+        "Resource Management"
+      ]
+    },
+    {
+      "id": 6,
+      "categoryRef": "cat-lakehouse",
+      "difficulty": "intermediate",
+      "title": "Delta Table Optimization",
+      "scenario": "A lakehouse Delta table stores 2 billion rows of IoT sensor data partitioned by date. Queries that filter by sensor_id (which is not the partition column) perform full partition scans taking 45 minutes. The table receives 10 million new rows daily via append operations. File sizes vary from 1MB to 500MB due to small batch appends throughout the day.",
+      "questionText": "Which combination of Delta optimizations will most improve query performance for sensor_id filters?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Repartition the table by sensor_id instead of date"
+        },
+        {
+          "letter": "B",
+          "text": "Increase the Spark executor memory to cache the full table in memory"
+        },
+        {
+          "letter": "C",
+          "text": "Create a materialized view filtered by sensor_id and schedule hourly refresh"
+        },
+        {
+          "letter": "D",
+          "text": "Apply OPTIMIZE with ZORDER on sensor_id, and enable V-Order for the table to improve read performance"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Z-ordering co-locates data by a column within files, enabling file skipping — and V-Order optimizes file layout for read performance."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "OPTIMIZE compacts small files (solving the 1MB-500MB variance from small batch appends) into optimal-sized files. ZORDER BY sensor_id co-locates rows with the same sensor_id within files, enabling data skipping — queries filtering by sensor_id only read files containing that sensor's data rather than scanning all files in a partition. V-Order is a Fabric-specific write optimization that sorts data within Parquet row groups for faster reads across all Fabric engines (SQL, Spark, Power BI)."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>OPTIMIZE compacts files to target size (~1GB in Fabric) — reducing the number of files scanned and metadata overhead.</li>\n              <li>Z-ordering creates min/max statistics per file for the z-ordered column — enabling file-level predicate pushdown (data skipping).</li>\n              <li>V-Order applies special sorting within Parquet row groups optimized for the Fabric Verti-Scan engine — 10-50% faster reads.</li>\n              <li>Best practice: OPTIMIZE with ZORDER as a scheduled maintenance job (nightly) after daily appends complete.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Delta Tables",
+        "Optimization",
+        "Performance"
+      ]
+    },
+    {
+      "id": 7,
+      "categoryRef": "cat-transform",
+      "difficulty": "intermediate",
+      "title": "Medallion Architecture",
+      "scenario": "A healthcare organization is implementing a medallion (bronze/silver/gold) architecture in their Fabric lakehouse. Raw data arrives from 20 source systems in varied formats (CSV, JSON, Parquet, HL7 FHIR). They need to track data lineage, handle late-arriving data, apply data quality rules, and produce curated datasets for reporting. Schema changes in source systems should not break the pipeline.",
+      "questionText": "Which implementation of the medallion architecture best handles schema evolution and data quality?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Bronze: raw files in Files section as-is; Silver: schema-enforced Delta tables with merge schema enabled; Gold: aggregated views with data quality checks via notebooks"
+        },
+        {
+          "letter": "B",
+          "text": "Single lakehouse with all three layers in the same set of tables using column prefixes (bronze_*, silver_*, gold_*)"
+        },
+        {
+          "letter": "C",
+          "text": "Three separate Fabric capacities — one per medallion layer — with cross-capacity queries"
+        },
+        {
+          "letter": "D",
+          "text": "Skip bronze entirely and load directly to silver with strict schema validation that rejects non-conforming records"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Bronze preserves raw data as-is (schema-agnostic), silver applies structure with schema evolution support, gold curates for consumption."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Bronze layer stores raw files in the lakehouse Files section without schema enforcement — preserving the original data regardless of format changes. Silver layer uses Delta tables with mergeSchema option enabled, which automatically adds new columns when sources evolve without breaking existing pipelines. Gold layer applies data quality rules (completeness, accuracy, consistency checks) and creates curated, business-ready aggregations. This three-layer approach provides full lineage (raw to curated) and resilience to schema drift."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Delta Lake mergeSchema: set spark.databricks.delta.schema.autoMerge.enabled = true or use .option(\"mergeSchema\", \"true\") on writes.</li>\n              <li>Bronze Files section supports any format — landing zone for ELT pattern where transformation happens downstream.</li>\n              <li>Data quality rules in gold can use Great Expectations, custom Spark assertions, or Fabric Data Quality Rules (preview).</li>\n              <li>Late-arriving data: use Delta MERGE (upsert) at silver layer with watermark columns to handle out-of-order arrivals.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Medallion Architecture",
+        "Data Quality",
+        "Schema Evolution"
+      ]
+    },
+    {
+      "id": 8,
+      "categoryRef": "cat-semantic",
+      "difficulty": "intermediate",
+      "title": "DAX Calculation Groups",
+      "scenario": "A financial reporting semantic model has 50 measures (Revenue, COGS, Gross Margin, Net Income, etc.) that each need time intelligence variants: Year-to-Date, Prior Year, Year-over-Year %, and Moving Average. Creating individual measures for each combination would result in 200+ measures, making the model difficult to maintain and confusing for report authors.",
+      "questionText": "Which DAX modeling technique reduces measure proliferation while providing all time intelligence variants?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Calculation groups with calculation items for YTD, PY, YoY%, and Moving Average that apply to any base measure dynamically"
+        },
+        {
+          "letter": "B",
+          "text": "Create all 200+ measures with consistent naming conventions and organize in display folders"
+        },
+        {
+          "letter": "C",
+          "text": "Create a single SWITCH measure that accepts a parameter to select the time intelligence type"
+        },
+        {
+          "letter": "D",
+          "text": "Use report-level measures in Power BI instead of model measures"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Calculation groups apply time intelligence patterns to ANY measure dynamically — creating the variants without duplicating measure logic."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Calculation groups create a virtual dimension with calculation items (YTD, PY, YoY%, Moving Average). When applied to any measure, the calculation item modifies the evaluation context — TOTALYTD, SAMEPERIODLASTYEAR, etc. are applied dynamically. You maintain only the 50 base measures plus 4 calculation items (54 total instead of 200+). Report authors drag the calculation group column into visuals to select which time intelligence variant to display. Maintenance is centralized — updating the YTD logic updates all 50 measures simultaneously."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Calculation groups use SELECTEDMEASURE() to reference whatever measure is in context — making them generic.</li>\n              <li>Precedence: when multiple calculation groups exist, the ordinal property determines application order.</li>\n              <li>Calculation items can use ISSELECTEDMEASURE() to apply different logic for specific measures (e.g., skip YoY% for ratio measures).</li>\n              <li>Available in Tabular Editor, ALM Toolkit, and natively in Power BI Desktop (Model view) for Fabric semantic models.</li></ul>"
+        }
+      ],
+      "tags": [
+        "DAX",
+        "Calculation Groups",
+        "Modeling"
+      ]
+    },
+    {
+      "id": 9,
+      "categoryRef": "cat-explore",
+      "difficulty": "intermediate",
+      "title": "KQL Database for Real-Time Analytics",
+      "scenario": "A logistics company needs to analyze real-time GPS telemetry from 50,000 delivery vehicles. They need sub-second query response for: current vehicle positions (last known location), route deviation alerts (comparing actual vs planned route), and historical trip analysis over the past 7 days. Data arrives at 100,000 events per second during peak hours. Older data should be archived to the lakehouse for long-term analytics.",
+      "questionText": "Which Fabric real-time analytics architecture handles this ingestion rate with the required query latency?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Stream data directly to lakehouse Delta tables and query with Spark SQL"
+        },
+        {
+          "letter": "B",
+          "text": "Direct ingestion to a Power BI streaming dataset with real-time dashboard"
+        },
+        {
+          "letter": "C",
+          "text": "Dataflow Gen2 running every minute to append data to a warehouse table"
+        },
+        {
+          "letter": "D",
+          "text": "Eventstream ingesting to a KQL database with hot cache for 7 days, OneLake availability enabled for automatic archival to lakehouse"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "KQL databases are optimized for high-ingestion, low-latency time-series queries — and OneLake availability bridges to the lakehouse for long-term storage."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Eventstream (Fabric's event ingestion service) captures the 100K events/second stream and routes to a KQL database. KQL databases are optimized for time-series and log analytics with sub-second query response on billions of rows. The 7-day hot cache keeps recent data in SSD/memory for fast queries. OneLake availability automatically makes KQL data queryable from the lakehouse (as Delta tables) without manual export — enabling long-term historical analysis via Spark or SQL endpoint. Power BI streaming datasets cannot handle 100K events/second."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>KQL databases in Fabric support up to millions of events/second ingestion with columnar storage optimized for time-series.</li>\n              <li>Hot cache policy (set in days) determines how much data stays on fast storage vs. cold storage.</li>\n              <li>OneLake availability creates a mirrored Delta table — queryable via SQL endpoint and Spark without data copying overhead.</li>\n              <li>KQL geo-spatial functions (geo_point_in_polygon, geo_distance_point_to_line) enable route deviation detection natively.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Real-Time Analytics",
+        "KQL",
+        "Eventstream"
+      ]
+    },
+    {
+      "id": 10,
+      "categoryRef": "cat-monitor",
+      "difficulty": "intermediate",
+      "title": "Data Pipeline Monitoring",
+      "scenario": "A data platform team runs 200 data pipelines in Fabric that execute throughout the day. They need: alerting when pipelines fail, SLA tracking (pipelines must complete within defined time windows), historical success/failure trends for capacity planning, and the ability to automatically retry failed pipelines with exponential backoff. Currently, failures go unnoticed until business users report missing data.",
+      "questionText": "Which monitoring and reliability approach provides comprehensive pipeline observability?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Check pipeline run history manually in the Fabric portal each morning"
+        },
+        {
+          "letter": "B",
+          "text": "Email notifications configured in each pipeline's success/failure paths only"
+        },
+        {
+          "letter": "C",
+          "text": "Azure Monitor integration with Log Analytics workspace and custom Kusto queries"
+        },
+        {
+          "letter": "D",
+          "text": "Data Pipeline monitoring with Fabric Monitoring Hub, alert rules on pipeline failures, retry policies with exponential backoff configured in pipeline activities, and Power BI dashboard on pipeline run metadata"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Fabric's native monitoring capabilities combined with built-in retry policies provide the full observability stack."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Fabric Monitoring Hub provides a centralized view of all pipeline runs across workspaces with status, duration, and error details. Alert rules trigger notifications (email, Teams) on pipeline failure events. Retry policies configured at the activity level support exponential backoff (e.g., retry 3 times with 10/20/40 minute intervals). Pipeline run metadata can be queried programmatically via REST API and visualized in a Power BI dashboard showing trends, SLA compliance (duration vs. target), and failure patterns for capacity planning."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Monitoring Hub shows: item type, status, start time, duration, submitted by, and workspace — across all Fabric items.</li>\n              <li>Pipeline retry policies: configurable max retry count, interval in seconds, and backoff multiplier (exponential).</li>\n              <li>Fabric REST APIs (Items API, Pipeline API) enable programmatic access to run history for custom dashboards.</li>\n              <li>Data Activator (Reflex) can trigger alerts based on data conditions in addition to pipeline execution status.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Monitoring",
+        "Pipeline",
+        "Reliability"
+      ]
+    },
+    {
+      "id": 11,
+      "categoryRef": "cat-lakehouse",
+      "difficulty": "intermediate",
+      "title": "Lakehouse vs Warehouse Selection",
+      "scenario": "A company is deciding between a Fabric Lakehouse and a Fabric Warehouse for their new analytics platform. Their requirements include: support for semi-structured data (JSON, Avro), ability to use both Spark and T-SQL for processing, compatibility with existing Power BI semantic models, open data format for portability, and ACID transactions for reliable data updates.",
+      "questionText": "Which Fabric item best meets all these requirements?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Fabric Warehouse — provides T-SQL, Power BI integration, and ACID transactions"
+        },
+        {
+          "letter": "B",
+          "text": "External Azure Data Lake Storage Gen2 with direct Power BI connection"
+        },
+        {
+          "letter": "C",
+          "text": "Both a Lakehouse and Warehouse with data movement between them"
+        },
+        {
+          "letter": "D",
+          "text": "Fabric Lakehouse — supports semi-structured data, Spark and T-SQL (via SQL endpoint), Delta format (open/portable), ACID transactions, and Power BI connectivity"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Which Fabric item natively supports ALL listed requirements: semi-structured data, dual engines (Spark + SQL), open format, and ACID?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "The Fabric Lakehouse satisfies all requirements: the Files section stores semi-structured data (JSON, Avro, Parquet), Spark notebooks process data with full PySpark/Scala support, the auto-generated SQL analytics endpoint provides T-SQL access, Delta Lake format is open (Apache-licensed) for portability, Delta provides ACID transactions, and the default semantic model connects directly to Power BI. The Warehouse would require data to already be structured and does not natively support Spark processing or semi-structured file storage."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Lakehouse has two sections: Tables (managed Delta tables) and Files (unstructured/semi-structured storage).</li>\n              <li>The SQL analytics endpoint is read-only — writes must happen through Spark or Data Pipeline.</li>\n              <li>Delta Lake is an open-source project (Linux Foundation) ensuring no vendor lock-in for data format.</li>\n              <li>Fabric Warehouse provides full DML (INSERT, UPDATE, DELETE) via T-SQL — choose it when T-SQL write access is the primary need.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Lakehouse",
+        "Warehouse",
+        "Architecture Decision"
+      ]
+    },
+    {
+      "id": 12,
+      "categoryRef": "cat-transform",
+      "difficulty": "intermediate",
+      "title": "Spark Notebook Best Practices",
+      "scenario": "A data engineer writes a Spark notebook that reads 500GB of raw data from the lakehouse Files section, performs complex transformations (window functions, UDFs, multiple joins), and writes results to a managed Delta table. The notebook takes 3 hours to complete and frequently fails with OutOfMemory errors at the join stage. The engineer is using a default Spark session with no custom configuration.",
+      "questionText": "Which combination of techniques will most effectively reduce execution time and eliminate OOM errors?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Switch to a larger Spark pool with more memory per executor"
+        },
+        {
+          "letter": "B",
+          "text": "Convert all transformations to SQL using spark.sql() instead of DataFrame API"
+        },
+        {
+          "letter": "C",
+          "text": "Optimize the join with broadcast hints for small tables, repartition data before the join stage, use Delta table partitioning on the write, and enable adaptive query execution (AQE)"
+        },
+        {
+          "letter": "D",
+          "text": "Split the notebook into 10 smaller notebooks running sequentially"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "OOM during joins typically means data skew or large shuffle — broadcast, repartition, and AQE address these root causes."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Broadcast hints join small dimension tables (&lt;500MB) without shuffle — eliminating OOM risk for those joins. Repartitioning before large joins distributes data evenly across executors, preventing single-partition memory pressure. AQE (Adaptive Query Execution) dynamically adjusts partition counts, handles skew with skew join optimization, and coalesces small partitions — addressing the most common causes of OOM. Delta table partitioning on write (by date or key column) optimizes downstream read performance."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Broadcast threshold default in Spark is 10MB — increase with spark.sql.autoBroadcastJoinThreshold for tables up to 500MB.</li>\n              <li>AQE features: coalesce post-shuffle partitions, skew join handling, and dynamic join strategy selection — enable with spark.sql.adaptive.enabled=true.</li>\n              <li>Repartition by join key before joining ensures co-located data — repartition(200, \"join_key\") is often optimal.</li>\n              <li>UDFs prevent Catalyst optimization — consider replacing with native Spark functions where possible for better performance.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Spark",
+        "Performance",
+        "Optimization"
+      ]
+    },
+    {
+      "id": 13,
+      "categoryRef": "cat-semantic",
+      "difficulty": "intermediate",
+      "title": "DirectLake Mode",
+      "scenario": "A company has a 50GB semantic model currently in Import mode that refreshes every 4 hours. Business users complain about stale data between refreshes. The data lives in a Fabric lakehouse Delta table that receives continuous updates throughout the day. The team wants near-real-time data freshness in Power BI reports without the performance degradation typically associated with DirectQuery.",
+      "questionText": "Which semantic model storage mode provides near-real-time freshness with Import-like performance?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "DirectQuery mode connecting to the lakehouse SQL endpoint"
+        },
+        {
+          "letter": "B",
+          "text": "Composite model with Import for historical data and DirectQuery for recent data"
+        },
+        {
+          "letter": "C",
+          "text": "Import mode with incremental refresh set to 15-minute intervals"
+        },
+        {
+          "letter": "D",
+          "text": "DirectLake mode — reads Delta Parquet files directly from OneLake with in-memory columnar engine performance"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "DirectLake is unique to Fabric — it reads directly from Delta files but processes them through the VertiPaq engine for Import-like speed."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "DirectLake mode reads Parquet files from Delta tables in OneLake directly into the VertiPaq columnar engine — no data copy or scheduled refresh needed. When the underlying Delta table is updated, DirectLake automatically detects the new files and loads them on the next query (or within a short framing interval). This provides near-real-time freshness (minutes, not hours) with the performance of Import mode (in-memory columnar). Unlike DirectQuery, it does not generate queries against a SQL engine for every report interaction."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>DirectLake requires data in Fabric lakehouse or warehouse Delta tables — external data sources are not supported.</li>\n              <li>Framing: DirectLake periodically checks for new Delta files; explicit framing can be triggered via XMLA endpoint.</li>\n              <li>Fallback: if a DAX query cannot be served from loaded Parquet segments, DirectLake falls back to DirectQuery automatically.</li>\n              <li>Guardrails exist: max rows per table, max model size — exceeding these causes fallback to DirectQuery behavior.</li></ul>"
+        }
+      ],
+      "tags": [
+        "DirectLake",
+        "Semantic Model",
+        "Performance"
+      ]
+    },
+    {
+      "id": 14,
+      "categoryRef": "cat-explore",
+      "difficulty": "intermediate",
+      "title": "Notebook Visualization and Sharing",
+      "scenario": "A data scientist builds an exploratory analysis in a Fabric Spark notebook. The analysis includes data profiling, statistical summaries, correlation matrices, and predictive model results. They need to share interactive findings with business stakeholders who do not have Fabric workspace access and are not technical users. The stakeholders should be able to filter and interact with the visualizations without running any code.",
+      "questionText": "Which approach best shares interactive notebook findings with non-technical stakeholders?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Give stakeholders Viewer role in the workspace to view notebook outputs"
+        },
+        {
+          "letter": "B",
+          "text": "Export notebook results to a Power BI report using the notebook's built-in chart visualizations, then share the report via Power BI app or embed in Teams"
+        },
+        {
+          "letter": "C",
+          "text": "Schedule the notebook to email HTML outputs to stakeholders daily"
+        },
+        {
+          "letter": "D",
+          "text": "Convert notebook outputs to PDF and distribute via email"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Power BI reports provide interactive visualizations that non-technical users can filter and explore — and can be shared widely without Fabric access."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Writing notebook analysis results to a lakehouse table, then building a Power BI report on that data, provides the interactive experience stakeholders need (filters, slicers, drill-through) without code exposure. Power BI apps and Teams embedding share reports with users who have no Fabric workspace access. Notebook visualizations require workspace access and code execution context — not suitable for non-technical audiences. This pattern separates the analytical computation (notebook) from the presentation layer (Power BI)."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Fabric notebooks support inline visualizations (matplotlib, plotly, seaborn) but these require workspace access to view.</li>\n              <li>Power BI reports connected to lakehouse tables via DirectLake provide live data without scheduled refresh.</li>\n              <li>Power BI Apps provide a curated, read-only experience with pre-configured navigation — ideal for business users.</li>\n              <li>Teams embedding allows stakeholders to interact with reports without leaving their collaboration tool.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Sharing",
+        "Power BI",
+        "Notebooks"
+      ]
+    },
+    {
+      "id": 15,
+      "categoryRef": "cat-monitor",
+      "difficulty": "intermediate",
+      "title": "Data Lineage and Impact Analysis",
+      "scenario": "A data engineer needs to modify the schema of a silver-layer Delta table (renaming a column and changing its data type). Before making the change, they need to understand all downstream dependencies: which gold-layer tables read from this table, which semantic models reference these columns, which Power BI reports will break, and which scheduled pipelines will fail. The lakehouse has 200 tables with complex interdependencies.",
+      "questionText": "Which Fabric capability provides this end-to-end dependency and impact analysis?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Fabric lineage view showing upstream and downstream dependencies across items (tables, models, reports, pipelines) with column-level lineage in semantic models"
+        },
+        {
+          "letter": "B",
+          "text": "Search through all notebook code manually for references to the table name"
+        },
+        {
+          "letter": "C",
+          "text": "Query the Delta table transaction log for read operations from other tables"
+        },
+        {
+          "letter": "D",
+          "text": "Power BI impact analysis for reports only, with manual pipeline review"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Fabric provides built-in lineage visualization that traces data flow from source through transformation to consumption across all item types."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Fabric lineage view (accessible from workspace settings and individual items) shows the complete dependency graph: which items read from and write to each other. For a lakehouse table, it shows downstream dependencies including other tables that read from it (via notebooks/pipelines), semantic models that reference it, and Power BI reports built on those models. Column-level lineage in semantic models traces specific columns through relationships and measures. This enables impact analysis before schema changes — identifying exactly what will break."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Lineage view supports: Lakehouses, Warehouses, Pipelines, Dataflows, Notebooks, Semantic Models, Reports, and Dashboards.</li>\n              <li>Column-level lineage tracks which source columns map to which semantic model columns through transformations.</li>\n              <li>Impact analysis in Power BI workspace shows report and dashboard counts affected by dataset schema changes.</li>\n              <li>Purview integration extends lineage beyond Fabric to external data sources (Azure SQL, Synapse, on-premises).</li></ul>"
+        }
+      ],
+      "tags": [
+        "Lineage",
+        "Impact Analysis",
+        "Governance"
+      ]
+    },
+    {
+      "id": 16,
+      "categoryRef": "cat-lakehouse",
+      "difficulty": "intermediate",
+      "title": "Shortcut Strategy",
+      "scenario": "A company has existing data in Azure Data Lake Storage Gen2 (2PB) and AWS S3 (500TB) that they cannot move to Fabric OneLake due to egress costs and data residency requirements. They need this external data to be queryable alongside Fabric-native lakehouse data using the same tools (Spark, SQL endpoint, Power BI). No data duplication is acceptable.",
+      "questionText": "Which Fabric feature enables querying external data without duplication or data movement?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "OneLake shortcuts pointing to ADLS Gen2 and S3 locations — queryable as native lakehouse tables without data movement"
+        },
+        {
+          "letter": "B",
+          "text": "Use Data Pipeline Copy Activity to replicate external data into the lakehouse on a schedule"
+        },
+        {
+          "letter": "C",
+          "text": "Mount external storage as a Spark file system (abfss://) and query directly without any Fabric integration"
+        },
+        {
+          "letter": "D",
+          "text": "Create a Fabric Warehouse with external tables referencing the remote storage"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Shortcuts create virtual references in OneLake to external storage — data appears as lakehouse tables without physical movement."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "OneLake shortcuts create virtual pointers to data in ADLS Gen2 and AWS S3. The external data appears in the lakehouse Tables section alongside native Delta tables — queryable via Spark notebooks, SQL analytics endpoint, and Power BI reports without any data copying. Reads go directly to the source storage. For Delta-formatted external data, full ACID semantics are preserved. For Parquet/CSV external data, read-only access is provided. This satisfies the zero-duplication and data residency requirements while enabling unified analytics."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Shortcuts support: other OneLake locations, ADLS Gen2, AWS S3, Google Cloud Storage, and Dataverse.</li>\n              <li>Authentication: ADLS shortcuts use organizational identity or service principal; S3 uses access key or IAM role.</li>\n              <li>Performance consideration: queries on shortcut data traverse the network to source storage — latency depends on source location.</li>\n              <li>Shortcuts respect source permissions — Fabric users must be authorized at both the Fabric and source storage level.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Shortcuts",
+        "OneLake",
+        "External Data"
+      ]
+    },
+    {
+      "id": 17,
+      "categoryRef": "cat-transform",
+      "difficulty": "intermediate",
+      "title": "Incremental Data Loading",
+      "scenario": "A data pipeline loads transactional data from an operational SQL database into a lakehouse Delta table. The source table has 500 million rows and grows by 2 million rows daily. Currently, the pipeline does a full reload daily (6 hours). The team needs to reduce this to incremental loads that capture only new and modified records, with the ability to handle both inserts and updates (records can be modified up to 7 days after creation).",
+      "questionText": "Which incremental loading pattern efficiently captures inserts and updates from the source?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "CDC (Change Data Capture) from the source database to capture insert/update/delete events, with Delta MERGE to apply changes to the lakehouse table"
+        },
+        {
+          "letter": "B",
+          "text": "Full reload with table truncate and reload approach optimized with parallel threads"
+        },
+        {
+          "letter": "C",
+          "text": "Query only records from the last 24 hours based on created_date column and append to the Delta table"
+        },
+        {
+          "letter": "D",
+          "text": "Compare source and target tables row-by-row to find differences and apply updates"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "CDC captures the exact changes (inserts, updates, deletes) at the source — Delta MERGE applies them idempotently to the target."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "CDC (Change Data Capture) on the source SQL database captures every insert, update, and delete as change events with timestamps. The Fabric pipeline reads only new CDC records since the last watermark. Delta MERGE (MERGE INTO target USING changes ON key WHEN MATCHED THEN UPDATE WHEN NOT MATCHED THEN INSERT) applies these changes idempotently to the lakehouse table. This handles both inserts and updates (including modifications up to 7 days later) without full table scans of either source or target."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>SQL Server CDC uses the transaction log to capture changes — minimal impact on source performance.</li>\n              <li>Delta MERGE is atomic — all changes succeed or none do (ACID transaction on the target table).</li>\n              <li>Watermark pattern: store the last processed CDC LSN/timestamp; next run reads only changes after that point.</li>\n              <li>For Azure SQL: Use Data Pipeline with CDC-enabled source and incremental watermark tracking in pipeline variables.</li></ul>"
+        }
+      ],
+      "tags": [
+        "CDC",
+        "Incremental Load",
+        "Delta MERGE"
+      ]
+    },
+    {
+      "id": 18,
+      "categoryRef": "cat-semantic",
+      "difficulty": "intermediate",
+      "title": "Row-Level Security Implementation",
+      "scenario": "A multinational corporation has a single semantic model for sales reporting. Regional sales managers should only see data for their own region (Americas, EMEA, APAC). The VP of Sales should see all regions. The security must be dynamic — when a new manager is hired, access should be granted without modifying the semantic model. There are 500 users across the organization who access these reports.",
+      "questionText": "Which RLS implementation provides dynamic, maintenance-free security that scales to 500 users?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Dynamic RLS using USERPRINCIPALNAME() matched against a security table that maps users to regions, with a role for the VP that has no filter (sees all data)"
+        },
+        {
+          "letter": "B",
+          "text": "Create separate reports per region with workspace-level access control"
+        },
+        {
+          "letter": "C",
+          "text": "Static RLS with a separate role per region and manually assign users to roles"
+        },
+        {
+          "letter": "D",
+          "text": "Use Power BI Row-Level Security with hardcoded email addresses in DAX filter expressions"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Dynamic RLS uses a security mapping table — no model changes needed when users change, just update the table."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Dynamic RLS creates a single role with a DAX filter expression that references a security table: FILTER(Regions, CONTAINS(SecurityTable, SecurityTable[UserPrincipalName], USERPRINCIPALNAME(), SecurityTable[Region], Regions[Region])). When new managers join, their mapping is added to the security table (which can be a lakehouse table refreshed automatically). The VP role has no DAX filter — they see all data. This scales to any number of users without model modification. Only the security table needs maintenance."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>USERPRINCIPALNAME() returns the authenticated user's email — works in Power BI Service, embedded, and Teams.</li>\n              <li>Security table can live in the lakehouse and sync from Active Directory or HR system automatically.</li>\n              <li>Performance: RLS filters are applied at query time — ensure the security table has a relationship to the model for efficient filtering.</li>\n              <li>Testing: \"View as\" in Power BI Service allows admins to test RLS as specific users before deployment.</li></ul>"
+        }
+      ],
+      "tags": [
+        "RLS",
+        "Security",
+        "DAX"
+      ]
+    },
+    {
+      "id": 19,
+      "categoryRef": "cat-explore",
+      "difficulty": "intermediate",
+      "title": "Cross-Workspace Analytics",
+      "scenario": "A company has domain-specific workspaces (Sales, Marketing, Finance, Operations) each with their own lakehouses. The executive team needs a unified analytics layer that combines data from all domains without moving data between workspaces. For example, a report showing marketing campaign ROI needs data from both the Marketing lakehouse (campaign metrics) and the Sales lakehouse (revenue attribution). Domain teams must retain ownership of their data.",
+      "questionText": "Which Fabric pattern enables cross-domain analytics while preserving domain data ownership?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Copy all data into a single centralized lakehouse owned by a BI team"
+        },
+        {
+          "letter": "B",
+          "text": "Use DirectQuery semantic models connecting to each domain's SQL endpoint independently"
+        },
+        {
+          "letter": "C",
+          "text": "Create an analytics workspace with a lakehouse that uses OneLake shortcuts to each domain workspace's lakehouse tables, enabling unified queries without data movement"
+        },
+        {
+          "letter": "D",
+          "text": "Schedule nightly data exports from each domain to a shared file location"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Shortcuts within OneLake can reference other workspaces' lakehouses — creating a virtual unified view without data duplication."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "An analytics workspace with its own lakehouse creates OneLake shortcuts pointing to tables in each domain workspace. This creates a unified query surface — Spark notebooks or the SQL endpoint can join tables across domains as if they were local. No data is copied (shortcuts are virtual references). Domain teams retain full ownership and control of their source lakehouses. The analytics workspace only needs read access (via workspace roles) to the source workspaces. This is the Fabric implementation of a data mesh access layer."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Internal OneLake shortcuts (within Fabric) have no egress costs — reads traverse the OneLake namespace directly.</li>\n              <li>Permissions: the shortcut consumer needs at least Viewer role in the source workspace to access the data.</li>\n              <li>SQL endpoint cross-database queries: FROM [other_lakehouse].[dbo].[table] enables joins across lakehouses in Spark SQL.</li>\n              <li>This pattern aligns with data mesh principles: domain ownership + centralized discovery/governance + self-serve access.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Cross-Workspace",
+        "Shortcuts",
+        "Data Mesh"
+      ]
+    },
+    {
+      "id": 20,
+      "categoryRef": "cat-monitor",
+      "difficulty": "intermediate",
+      "title": "Governance and Compliance",
+      "scenario": "A financial services company using Fabric must comply with SOX regulations requiring: data classification (identifying PII and financial data), access audit trails (who accessed what data and when), data retention policies (7-year minimum for financial records), and prevention of unauthorized data sharing outside the organization. They have 1,000 users across 50 workspaces.",
+      "questionText": "Which combination of Fabric governance features addresses these compliance requirements?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Manual data classification spreadsheets and quarterly access reviews"
+        },
+        {
+          "letter": "B",
+          "text": "Microsoft Purview for data classification and sensitivity labels, Fabric audit logs for access tracking, workspace-level retention policies, and sensitivity label-based DLP policies preventing external sharing of labeled data"
+        },
+        {
+          "letter": "C",
+          "text": "Azure Policy applied to the Fabric tenant for all governance requirements"
+        },
+        {
+          "letter": "D",
+          "text": "Workspace admin roles with custom scripts to track data access from pipeline logs"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Microsoft Purview integrates with Fabric for classification, and sensitivity labels drive DLP policies — audit logs provide the access trail."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Microsoft Purview scans Fabric items and automatically classifies sensitive data (PII, financial data) using built-in and custom classifiers. Sensitivity labels (Confidential, Highly Confidential) applied to Fabric items flow through to exports and sharing — DLP policies prevent sharing of labeled items externally. Fabric audit logs (via Microsoft 365 unified audit) record every data access event (who, what, when) for SOX compliance. Information protection policies enforce retention and prevent deletion of financial records within the retention period."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Purview sensitivity labels in Fabric: applied to semantic models, reports, lakehouses — inherited downstream automatically.</li>\n              <li>Audit logs capture: report views, data exports, sharing events, admin actions — searchable in Microsoft 365 Compliance Center.</li>\n              <li>DLP policies for Fabric: detect and block sharing of items containing credit card numbers, SSNs, or custom patterns.</li>\n              <li>Retention labels applied via Purview prevent deletion of Fabric items until the retention period expires (legal hold capable).</li></ul>"
+        }
+      ],
+      "tags": [
+        "Governance",
+        "Compliance",
+        "Purview"
+      ]
+    },
+    {
+      "id": 21,
+      "categoryRef": "cat-lakehouse",
+      "difficulty": "intermediate",
+      "title": "Data Ingestion Patterns",
+      "scenario": "A company receives data from multiple sources with different delivery patterns: hourly CSV files dropped to Azure Blob Storage (10GB/hour), real-time events from an Azure Event Hub (50,000 events/second), daily database extracts from SAP via OData API (200GB), and weekly Excel files uploaded by business analysts to a SharePoint folder. All data must land in the lakehouse for unified analytics.",
+      "questionText": "Which combination of Fabric ingestion methods handles all four source patterns?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Use a single Data Pipeline with different activities scheduled at different frequencies for all sources"
+        },
+        {
+          "letter": "B",
+          "text": "Dataflow Gen2 for all sources with Power Query connectors"
+        },
+        {
+          "letter": "C",
+          "text": "Spark notebooks for all four sources with different schedules"
+        },
+        {
+          "letter": "D",
+          "text": "OneLake shortcut for Blob Storage CSVs, Eventstream for Event Hub real-time data, Data Pipeline with Copy Activity for SAP OData, and Dataflow Gen2 for SharePoint Excel files"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Match each source pattern (batch files, streaming, API, small files) to the Fabric ingestion tool designed for that pattern."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "OneLake shortcuts to Blob Storage make CSV files immediately queryable without ingestion latency or data copying (ideal for frequent batch files). Eventstream captures Event Hub events in real-time and routes to lakehouse or KQL database. Data Pipeline with Copy Activity handles the scheduled SAP OData extraction with pagination and error handling at 200GB scale. Dataflow Gen2 with Power Query Excel connector handles the low-volume SharePoint files with familiar transformation UI for business analyst self-service. Each tool is purpose-built for its source pattern."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Blob Storage shortcuts: zero-copy, zero-latency — files are queryable immediately upon landing in source storage.</li>\n              <li>Eventstream supports: Event Hubs, IoT Hub, Custom App (SDK), and Kafka as sources with sub-second latency to destinations.</li>\n              <li>Copy Activity OData connector: supports pagination, $filter, $select, and OAuth2/basic authentication.</li>\n              <li>Dataflow Gen2 SharePoint connector: handles Excel, CSV, and JSON files from SharePoint Online with folder and file discovery.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Ingestion",
+        "Multi-Source",
+        "Integration"
+      ]
+    },
+    {
+      "id": 22,
+      "categoryRef": "cat-transform",
+      "difficulty": "intermediate",
+      "title": "Data Quality Framework",
+      "scenario": "A healthcare data platform processes patient records that must meet strict data quality standards before being used in clinical reports. Requirements include: null checks on mandatory fields (patient_id, date_of_birth), referential integrity validation (diagnosis codes must exist in a reference table), range validation (age between 0 and 150, blood pressure within physiological limits), and freshness checks (data must not be older than 24 hours). Failed records must be quarantined for review, not dropped silently.",
+      "questionText": "Which data quality implementation ensures validation, quarantine, and auditability in Fabric?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Spark notebook with validation logic that writes passing records to the gold table and failing records to a quarantine table with failure reasons, tracked via a data quality metrics table"
+        },
+        {
+          "letter": "B",
+          "text": "Apply constraints on the Delta table schema to reject invalid data at write time"
+        },
+        {
+          "letter": "C",
+          "text": "Power Query data profiling in Dataflow Gen2 with conditional column filters"
+        },
+        {
+          "letter": "D",
+          "text": "SQL stored procedures on the warehouse SQL endpoint with CHECK constraints"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "A validation notebook can apply complex rules (including referential integrity) and route records to either the target or quarantine table with full audit trails."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "A Spark notebook reads staged records, applies validation rules (null checks, range validation, referential integrity joins against reference tables, freshness checks on timestamps), and classifies each record as pass or fail. Passing records are written to the gold Delta table. Failing records are written to a quarantine Delta table with columns for: failure reason, rule violated, timestamp, and source batch ID. A metrics table tracks pass/fail rates over time for monitoring. This provides full auditability — no records are silently dropped, and every failure is explained."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Delta table constraints (CHECK constraints) only support simple column-level validation — not referential integrity or cross-table checks.</li>\n              <li>Quarantine pattern: quarantine table mirrors source schema plus: rule_id, failure_description, quarantine_timestamp, resolution_status.</li>\n              <li>Great Expectations library integrates with Spark for declarative rule definition — consider for large rule sets.</li>\n              <li>Data quality metrics (records processed, pass rate, failure categories) can feed a Power BI monitoring dashboard for the data steward.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Data Quality",
+        "Validation",
+        "Healthcare"
+      ]
+    },
+    {
+      "id": 23,
+      "categoryRef": "cat-semantic",
+      "difficulty": "intermediate",
+      "title": "Composite Model Design",
+      "scenario": "A company's enterprise semantic model has become too large (200GB) for Import mode. Most tables are slowly-changing dimensions and historical facts that rarely change, but the sales transaction table (100GB) updates every 15 minutes. Analysts need fast report performance for dashboards that combine historical trends with current-day transactions. Moving entirely to DirectQuery would degrade interactive report performance unacceptably.",
+      "questionText": "Which semantic model configuration balances freshness with performance for this mixed workload?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Composite model: DirectLake mode for the frequently-updated sales transaction table, Import mode for slowly-changing dimensions and historical facts"
+        },
+        {
+          "letter": "B",
+          "text": "Full DirectQuery mode for all tables with aggressive caching at the report level"
+        },
+        {
+          "letter": "C",
+          "text": "Import mode for all tables with 15-minute incremental refresh on the sales table"
+        },
+        {
+          "letter": "D",
+          "text": "Separate models — one Import for history, one DirectQuery for real-time — with drillthrough between reports"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Composite models mix storage modes — use the fastest mode for each table based on its update frequency and query pattern."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "A composite model uses DirectLake for the sales transaction table — providing near-real-time data (from the underlying Delta table updates) with VertiPaq-like query performance, no scheduled refresh needed. Import mode for dimensions and historical facts provides maximum query speed for the stable majority of the model. When reports combine both (e.g., current sales by product category), the engine handles the cross-mode joins transparently. This eliminates the 200GB Import refresh problem while maintaining interactive performance."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Composite models in Fabric can mix: Import, DirectLake, and DirectQuery within a single model.</li>\n              <li>Cross-mode join performance: the engine materializes the DirectLake/DirectQuery side and joins in memory.</li>\n              <li>Import tables in composite models still need refresh — but only for the stable dimensions (small, infrequent).</li>\n              <li>Best practice: keep all dimensions in Import mode for filter performance; only transaction/fact tables need DirectLake for freshness.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Composite Model",
+        "DirectLake",
+        "Performance"
+      ]
+    },
+    {
+      "id": 24,
+      "categoryRef": "cat-explore",
+      "difficulty": "intermediate",
+      "title": "Data Activator (Reflex)",
+      "scenario": "A manufacturing operations team monitors production line metrics in a Power BI report. They need automated actions when specific conditions are met: send a Teams notification when defect rate exceeds 5%, pause the production pipeline in Fabric when input data quality drops below a threshold, and create a ServiceNow ticket when equipment temperature exceeds safe limits. Currently, operators manually watch dashboards 24/7.",
+      "questionText": "Which Fabric feature automates actions based on data conditions without manual monitoring?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Scheduled Power BI report subscriptions with threshold alerts sent via email"
+        },
+        {
+          "letter": "B",
+          "text": "Custom Python script running on a schedule checking metrics and sending alerts"
+        },
+        {
+          "letter": "C",
+          "text": "Azure Logic Apps with scheduled queries against the lakehouse SQL endpoint"
+        },
+        {
+          "letter": "D",
+          "text": "Data Activator (Reflex) with triggers monitoring data conditions and configured actions (Teams notifications, Power Automate flows for ServiceNow, and Fabric REST API calls for pipeline control)"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Data Activator monitors data conditions continuously and triggers actions automatically — replacing manual dashboard watching."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Data Activator (Reflex) in Fabric monitors data from multiple sources (Power BI visuals, Eventstream, Fabric items) and triggers actions when specified conditions are met. Triggers define the condition (defect_rate &gt; 5%, temperature &gt; threshold) and the action (Teams notification, email, Power Automate flow). Power Automate integration enables complex actions like creating ServiceNow tickets or calling Fabric REST APIs to pause pipelines. This provides 24/7 automated monitoring without human dashboard watching, reducing response time from hours to seconds."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Data Activator connects to: Power BI report visuals (right-click &gt; \"Set alert\"), Eventstream real-time data, and custom data via REST API.</li>\n              <li>Triggers support: threshold crossing, rate of change, pattern detection (sustained above X for Y minutes).</li>\n              <li>Actions: Email, Teams message, Power Automate flow (enabling any downstream action the flow platform supports).</li>\n              <li>Evaluation frequency is configurable — from every few seconds (Eventstream) to hourly (Power BI refresh-based).</li></ul>"
+        }
+      ],
+      "tags": [
+        "Data Activator",
+        "Automation",
+        "Alerting"
+      ]
+    },
+    {
+      "id": 25,
+      "categoryRef": "cat-monitor",
+      "difficulty": "intermediate",
+      "title": "Lakehouse Maintenance",
+      "scenario": "A lakehouse has 500 Delta tables that have been in production for 6 months. Performance has degraded significantly: queries take 3x longer than initial benchmarks. Investigation reveals: tables have thousands of small files (1-10MB each) from frequent micro-batch writes, Delta transaction logs have grown large (10,000+ entries per table without checkpoints), and deleted/updated data files have not been cleaned up (vacuum never run), consuming 2x the expected storage.",
+      "questionText": "Which maintenance strategy restores performance and reduces storage waste?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Drop and recreate all tables from source data"
+        },
+        {
+          "letter": "B",
+          "text": "Increase Spark executor count to brute-force through the small files"
+        },
+        {
+          "letter": "C",
+          "text": "Schedule OPTIMIZE (bin compaction) for all tables, run VACUUM to remove obsolete files, and configure checkpoint interval to control log growth — implemented as a maintenance notebook on a nightly schedule"
+        },
+        {
+          "letter": "D",
+          "text": "Migrate all tables to Parquet format without Delta Lake overhead"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Delta tables require periodic maintenance: OPTIMIZE compacts files, VACUUM removes old files, and checkpointing controls log size."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "OPTIMIZE compacts thousands of small files into fewer, larger files (target ~1GB) — dramatically reducing the number of file reads per query. VACUUM removes files no longer referenced by the Delta log (from previous UPDATE/DELETE/MERGE operations), reclaiming the 2x storage overhead. Delta automatically creates checkpoints every 10 commits by default, but tables with very frequent micro-batch writes may benefit from explicit checkpointing configuration. Scheduling these as a nightly maintenance notebook ensures ongoing performance without manual intervention."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>OPTIMIZE in Fabric: compacts files within each partition, supports ZORDER for co-location optimization.</li>\n              <li>VACUUM default retention: 7 days (168 hours). Never set below the longest-running query duration to avoid breaking active reads.</li>\n              <li>Delta checkpoints: Parquet file summarizing the table state, avoiding log replay from the beginning. Created every 10 commits by default.</li>\n              <li>Fabric Lakehouse tables have automatic optimization enabled by default for new tables — but existing tables from before the feature need manual maintenance.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Maintenance",
+        "OPTIMIZE",
+        "VACUUM"
+      ]
+    },
+    {
+      "id": 26,
+      "categoryRef": "cat-lakehouse",
+      "difficulty": "intermediate",
+      "title": "Mirroring for Operational Analytics",
+      "scenario": "A company uses Azure SQL Database as their primary transactional system. Business analysts need near-real-time analytics on operational data without impacting transaction processing. The current approach — nightly ETL to the lakehouse — means analysts work with stale data. They need continuous replication with minimal latency and zero impact on the source database performance.",
+      "questionText": "Which Fabric feature provides continuous, low-impact replication from Azure SQL to the lakehouse?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Fabric Mirroring for Azure SQL Database — continuous change replication to OneLake Delta tables with near-real-time latency and no source performance impact"
+        },
+        {
+          "letter": "B",
+          "text": "Data Pipeline with Copy Activity scheduled every 5 minutes for incremental loads"
+        },
+        {
+          "letter": "C",
+          "text": "Azure SQL Database linked service with DirectQuery from Power BI"
+        },
+        {
+          "letter": "D",
+          "text": "Azure Data Factory Change Data Capture connector writing to a Fabric lakehouse"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Fabric Mirroring provides continuous, change-based replication from operational databases to OneLake without ETL pipelines."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Fabric Mirroring creates a continuously synchronized copy of Azure SQL Database tables as Delta tables in OneLake. It uses change feed technology to capture only changed rows (inserts, updates, deletes) with near-real-time latency (seconds to minutes). The replication is read-only from the source — no agents installed, no load on the transaction processing. The mirrored data is immediately queryable via SQL endpoint, Spark, and Power BI DirectLake mode, providing analysts with fresh operational data without impacting the source system."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Mirroring supports: Azure SQL Database, Azure Cosmos DB, Snowflake, Azure SQL Managed Instance, and more sources.</li>\n              <li>Replication latency: typically seconds to a few minutes depending on change volume and source type.</li>\n              <li>Zero impact on source: uses read-only change tracking/CDC mechanisms without installing agents or triggers.</li>\n              <li>Mirrored tables appear in a Mirrored Database item in Fabric — queryable identically to native lakehouse tables.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Mirroring",
+        "Replication",
+        "Real-Time"
+      ]
+    },
+    {
+      "id": 27,
+      "categoryRef": "cat-transform",
+      "difficulty": "intermediate",
+      "title": "Slowly Changing Dimensions",
+      "scenario": "A retail company's customer dimension table needs to handle customer address changes. When a customer moves, the business requires: the current address for shipping and billing (Type 1 — overwrite), the history of all addresses for marketing analytics (Type 2 — new row), and the original address at time of first purchase preserved (Type 3 — additional column). The table has 10 million customers with an average of 3 address changes per customer over 5 years.",
+      "questionText": "Which SCD implementation in Fabric handles all three requirements simultaneously?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Single Type 2 table with is_current flag, effective_date/end_date columns, and an additional original_address column for the first-ever record — maintained via Delta MERGE with SCD logic in a Spark notebook"
+        },
+        {
+          "letter": "B",
+          "text": "Three separate tables: one Type 1 (current only), one Type 2 (full history), and one Type 3 (original + current)"
+        },
+        {
+          "letter": "C",
+          "text": "Update-in-place for all changes and rely on Delta time travel to query historical states"
+        },
+        {
+          "letter": "D",
+          "text": "Append-only table with no distinction between current and historical records"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "A combined SCD approach in a single table uses Type 2 structure (history rows) with a current flag and additional columns for Type 3 attributes."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "A single table with Type 2 structure (surrogate key, effective_date, end_date, is_current flag) preserves full address history. The is_current = true row always has the latest address (satisfying Type 1 queries via a simple filter). An original_address column on every row stores the first-ever address (Type 3). Delta MERGE in a Spark notebook handles the logic: when an address change arrives, expire the current row (set end_date, is_current=false), insert a new row with the new address (is_current=true), and copy original_address from the expired row. This unified approach avoids data duplication across multiple tables."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Delta MERGE supports complex WHEN MATCHED / WHEN NOT MATCHED logic needed for SCD Type 2 operations.</li>\n              <li>Surrogate keys (monotonically_increasing_id or hash-based) enable joining facts to the correct dimension version.</li>\n              <li>Delta time travel is NOT a substitute for SCD2 — it has a retention limit and doesn't preserve business-meaningful versioning.</li>\n              <li>Performance tip: partition the dimension by is_current for fast current-state queries (most queries only need current rows).</li></ul>"
+        }
+      ],
+      "tags": [
+        "SCD",
+        "Dimension",
+        "Data Modeling"
+      ]
+    },
+    {
+      "id": 28,
+      "categoryRef": "cat-semantic",
+      "difficulty": "intermediate",
+      "title": "Large Semantic Model Optimization",
+      "scenario": "A retail company's semantic model has grown to 80GB with 3 billion rows in the fact table. Report page load times have increased to 30 seconds. Analysis shows: the fact table stores daily granularity data from 10 years ago but reports only drill to daily for the last 2 years, 50% of columns in the fact table are never used in any report, and text columns with high cardinality (product descriptions, 500K unique values) are included but only used for tooltips.",
+      "questionText": "Which optimization combination will most reduce model size and improve report performance?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Upgrade to a larger Fabric capacity for more processing power"
+        },
+        {
+          "letter": "B",
+          "text": "Enable automatic aggregations on the fact table and let the engine handle optimization"
+        },
+        {
+          "letter": "C",
+          "text": "Switch the entire model to DirectQuery to eliminate model size concerns"
+        },
+        {
+          "letter": "D",
+          "text": "Aggregate older data to monthly granularity (aggregation table), remove unused columns, and move high-cardinality text to a separate detail table with drill-through access"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Reduce what's in the model: aggregate old data, remove unused columns, and isolate high-cardinality text — all directly reduce model size."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Aggregating 8 years of daily data to monthly reduces those rows by ~30x (from 2.9B rows to ~100M for old data + keeping 730 days at daily = ~730M rows — total model drops significantly). Removing the 50% unused columns immediately halves the remaining model's column storage. Moving high-cardinality text (500K unique values) to a drill-through detail table means the main model's dictionary encoding is not bloated by those strings. Combined, these optimizations can reduce the model from 80GB to under 10GB while preserving all report functionality through aggregation awareness and drill-through patterns."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>VertiPaq compression is dictionary-based — high cardinality text columns compress poorly and bloat memory.</li>\n              <li>User-defined aggregation tables with the \"Manage aggregations\" feature in Power BI route queries to the appropriate granularity automatically.</li>\n              <li>DAX Studio or Tabular Editor VertiPaq Analyzer identifies which columns consume the most memory for targeted optimization.</li>\n              <li>Rule of thumb: every column removed reduces model size proportionally — a 50-column fact table cut to 25 columns halves that table's storage.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Optimization",
+        "Model Size",
+        "Aggregations"
+      ]
+    },
+    {
+      "id": 29,
+      "categoryRef": "cat-explore",
+      "difficulty": "intermediate",
+      "title": "Spark vs SQL Endpoint Selection",
+      "scenario": "A data team needs to perform different types of analyses on lakehouse data: exploratory data science with statistical libraries (scipy, sklearn), complex data transformations with window functions and pivot operations, scheduled ETL producing derived tables, and ad-hoc business reporting queries. Team members have varied backgrounds — data scientists prefer Python, data engineers prefer SQL, and business analysts prefer drag-and-drop interfaces.",
+      "questionText": "Which Fabric compute assignment provides optimal tool-to-task matching for this diverse team?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Spark notebooks for everything — SQL users can use spark.sql()"
+        },
+        {
+          "letter": "B",
+          "text": "SQL analytics endpoint for everything — data scientists can use SQL-based ML"
+        },
+        {
+          "letter": "C",
+          "text": "Separate instances of each tool per team member regardless of task type"
+        },
+        {
+          "letter": "D",
+          "text": "Spark notebooks for data science and complex ETL, SQL analytics endpoint for ad-hoc business queries and simple reporting, Dataflow Gen2 for business analyst self-service transformations"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Match compute to the task and user skill set — each Fabric engine excels at different workloads."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Spark notebooks are ideal for data science (Python with scipy, sklearn, pandas) and complex ETL (distributed processing, UDFs, streaming). The SQL analytics endpoint provides T-SQL for ad-hoc queries and business reporting — familiar to analysts using SSMS or Azure Data Studio, with no Spark session startup time. Dataflow Gen2's Power Query interface provides drag-and-drop transformation for business analysts without code. This assignment leverages each engine's strengths while respecting team skill sets — maximizing productivity across all user personas."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Spark session startup takes 30-60 seconds — SQL endpoint queries are instant (always-on engine).</li>\n              <li>SQL endpoint is read-only for lakehouse tables — writes require Spark, Pipeline, or Dataflow.</li>\n              <li>Dataflow Gen2 Power Query supports 300+ connectors with no-code transformation for citizen data engineers.</li>\n              <li>All three engines read the same Delta tables — no data copying needed when switching between tools.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Tool Selection",
+        "Personas",
+        "Best Practice"
+      ]
+    },
+    {
+      "id": 30,
+      "categoryRef": "cat-monitor",
+      "difficulty": "intermediate",
+      "title": "Cost Management",
+      "scenario": "A company's Fabric capacity costs are growing 30% month-over-month. The platform team needs to: identify which workspaces and workloads consume the most capacity units (CUs), detect inefficient patterns (runaway Spark jobs, unoptimized queries), implement showback/chargeback to business units based on consumption, and set guardrails to prevent any single team from exhausting shared capacity.",
+      "questionText": "Which approach provides cost visibility, optimization, and governance for Fabric capacity?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Review the monthly Azure invoice for total Fabric spend without workspace breakdown"
+        },
+        {
+          "letter": "B",
+          "text": "Purchase the largest possible capacity to avoid throttling without cost optimization"
+        },
+        {
+          "letter": "C",
+          "text": "Disable Fabric features for teams that consume too many resources without analysis"
+        },
+        {
+          "letter": "D",
+          "text": "Fabric Capacity Metrics app for consumption analysis by workspace and workload type, admin APIs for programmatic cost allocation, workspace-specific capacity assignment for high-consumption teams, and Spark pool size limits per workspace"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "The Capacity Metrics app provides consumption breakdown — combine with admin APIs and workspace isolation for governance."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "The Fabric Capacity Metrics app (installable from AppSource) provides detailed breakdowns: CU consumption by workspace, item type (Spark, SQL, Dataflow, Power BI), user, and time period — enabling identification of top consumers and inefficient patterns. Admin REST APIs expose the same data programmatically for building chargeback reports allocated to business units. Assigning high-consumption teams to dedicated capacities prevents them from impacting others. Spark pool configuration limits (max nodes, timeout) per workspace prevent runaway jobs."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Capacity Metrics app shows: interactive vs. background CU consumption, throttling events, and overages over 24-hour smoothing periods.</li>\n              <li>CU consumption varies by workload: Spark jobs consume more CUs than SQL queries for the same data volume.</li>\n              <li>Admin APIs (Microsoft.Fabric/capacities/metrics) enable custom Power BI reports for executive cost dashboards.</li>\n              <li>Capacity reservation: F2 through F2048 SKUs with per-second billing — right-sizing the SKU is the primary cost lever.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Cost Management",
+        "Capacity",
+        "Governance"
+      ]
+    },
+    {
+      "id": 31,
+      "categoryRef": "cat-lakehouse",
+      "difficulty": "intermediate",
+      "title": "Multi-Format Data Handling",
+      "scenario": "A data lake migration brings data in multiple formats: legacy Parquet files (partitioned by year/month/day), CSV files with inconsistent schemas (columns vary across files), JSON files with deeply nested structures (5 levels deep), and Avro files from Kafka topics. All must be consolidated into managed Delta tables in the lakehouse with a consistent schema. Some source files have no headers, incorrect data types, and encoding issues (UTF-8 and Latin-1 mixed).",
+      "questionText": "Which Spark approach handles multi-format ingestion with schema inconsistencies robustly?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Use Auto Loader (Auto Schema) for all file types and let Spark infer everything automatically"
+        },
+        {
+          "letter": "B",
+          "text": "Format-specific readers with explicit schema definitions, schema evolution via mergeSchema, encoding specification, and corrupt record handling using PERMISSIVE mode with a rescue column for malformed data"
+        },
+        {
+          "letter": "C",
+          "text": "Convert all files to CSV first, then process uniformly as CSV"
+        },
+        {
+          "letter": "D",
+          "text": "Use Dataflow Gen2 Power Query for all file formats with automatic type detection"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Explicit schemas prevent type inference errors, PERMISSIVE mode captures malformed records instead of failing, and encoding options handle character set mismatches."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Format-specific readers (spark.read.parquet, .csv, .json, .format(\"avro\")) with explicitly defined schemas (using StructType) prevent incorrect type inference that plagues inconsistent CSVs. PERMISSIVE mode with columnNameOfCorruptRecord captures malformed rows in a rescue column instead of silently dropping them or failing the job. The .option(\"encoding\", \"latin1\") handles non-UTF-8 files. Schema evolution via mergeSchema on the Delta write handles columns varying across files. This approach is robust, auditable (corrupt records are preserved), and handles all listed edge cases."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>PERMISSIVE mode: puts corrupt records in _corrupt_record column; DROPMALFORMED silently drops them; FAILFAST aborts the job.</li>\n              <li>Explicit schema avoids costly schema inference pass (which reads all files) and prevents type misdetection (e.g., \"001\" as integer 1).</li>\n              <li>JSON schema_of_json() function can generate StructType from a sample record for deeply nested structures.</li>\n              <li>Delta mergeSchema adds new columns from source files that have extra columns — existing columns with different types require explicit casting.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Data Ingestion",
+        "Schema",
+        "Multi-Format"
+      ]
+    },
+    {
+      "id": 32,
+      "categoryRef": "cat-transform",
+      "difficulty": "intermediate",
+      "title": "Parameterized Pipelines",
+      "scenario": "A data engineering team manages 30 source systems that follow the same ingestion pattern: extract from source, land in bronze, transform to silver, load to gold. Writing 30 separate pipelines is unmaintainable. They need a single parameterized pipeline that accepts: source connection string, source table name, bronze/silver/gold destination paths, transformation logic (column mappings vary per source), and scheduling frequency. Changes to the shared pipeline should propagate to all sources.",
+      "questionText": "Which Fabric pipeline design pattern provides maintainable, reusable ingestion at scale?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "30 individual pipelines with copy-pasted activities and manual synchronization of changes"
+        },
+        {
+          "letter": "B",
+          "text": "A metadata-driven pipeline: master pipeline reads configuration from a metadata table (source, destination, mappings, schedule), loops through entries with ForEach activity, and calls a shared child pipeline template with parameters for each source"
+        },
+        {
+          "letter": "C",
+          "text": "A single massive pipeline with 30 branches using Switch activity on source name"
+        },
+        {
+          "letter": "D",
+          "text": "Spark notebook that reads all 30 sources sequentially in a single job"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Metadata-driven architecture: store source configuration in a table, loop through it, and call a parameterized template pipeline for each entry."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "A metadata-driven architecture separates configuration from logic. A metadata table (in the lakehouse or Dataverse) stores: source_connection, source_table, bronze_path, silver_path, gold_path, column_mappings (JSON), schedule, and enabled flag. The master pipeline reads this table with a Lookup activity, then ForEach iterates through entries, calling an Execute Pipeline activity that invokes the shared child pipeline with parameters. Adding a new source means adding a row to the metadata table — zero pipeline changes. Modifying the shared template propagates to all 30 sources immediately."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>ForEach supports sequential and parallel execution (batch count) — control parallelism based on source system capacity.</li>\n              <li>Dynamic content expressions: @item().source_table resolves metadata values into activity parameters at runtime.</li>\n              <li>Column mappings as JSON in metadata enable dynamic Copy Activity schema mapping without pipeline modification.</li>\n              <li>Error handling: each child pipeline execution is independent — one source failure doesn't block others (with appropriate error settings).</li></ul>"
+        }
+      ],
+      "tags": [
+        "Pipeline Design",
+        "Metadata-Driven",
+        "Reusability"
+      ]
+    },
+    {
+      "id": 33,
+      "categoryRef": "cat-semantic",
+      "difficulty": "intermediate",
+      "title": "Power BI Report Performance",
+      "scenario": "A Power BI report connected to a DirectLake semantic model loads slowly (12 seconds for the main page). The page has 15 visuals, including a table with 500,000 rows (scrollable), 3 slicers on high-cardinality columns (1 million unique values each), 5 card visuals with complex DAX measures using CALCULATE with multiple filters, and a map visual plotting 100,000 locations. The report serves 500 concurrent users.",
+      "questionText": "Which combination of optimizations will most reduce page load time?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Switch to DirectQuery mode to reduce memory pressure from concurrent users"
+        },
+        {
+          "letter": "B",
+          "text": "Add more Premium capacity to handle 500 concurrent users"
+        },
+        {
+          "letter": "C",
+          "text": "Limit table visual to top 100 rows with drill-through for detail, replace high-cardinality slicers with dropdown search or hierarchy filters, simplify DAX measures using variables, and replace the map with a pre-aggregated regional summary visual"
+        },
+        {
+          "letter": "D",
+          "text": "Enable automatic page refresh every 30 seconds to keep the cache warm"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Report performance is driven by: number of rows rendered, slicer cardinality, DAX complexity, and visual rendering cost — optimize each."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Limiting the table to top 100 rows eliminates rendering 500K DOM elements (the biggest performance killer in reports). Replacing high-cardinality slicers (1M values each) with search-enabled dropdowns prevents loading all values into the filter pane. DAX variables (VAR) prevent redundant CALCULATE evaluations — each variable is evaluated once and reused. Replacing the 100K-point map with a regional summary reduces both query and rendering time dramatically. These changes target the specific bottlenecks identified in the scenario."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Table visuals rendering 500K+ rows generate massive DAX queries and DOM elements — Top N filter or pagination is essential.</li>\n              <li>Slicer performance: each slicer queries DISTINCT values at page load — 1M values * 3 slicers = 3M values loaded before any interaction.</li>\n              <li>DAX VAR pattern: VAR Sales = [Total Sales] RETURN DIVIDE(Sales, [Target]) evaluates Sales once vs. 2x without VAR.</li>\n              <li>Performance Analyzer in Power BI Desktop shows per-visual query time and rendering time — use it to identify which visual to fix first.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Report Performance",
+        "Power BI",
+        "Optimization"
+      ]
+    },
+    {
+      "id": 34,
+      "categoryRef": "cat-explore",
+      "difficulty": "intermediate",
+      "title": "Git Integration for Fabric",
+      "scenario": "A data platform team of 12 engineers works on the same Fabric workspace. They need: version control for notebooks, pipelines, and semantic model definitions, the ability to work on changes without affecting production, code review before changes go live, and rollback capability when deployments cause issues. Currently, any change made by one engineer immediately affects all users of the workspace.",
+      "questionText": "Which Fabric development workflow provides version control, isolation, and safe deployment?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Each engineer works in a personal copy of the workspace with manual export/import of items"
+        },
+        {
+          "letter": "B",
+          "text": "Fabric Git integration with Azure DevOps or GitHub: connect workspace to a repo, engineers work in feature branches synced to personal dev workspaces, pull requests for review, and main branch auto-syncs to production workspace via deployment pipeline"
+        },
+        {
+          "letter": "C",
+          "text": "Use file versioning by saving notebooks with date suffixes (notebook_v1, notebook_v2)"
+        },
+        {
+          "letter": "D",
+          "text": "Restrict edit access to a single engineer who manually applies changes from others"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Fabric Git integration connects workspaces to Git repos — enabling branching, pull requests, and CI/CD for Fabric items."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Fabric Git integration connects a workspace to a Git repository (Azure DevOps or GitHub). Engineers create feature branches and work in personal development workspaces synced to their branch — changes are isolated from production. When ready, they create pull requests for code review by peers. After merge to main, deployment pipelines promote changes from development to test to production workspaces. Rollback is a simple git revert + resync. All Fabric item definitions (notebooks, pipelines, semantic models, reports) are stored as code in the repo."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Supported items for Git: Notebooks, Pipelines, Semantic Models, Reports, Lakehouses (metadata only — data stays in OneLake).</li>\n              <li>Conflict resolution: if two engineers modify the same item, Git merge conflict resolution applies at the definition level.</li>\n              <li>Deployment pipelines: Dev &gt; Test &gt; Prod stages with configurable deployment rules and parameter overrides per stage.</li>\n              <li>Limitation: Data in lakehouses is NOT version-controlled — only the item definitions (schema, configuration) are in Git.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Git Integration",
+        "DevOps",
+        "Deployment"
+      ]
+    },
+    {
+      "id": 35,
+      "categoryRef": "cat-monitor",
+      "difficulty": "intermediate",
+      "title": "Disaster Recovery for Fabric",
+      "scenario": "A company runs mission-critical analytics in Fabric with an RPO of 1 hour and RTO of 4 hours. Their Fabric tenant is in the East US region. They need to survive a complete region failure and resume analytics operations in another region within the RTO. The data includes: 50TB in lakehouse Delta tables, 100 semantic models, 500 reports, and 200 data pipelines.",
+      "questionText": "Which disaster recovery strategy meets the RPO/RTO requirements for Fabric?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Rely on Microsoft's built-in Fabric high availability within the region (no cross-region DR)"
+        },
+        {
+          "letter": "B",
+          "text": "Manual export of all items weekly and store in a separate Azure region"
+        },
+        {
+          "letter": "C",
+          "text": "BCDR capacity with cross-region replication enabled for OneLake data, Git-based item definitions for rapid re-deployment in secondary region, and documented runbooks for workspace recreation"
+        },
+        {
+          "letter": "D",
+          "text": "Real-time replication using Data Pipeline to a lakehouse in a secondary Fabric capacity in another region"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Fabric BCDR features plus Git-stored definitions provide the data replication and item recovery needed for cross-region DR."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Fabric's BCDR (Business Continuity and Disaster Recovery) capacity settings enable geo-redundant replication of OneLake data to a paired region — meeting the 1-hour RPO for data. Git integration stores all item definitions (notebooks, pipelines, reports, semantic models) in a repository — enabling rapid re-deployment to a new workspace in the secondary region within the 4-hour RTO. Documented runbooks specify the recovery sequence: provision secondary capacity, create workspace, sync from Git, verify data accessibility. This combination protects both data and configuration."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Fabric BCDR replicates OneLake data to the Azure paired region with configurable RPO (GRS replication).</li>\n              <li>Git-stored definitions enable \"infrastructure as code\" recovery — workspace items can be recreated from the repo in minutes.</li>\n              <li>Semantic models, reports, and pipelines are definition files — relatively small, quick to deploy from Git.</li>\n              <li>Key limitation: Fabric DR is capacity-level — individual workspace DR requires Git + manual workspace setup in the secondary region.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Disaster Recovery",
+        "BCDR",
+        "Resilience"
+      ]
+    },
+    {
+      "id": 36,
+      "categoryRef": "cat-lakehouse",
+      "difficulty": "intermediate",
+      "title": "Data Partitioning Strategy",
+      "scenario": "A lakehouse stores 5 years of e-commerce transaction data (10 billion rows). Most queries filter by: date range (last 30/90/365 days), country (50 countries), and product_category (200 categories). The table is currently unpartitioned and query scans take 15 minutes. The team wants to add partitioning but is concerned about over-partitioning creating too many small files. Daily data volume is 50GB.",
+      "questionText": "Which partitioning strategy optimizes query performance without creating small-file problems?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Partition by country and product_category for maximum predicate pushdown (50 * 200 = 10,000 partitions)"
+        },
+        {
+          "letter": "B",
+          "text": "Partition by date (year/month) providing 60 partitions, with ZORDER on country and product_category within partitions for efficient filtering on all three predicates"
+        },
+        {
+          "letter": "C",
+          "text": "Partition by day (1,825 daily partitions) for finest-grained date filtering"
+        },
+        {
+          "letter": "D",
+          "text": "No partitioning — rely solely on ZORDER across all three filter columns"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Year/month partitioning gives manageable partition count, while ZORDER handles the other filter dimensions within each partition."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Partitioning by year/month creates ~60 partitions — each containing ~166GB of data with optimal file sizes. Date-range queries (most common pattern) skip entire partitions via partition pruning. ZORDER on country and product_category co-locates data within each monthly partition, enabling file-level data skipping for those predicates. This avoids the 10,000-partition explosion (country * category) which would create many small files (&lt;10MB each) degrading both write and read performance. Daily partitioning at 50GB/day also works but creates 1,825 partitions — manageable but more metadata overhead."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Rule of thumb: each partition should contain at least 1GB of data to avoid small-file overhead.</li>\n              <li>ZORDER interleaves column values in file-level min/max statistics — queries on z-ordered columns skip non-relevant files.</li>\n              <li>Over-partitioning (too many small files) causes: slow metadata operations, excessive file listing, and poor compression.</li>\n              <li>Combining partition pruning (date) + data skipping (ZORDER) typically achieves 95%+ data elimination for selective queries.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Partitioning",
+        "ZORDER",
+        "Performance"
+      ]
+    },
+    {
+      "id": 37,
+      "categoryRef": "cat-transform",
+      "difficulty": "intermediate",
+      "title": "Error Handling in Pipelines",
+      "scenario": "A critical data pipeline runs nightly and processes data from 5 independent sources. If one source fails (network timeout, schema change, source unavailable), the pipeline currently aborts entirely — blocking all 5 sources from loading. The team needs: independent processing per source (one failure doesn't block others), automatic retry with backoff for transient errors, alerting on permanent failures, and a summary log showing which sources succeeded and which failed with error details.",
+      "questionText": "Which pipeline error handling design provides independent processing with comprehensive failure management?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Sequential activities with a single try-catch around the entire pipeline"
+        },
+        {
+          "letter": "B",
+          "text": "ForEach activity (parallel) iterating over sources with retry policies on each Copy Activity, per-source error handling using If Condition on activity output, a Set Variable activity accumulating results, and a final notification activity summarizing successes and failures"
+        },
+        {
+          "letter": "C",
+          "text": "Five separate pipelines triggered independently with no coordination or summary"
+        },
+        {
+          "letter": "D",
+          "text": "A single Copy Activity with multiple sources and \"continue on error\" enabled"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "ForEach with per-iteration error handling provides independence — combined with result accumulation for a summary notification."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "ForEach with parallel execution processes all 5 sources independently — one failure doesn't block others. Within each iteration: Copy Activity has retry policy (count=3, interval=exponential backoff) handling transient errors automatically. If Condition checks the activity output status — on failure, captures error details into a variable array. After ForEach completes, a notification activity (email/Teams) sends a summary: which sources loaded successfully (with row counts) and which failed (with error messages). This provides resilience, automation, and observability in a single pipeline."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>ForEach \"Continue on error\" setting: when enabled, pipeline continues even if an iteration fails — essential for this pattern.</li>\n              <li>Retry policy: retryIntervalInSeconds with backoffMultiplier creates exponential backoff (10s, 20s, 40s for multiplier=2).</li>\n              <li>Activity output: @activity('CopyData').output.rowsCopied for success, @activity('CopyData').error.message for failures.</li>\n              <li>Append Variable activity within ForEach accumulates per-source results into an array for the summary notification.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Error Handling",
+        "Pipeline",
+        "Reliability"
+      ]
+    },
+    {
+      "id": 38,
+      "categoryRef": "cat-semantic",
+      "difficulty": "intermediate",
+      "title": "Deployment Pipeline Stages",
+      "scenario": "A BI team maintains 50 reports and 10 semantic models that serve 2,000 business users. They need to test changes (new measures, modified visuals, data model changes) without affecting production reports. The testing process requires: validation with real data volumes, user acceptance testing by a small group of business stakeholders, and the ability to promote tested changes to production instantly when approved. Different connection strings are needed per environment (dev, test, prod data sources).",
+      "questionText": "Which Fabric deployment approach provides staged promotion with environment-specific configuration?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Manually copy items between workspaces and update connection strings by hand"
+        },
+        {
+          "letter": "B",
+          "text": "Three separate tenant environments (dev, test, prod) with manual synchronization"
+        },
+        {
+          "letter": "C",
+          "text": "Fabric Deployment Pipelines with Dev/Test/Prod stages, parameter rules for data source overrides per stage, and configured deployment rules that auto-bind datasets to stage-specific connections upon promotion"
+        },
+        {
+          "letter": "D",
+          "text": "A single workspace with report copies named \"Report_DEV\", \"Report_TEST\", \"Report_PROD\""
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Deployment Pipelines provide managed promotion between stages with parameter rules that swap connection strings automatically."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Fabric Deployment Pipelines define stages (Development, Test, Production) with one-click promotion between them. Parameter rules override data source connections per stage — dev points to dev database, production to production database — without manual editing after each promotion. UAT stakeholders access the Test stage workspace for validation. When approved, promoting to Production instantly publishes to 2,000 users. Deployment rules also handle workspace-specific settings like gateway bindings and refresh schedules per stage."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Deployment rules support: data source overrides, parameter value changes, and semantic model settings per stage.</li>\n              <li>Backward deployment (Prod to Dev) enables pulling production state to fix urgent issues in the dev environment.</li>\n              <li>Selective deployment: promote individual items or all items — useful when only specific reports are ready.</li>\n              <li>Deployment Pipelines show comparison between stages: which items are in-sync, modified, or stage-only.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Deployment",
+        "ALM",
+        "Environments"
+      ]
+    },
+    {
+      "id": 39,
+      "categoryRef": "cat-explore",
+      "difficulty": "intermediate",
+      "title": "Copilot for Data Analysis",
+      "scenario": "A business analyst needs to explore a new lakehouse dataset they have never seen before. The dataset has 200 columns across 15 tables with cryptic column names (col_amt_1, dt_fld_x, flg_status). They need to understand: what each column contains, relationships between tables, data quality issues (nulls, outliers, duplicates), and meaningful patterns for their quarterly business review. They have limited SQL or Python skills.",
+      "questionText": "Which Fabric capability enables a non-technical analyst to explore and understand an unfamiliar dataset efficiently?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Fabric Copilot in notebooks — use natural language prompts to generate profiling code, ask questions about the data, get column descriptions, and create visualizations without writing code manually"
+        },
+        {
+          "letter": "B",
+          "text": "Read all table documentation in the Glue Data Catalog metadata"
+        },
+        {
+          "letter": "C",
+          "text": "Export all tables to Excel and use pivot tables for exploration"
+        },
+        {
+          "letter": "D",
+          "text": "Request the data engineering team to create documentation for all 200 columns"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Copilot understands natural language questions about data and generates appropriate profiling code — no SQL or Python knowledge required."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Fabric Copilot in notebooks accepts natural language prompts like \"profile this table\", \"what does col_amt_1 contain — show me sample values and distribution\", \"find relationships between these tables based on matching columns\", \"show null percentages for all columns\", and \"create a chart showing quarterly trends\". Copilot generates and executes PySpark or SQL code, displaying results inline. The analyst iterates conversationally — asking follow-up questions, requesting different visualizations, or asking Copilot to explain patterns it finds. No manual coding required."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Copilot for notebooks: generates PySpark/SparkSQL code from natural language, executes it, and explains results.</li>\n              <li>Data profiling prompts: \"show statistics for all numeric columns\", \"find columns with more than 50% nulls\", \"detect duplicates on primary key\".</li>\n              <li>Copilot can infer column meanings from sample data and provide human-readable descriptions.</li>\n              <li>Copilot in Power BI reports also enables natural language Q&amp;A for business users against semantic models.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Copilot",
+        "Data Exploration",
+        "Self-Service"
+      ]
+    },
+    {
+      "id": 40,
+      "categoryRef": "cat-monitor",
+      "difficulty": "intermediate",
+      "title": "Workspace Permissions Model",
+      "scenario": "A Fabric workspace serves multiple personas: data engineers who build pipelines and notebooks, data analysts who create reports and semantic models, business users who only view reports, and an external auditor who needs read-only access to specific lakehouse tables (not all data). The team needs to grant minimum required permissions to each persona without over-provisioning access to sensitive financial data in some tables.",
+      "questionText": "Which permission configuration provides least-privilege access for all personas?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Data engineers: Contributor role; Data analysts: Member role; Business users: Viewer role; External auditor: item-level sharing on specific lakehouse tables with read-only SQL endpoint access and OneLake data access roles for table-level restrictions"
+        },
+        {
+          "letter": "B",
+          "text": "Give everyone Admin role and rely on individual responsibility"
+        },
+        {
+          "letter": "C",
+          "text": "Create separate workspaces per persona and copy shared items between them"
+        },
+        {
+          "letter": "D",
+          "text": "Use a single \"Member\" role for everyone with verbal agreements about what each person should access"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Fabric workspace roles provide coarse-grained access; item-level sharing and OneLake data access roles provide fine-grained table/column restrictions."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Workspace roles define capability levels: Contributor (create/edit items, no sharing/permissions), Member (share items, create reports), Viewer (view reports and items read-only). Data engineers need Contributor to build pipelines. Analysts need Member to create and share reports. Business users need Viewer for report consumption only. The external auditor gets item-level sharing (per-item permissions without workspace role) on specific lakehouse tables, combined with OneLake data access roles that restrict which tables/folders they can query through the SQL endpoint. This is true least-privilege."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Workspace roles hierarchy: Admin &gt; Member &gt; Contributor &gt; Viewer — each inherits lower role capabilities.</li>\n              <li>Item-level sharing: grants access to specific items without any workspace role — ideal for external users.</li>\n              <li>OneLake data access roles (preview): define which folders/tables within a lakehouse a user can access — SQL endpoint respects these.</li>\n              <li>Row-level security on semantic models provides additional filtering for business users who share a Viewer role but need different data slices.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Permissions",
+        "Security",
+        "Least Privilege"
+      ]
+    },
+    {
+      "id": 41,
+      "categoryRef": "cat-lakehouse",
+      "difficulty": "intermediate",
+      "title": "Time Travel and Versioning",
+      "scenario": "A data engineering team accidentally ran a DELETE statement that removed 1 million valid records from a production Delta table. The error was discovered 2 hours later. They need to recover the deleted records without restoring the entire table to a previous state (because other valid writes happened in the intervening 2 hours). The table has Delta log history retention set to 30 days.",
+      "questionText": "Which Delta Lake capability enables selective recovery of the deleted records without losing subsequent valid writes?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Restore the table to the version before the delete using RESTORE, losing all subsequent writes"
+        },
+        {
+          "letter": "B",
+          "text": "Use Delta time travel to read the deleted records from the previous version, then INSERT them back into the current table — recovering only the deleted rows while preserving all subsequent valid writes"
+        },
+        {
+          "letter": "C",
+          "text": "Recover from the most recent backup snapshot in OneLake"
+        },
+        {
+          "letter": "D",
+          "text": "Contact Microsoft support to restore the table from internal backups"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Delta time travel lets you read any historical version — compare the before-delete version to current to identify exactly which records were removed."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Delta time travel (VERSION AS OF or TIMESTAMP AS OF) reads the table state before the erroneous DELETE. By comparing the pre-delete version to the current table (using EXCEPT or LEFT ANTI JOIN), you identify exactly which records were removed. INSERT these recovered records into the current table — restoring only the deleted rows without affecting any valid writes that occurred in the 2 hours since. This is selective recovery: precise, auditable, and non-destructive to subsequent data. RESTORE would overwrite the entire table to a point in time, losing all valid writes after that point."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Syntax: SELECT * FROM table VERSION AS OF 42 EXCEPT SELECT * FROM table — gives exactly the deleted rows.</li>\n              <li>TIMESTAMP AS OF '2026-05-05T10:00:00' — useful when you know the approximate time of the bad operation.</li>\n              <li>DESCRIBE HISTORY table — shows all operations with version numbers, timestamps, and operation types for forensics.</li>\n              <li>Time travel requires that VACUUM has not removed the relevant files — default retention is 7 days (168 hours).</li></ul>"
+        }
+      ],
+      "tags": [
+        "Time Travel",
+        "Recovery",
+        "Delta Lake"
+      ]
+    },
+    {
+      "id": 42,
+      "categoryRef": "cat-transform",
+      "difficulty": "intermediate",
+      "title": "Stream Processing with Eventstream",
+      "scenario": "An e-commerce platform sends clickstream events (page views, add-to-cart, purchases) to Azure Event Hub at 10,000 events/second. The team needs three outputs from this stream: real-time dashboard showing current active users and conversion funnel (updated every 10 seconds), enriched events joined with customer profile data written to the lakehouse for historical analysis, and alerts when the cart abandonment rate exceeds 80% in a 5-minute window.",
+      "questionText": "Which Fabric Eventstream configuration handles all three output requirements from a single input stream?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Three separate Eventstreams each consuming from the same Event Hub independently"
+        },
+        {
+          "letter": "B",
+          "text": "Data Pipeline with a scheduled trigger every 10 seconds reading from Event Hub"
+        },
+        {
+          "letter": "C",
+          "text": "Spark Structured Streaming notebook processing the stream with three output sinks"
+        },
+        {
+          "letter": "D",
+          "text": "Single Eventstream with Event Hub source, branching to: KQL database destination for real-time dashboards, lakehouse destination with custom processing for enrichment, and Data Activator trigger for abandonment rate alerting"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Eventstream supports multiple destinations from a single source — each destination handles a different output pattern."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "A single Eventstream connects to the Event Hub source and routes events to three destinations: KQL database for real-time dashboards (sub-second ingestion, Power BI real-time reporting with auto-refresh), lakehouse destination with inline transformations (joining with customer dimension data for enrichment before landing in Delta tables), and Data Activator for monitoring aggregated metrics (cart abandonment rate over 5-minute windows) with automated Teams/email alerts when thresholds are breached. This single pipeline handles ingestion, enrichment, analytics, and alerting without separate infrastructure per use case."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Eventstream supports multiple destinations from a single source — events are replicated to each destination independently.</li>\n              <li>KQL database ingestion provides sub-second latency — ideal for real-time dashboards with 10-second refresh.</li>\n              <li>Eventstream inline processing: filter, project, group-by, and join operations on the stream before destination.</li>\n              <li>Data Activator integration: windowed aggregations (tumbling/hopping windows) feed trigger conditions directly from the stream.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Eventstream",
+        "Stream Processing",
+        "Real-Time"
+      ]
+    },
+    {
+      "id": 43,
+      "categoryRef": "cat-semantic",
+      "difficulty": "intermediate",
+      "title": "Semantic Model Refresh Strategy",
+      "scenario": "A semantic model has 20 tables: 2 large fact tables (500M and 300M rows) that change daily, 15 dimension tables (1K to 1M rows) that change rarely (weekly), and 3 reference tables that never change. The current full refresh takes 4 hours and runs nightly. Business users need the fact tables refreshed twice daily (7 AM and 1 PM) but the 4-hour refresh window is too long for midday runs. The model is in Import mode.",
+      "questionText": "Which refresh strategy reduces refresh time while maintaining data freshness for fact tables?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Schedule full refresh 3 times daily and accept the 4-hour processing window"
+        },
+        {
+          "letter": "B",
+          "text": "Incremental refresh on fact tables (refresh only recent partitions), static dimensions refreshed weekly on a separate schedule, reference tables excluded from refresh entirely"
+        },
+        {
+          "letter": "C",
+          "text": "Switch to DirectQuery to eliminate refresh entirely"
+        },
+        {
+          "letter": "D",
+          "text": "Refresh only the 2 fact tables and never refresh dimensions"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Incremental refresh partitions tables by date — only recent partitions are refreshed, reducing time from hours to minutes for large fact tables."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Incremental refresh partitions fact tables by date (e.g., monthly or daily partitions). Only the current and recent partitions are refreshed — historical partitions are untouched. For a 500M-row table where only the last 30 days change, refreshing only those 2-3 partitions takes minutes instead of hours. Dimensions that change weekly are refreshed on a separate weekly schedule. Static reference tables are configured with \"never refresh\" to avoid unnecessary processing. This reduces the twice-daily refresh from 4 hours to 15-30 minutes."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Incremental refresh configuration: define RangeStart/RangeEnd parameters and refresh/archive windows in Power BI.</li>\n              <li>Detect data changes: polling expression on a modified-date column refreshes a partition only when data actually changed.</li>\n              <li>XMLA endpoint enables programmatic partition management — refresh specific partitions on demand via API.</li>\n              <li>Enhanced refresh: \"Only refresh complete days\" prevents partial day data appearing in reports during the midday refresh.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Incremental Refresh",
+        "Performance",
+        "Scheduling"
+      ]
+    },
+    {
+      "id": 44,
+      "categoryRef": "cat-explore",
+      "difficulty": "intermediate",
+      "title": "Data Science Workflows",
+      "scenario": "A data science team wants to build, train, and deploy machine learning models within Fabric. Their workflow includes: feature engineering on lakehouse data, model training with scikit-learn and LightGBM, experiment tracking (comparing model versions by accuracy, F1 score), model registration with versioning, and batch scoring that writes predictions back to the lakehouse nightly. They currently use a separate MLflow server that is difficult to maintain.",
+      "questionText": "Which Fabric capability provides an integrated ML lifecycle without external infrastructure?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Fabric MLflow integration — experiment tracking, model registry, and scoring all within Fabric notebooks using the built-in MLflow server, with results written directly to lakehouse Delta tables"
+        },
+        {
+          "letter": "B",
+          "text": "Deploy a separate Azure Machine Learning workspace and connect to Fabric lakehouse via shortcuts"
+        },
+        {
+          "letter": "C",
+          "text": "Train models in notebooks and manually save model files to the lakehouse Files section"
+        },
+        {
+          "letter": "D",
+          "text": "Use Power BI's built-in AI visuals for all machine learning tasks"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Fabric provides a built-in MLflow integration — no external MLflow server needed for experiment tracking and model management."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Fabric includes a fully managed MLflow integration within notebooks. Data scientists: log experiments (mlflow.log_metric, mlflow.log_param) to track model performance across versions, register best models in the built-in model registry with versioning and stage transitions (Staging, Production), and deploy models for batch scoring in scheduled notebooks that read from and write predictions to lakehouse Delta tables. The MLflow UI (accessible from the workspace) provides experiment comparison, metric visualization, and artifact management — all without external infrastructure."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Fabric MLflow: mlflow.set_experiment(), mlflow.start_run(), mlflow.log_metrics() — standard MLflow API works natively.</li>\n              <li>Model registry: mlflow.register_model() with version tracking, stage transitions (None &gt; Staging &gt; Production &gt; Archived).</li>\n              <li>Batch scoring: mlflow.pyfunc.load_model() in a scheduled notebook, apply to Spark DataFrame, write to Delta table.</li>\n              <li>PREDICT function in SQL endpoint allows scoring registered models directly from T-SQL queries (preview feature).</li></ul>"
+        }
+      ],
+      "tags": [
+        "MLflow",
+        "Data Science",
+        "ML Lifecycle"
+      ]
+    },
+    {
+      "id": 45,
+      "categoryRef": "cat-monitor",
+      "difficulty": "intermediate",
+      "title": "Tenant-Level Administration",
+      "scenario": "A Fabric tenant admin needs to govern 50 workspaces across 500 users. Concerns include: users creating workspaces without approval, sensitive data being shared externally via Power BI publish-to-web, uncontrolled Spark cluster sizes consuming excessive capacity, and no visibility into which users access which data across the organization. The admin needs centralized controls without blocking legitimate self-service analytics.",
+      "questionText": "Which tenant-level settings balance governance with self-service for this organization?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Block all self-service features and require IT approval for every action"
+        },
+        {
+          "letter": "B",
+          "text": "Remove Fabric licenses from all non-IT users to prevent unauthorized usage"
+        },
+        {
+          "letter": "C",
+          "text": "Leave all settings at defaults and address issues reactively when they occur"
+        },
+        {
+          "letter": "D",
+          "text": "Admin portal settings: restrict workspace creation to security group, disable publish-to-web or restrict to internal domains, configure Spark pool limits per workspace, and enable audit logging with Microsoft Purview for data access tracking — while keeping report creation and data exploration unrestricted for all users"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Tenant settings provide granular controls: restrict risky features to authorized groups while leaving analytical capabilities open for self-service."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Fabric Admin Portal tenant settings enable surgical governance: workspace creation restricted to an \"Approved Creators\" security group prevents sprawl without blocking existing workspaces. Publish-to-web disabled (or restricted to approved security groups) prevents public data exposure. Spark pool configuration limits (max nodes, auto-scale bounds) prevent runaway capacity consumption. Audit logs (unified audit in Microsoft 365 + Purview) track all data access across the tenant. Meanwhile, report creation, notebook execution, and data exploration remain unrestricted — preserving the self-service analytics experience for all 500 users."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Tenant settings apply globally or to specific security groups — enabling graduated rollout of features.</li>\n              <li>Workspace creation governance: \"Users can create workspaces\" setting restricted to an AD security group.</li>\n              <li>Export settings: control whether users can export data from reports (CSV, Excel, PDF) — another data loss prevention lever.</li>\n              <li>Admin monitoring workspace: auto-created workspace with admin usage metrics semantic model for tracking adoption and governance.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Admin",
+        "Governance",
+        "Tenant Settings"
+      ]
+    },
+    {
+      "id": 46,
+      "categoryRef": "cat-lakehouse",
+      "difficulty": "intermediate",
+      "title": "Lakehouse Security Architecture",
+      "scenario": "A healthcare lakehouse stores patient data subject to HIPAA. Access requirements: doctors can see patient records for their assigned patients only, nurses can see demographics and vitals but not psychiatric notes, researchers can see de-identified data only, and administrators can see everything. All access must be audited with who-what-when logging. The data is in a single lakehouse with 50 tables.",
+      "questionText": "Which layered security approach provides role-based, column-level, and row-level protection with auditing?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Create separate lakehouses per role with different table subsets copied to each"
+        },
+        {
+          "letter": "B",
+          "text": "OneLake data access roles for table-level access, column-level security on the SQL endpoint to hide psychiatric columns from nurses, dynamic row-level security in the semantic model for doctor-patient assignment, and audit logs via Fabric activity logging"
+        },
+        {
+          "letter": "C",
+          "text": "Application-level security in the reporting tool only, with no lakehouse-level controls"
+        },
+        {
+          "letter": "D",
+          "text": "Encrypt sensitive columns and only provide decryption keys to authorized roles"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Layer multiple security mechanisms: table-level (OneLake roles), column-level (SQL endpoint), row-level (semantic model), and audit logging."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Layered security addresses each requirement: OneLake data access roles control which tables each role can access at the storage layer. Column-level security on the SQL analytics endpoint restricts columns (DENY SELECT on psychiatric_notes columns for nurse role). Dynamic RLS in the semantic model filters rows based on doctor-patient assignment (USERPRINCIPALNAME() matched to assignment table). Researchers get a separate view with de-identified columns (hashed patient IDs, removed names). Fabric audit logs capture all data access events with user identity, item accessed, and timestamp for HIPAA compliance."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Defense in depth: even if one layer is misconfigured, other layers prevent unauthorized access.</li>\n              <li>SQL endpoint column-level security: GRANT SELECT on specific columns, DENY on restricted columns per database role.</li>\n              <li>De-identification for researchers: create views with SHA256(patient_id) as anonymized_id and exclude PII columns.</li>\n              <li>HIPAA requires 6-year audit retention — configure audit log export to immutable storage for compliance.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Security",
+        "HIPAA",
+        "Access Control"
+      ]
+    },
+    {
+      "id": 47,
+      "categoryRef": "cat-transform",
+      "difficulty": "intermediate",
+      "title": "Data Warehouse Loading Patterns",
+      "scenario": "A Fabric Warehouse receives nightly loads from the lakehouse silver layer. The warehouse has a star schema with 5 fact tables and 20 dimension tables. Currently, the load process: truncates and reloads all tables nightly (3 hours), breaks all query caches, causes report errors during the load window, and violates referential integrity temporarily (facts load before dimensions complete). Users need uninterrupted query access during loads.",
+      "questionText": "Which loading pattern eliminates downtime, preserves query performance, and maintains referential integrity?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Load dimensions first in dependency order, then facts — accepting a 3-hour window with stale data"
+        },
+        {
+          "letter": "B",
+          "text": "Table swap pattern: load data into staging tables (parallel loads for all tables), validate referential integrity in staging, then use ALTER TABLE SWAP to atomically swap staging with production — zero downtime, instant switch, integrity guaranteed"
+        },
+        {
+          "letter": "C",
+          "text": "Use MERGE (upsert) on all tables incrementally instead of truncate and reload"
+        },
+        {
+          "letter": "D",
+          "text": "Schedule loads during a maintenance window when no users are active"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "The table swap pattern loads to staging tables while production stays live, then atomically swaps — zero downtime and integrity validation before swap."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "The table swap pattern: create staging versions of all tables, load data into staging (all tables in parallel since order doesn't matter for staging), run referential integrity validation queries on staging tables (ensuring foreign keys resolve), then execute ALTER TABLE SWAP to atomically replace production tables with staging. Users experience zero downtime — queries hit production tables until the instant of swap. Referential integrity is validated before go-live. Query caches are preserved for the most recent queries since the swap is instant. If validation fails, production remains untouched — no partial load corruption."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>ALTER TABLE SWAP in Fabric Warehouse: atomic metadata operation — instant regardless of table size.</li>\n              <li>Parallel staging loads: all 25 tables load simultaneously (no dependency ordering needed since staging is independent).</li>\n              <li>Integrity validation: SELECT fact.dim_key WHERE NOT EXISTS (SELECT 1 FROM dim WHERE dim.key = fact.dim_key) should return 0 rows.</li>\n              <li>Rollback: keep the previous production tables (renamed) for 24 hours — instant rollback by swapping back if issues are found.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Warehouse",
+        "Loading Pattern",
+        "Zero Downtime"
+      ]
+    },
+    {
+      "id": 48,
+      "categoryRef": "cat-semantic",
+      "difficulty": "intermediate",
+      "title": "Multi-Language Semantic Model",
+      "scenario": "A global company deploys Power BI reports to users in 12 countries. Reports must display measure names, column headers, and table names in each user's local language (English, French, German, Spanish, Japanese, etc.). The underlying data values remain in English but all metadata (field names, folder names, measure display names) must be translated. Managing 12 separate semantic models is not sustainable.",
+      "questionText": "Which approach provides multi-language metadata in a single semantic model?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Translations in the semantic model using the TMDL/TMSL translation properties — a single model with metadata translated into multiple cultures, displayed based on the user's browser locale"
+        },
+        {
+          "letter": "B",
+          "text": "Create 12 copies of the semantic model with translated field names in each"
+        },
+        {
+          "letter": "C",
+          "text": "Use calculated columns with SWITCH on user language for display names"
+        },
+        {
+          "letter": "D",
+          "text": "Create a translation lookup table and use DAX to dynamically rename columns"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Tabular model translations are a built-in feature — metadata (captions) can be defined per culture/locale in a single model."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Tabular model translations (TMDL translations property) define translated captions, descriptions, and display folder names for each supported culture (en-US, fr-FR, de-DE, es-ES, ja-JP, etc.) within a single semantic model. Power BI Service automatically displays the appropriate translation based on the user's browser locale setting. This is a metadata-only feature — no data duplication, no separate models, no DAX complexity. Translators maintain a translation file (JSON) that maps each object to its localized name. Tools like Tabular Editor and ALM Toolkit provide UI for managing translations."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Translations apply to: table names, column names, measure names, hierarchy names, level names, and display folders.</li>\n              <li>TMDL format: model/tables/Sales/translations/fr-FR.tmdl defines French translations for the Sales table.</li>\n              <li>Tabular Editor 3: Translation Manager view provides a grid UI for bulk translation management across all cultures.</li>\n              <li>Fallback: if a translation is missing for the user's locale, the default culture (usually en-US) is displayed.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Translations",
+        "Internationalization",
+        "Semantic Model"
+      ]
+    },
+    {
+      "id": 49,
+      "categoryRef": "cat-explore",
+      "difficulty": "intermediate",
+      "title": "Power BI Embedded Analytics",
+      "scenario": "A SaaS company wants to embed Fabric Power BI reports into their customer-facing web application. Requirements: each customer sees only their own data (multi-tenant isolation), the embedding must work without customers needing Power BI licenses, the application controls authentication (customers log in to the SaaS app, not to Microsoft), and reports must be white-labeled (no Power BI branding visible).",
+      "questionText": "Which Power BI embedding approach meets all requirements for customer-facing SaaS analytics?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "\"User Owns Data\" embedding requiring each customer to have a Power BI Pro license and Microsoft account"
+        },
+        {
+          "letter": "B",
+          "text": "Power BI Embedded with \"App Owns Data\" pattern — service principal authentication, generate embed tokens with effective identity for RLS enforcement per customer, embedded in an iframe with custom branding"
+        },
+        {
+          "letter": "C",
+          "text": "Publish reports to Power BI public web (publish-to-web) with URL parameters for filtering"
+        },
+        {
+          "letter": "D",
+          "text": "Export reports as PDF per customer and display in the web application"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "\"App Owns Data\" with service principal and effective identity provides multi-tenant embedding without customer licenses."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "\"App Owns Data\" pattern: the SaaS application authenticates to Power BI using a service principal (no user interaction with Microsoft). The app generates embed tokens with EffectiveIdentity specifying the customer's tenant ID — Power BI applies RLS rules to show only that customer's data. Customers interact with fully interactive reports embedded in iframes within the SaaS UI — no Power BI license needed per user. Custom CSS and configuration hide Power BI branding. The Fabric capacity (F-SKU) provides the compute — cost is per-capacity, not per-user."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Service principal: registered in Azure AD, granted workspace Member role — no interactive user needed for embedding.</li>\n              <li>EffectiveIdentity in embed token: specifies username and roles — RLS evaluates as that identity without actual user authentication.</li>\n              <li>F-SKU (Fabric) replaces A-SKU (Azure) and EM-SKU (Premium) for embedded scenarios — single capacity type for all workloads.</li>\n              <li>Client-side APIs (powerbi-client JavaScript SDK) enable: page navigation, bookmark application, filter setting, and event handling in the host application.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Embedded",
+        "SaaS",
+        "Multi-Tenant"
+      ]
+    },
+    {
+      "id": 50,
+      "categoryRef": "cat-monitor",
+      "difficulty": "intermediate",
+      "title": "Performance Troubleshooting",
+      "scenario": "A Power BI report that was fast last week now takes 45 seconds to load. Nothing changed in the report definition. The data volume grew by 10% (within normal range). The semantic model uses DirectLake mode connected to a lakehouse Delta table. Users report the slowdown started on Monday morning. The Fabric capacity utilization shows normal levels. The DBA confirms no changes to the underlying data pipeline.",
+      "questionText": "What is the most likely cause and how should it be diagnosed?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "DirectLake fallback to DirectQuery due to exceeding guardrail limits (max rows, model size) — diagnose via DAX query plan showing DirectQuery mode, resolve by running OPTIMIZE on the Delta table to compact files and reduce row group count, or increase DirectLake guardrail limits for the capacity"
+        },
+        {
+          "letter": "B",
+          "text": "The Fabric capacity is throttled — upgrade to a larger SKU"
+        },
+        {
+          "letter": "C",
+          "text": "The Power BI service is experiencing a global outage affecting all tenants"
+        },
+        {
+          "letter": "D",
+          "text": "Network latency between the user's browser and the Power BI service increased"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "DirectLake silently falls back to DirectQuery when guardrails are exceeded — small data growth can push a table over the threshold, causing dramatic performance drops."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "DirectLake has guardrails: maximum rows per table, maximum model size, and maximum column cardinality. When exceeded, DirectLake silently falls back to DirectQuery mode — generating SQL queries against the SQL endpoint instead of reading Parquet files directly. This causes dramatic performance degradation (from seconds to 45+ seconds). The 10% data growth likely pushed the table over a guardrail limit. Additionally, if OPTIMIZE hasn't run on the Delta table, accumulated small files increase the Parquet row group count beyond DirectLake's file-per-table limit. Diagnosis: check the DAX query plan for \"DirectQuery\" storage mode on tables that should be DirectLake."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>DirectLake guardrails per F-SKU: F2 supports 300M rows/table, F64 supports 1.5B rows — check capacity-specific limits.</li>\n              <li>Diagnose: DAX Studio query plan shows StorageMode per table — \"DirectLake\" is healthy, \"DirectQuery\" indicates fallback.</li>\n              <li>Resolution options: OPTIMIZE Delta table (compact files), increase capacity SKU (higher guardrails), or reduce model scope.</li>\n              <li>Framing status: if framing failed (could not load Parquet segments), DirectLake falls back for all queries until successful framing.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Troubleshooting",
+        "DirectLake",
+        "Performance"
+      ]
+    }
+  ],
+  "glossary": {}
+}

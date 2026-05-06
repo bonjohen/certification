@@ -1,0 +1,2472 @@
+{
+  "version": "1.0",
+  "metadata": {
+    "examCode": "SY0-701",
+    "examTitle": "CompTIA Security+",
+    "provider": "CompTIA",
+    "description": "Validate core cybersecurity skills across general security concepts, threats and vulnerabilities, security architecture, security operations, and security program management and oversight.",
+    "totalQuestions": 50,
+    "createdDate": "2026-04-13",
+    "lastModified": "2026-04-13T00:00:00Z",
+    "categories": {
+      "cat-general-security": "General Security Concepts",
+      "cat-threats-vulns": "Threats, Vulnerabilities and Mitigations",
+      "cat-security-arch": "Security Architecture",
+      "cat-security-ops": "Security Operations",
+      "cat-program-mgmt": "Security Program Management and Oversight"
+    }
+  },
+  "questions": [
+    {
+      "id": 1,
+      "categoryRef": "cat-general-security",
+      "difficulty": "basic",
+      "title": "Symmetric vs Asymmetric Encryption",
+      "scenario": "A developer is designing a secure file transfer system and needs to choose between encryption approaches for bulk data at rest.",
+      "questionText": "Which encryption type uses the same key for both encryption and decryption?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Symmetric encryption"
+        },
+        {
+          "letter": "B",
+          "text": "Hashing"
+        },
+        {
+          "letter": "C",
+          "text": "Asymmetric encryption"
+        },
+        {
+          "letter": "D",
+          "text": "Digital signatures"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Think about which approach is faster and relies on a single shared secret between communicating parties rather than a key pair."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Symmetric encryption uses one key for both encryption and decryption, making it fast and efficient for bulk data. AES is the dominant symmetric algorithm today. Asymmetric encryption uses a public/private key pair — slower but solves the key distribution problem by letting parties share a public key freely. Hashing is one-way and produces a fixed-length digest; it is not reversible encryption. Digital signatures use asymmetric keys to verify integrity and authenticity but do not encrypt data for confidentiality."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Common symmetric algorithms: AES (128/192/256-bit), 3DES (legacy), ChaCha20 (used in TLS 1.3 for performance on mobile).</li>\n              <li>The key distribution problem: both parties need the same key securely — solved by asymmetric key exchange (Diffie-Hellman) or a PKI-based session handshake.</li>\n              <li>Hybrid encryption: TLS uses asymmetric cryptography to exchange a symmetric session key, then symmetric encryption for the bulk data transfer — combining the benefits of both.</li>\n              <li>Security+ expects you to know AES-256 is the current NIST standard and that longer keys increase brute-force resistance exponentially.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Cryptography",
+        "Symmetric Encryption",
+        "AES"
+      ]
+    },
+    {
+      "id": 2,
+      "categoryRef": "cat-general-security",
+      "difficulty": "basic",
+      "title": "Hashing vs Encryption",
+      "scenario": "A web application stores user passwords in a database. The security team is reviewing how passwords should be protected to prevent exposure if the database is breached.",
+      "questionText": "Which cryptographic operation is most appropriate for storing passwords so they cannot be reversed to plaintext?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "AES-256 encryption"
+        },
+        {
+          "letter": "B",
+          "text": "Hashing with a salt"
+        },
+        {
+          "letter": "C",
+          "text": "RSA encryption"
+        },
+        {
+          "letter": "D",
+          "text": "Base64 encoding"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Password storage requires a one-way operation; encryption is reversible, but a salted hash is not — making it the right tool for this job."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Hashing with a salt is the correct approach. A cryptographic hash (e.g., bcrypt, Argon2, SHA-256) produces a fixed-length digest that cannot be reversed. Adding a unique salt per user defeats rainbow table attacks. AES-256 and RSA are reversible encryption algorithms — if the key is compromised, all passwords are exposed. Base64 is encoding, not encryption or hashing, and provides zero security; it is trivially reversible. Security+ specifically tests knowledge that passwords must be hashed, not encrypted."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Preferred password hashing algorithms: bcrypt, scrypt, Argon2id — all are intentionally slow to resist brute-force attacks.</li>\n              <li>A salt is a random value appended to the password before hashing; it ensures two users with the same password get different hashes.</li>\n              <li>SHA-256 alone is too fast for password hashing — an attacker with a GPU can test billions of hashes per second against an unsalted SHA-256 list.</li>\n              <li>Pepper: an additional secret value stored outside the database, added server-side before hashing, providing a second layer if only the DB is leaked.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Hashing",
+        "Password Security",
+        "Cryptography"
+      ]
+    },
+    {
+      "id": 3,
+      "categoryRef": "cat-general-security",
+      "difficulty": "intermediate",
+      "title": "PKI Certificate Authority",
+      "scenario": "An enterprise is deploying internal HTTPS services and wants to issue TLS certificates without paying a commercial CA for each internal hostname.",
+      "questionText": "Which PKI component is responsible for digitally signing and issuing certificates to entities within an organization?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Certificate Authority (CA)"
+        },
+        {
+          "letter": "B",
+          "text": "Online Certificate Status Protocol (OCSP)"
+        },
+        {
+          "letter": "C",
+          "text": "Registration Authority (RA)"
+        },
+        {
+          "letter": "D",
+          "text": "Certificate Revocation List (CRL)"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "One PKI entity verifies identity, another issues and signs — the signer is the trusted root that browsers and clients ultimately check."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "The Certificate Authority (CA) is the entity that signs and issues digital certificates, binding a public key to an identity. An enterprise can run an internal CA (e.g., Microsoft AD CS) to issue certificates for internal services without cost. The Registration Authority (RA) handles identity verification before requesting issuance from the CA but cannot sign certificates itself. CRL and OCSP are revocation mechanisms — they check whether a certificate is still valid, not issue them."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>CA hierarchy: Root CA (offline, highly protected) → Intermediate CA (online, issues end-entity certs) → End-entity certificate. The intermediate layer limits exposure of the root key.</li>\n              <li>Certificate pinning: applications can be configured to trust only a specific CA or leaf certificate, defeating rogue CA attacks.</li>\n              <li>CRL vs OCSP: CRL is a downloadable list; OCSP queries the CA in real time. OCSP stapling lets the server cache and serve the OCSP response, reducing latency.</li>\n              <li>Security+ tests: difference between RA and CA, chain of trust, and the purpose of the root CA being kept offline.</li></ul>"
+        }
+      ],
+      "tags": [
+        "PKI",
+        "Certificates",
+        "TLS"
+      ]
+    },
+    {
+      "id": 4,
+      "categoryRef": "cat-general-security",
+      "difficulty": "basic",
+      "title": "Multi-Factor Authentication Types",
+      "scenario": "A financial institution requires employees to authenticate with their password and a one-time code sent to a registered mobile phone before accessing core banking systems.",
+      "questionText": "Which authentication factor category does the one-time code sent to a mobile phone represent?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Something you have"
+        },
+        {
+          "letter": "B",
+          "text": "Something you are"
+        },
+        {
+          "letter": "C",
+          "text": "Somewhere you are"
+        },
+        {
+          "letter": "D",
+          "text": "Something you know"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "The three classic MFA categories map to knowledge, possession, and inherence — a code delivered to a physical device fits the possession category."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "A one-time code sent to a registered mobile phone represents \"something you have\" — possession of the device. \"Something you know\" covers passwords, PINs, and security questions. \"Something you are\" covers biometrics such as fingerprints, retinal scans, and facial recognition. \"Somewhere you are\" (geolocation) is a fourth factor used in context-aware authentication but is not one of the three primary MFA categories tested on Security+. The password in this scenario is \"something you know,\" making this a true two-factor authentication setup."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>TOTP (Time-based One-Time Password, RFC 6238) generates codes every 30 seconds using a shared secret — more phishing-resistant than SMS OTP.</li>\n              <li>SMS OTP is vulnerable to SIM-swapping attacks; NIST SP 800-63B deprecated SMS as a FIDO-equivalent second factor for high-assurance systems.</li>\n              <li>FIDO2/WebAuthn hardware security keys (YubiKey) are the strongest \"something you have\" factor — they are phishing-proof because authentication is origin-bound.</li>\n              <li>Security+ expects you to identify all four factor types and distinguish true MFA (two different categories) from two-step verification (two of the same category).</li></ul>"
+        }
+      ],
+      "tags": [
+        "Authentication",
+        "MFA",
+        "Access Control"
+      ]
+    },
+    {
+      "id": 5,
+      "categoryRef": "cat-general-security",
+      "difficulty": "intermediate",
+      "title": "Access Control Models Compared",
+      "scenario": "A government agency classifies data at SECRET and TOP SECRET levels. Users are granted clearances and can only read data at or below their clearance level and write data at or above it.",
+      "questionText": "Which access control model enforces data confidentiality through mandatory read-down and write-up restrictions based on security labels?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Role-Based Access Control (RBAC)"
+        },
+        {
+          "letter": "B",
+          "text": "Discretionary Access Control (DAC)"
+        },
+        {
+          "letter": "C",
+          "text": "Biba Integrity Model"
+        },
+        {
+          "letter": "D",
+          "text": "Bell-LaPadula Model"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "One formal model focuses on confidentiality with \"no read up, no write down\" — named after two researchers who formalized it for the US military."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "The Bell-LaPadula model enforces confidentiality through two core rules: the Simple Security Property (no read up — a subject cannot read data at a higher classification) and the Star Property (no write down — a subject cannot write data to a lower classification, preventing information leakage). RBAC assigns permissions based on job roles, not security labels. DAC lets resource owners control access at their discretion. Biba is the integrity counterpart to Bell-LaPadula — it prevents write up and read down to protect data integrity, not confidentiality."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Bell-LaPadula was developed for the US DoD and underpins MAC (Mandatory Access Control) systems like SELinux.</li>\n              <li>Biba model mnemonic: \"no write up, no read down\" — the inverse of Bell-LaPadula, protecting integrity rather than confidentiality.</li>\n              <li>Clark-Wilson model: also an integrity model, but enforces well-formed transactions and separation of duties — more applicable to commercial environments.</li>\n              <li>Brewer-Nash (Chinese Wall): prevents conflicts of interest by dynamically restricting access based on prior access history — used in financial consulting contexts.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Access Control",
+        "Bell-LaPadula",
+        "MAC"
+      ]
+    },
+    {
+      "id": 6,
+      "categoryRef": "cat-general-security",
+      "difficulty": "basic",
+      "title": "Digital Signature Purpose",
+      "scenario": "A software vendor distributes update packages to customers. Customers need to verify that the package genuinely came from the vendor and was not tampered with in transit.",
+      "questionText": "Which cryptographic mechanism provides both authenticity and integrity verification for the software update package?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "A VPN tunnel between vendor and customer"
+        },
+        {
+          "letter": "B",
+          "text": "TLS transport encryption"
+        },
+        {
+          "letter": "C",
+          "text": "A digital signature using the vendor's private key"
+        },
+        {
+          "letter": "D",
+          "text": "Symmetric encryption with AES-256"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Authenticity requires proof of origin tied to a specific identity — only a private key known exclusively to the vendor can produce a signature that the vendor's public key verifies."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "A digital signature is created by hashing the package and encrypting the hash with the vendor's private key. Recipients verify by decrypting with the vendor's public key and comparing hashes — proving the package came from the vendor (authenticity) and was not modified (integrity). Symmetric AES encryption provides confidentiality but not authenticity. A VPN and TLS protect data in transit but do not prove the identity of the source or detect post-transit tampering of the stored file."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Common signature algorithms: RSA-PSS, ECDSA (Elliptic Curve Digital Signature Algorithm), Ed25519 — Security+ focuses on RSA and ECDSA.</li>\n              <li>Code signing certificates are a specialized PKI certificate type; the CA verifies the software publisher's identity before issuing one.</li>\n              <li>Windows Authenticode and Linux GPG package signing are real-world implementations of software digital signatures.</li>\n              <li>Non-repudiation: because only the vendor holds the private key, they cannot later deny having signed the package — this is the legal/audit value of signatures.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Digital Signatures",
+        "Cryptography",
+        "Integrity"
+      ]
+    },
+    {
+      "id": 7,
+      "categoryRef": "cat-general-security",
+      "difficulty": "intermediate",
+      "title": "Security Control Categories",
+      "scenario": "An organization installs security cameras at building entrances, trains employees on badge policy, and requires security guards to escort visitors. These measures are evaluated during an audit.",
+      "questionText": "Security cameras at entrances are best classified under which security control category?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Compensating"
+        },
+        {
+          "letter": "B",
+          "text": "Deterrent"
+        },
+        {
+          "letter": "C",
+          "text": "Recovery"
+        },
+        {
+          "letter": "D",
+          "text": "Corrective"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Visible cameras do not stop an attacker physically — they discourage would-be attackers by increasing the perceived risk of being caught."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Security cameras are deterrent controls — they discourage attacks by making potential attackers aware they are being observed. Corrective controls restore systems or reduce impact after an incident (e.g., antivirus quarantine). Compensating controls substitute for a primary control that cannot be implemented. Recovery controls restore normal operations after a disaster (e.g., backups). Cameras can also serve a detective function after the fact, but their primary purpose at entrances is deterrence."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Security+ control taxonomy: Preventive, Detective, Corrective, Deterrent, Compensating, Directive, and Recovery — know all seven and their primary purpose.</li>\n              <li>Controls can span multiple types: a camera is deterrent (discourages) and detective (records evidence) simultaneously.</li>\n              <li>Implementation types overlay the category: Technical (firewall), Administrative (policy), and Physical (lock) — a camera is both Physical and can be Detective/Deterrent.</li>\n              <li>Compensating controls are formally defined in PCI DSS: they must provide equivalent protection to the original control they replace and be documented with risk acceptance.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Security Controls",
+        "Physical Security",
+        "Risk Management"
+      ]
+    },
+    {
+      "id": 8,
+      "categoryRef": "cat-general-security",
+      "difficulty": "intermediate",
+      "title": "Diffie-Hellman Key Exchange",
+      "scenario": "Two servers need to establish an encrypted session over an untrusted network without having previously shared any secret key. The protocol must allow them to independently derive the same session key.",
+      "questionText": "Which protocol allows two parties to establish a shared secret over an insecure channel without transmitting the secret itself?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Diffie-Hellman key exchange"
+        },
+        {
+          "letter": "B",
+          "text": "AES-256 key wrapping"
+        },
+        {
+          "letter": "C",
+          "text": "HMAC key derivation"
+        },
+        {
+          "letter": "D",
+          "text": "RSA key transport"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "This protocol uses mathematical properties of modular exponentiation so that both sides arrive at the same value without either transmitting the secret directly."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Diffie-Hellman (DH) key exchange allows two parties to independently compute the same shared secret using their own private values and each other's public values, without the shared secret ever traversing the network. RSA key transport encrypts the secret under the recipient's public key — the secret is transmitted, just encrypted. AES key wrapping encrypts a symmetric key with another key but still requires a pre-shared or already-exchanged key. HMAC is for message authentication, not key establishment."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Ephemeral Diffie-Hellman (DHE) and its elliptic-curve variant (ECDHE) provide Perfect Forward Secrecy (PFS): each session uses a fresh key pair so compromising the server's long-term key does not decrypt past sessions.</li>\n              <li>TLS 1.3 mandates ECDHE for all key exchanges, removing RSA key transport entirely — PFS is now non-optional.</li>\n              <li>DH groups: Group 14 (2048-bit MODP) is the minimum recommended; Group 19/20 (ECDH P-256/P-384) are preferred for performance and security.</li>\n              <li>Logjam attack: downgrade attacks exploited weak 512-bit DH parameters — patched by enforcing minimum DH group sizes.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Cryptography",
+        "Key Exchange",
+        "TLS"
+      ]
+    },
+    {
+      "id": 9,
+      "categoryRef": "cat-general-security",
+      "difficulty": "basic",
+      "title": "Least Privilege Principle",
+      "scenario": "An HR analyst needs to read employee salary records to prepare quarterly reports. The IT team is configuring the analyst's account permissions in the HR system.",
+      "questionText": "Which security principle dictates that the analyst should be granted only the minimum access required to perform the quarterly reporting task?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Separation of duties"
+        },
+        {
+          "letter": "B",
+          "text": "Need to know"
+        },
+        {
+          "letter": "C",
+          "text": "Defense in depth"
+        },
+        {
+          "letter": "D",
+          "text": "Least privilege"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "The principle limits account permissions to the exact minimum needed for the job function — no more, no less."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Least privilege requires that users, processes, and systems have only the minimum permissions necessary to perform their legitimate functions. Granting the HR analyst only read access to salary records (not write or delete) exemplifies this. Separation of duties ensures no single person can complete a sensitive task alone (e.g., approving and paying an invoice). Need to know restricts access to information based on job relevance — closely related but specifically about information access rather than system permissions broadly. Defense in depth uses multiple layered security controls."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Privilege creep: accounts accumulate permissions over time as roles change — periodic access reviews (user account audits) detect and remediate this.</li>\n              <li>Just-in-time (JIT) access: a modern implementation granting elevated privileges only for the duration of a specific task, then revoking them automatically.</li>\n              <li>Service accounts often violate least privilege by being granted broad permissions for convenience — a common finding in penetration tests.</li>\n              <li>Zero Trust architecture operationalizes least privilege at the network layer: every request is verified and access is scoped per-session regardless of network location.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Access Control",
+        "Least Privilege",
+        "Security Principles"
+      ]
+    },
+    {
+      "id": 10,
+      "categoryRef": "cat-general-security",
+      "difficulty": "intermediate",
+      "title": "Certificate Revocation Checking",
+      "scenario": "A browser connects to an e-commerce site. The server presents a TLS certificate, and the browser needs to verify in real time whether the certificate has been revoked since it was issued.",
+      "questionText": "Which protocol allows a client to query the current revocation status of a specific certificate in real time without downloading a full revocation list?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Online Certificate Status Protocol (OCSP)"
+        },
+        {
+          "letter": "B",
+          "text": "Certificate Transparency (CT)"
+        },
+        {
+          "letter": "C",
+          "text": "LDAP directory lookup"
+        },
+        {
+          "letter": "D",
+          "text": "Certificate Revocation List (CRL)"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "One mechanism downloads a large list periodically; the other sends a single query about one certificate and gets an immediate valid/revoked response."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "OCSP (Online Certificate Status Protocol) allows clients to query a CA's OCSP responder with a single certificate's serial number and receive a real-time good/revoked/unknown response. CRL is a downloadable list of all revoked certificates — it can be large, cached, and therefore stale. Certificate Transparency is a logging system for detecting misissued certificates, not a revocation mechanism. LDAP can publish CRLs but is not a dedicated revocation query protocol. OCSP stapling further improves performance by having the server cache and attach the OCSP response directly in the TLS handshake."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>OCSP stapling: the server periodically fetches its own OCSP response and staples it to the TLS handshake — eliminates client-to-OCSP-responder round trips and privacy leakage.</li>\n              <li>Must-Staple TLS extension: instructs clients to reject the certificate if no valid OCSP staple is provided, hardening against OCSP soft-fail behavior.</li>\n              <li>CRL weakness: browsers often soft-fail (proceed) if the CRL is unavailable — an attacker can block CRL retrieval to prevent revocation from taking effect.</li>\n              <li>Certificate Transparency logs (RFC 9162) allow anyone to audit all certificates issued by a CA, detecting rogue issuance even before revocation is needed.</li></ul>"
+        }
+      ],
+      "tags": [
+        "PKI",
+        "OCSP",
+        "Certificate Management"
+      ]
+    },
+    {
+      "id": 11,
+      "categoryRef": "cat-general-security",
+      "difficulty": "advanced",
+      "title": "Elliptic Curve Cryptography Benefits",
+      "scenario": "A mobile application needs to implement public-key cryptography for secure messaging. Battery life and bandwidth are constrained, so the team is comparing RSA-2048 with ECC alternatives.",
+      "questionText": "What is the primary advantage of Elliptic Curve Cryptography (ECC) over RSA at equivalent security levels?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "ECC supports symmetric key exchange natively, eliminating the need for Diffie-Hellman"
+        },
+        {
+          "letter": "B",
+          "text": "ECC is quantum-resistant and will not be broken by Shor's algorithm"
+        },
+        {
+          "letter": "C",
+          "text": "ECC provides equivalent security with significantly smaller key sizes, reducing computational overhead"
+        },
+        {
+          "letter": "D",
+          "text": "ECC certificates are free of charge from all public certificate authorities"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "ECC achieves the same security strength as RSA using dramatically shorter keys — a 256-bit ECC key is roughly equivalent to a 3072-bit RSA key."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "ECC achieves equivalent cryptographic strength to RSA with much smaller key sizes. A 256-bit ECC key provides roughly the same security as a 3072-bit RSA key. Smaller keys mean faster computation, less memory use, and lower power consumption — critical advantages for mobile and IoT devices. ECC does not natively replace Diffie-Hellman; rather, ECDH and ECDHE are elliptic-curve variants of DH. ECC is NOT quantum-resistant — Shor's algorithm breaks both RSA and ECC. NIST post-quantum candidates (CRYSTALS-Kyber, CRYSTALS-Dilithium) are the quantum-safe replacements."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Key size equivalency: 256-bit ECC ≈ 3072-bit RSA ≈ 128-bit AES security; 384-bit ECC ≈ 7680-bit RSA ≈ 192-bit AES.</li>\n              <li>Common ECC curves on Security+: P-256 (prime256v1), P-384, Curve25519 (used in Signal, WireGuard) — know the names and contexts.</li>\n              <li>Post-quantum cryptography (PQC): NIST finalized CRYSTALS-Kyber (ML-KEM) for key encapsulation and CRYSTALS-Dilithium (ML-DSA) for signatures in 2024.</li>\n              <li>TLS 1.3 prefers ECDHE_P-256 or X25519 for key exchange because of the performance advantage — RSA key exchange was removed entirely.</li></ul>"
+        }
+      ],
+      "tags": [
+        "ECC",
+        "Cryptography",
+        "Public Key Infrastructure"
+      ]
+    },
+    {
+      "id": 12,
+      "categoryRef": "cat-general-security",
+      "difficulty": "intermediate",
+      "title": "AAA Framework Components",
+      "scenario": "An enterprise deploys RADIUS to manage network device access. When an engineer logs into a switch, the system verifies credentials, determines what commands are allowed, and writes a log entry of every command executed.",
+      "questionText": "The logging of every command executed by the engineer on the switch corresponds to which AAA component?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Authentication"
+        },
+        {
+          "letter": "B",
+          "text": "Authorization"
+        },
+        {
+          "letter": "C",
+          "text": "Accounting"
+        },
+        {
+          "letter": "D",
+          "text": "Auditing"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "AAA: the first component proves identity, the second enforces what you can do, and the third records what you actually did."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Accounting is the AAA component that records what authenticated and authorized users actually do — in this case, every command entered on the switch. Authentication verifies identity (username + password). Authorization determines what the authenticated user is permitted to do (which commands, which VLANs). Accounting logs activity for audit trails, billing, and forensic investigation. RADIUS and TACACS+ both support all three AAA functions; TACACS+ is preferred for device administration because it encrypts the full payload and provides more granular command authorization."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>RADIUS: encrypts only the password field in authentication packets; UDP-based; commonly used for network access (VPN, Wi-Fi 802.1X).</li>\n              <li>TACACS+: encrypts the entire payload; TCP-based; separates authentication, authorization, and accounting into distinct packets — preferred for device administration (Cisco gear).</li>\n              <li>Accounting records typically include: session start/stop times, bytes transferred, commands issued, and terminal ID — essential for forensic investigations.</li>\n              <li>Diameter: the successor to RADIUS used in 4G/5G mobile networks and some enterprise contexts; supports more extensible attribute-value pairs.</li></ul>"
+        }
+      ],
+      "tags": [
+        "AAA",
+        "RADIUS",
+        "Authentication"
+      ]
+    },
+    {
+      "id": 13,
+      "categoryRef": "cat-threats-vulns",
+      "difficulty": "basic",
+      "title": "Phishing vs Spear Phishing",
+      "scenario": "An attacker researches a specific CFO's name, direct reports, and current vendor relationships from LinkedIn and the company website, then sends a convincing email impersonating the CEO requesting an urgent wire transfer.",
+      "questionText": "This highly targeted attack using personalized information about a specific individual is best described as which type of social engineering?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Vishing"
+        },
+        {
+          "letter": "B",
+          "text": "Smishing"
+        },
+        {
+          "letter": "C",
+          "text": "Whaling"
+        },
+        {
+          "letter": "D",
+          "text": "Spear phishing"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Generic phishing casts a wide net; the targeted variant uses research on a specific individual — the name reflects precision fishing with a spear."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Spear phishing is a targeted phishing attack directed at a specific individual using personalized information gathered through reconnaissance. In this scenario, the attacker researched the CFO before crafting the email, which is the hallmark of spear phishing. Whaling is spear phishing directed specifically at senior executives (C-suite) — in this case the CFO is the target, so technically this is also whaling, but spear phishing is the broader, more fundamental term. Vishing uses voice calls. Smishing uses SMS text messages."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Business Email Compromise (BEC): a form of spear phishing that impersonates executives to authorize fraudulent wire transfers — the FBI's IC3 reports BEC as the costliest cybercrime category.</li>\n              <li>OSINT sources attackers commonly use: LinkedIn, company websites, SEC filings, job postings, social media — all publicly available.</li>\n              <li>Technical defenses: DMARC, DKIM, and SPF email authentication reduce spoofed-domain phishing; they cannot prevent look-alike domains.</li>\n              <li>Whaling vs BEC: whaling targets executives with phishing lures; BEC may or may not involve phishing — it can include account takeover via credential stuffing.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Social Engineering",
+        "Phishing",
+        "Threats"
+      ]
+    },
+    {
+      "id": 14,
+      "categoryRef": "cat-threats-vulns",
+      "difficulty": "basic",
+      "title": "Ransomware Attack Characteristics",
+      "scenario": "A hospital's file servers become inaccessible overnight. Staff discover that all patient record files have been renamed with a .locked extension and a text file demands payment in cryptocurrency to restore access.",
+      "questionText": "Which malware category best describes this attack?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Trojan"
+        },
+        {
+          "letter": "B",
+          "text": "Ransomware"
+        },
+        {
+          "letter": "C",
+          "text": "Rootkit"
+        },
+        {
+          "letter": "D",
+          "text": "Spyware"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "The defining characteristic is encryption of victim files combined with a ransom demand — no other malware category combines both elements."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Ransomware encrypts victim files or systems and demands payment (typically cryptocurrency) for the decryption key. The .locked extension and ransom note are textbook indicators. Trojans disguise themselves as legitimate software to gain initial access but do not inherently encrypt files. Rootkits hide attacker presence at the OS or firmware level, often without immediately obvious impact. Spyware silently collects and exfiltrates data without the user's knowledge. Modern ransomware often combines double extortion: encrypting files AND threatening to publish stolen data if the ransom is not paid."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Ransomware-as-a-Service (RaaS): criminal groups sell or lease ransomware toolkits to affiliates who conduct attacks and split the ransom proceeds.</li>\n              <li>Common initial access vectors: phishing emails, RDP brute force, unpatched VPN vulnerabilities, and malicious macros in Office documents.</li>\n              <li>Defense best practices: immutable offline backups (the 3-2-1 rule), network segmentation to limit lateral movement, and endpoint detection and response (EDR).</li>\n              <li>Double extortion: attackers exfiltrate data before encrypting, then threaten to publish it on a leak site — paying does not guarantee data deletion.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Malware",
+        "Ransomware",
+        "Incident Response"
+      ]
+    },
+    {
+      "id": 15,
+      "categoryRef": "cat-threats-vulns",
+      "difficulty": "intermediate",
+      "title": "SQL Injection Attack Vector",
+      "scenario": "A penetration tester enters the string <code>' OR '1'='1</code> into a web application's login form username field. The application returns all user records from the database without requiring a password.",
+      "questionText": "Which vulnerability class allows the attacker to manipulate the database query by injecting characters into the input field?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Cross-Site Scripting (XSS)"
+        },
+        {
+          "letter": "B",
+          "text": "SQL Injection"
+        },
+        {
+          "letter": "C",
+          "text": "Directory Traversal"
+        },
+        {
+          "letter": "D",
+          "text": "Cross-Site Request Forgery (CSRF)"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "The injected string contains SQL syntax — the single quote breaks out of the string literal, and the OR clause makes the condition always true."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "SQL Injection occurs when user-supplied input is incorporated into a database query without proper sanitization or parameterization. The string ' OR '1'='1 closes the original string parameter and appends a condition that is always true, effectively bypassing authentication. XSS injects malicious scripts into web pages viewed by other users — it targets browsers, not databases. CSRF tricks authenticated users into submitting requests they did not intend to make. Directory traversal uses ../ sequences to access files outside the web root. SQLi is ranked in the OWASP Top 10 and is fully preventable with parameterized queries."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Parameterized queries (prepared statements) are the primary defense — they separate SQL code from data so user input can never alter query structure.</li>\n              <li>Blind SQL injection: the application does not return query results directly but behaves differently based on true/false conditions — attackers infer data one bit at a time.</li>\n              <li>Out-of-band SQL injection: uses secondary channels (DNS, HTTP requests) to exfiltrate data when the application response does not reflect query results.</li>\n              <li>Defense in depth for SQLi: parameterized queries + WAF (Web Application Firewall) + principle of least privilege on DB accounts + stored procedure usage.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Injection Attacks",
+        "Web Security",
+        "OWASP"
+      ]
+    },
+    {
+      "id": 16,
+      "categoryRef": "cat-threats-vulns",
+      "difficulty": "intermediate",
+      "title": "Zero-Day Vulnerability Defined",
+      "scenario": "A security researcher discovers a previously unknown flaw in a widely used PDF reader. The vendor has no knowledge of the flaw and no patch exists. An APT group is actively exploiting it in the wild.",
+      "questionText": "Which term describes a vulnerability that is unknown to the software vendor and for which no patch currently exists?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Known exploit"
+        },
+        {
+          "letter": "B",
+          "text": "Race condition"
+        },
+        {
+          "letter": "C",
+          "text": "Zero-day vulnerability"
+        },
+        {
+          "letter": "D",
+          "text": "Logic bomb"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "The term reflects that the vendor has had zero days to develop and distribute a fix — the flaw is being exploited before any patch can exist."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "A zero-day vulnerability is a security flaw that is unknown to the vendor, meaning no patch has been developed or released. Attackers who discover or purchase these flaws can exploit systems without defenders having a remediation path. Once the vendor learns of the flaw and releases a patch, it is no longer a zero-day. A logic bomb is malicious code that triggers on a condition (date, event). A known exploit targets a publicly disclosed CVE for which patches exist. A race condition is a timing flaw in software where two operations produce unintended results — it can become a zero-day, but the terms are not synonymous."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Vulnerability markets: zero-days are bought and sold; Zerodium published a price list showing iOS zero-days can fetch over $2.5M — nation-states are major buyers.</li>\n              <li>Responsible disclosure vs full disclosure: researchers typically notify the vendor privately (responsible disclosure) and give a grace period (e.g., 90 days per Project Zero) before publishing.</li>\n              <li>Mitigations before a patch: virtual patching via WAF/IPS signatures, network isolation, disabling the vulnerable feature, and monitoring for exploit indicators.</li>\n              <li>CISA KEV (Known Exploited Vulnerabilities) catalog: federal agencies must patch listed CVEs within mandated timelines — a practical threat intelligence source for Security+ context.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Vulnerability Management",
+        "Zero-Day",
+        "Threat Intelligence"
+      ]
+    },
+    {
+      "id": 17,
+      "categoryRef": "cat-threats-vulns",
+      "difficulty": "intermediate",
+      "title": "Vulnerability Scanning vs Penetration Testing",
+      "scenario": "A compliance officer asks whether the annual security assessment that runs automated tools to identify missing patches and misconfigurations qualifies as a penetration test for audit purposes.",
+      "questionText": "How does a vulnerability scan fundamentally differ from a penetration test?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Vulnerability scans identify potential weaknesses without exploiting them; penetration tests actively exploit vulnerabilities to demonstrate impact"
+        },
+        {
+          "letter": "B",
+          "text": "Vulnerability scans are performed by external attackers; penetration tests are performed internally"
+        },
+        {
+          "letter": "C",
+          "text": "Vulnerability scans are only applicable to web applications; penetration tests cover all systems"
+        },
+        {
+          "letter": "D",
+          "text": "Vulnerability scans require written authorization; penetration tests do not"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "A scan identifies and reports; a pen test goes further by actually exploiting findings to prove real-world impact — one is passive discovery, the other is active attack simulation."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Vulnerability scanning uses automated tools to detect known vulnerabilities, misconfigurations, and missing patches — it does not attempt to exploit findings. A penetration test goes further: a human tester actively exploits vulnerabilities to demonstrate actual impact, chain findings together, and assess the depth of access achievable. Both require written authorization. Penetration tests can be internal or external, and can target any asset class. The distinction matters for compliance — many frameworks (PCI DSS, ISO 27001) require both types of assessment."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Pen test types: Black box (no prior knowledge), White box (full system knowledge), Grey box (partial knowledge) — each simulates a different attacker profile.</li>\n              <li>Rules of Engagement (RoE): a document defining scope, permitted techniques, timing, and escalation contacts — mandatory before any authorized pen test.</li>\n              <li>Common vulnerability scanners: Nessus (Tenable), Qualys, OpenVAS — they correlate findings against CVE databases and CVSS scores.</li>\n              <li>Bug bounty programs are a form of continuous crowdsourced vulnerability discovery that complements internal scanning and formal pen tests.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Vulnerability Management",
+        "Penetration Testing",
+        "Security Assessment"
+      ]
+    },
+    {
+      "id": 18,
+      "categoryRef": "cat-threats-vulns",
+      "difficulty": "intermediate",
+      "title": "Man-in-the-Middle Attack",
+      "scenario": "An attacker on a coffee shop Wi-Fi uses ARP spoofing to intercept traffic between a laptop and the router. The attacker reads and modifies HTTP traffic before forwarding it to the legitimate destination.",
+      "questionText": "Which attack type is described when an attacker secretly intercepts and potentially alters communications between two parties who believe they are communicating directly?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Replay attack"
+        },
+        {
+          "letter": "B",
+          "text": "Denial of Service attack"
+        },
+        {
+          "letter": "C",
+          "text": "Smurf attack"
+        },
+        {
+          "letter": "D",
+          "text": "Man-in-the-Middle (MitM) attack"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "The attacker positions themselves between two communicating parties, relaying traffic while having full visibility and the ability to modify it."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "A Man-in-the-Middle attack occurs when an attacker secretly positions themselves between two parties, intercepting, reading, and potentially modifying communications. ARP spoofing is a common technique to achieve this on local networks by associating the attacker's MAC address with a legitimate IP. A replay attack captures and reuses valid authentication tokens or messages. A DoS attack disrupts availability rather than intercepting traffic. A Smurf attack is a legacy amplified ICMP flood. Defenses against MitM include HTTPS/TLS, certificate pinning, VPN, and dynamic ARP inspection on switches."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>ARP spoofing tools: Ettercap, arpspoof (dsniff suite) — demonstrate how easy MitM is on unencrypted networks.</li>\n              <li>SSL stripping: downgrades HTTPS connections to HTTP, enabling MitM on TLS — countered by HSTS (HTTP Strict Transport Security) preloading.</li>\n              <li>Dynamic ARP Inspection (DAI): a switch feature that validates ARP packets against a DHCP snooping binding table, blocking spoofed ARP responses.</li>\n              <li>Certificate pinning: clients refuse connections where the server certificate does not match a pinned fingerprint, preventing MitM with a rogue CA certificate.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Network Attacks",
+        "MitM",
+        "ARP Spoofing"
+      ]
+    },
+    {
+      "id": 19,
+      "categoryRef": "cat-threats-vulns",
+      "difficulty": "advanced",
+      "title": "Indicators of Compromise",
+      "scenario": "A threat analyst notices several systems making DNS queries to an unusual domain with long random-looking subdomains at regular 60-second intervals. CPU and memory usage on these systems is normal.",
+      "questionText": "The regular beaconing to a suspicious domain is most indicative of which threat activity?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "A SQL injection attack against an internal database"
+        },
+        {
+          "letter": "B",
+          "text": "An insider threat exfiltrating files via USB"
+        },
+        {
+          "letter": "C",
+          "text": "Command-and-control (C2) communication from malware"
+        },
+        {
+          "letter": "D",
+          "text": "Ransomware encryption in progress"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Regular, automated outbound connections at fixed intervals to an external domain suggest malware checking in with its operator for instructions."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Command-and-control (C2) beaconing is a key indicator of compromise for malware infections. Malware phones home at regular intervals to receive instructions, exfiltrate data, or confirm the implant is still active. DNS-based C2 is particularly stealthy because DNS traffic is rarely blocked and the data is embedded in subdomain labels (DNS tunneling). Ransomware encryption causes high disk I/O and CPU. SQL injection targets web application databases, not DNS. USB exfiltration would not generate network beaconing. Security+ expects candidates to recognize beaconing as a primary malware IoC."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>DNS tunneling tools: Iodine, dnscat2 — encode arbitrary data in DNS query/response records to create covert channels through firewall-permitted DNS traffic.</li>\n              <li>Detection techniques: DNS query frequency analysis, entropy scoring of subdomain labels (random-looking strings have high entropy), unusual record types (TXT, NULL).</li>\n              <li>Domain Generation Algorithms (DGA): malware generates hundreds of pseudo-random C2 domains daily — only the attacker knows which one is registered, making blacklisting ineffective.</li>\n              <li>IoC vs IoA: Indicators of Compromise (IoC) are forensic artifacts of past activity; Indicators of Attack (IoA) are behavioral patterns of active attacks — beaconing is both.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Threat Intelligence",
+        "Malware",
+        "DNS Security"
+      ]
+    },
+    {
+      "id": 20,
+      "categoryRef": "cat-threats-vulns",
+      "difficulty": "intermediate",
+      "title": "Buffer Overflow Exploitation",
+      "scenario": "A security researcher tests a legacy C application by entering input significantly longer than the allocated buffer. The application crashes and the researcher is able to redirect execution to injected shellcode.",
+      "questionText": "Which vulnerability class is being exploited when excess input overwrites adjacent memory and redirects program execution?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Buffer overflow"
+        },
+        {
+          "letter": "B",
+          "text": "Race condition"
+        },
+        {
+          "letter": "C",
+          "text": "Format string vulnerability"
+        },
+        {
+          "letter": "D",
+          "text": "Integer overflow"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "When input exceeds the allocated memory buffer and spills into adjacent memory regions — including the return address — the attacker can hijack control flow."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "A buffer overflow occurs when a program writes more data to a buffer than it was allocated, overwriting adjacent memory. On the stack, this can overwrite the saved return address, allowing the attacker to redirect execution to injected shellcode. Integer overflow occurs when arithmetic exceeds the maximum value for a data type, wrapping around unexpectedly. A format string vulnerability arises when user input is passed directly as a printf format string, enabling memory reads or writes. A race condition exploits timing between two operations. Buffer overflows are classic vulnerabilities in C/C++ code lacking bounds checking."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Mitigations: ASLR (Address Space Layout Randomization) randomizes memory addresses; DEP/NX (Data Execution Prevention/No-Execute) marks stack memory non-executable; Stack Canaries detect overwrites before return.</li>\n              <li>Return-Oriented Programming (ROP): bypasses NX by chaining existing executable code gadgets rather than injecting new shellcode.</li>\n              <li>Safe coding alternatives: in C, use strncpy/strncat instead of strcpy/strcat; in modern languages (Rust, Go), bounds checking is enforced at compile or runtime.</li>\n              <li>Heap overflow vs stack overflow: stack overflows target return addresses; heap overflows corrupt dynamically allocated structures, often overwriting function pointers.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Application Security",
+        "Memory Vulnerabilities",
+        "Exploitation"
+      ]
+    },
+    {
+      "id": 21,
+      "categoryRef": "cat-threats-vulns",
+      "difficulty": "basic",
+      "title": "Social Engineering Pretexting",
+      "scenario": "An attacker calls the help desk claiming to be a new executive assistant locked out of her manager's account. She provides the manager's employee ID and explains the manager is traveling and urgently needs access restored.",
+      "questionText": "Which social engineering technique involves fabricating a believable scenario or identity to manipulate the target into taking an action?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Pretexting"
+        },
+        {
+          "letter": "B",
+          "text": "Quid pro quo"
+        },
+        {
+          "letter": "C",
+          "text": "Tailgating"
+        },
+        {
+          "letter": "D",
+          "text": "Baiting"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "The attacker invents a plausible backstory — a fabricated context (pretext) that makes the request seem legitimate."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Pretexting involves creating a fabricated scenario (pretext) to manipulate a target into taking an action or revealing information. The attacker in this case invented a believable identity and urgent situation to bypass normal verification procedures. Tailgating (piggybacking) is physically following an authorized person through a secured door. Baiting leaves infected physical media (USB drives) or enticing downloads for victims to find. Quid pro quo offers something of value (fake IT support, prizes) in exchange for information or access. Pretexting is the foundation of most vishing (voice phishing) attacks."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Vishing (voice phishing): pretexting conducted over the phone — attackers impersonate IT support, IRS agents, bank fraud departments, or vendors.</li>\n              <li>Countermeasures: callback verification (hang up, call the official number independently), out-of-band identity confirmation, and strict change procedures for privileged account resets.</li>\n              <li>The attack in this scenario targets help desk staff who are trained to be helpful — exploiting empathy and urgency is the core social engineering mechanism.</li>\n              <li>Security awareness training simulations: red teams regularly conduct pretexting exercises against help desks to measure and improve employee resistance.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Social Engineering",
+        "Pretexting",
+        "Human Factors"
+      ]
+    },
+    {
+      "id": 22,
+      "categoryRef": "cat-threats-vulns",
+      "difficulty": "intermediate",
+      "title": "Cross-Site Scripting Attack",
+      "scenario": "A forum website stores user comments without sanitizing them. An attacker posts a comment containing a script tag that steals cookies. Every user who loads the forum page executes the malicious script in their browser.",
+      "questionText": "Which vulnerability class allows an attacker to inject malicious scripts into web pages viewed by other users?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "XML External Entity (XXE)"
+        },
+        {
+          "letter": "B",
+          "text": "SQL Injection"
+        },
+        {
+          "letter": "C",
+          "text": "Cross-Site Request Forgery"
+        },
+        {
+          "letter": "D",
+          "text": "Cross-Site Scripting (XSS)"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "The malicious payload executes in other users' browsers — the web server is the delivery mechanism, but the victim's browser is where the attack runs."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Cross-Site Scripting (XSS) allows attackers to inject malicious scripts into content delivered by a trusted website. In stored (persistent) XSS, the script is saved in the database and executes for every user who loads the page. SQL injection targets the database layer, not the browser. CSRF tricks an authenticated user into submitting an unintended request — it does not inject scripts. XXE attacks exploit XML parsers that process external entity references to read files or trigger server-side requests. XSS is in the OWASP Top 10 and is mitigated by output encoding, Content Security Policy (CSP), and input validation."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>XSS types: Stored (persistent) — script in database served to all users; Reflected — script in URL parameter echoed back; DOM-based — JavaScript manipulates the DOM with attacker-controlled data.</li>\n              <li>Content Security Policy (CSP): HTTP header that restricts which script sources browsers will execute — strong CSP can prevent XSS execution even when injection occurs.</li>\n              <li>HttpOnly cookie flag: prevents JavaScript from reading session cookies, limiting XSS cookie theft impact.</li>\n              <li>Output encoding: HTML-encoding user-supplied data before rendering prevents the browser from interpreting it as executable script — the primary developer-side defense.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Web Security",
+        "XSS",
+        "OWASP"
+      ]
+    },
+    {
+      "id": 23,
+      "categoryRef": "cat-threats-vulns",
+      "difficulty": "advanced",
+      "title": "Threat Intelligence Feed Types",
+      "scenario": "A SOC team subscribes to an automated feed that delivers machine-readable indicators (IP addresses, domains, file hashes) in a standardized format directly into their SIEM for automated blocking decisions.",
+      "questionText": "Which threat intelligence sharing standard is designed to express and exchange cyber threat information in a machine-readable format?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "STIX/TAXII"
+        },
+        {
+          "letter": "B",
+          "text": "MITRE ATT&CK"
+        },
+        {
+          "letter": "C",
+          "text": "CVSS"
+        },
+        {
+          "letter": "D",
+          "text": "NIST CSF"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "One standard describes threat data structure; the companion standard defines how to transport it — together they enable automated machine-to-machine threat sharing."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "STIX (Structured Threat Information eXpression) is the language for describing cyber threat intelligence in a standardized, machine-readable JSON format. TAXII (Trusted Automated eXchange of Intelligence Information) is the transport protocol used to share STIX content between organizations and platforms. CVSS (Common Vulnerability Scoring System) scores vulnerability severity but does not exchange threat intelligence. MITRE ATT&amp;CK is a framework of adversary tactics and techniques — descriptive, not a machine-readable exchange format. NIST CSF is a risk management framework, not a threat sharing standard."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>STIX objects: Indicators (file hashes, IPs), Threat Actors, Campaigns, Attack Patterns, Malware, Vulnerabilities, Relationships — rich graph-based intelligence model.</li>\n              <li>TAXII servers expose collections or channels; clients poll or subscribe to receive STIX bundles — ISACs (Information Sharing and Analysis Centers) use TAXII for sector-specific sharing.</li>\n              <li>MITRE ATT&amp;CK: a publicly available knowledge base of adversary TTPs (Tactics, Techniques, Procedures) mapped to real-world threat groups — used for purple team exercises and detection engineering.</li>\n              <li>OpenCTI and MISP are open-source threat intelligence platforms that ingest STIX/TAXII feeds and correlate them with local observations.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Threat Intelligence",
+        "STIX TAXII",
+        "SOC"
+      ]
+    },
+    {
+      "id": 24,
+      "categoryRef": "cat-threats-vulns",
+      "difficulty": "intermediate",
+      "title": "Patch Management Priority",
+      "scenario": "A vulnerability scanner reports 200 findings across the enterprise. The security team must triage them for remediation. Three findings are rated Critical (CVSS 9.8+), 40 are High, and the rest are Medium or Low.",
+      "questionText": "Which factor should most heavily influence which vulnerabilities the team addresses first?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "The cost of the patch to deploy"
+        },
+        {
+          "letter": "B",
+          "text": "CVSS score combined with whether the vulnerability is actively exploited in the wild"
+        },
+        {
+          "letter": "C",
+          "text": "The age of the vulnerability — oldest CVEs first"
+        },
+        {
+          "letter": "D",
+          "text": "The alphabetical order of the affected application name"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "A high CVSS score means potential severity — but active exploitation in the wild means the threat is real and immediate, not theoretical."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Effective vulnerability prioritization combines the CVSS severity score with threat intelligence about active exploitation. A CVSS 7.5 vulnerability being actively exploited by ransomware groups is more urgent than a CVSS 9.0 vulnerability with no known exploits. CISA's KEV catalog specifically lists vulnerabilities known to be exploited in the wild. Alphabetical order, age, and patch cost are not risk-based criteria. Risk-based vulnerability management (RBVM) also factors in asset criticality — a Critical CVE on an internet-facing authentication server outranks the same CVE on an isolated test system."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>CVSS v3.1 vs CVSS v4.0: v4.0 (released 2023) introduces finer granularity with supplemental metrics and separates base, threat, and environmental scores more explicitly.</li>\n              <li>EPSS (Exploit Prediction Scoring System): a probability model predicting likelihood of exploitation within 30 days — complements CVSS for prioritization decisions.</li>\n              <li>CISA KEV mandate: FCEB agencies must remediate KEV-listed vulnerabilities within 15 days (critical) or 25 days (high) of listing — a model many enterprises adopt.</li>\n              <li>Asset criticality weighting: multiply CVSS by asset risk score — a 7.0 on a PCI-scoped card processing server may outrank a 9.8 on a development workstation.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Vulnerability Management",
+        "Patch Management",
+        "Risk Prioritization"
+      ]
+    },
+    {
+      "id": 25,
+      "categoryRef": "cat-security-arch",
+      "difficulty": "basic",
+      "title": "DMZ Network Design",
+      "scenario": "An organization runs a public-facing web server that must be accessible from the internet but should not have direct access to the internal corporate network or database servers.",
+      "questionText": "Which network architecture places publicly accessible servers in a segregated zone between the internet and the internal network?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Network Address Translation (NAT)"
+        },
+        {
+          "letter": "B",
+          "text": "Air gap"
+        },
+        {
+          "letter": "C",
+          "text": "VLAN trunking"
+        },
+        {
+          "letter": "D",
+          "text": "Demilitarized Zone (DMZ)"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "The military term refers to a buffer zone between opposing territories — in networking it places public servers where they can be reached from the internet without exposing the internal network."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "A DMZ (Demilitarized Zone) is a network segment that sits between the internet-facing firewall and the internal network, hosting publicly accessible services like web servers, email gateways, and DNS. It provides a security buffer: if a DMZ server is compromised, the attacker faces another firewall before reaching internal resources. VLAN trunking carries multiple VLANs over a single link but does not create a security boundary by itself. NAT translates IP addresses but does not segment security zones. An air gap completely disconnects a network from all external connectivity — the opposite of hosting public services."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Three-legged firewall DMZ: a single firewall with three interfaces — internet, DMZ, and internal — simpler but the firewall is a single point of failure.</li>\n              <li>Dual-firewall DMZ: two separate firewalls flank the DMZ, ideally from different vendors — more resilient and the preferred design for high-security environments.</li>\n              <li>Common DMZ residents: reverse proxies, load balancers, web application firewalls (WAFs), SMTP gateways, public DNS resolvers, and jump servers.</li>\n              <li>Internal-to-DMZ traffic: DMZ servers should initiate as few connections to internal hosts as possible; database connections from DMZ web servers to internal DB servers are a common attack path.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Network Segmentation",
+        "DMZ",
+        "Firewall"
+      ]
+    },
+    {
+      "id": 26,
+      "categoryRef": "cat-security-arch",
+      "difficulty": "intermediate",
+      "title": "Zero Trust Architecture Principles",
+      "scenario": "A company is redesigning its network access model after a breach where an attacker moved laterally from a compromised laptop to sensitive servers undetected because all internal traffic was implicitly trusted.",
+      "questionText": "Which core principle of Zero Trust Architecture addresses implicit trust in internal networks by requiring continuous verification of every request?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Security through obscurity"
+        },
+        {
+          "letter": "B",
+          "text": "Never trust, always verify"
+        },
+        {
+          "letter": "C",
+          "text": "Defense in depth"
+        },
+        {
+          "letter": "D",
+          "text": "Implicit deny all"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Zero Trust rejects the assumption that anything inside the network perimeter is safe — every user, device, and request must be continuously verified regardless of location."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "\"Never trust, always verify\" is the foundational principle of Zero Trust Architecture (ZTA), as formalized in NIST SP 800-207. It eliminates the assumption that internal network location confers trust. Every access request — regardless of source — must be authenticated, authorized, and continuously validated. Defense in depth is a layered security strategy but does not specifically address implicit internal trust. Security through obscurity is an anti-pattern. Implicit deny all is a firewall rule concept that is one implementation mechanism of Zero Trust but is not the overarching principle."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>NIST SP 800-207 defines Zero Trust via seven tenets: resource-centric access, per-request authentication, dynamic policy, device health assessment, behavior monitoring, strict least privilege, and continuous improvement.</li>\n              <li>Zero Trust pillars: Identity, Device, Network, Application, Data — each pillar has maturity levels from traditional to optimal.</li>\n              <li>Microsegmentation: a key ZTA implementation technique that creates fine-grained security zones per workload, limiting east-west (lateral) movement even within the same data center.</li>\n              <li>Software-Defined Perimeter (SDP): hides resources entirely until a device passes identity and posture checks — makes resources invisible to unauthenticated users.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Zero Trust",
+        "Network Architecture",
+        "Access Control"
+      ]
+    },
+    {
+      "id": 27,
+      "categoryRef": "cat-security-arch",
+      "difficulty": "intermediate",
+      "title": "VPN Tunnel Types",
+      "scenario": "A remote employee uses a company-provided client to connect to headquarters. All traffic from their laptop — including web browsing — is routed through the corporate network. A colleague uses a different mode where only traffic to internal resources routes through the VPN.",
+      "questionText": "Which VPN mode routes all client traffic through the corporate tunnel, including general internet browsing?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Site-to-site VPN"
+        },
+        {
+          "letter": "B",
+          "text": "SSL portal VPN"
+        },
+        {
+          "letter": "C",
+          "text": "Full tunnel (full-split disabled)"
+        },
+        {
+          "letter": "D",
+          "text": "Split tunneling"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "When all traffic goes through the corporate network — not just internal resources — the VPN is operating in full-tunnel mode, giving the organization visibility over all user traffic."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Full tunnel VPN routes all traffic from the client through the corporate network, including internet browsing. This gives the organization visibility into and control over all employee traffic, and subjects it to corporate security controls. Split tunneling routes only corporate-bound traffic through the VPN and sends internet traffic directly, reducing bandwidth load on corporate infrastructure but limiting visibility. Site-to-site VPN connects two networks (not individual clients). SSL portal VPN provides browser-based access to specific applications, not full network-layer tunneling."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Security tradeoff: full tunnel provides control but increases VPN gateway load and latency; split tunneling reduces load but allows unmonitored internet activity.</li>\n              <li>Split tunneling risk: malware on the user's device can communicate directly to the internet without passing through corporate security controls.</li>\n              <li>Always-on VPN: enforces full-tunnel at the OS level so the connection is established before login and persists — used in highly regulated environments and zero-trust posture enforcement.</li>\n              <li>Common VPN protocols: IPsec (IKEv2), OpenVPN, WireGuard — Security+ tests IPsec modes (tunnel vs transport) and the role of IKE in key exchange.</li></ul>"
+        }
+      ],
+      "tags": [
+        "VPN",
+        "Remote Access",
+        "Network Architecture"
+      ]
+    },
+    {
+      "id": 28,
+      "categoryRef": "cat-security-arch",
+      "difficulty": "intermediate",
+      "title": "Cloud Shared Responsibility",
+      "scenario": "A company hosts a web application on an IaaS platform. The cloud provider patches the hypervisor and physical hardware. A breach occurs because the company failed to patch the OS on their virtual machines.",
+      "questionText": "Under the cloud shared responsibility model, who is responsible for patching the operating system on IaaS virtual machines?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "A third-party managed service provider by default"
+        },
+        {
+          "letter": "B",
+          "text": "Responsibility is shared equally between provider and customer"
+        },
+        {
+          "letter": "C",
+          "text": "The cloud service provider"
+        },
+        {
+          "letter": "D",
+          "text": "The customer"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "In IaaS, the provider manages everything up to and including the hypervisor; the customer owns everything from the OS up — including patching."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "In the IaaS (Infrastructure as a Service) model, the cloud provider is responsible for physical hardware, networking, hypervisor, and data center facilities. The customer is responsible for the guest operating system, middleware, runtime, applications, and data. OS patching falls squarely on the customer. In PaaS, the provider also manages the OS and runtime. In SaaS, the provider manages everything except data and user access configurations. The shared responsibility model is tested heavily on Security+ and varies by service model."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>IaaS customer responsibilities: OS patching, application security, identity management, data encryption, network security group configuration, backup.</li>\n              <li>PaaS shifts OS/runtime responsibility to the provider — customers focus on application code and data.</li>\n              <li>SaaS responsibility: provider manages the full stack; customer owns data classification, user provisioning, and access controls (e.g., who has admin rights in Salesforce).</li>\n              <li>Cloud Security Posture Management (CSPM): tools that continuously audit cloud configurations against the shared responsibility model and compliance frameworks — flag misconfigurations that customers are responsible for.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Cloud Security",
+        "Shared Responsibility",
+        "IaaS"
+      ]
+    },
+    {
+      "id": 29,
+      "categoryRef": "cat-security-arch",
+      "difficulty": "intermediate",
+      "title": "Firewall Rule Order",
+      "scenario": "A network administrator is adding a rule to allow SSH from a management subnet to all servers. The firewall processes rules top-to-bottom and has an existing \"deny all\" rule as the first entry.",
+      "questionText": "If the \"deny all\" rule is at the top of the ruleset and the \"allow SSH from management\" rule is below it, what will happen to SSH traffic from the management subnet?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "SSH traffic will be denied because the deny-all rule matches first"
+        },
+        {
+          "letter": "B",
+          "text": "SSH traffic will be allowed because explicit allows override deny-all"
+        },
+        {
+          "letter": "C",
+          "text": "The firewall will prompt the administrator before applying the rule"
+        },
+        {
+          "letter": "D",
+          "text": "SSH traffic will be allowed because SSH is a management protocol"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Firewalls apply rules in sequential order and stop at the first match — a deny-all rule at the top catches everything before any allow rules below it are evaluated."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Firewalls evaluate rules sequentially from top to bottom and apply the first matching rule. If \"deny all\" is the first rule, all traffic matches it and is denied — no subsequent rules are ever evaluated. The \"allow SSH\" rule below it will never be reached. The correct placement is to put specific allow rules before broad deny rules. Firewalls do not prompt administrators in real time. Explicit allows do not automatically take precedence over deny-all unless the firewall platform implements a different processing model (which is not the standard behavior)."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Implicit deny: most firewalls have a built-in implicit deny at the bottom — any traffic not matched by an explicit allow is dropped. This is the recommended pattern: allow rules first, implicit deny last.</li>\n              <li>Stateful vs stateless firewalls: stateful firewalls track connection state and allow return traffic automatically; stateless require explicit rules for both directions.</li>\n              <li>NGFW (Next-Generation Firewall): adds application-layer inspection, user identity awareness, IPS, and threat intelligence to traditional ACL-based firewalls.</li>\n              <li>Rule base hygiene: periodic reviews to remove shadowed rules (rules that can never be reached because a prior rule matches all the same traffic) are a common firewall audit finding.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Firewall",
+        "Network Security",
+        "Access Control Lists"
+      ]
+    },
+    {
+      "id": 30,
+      "categoryRef": "cat-security-arch",
+      "difficulty": "advanced",
+      "title": "Microsegmentation Implementation",
+      "scenario": "A cloud-native organization runs hundreds of containerized microservices in a Kubernetes cluster. The security team wants to enforce a policy that each service can only communicate with the specific other services it legitimately needs to reach.",
+      "questionText": "Which approach implements least-privilege network access between workloads within the same cluster?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Enabling HTTPS on all service endpoints"
+        },
+        {
+          "letter": "B",
+          "text": "Using Kubernetes Network Policies to define allowed pod-to-pod communication paths"
+        },
+        {
+          "letter": "C",
+          "text": "Deploying a VPN gateway between each microservice pair"
+        },
+        {
+          "letter": "D",
+          "text": "Placing all containers in a single VLAN with a perimeter firewall"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "HTTPS encrypts traffic but does not restrict which services can reach which — network policies define explicit allow rules for each communication path between workloads."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Kubernetes Network Policies are the native mechanism for microsegmentation within a cluster. They define which pods can communicate with which other pods based on labels, namespaces, and ports. By default, Kubernetes allows all pod-to-pod communication — Network Policies change this to explicit allow only. A single VLAN with a perimeter firewall provides no east-west control within the cluster. HTTPS encrypts but does not enforce which services can connect to which. A VPN per service pair is operationally infeasible at scale and not a standard approach."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Network Policy requires a CNI plugin that enforces them (e.g., Calico, Cilium, Weave Net) — the default Kubernetes CNI does not enforce policies.</li>\n              <li>Service mesh (Istio, Linkerd): adds mTLS between services, fine-grained authorization policies, and observability on top of what Network Policies provide.</li>\n              <li>Default deny pattern: create a \"deny all ingress/egress\" policy per namespace, then add explicit allow policies — mirrors the firewall implicit-deny best practice.</li>\n              <li>eBPF-based CNIs (Cilium): enforce policy at the kernel level with very low overhead and can apply Layer 7 (HTTP method, path) policies, not just L3/L4.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Microsegmentation",
+        "Cloud Security",
+        "Zero Trust"
+      ]
+    },
+    {
+      "id": 31,
+      "categoryRef": "cat-security-arch",
+      "difficulty": "intermediate",
+      "title": "Network Segmentation with VLANs",
+      "scenario": "A university wants to prevent students on the campus Wi-Fi from accessing administrative servers that hold faculty records and payroll data. Both groups share the same physical switch infrastructure.",
+      "questionText": "Which technology logically separates network traffic between students and administrative systems on shared physical infrastructure?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Virtual Local Area Networks (VLANs)"
+        },
+        {
+          "letter": "B",
+          "text": "Port mirroring"
+        },
+        {
+          "letter": "C",
+          "text": "Subnetting alone"
+        },
+        {
+          "letter": "D",
+          "text": "Network Address Translation"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "VLANs create logical broadcast domains on shared physical switches — traffic between VLANs requires a router or Layer 3 switch enforcing access rules."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "VLANs (Virtual Local Area Networks) logically segment network traffic on shared physical switches using tags (IEEE 802.1Q). Devices in different VLANs cannot communicate without routing through a Layer 3 device, where access control lists can enforce policies. Subnetting divides IP address space but does not enforce traffic isolation on shared Layer 2 infrastructure without VLANs. NAT translates addresses but does not provide isolation. Port mirroring copies traffic to a monitoring port for analysis — it does not restrict traffic."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>802.1Q VLAN tagging: a 4-byte tag inserted in the Ethernet frame header identifies the VLAN — trunk ports carry multiple VLANs; access ports carry one.</li>\n              <li>Inter-VLAN routing: required for VLANs to communicate — implemented via a router-on-a-stick (subinterfaces) or a Layer 3 switch with SVIs (Switched Virtual Interfaces).</li>\n              <li>VLAN hopping attack: an attacker sends 802.1Q-tagged frames to exploit misconfigured trunk ports and gain access to other VLANs — mitigated by disabling auto-trunk negotiation (DTP) and using dedicated native VLANs.</li>\n              <li>Private VLANs (PVLANs): further isolate ports within a VLAN from each other — commonly used in hosting environments to prevent tenant-to-tenant lateral movement.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Network Segmentation",
+        "VLAN",
+        "Layer 2 Security"
+      ]
+    },
+    {
+      "id": 32,
+      "categoryRef": "cat-security-arch",
+      "difficulty": "intermediate",
+      "title": "Load Balancer Security Role",
+      "scenario": "An e-commerce platform deploys a load balancer in front of its web tier. The security architect notes that the load balancer also terminates TLS, inspects HTTP headers, and blocks requests matching known attack signatures.",
+      "questionText": "When a load balancer terminates TLS and inspects application-layer content to block malicious requests, it is functioning as which additional security component?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Intrusion Detection System (IDS)"
+        },
+        {
+          "letter": "B",
+          "text": "Data Loss Prevention (DLP)"
+        },
+        {
+          "letter": "C",
+          "text": "Web Application Firewall (WAF)"
+        },
+        {
+          "letter": "D",
+          "text": "Network Access Control (NAC)"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "TLS termination plus HTTP-layer inspection and attack signature blocking is the definition of a Web Application Firewall — whether it is a standalone appliance or a feature of a load balancer."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "A Web Application Firewall (WAF) inspects HTTP/HTTPS traffic at Layer 7, blocking requests that match attack signatures for SQLi, XSS, CSRF, and other web application attacks. Many load balancers include WAF functionality after TLS offload. An IDS passively monitors and alerts but does not block inline. DLP monitors and prevents sensitive data exfiltration, not inbound attacks. NAC controls which devices are permitted to connect to the network based on posture checks, not application-layer traffic inspection."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>WAF deployment modes: inline (blocks), out-of-band/passive (alerts only), reverse proxy (intercepts all traffic before forwarding to origin).</li>\n              <li>OWASP ModSecurity Core Rule Set (CRS): the most widely used open-source WAF rule set, covering OWASP Top 10 attack categories.</li>\n              <li>WAF bypass techniques: encoding obfuscation, HTTP parameter pollution, chunked encoding — WAFs require tuning to avoid both false positives and evasion.</li>\n              <li>Cloud WAF services: AWS WAF, Azure WAF (Front Door/App Gateway), Cloudflare WAF — all terminate TLS and inspect Layer 7 traffic before forwarding to origin servers.</li></ul>"
+        }
+      ],
+      "tags": [
+        "WAF",
+        "Web Security",
+        "Network Architecture"
+      ]
+    },
+    {
+      "id": 33,
+      "categoryRef": "cat-security-arch",
+      "difficulty": "advanced",
+      "title": "Software-Defined Networking Security",
+      "scenario": "A data center is transitioning to a software-defined networking architecture. A security team member notes that the centralized SDN controller, if compromised, would give an attacker control over all network flows.",
+      "questionText": "The centralized SDN controller represents which type of architectural concern in a software-defined network?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Single point of failure and high-value attack target"
+        },
+        {
+          "letter": "B",
+          "text": "Lack of network segmentation"
+        },
+        {
+          "letter": "C",
+          "text": "Separation of duties violation"
+        },
+        {
+          "letter": "D",
+          "text": "Insufficient logging capability"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Centralizing control increases management efficiency but concentrates risk — one compromise grants an attacker influence over the entire network's traffic flows."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "The SDN controller is a single point of failure and a high-value attack target. Because it programs all forwarding rules in the data plane, a compromised controller can redirect, inspect, or drop any traffic in the network. This is not a separation of duties violation — it is an availability and confidentiality risk from centralization. While SDN improves agility and enables fine-grained segmentation, it demands the controller itself be hardened, highly available (clustered), and access-restricted. Security teams must treat the SDN controller with the same rigor as a CA or identity provider."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>SDN layers: Data plane (switches/routers forwarding packets), Control plane (SDN controller setting forwarding rules), Management plane (operator interface).</li>\n              <li>Controller hardening: role-based admin access, MFA, out-of-band management network, TLS-encrypted southbound API (OpenFlow), audit logging of all policy changes.</li>\n              <li>SDN security benefits: microsegmentation at scale, automated policy enforcement, rapid incident response (quarantine a compromised host by updating flow rules instantly).</li>\n              <li>Intent-based networking (IBN): extends SDN with AI-driven policy — Cisco DNA Center and similar platforms translate business intent into network configurations automatically.</li></ul>"
+        }
+      ],
+      "tags": [
+        "SDN",
+        "Network Architecture",
+        "Security Design"
+      ]
+    },
+    {
+      "id": 34,
+      "categoryRef": "cat-security-arch",
+      "difficulty": "intermediate",
+      "title": "Secure DNS Resolution",
+      "scenario": "An organization wants to prevent employees' DNS queries from being intercepted or modified in transit and also wants to ensure that DNS responses are cryptographically validated as coming from the authoritative source.",
+      "questionText": "Which two DNS security technologies address DNS-in-transit encryption and DNS response integrity validation respectively?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "SPF for encryption and DMARC for integrity"
+        },
+        {
+          "letter": "B",
+          "text": "DNSSEC for encryption and DoT (DNS over TLS) for integrity"
+        },
+        {
+          "letter": "C",
+          "text": "DoH (DNS over HTTPS) for encryption and DNSSEC for integrity validation"
+        },
+        {
+          "letter": "D",
+          "text": "DoH for both encryption and integrity validation"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Encrypting the query in transit and validating the answer's digital signature are two separate problems solved by two separate technologies."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "DNS over HTTPS (DoH) and DNS over TLS (DoT) encrypt DNS queries in transit, preventing eavesdropping and on-path manipulation. DNSSEC (DNS Security Extensions) cryptographically signs DNS records so resolvers can verify responses came from the authoritative source and were not modified — it does not encrypt the query. SPF and DMARC are email authentication mechanisms unrelated to DNS query security. The correct pairing is DoH/DoT for transport encryption plus DNSSEC for response integrity."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>DoH uses TCP port 443 (blends with HTTPS traffic); DoT uses TCP port 853 — DoH is harder for corporate proxies to inspect and control.</li>\n              <li>DNSSEC chain of trust: root zone signs TLD zones, TLD zones sign domain zones — a broken chain (missing DS record) causes validation failures.</li>\n              <li>DNSSEC limitation: validates that the answer is authentic but does not prevent an authoritative server from serving a legitimate but incorrect record if the zone is misconfigured.</li>\n              <li>Enterprise concern with DoH: it can bypass corporate DNS sinkholes and content filters — organizations often block DoH endpoints to maintain visibility and control.</li></ul>"
+        }
+      ],
+      "tags": [
+        "DNS Security",
+        "DNSSEC",
+        "Encryption"
+      ]
+    },
+    {
+      "id": 35,
+      "categoryRef": "cat-security-ops",
+      "difficulty": "basic",
+      "title": "SIEM Log Correlation",
+      "scenario": "A SOC analyst notices that a single user account generated 500 failed login attempts across 15 different servers within a 10-minute window, followed by a successful login from an unusual geographic location.",
+      "questionText": "Which security tool is most effective for correlating events from multiple systems to detect this type of attack pattern?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Security Information and Event Management (SIEM)"
+        },
+        {
+          "letter": "B",
+          "text": "Antivirus software"
+        },
+        {
+          "letter": "C",
+          "text": "Data Loss Prevention (DLP)"
+        },
+        {
+          "letter": "D",
+          "text": "Vulnerability scanner"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "The attack spans 15 systems and 10 minutes — no single-system tool can see the full pattern. You need a platform that ingests logs from everywhere and correlates them."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "A SIEM (Security Information and Event Management) system aggregates logs and events from across the environment, normalizes them, and applies correlation rules to detect patterns that span multiple systems and time windows. The pattern here — distributed failed logins followed by a successful authentication from a new location — is a classic credential stuffing indicator that a SIEM correlation rule would flag. Antivirus operates on individual endpoints. DLP monitors data movement. Vulnerability scanners identify weaknesses, not active attack patterns in logs."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>SIEM components: log aggregation, normalization (parsing diverse formats), correlation engine (rules and ML), alerting, dashboards, and long-term log retention for forensics.</li>\n              <li>SOAR (Security Orchestration, Automation, and Response): integrates with SIEM to automatically respond to alerts — isolating a compromised endpoint, blocking an IP, or creating a ticket without human intervention.</li>\n              <li>Common SIEM correlation rules: failed login threshold, login from impossible geography (two logins from different countries within minutes), privilege escalation, and mass file access.</li>\n              <li>Popular SIEMs: Splunk, Microsoft Sentinel, IBM QRadar, Elastic SIEM — Security+ tests the function, not specific vendor products.</li></ul>"
+        }
+      ],
+      "tags": [
+        "SIEM",
+        "Log Analysis",
+        "SOC"
+      ]
+    },
+    {
+      "id": 36,
+      "categoryRef": "cat-security-ops",
+      "difficulty": "intermediate",
+      "title": "Incident Response Phases",
+      "scenario": "A healthcare organization detects ransomware on three servers at 2 AM. The on-call engineer isolates the affected servers from the network, notifies the incident response team, and begins collecting memory dumps and logs before reimaging.",
+      "questionText": "Isolating the affected servers from the network corresponds to which incident response phase?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Identification"
+        },
+        {
+          "letter": "B",
+          "text": "Containment"
+        },
+        {
+          "letter": "C",
+          "text": "Recovery"
+        },
+        {
+          "letter": "D",
+          "text": "Eradication"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "After confirming an incident, the immediate priority is limiting the blast radius — stopping the spread before cleaning up or restoring systems."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Containment is the phase where the spread of an incident is stopped by isolating affected systems, blocking malicious network paths, or disabling compromised accounts. Network isolation of infected servers is textbook containment. Identification is detecting and confirming the incident occurred. Eradication removes the malware, closes vulnerabilities, and cleans affected systems. Recovery restores systems to normal operation and monitors for recurrence. The NIST SP 800-61 IR lifecycle is: Preparation → Detection and Analysis → Containment, Eradication, and Recovery → Post-Incident Activity."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Short-term vs long-term containment: short-term isolates immediately (network ACL, VLAN change); long-term prepares clean systems in parallel before the final cutover.</li>\n              <li>Forensic preservation before containment action: memory dumps and log collection before isolation preserves volatile evidence that would be lost on a power cycle or network change.</li>\n              <li>NIST SP 800-61r2: the authoritative IR guide — defines the four-phase lifecycle and specific tasks within each phase. Security+ references this standard directly.</li>\n              <li>Chain of custody: forensic evidence collected during IR must be documented and handled to preserve admissibility — hash files on collection, log every access.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Incident Response",
+        "NIST",
+        "Forensics"
+      ]
+    },
+    {
+      "id": 37,
+      "categoryRef": "cat-security-ops",
+      "difficulty": "intermediate",
+      "title": "Digital Forensics Order of Volatility",
+      "scenario": "A forensic investigator arrives at a powered-on workstation suspected of being used in a data exfiltration incident. The investigator must decide the order of evidence collection to preserve the most valuable and perishable data first.",
+      "questionText": "According to the order of volatility, which evidence source should be collected FIRST?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Optical disc images"
+        },
+        {
+          "letter": "B",
+          "text": "Backup tape archives"
+        },
+        {
+          "letter": "C",
+          "text": "Hard drive contents"
+        },
+        {
+          "letter": "D",
+          "text": "RAM (system memory)"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Volatile data disappears when power is removed — RAM contents vanish the moment the system is shut down, making it the highest priority for live acquisition."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "The order of volatility (from most to least volatile) guides forensic evidence collection: CPU registers and cache → RAM → swap/pagefile → network state → running processes → disk → optical media → backup tapes. RAM is collected first because it contains running processes, decryption keys, network connections, and malware artifacts that disappear on shutdown. Hard drives, optical discs, and backup tapes are non-volatile and can be collected later without data loss from delay."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Live forensic tools for RAM acquisition: WinPmem, DumpIt (Windows), LiME kernel module (Linux) — they dump physical memory to a file while the system is running.</li>\n              <li>Memory analysis yields: running processes (including hidden ones), open network connections, loaded kernel modules, encryption keys, browser history, and malware injected into legitimate processes.</li>\n              <li>Write blockers: hardware devices that prevent forensic tools from writing to disk during acquisition, preserving evidence integrity and supporting chain of custody.</li>\n              <li>RFC 3227 (\"Guidelines for Evidence Collection and Archiving\"): the foundational document defining the order of volatility and evidence handling principles referenced by Security+.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Digital Forensics",
+        "Incident Response",
+        "Evidence Collection"
+      ]
+    },
+    {
+      "id": 38,
+      "categoryRef": "cat-security-ops",
+      "difficulty": "intermediate",
+      "title": "Identity and Access Management",
+      "scenario": "A large enterprise allows employees to use their corporate Active Directory credentials to log into cloud SaaS applications like Salesforce and ServiceNow without entering a separate password for each application.",
+      "questionText": "Which identity federation standard enables users to authenticate once with their corporate identity provider and access multiple applications without re-authenticating?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "RADIUS"
+        },
+        {
+          "letter": "B",
+          "text": "Kerberos ticket granting only"
+        },
+        {
+          "letter": "C",
+          "text": "SAML (Security Assertion Markup Language)"
+        },
+        {
+          "letter": "D",
+          "text": "LDAP directory binding"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "The key requirement is cross-domain SSO to cloud SaaS applications — this requires a federation standard that passes authentication assertions between a corporate IdP and cloud service providers."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "SAML (Security Assertion Markup Language) is an XML-based federation standard that enables Single Sign-On (SSO) across organizational boundaries. The corporate Active Directory (via ADFS or Azure AD) acts as the Identity Provider (IdP); Salesforce and ServiceNow are the Service Providers (SP). SAML assertions contain authentication and attribute statements. RADIUS is for network device authentication, not web SSO. Kerberos provides SSO within a single domain/realm but does not natively federate to cloud SaaS. LDAP is a directory access protocol, not a federation mechanism."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>SAML 2.0 flow: SP-initiated (user goes to app first, redirected to IdP) vs IdP-initiated (user starts at IdP portal) — SP-initiated is more common and more secure.</li>\n              <li>OAuth 2.0 and OpenID Connect (OIDC): modern alternatives to SAML for web/mobile apps — OIDC is an identity layer on top of OAuth 2.0, using JSON rather than XML.</li>\n              <li>JIT (Just-in-Time) provisioning: SAML can carry attributes (department, role, email) that the SP uses to auto-create the user account on first login.</li>\n              <li>Security+ distinguishes: SAML for enterprise web SSO/federation, OAuth for delegated authorization, OIDC for authentication in modern apps, Kerberos for on-premises domain SSO.</li></ul>"
+        }
+      ],
+      "tags": [
+        "IAM",
+        "SAML",
+        "Single Sign-On"
+      ]
+    },
+    {
+      "id": 39,
+      "categoryRef": "cat-security-ops",
+      "difficulty": "intermediate",
+      "title": "Endpoint Detection and Response",
+      "scenario": "A security team deploys an agent on all endpoints that records process creation events, network connections, file writes, and registry changes. When an analyst investigates an alert, they can query six months of historical endpoint telemetry.",
+      "questionText": "Which endpoint security technology provides continuous behavioral monitoring, threat detection, and historical telemetry for investigation?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Traditional antivirus (signature-based)"
+        },
+        {
+          "letter": "B",
+          "text": "Endpoint Detection and Response (EDR)"
+        },
+        {
+          "letter": "C",
+          "text": "Host-based firewall"
+        },
+        {
+          "letter": "D",
+          "text": "Data Loss Prevention agent"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "The ability to query months of behavioral telemetry — not just block known malware signatures — is the defining capability that separates EDR from traditional antivirus."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "EDR (Endpoint Detection and Response) solutions continuously record endpoint telemetry including process events, file activity, network connections, and registry changes. This data enables both real-time detection (behavioral analytics, ML) and retrospective investigation (threat hunting, incident reconstruction). Traditional AV relies on known malware signatures and cannot detect novel threats or provide historical telemetry. A host-based firewall controls network traffic but does not record process or file behavior. DLP agents monitor data movement but do not provide broad behavioral monitoring for threat detection."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>EDR vs XDR: EDR focuses on endpoint telemetry; XDR (Extended Detection and Response) correlates endpoint, network, email, cloud, and identity telemetry in a unified platform.</li>\n              <li>Behavioral detection: EDR can detect process injection, living-off-the-land binaries (LOLBins), credential dumping (LSASS access), and lateral movement without relying on signatures.</li>\n              <li>Threat hunting: analysts proactively query EDR telemetry for IoCs and TTPs from threat intelligence, finding compromises that evaded automated alerts.</li>\n              <li>Common EDR platforms: CrowdStrike Falcon, Microsoft Defender for Endpoint, SentinelOne, Carbon Black — Security+ tests the function, not vendor products.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Endpoint Security",
+        "EDR",
+        "Threat Detection"
+      ]
+    },
+    {
+      "id": 40,
+      "categoryRef": "cat-security-ops",
+      "difficulty": "advanced",
+      "title": "Log Analysis Attack Detection",
+      "scenario": "An analyst reviews Apache web server logs and finds thousands of requests to /admin/config.php with User-Agent strings like sqlmap/1.6 and response codes alternating between 200 and 500. Normal traffic shows response codes of 200 and 304 only.",
+      "questionText": "What type of attack is most likely indicated by the automated tool User-Agent and the pattern of 200/500 response codes against an administrative endpoint?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Distributed Denial of Service (DDoS)"
+        },
+        {
+          "letter": "B",
+          "text": "Directory brute-forcing"
+        },
+        {
+          "letter": "C",
+          "text": "Cross-site scripting enumeration"
+        },
+        {
+          "letter": "D",
+          "text": "Automated SQL injection scanning"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "The User-Agent string names a well-known automated SQL injection tool — the 500 errors indicate injected payloads are causing database errors, confirming the attack vector."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "sqlmap is an open-source, widely used automated SQL injection and database takeover tool. Its User-Agent appearing in logs is a definitive indicator of automated SQLi testing. HTTP 500 errors triggered by requests to a PHP endpoint suggest injected SQL syntax is causing unhandled database exceptions — confirming the target is a dynamic database-backed page. DDoS would show extremely high request volumes with minimal variation. XSS enumeration would target JavaScript contexts and user-input fields. Directory brute-forcing would show 404 responses to sequential path guesses."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>sqlmap capabilities: automated detection, exploitation, database enumeration, data extraction, and even OS command execution via SQLi — a complete post-exploitation tool chain.</li>\n              <li>Detection signatures: sqlmap's default User-Agent is a reliable IoC; WAFs and IDS tools have built-in rules to detect and block it.</li>\n              <li>HTTP 500 as an SQLi indicator: unhandled exceptions leaking database errors in responses also provide information disclosure — error-based blind SQLi extracts data from error messages.</li>\n              <li>Log retention importance: without months of web server logs, analysts cannot reconstruct how long automated scanning preceded a successful breach or what data was accessed.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Log Analysis",
+        "SQL Injection",
+        "Attack Detection"
+      ]
+    },
+    {
+      "id": 41,
+      "categoryRef": "cat-security-ops",
+      "difficulty": "intermediate",
+      "title": "Privileged Access Management",
+      "scenario": "A bank requires that no administrator can access production database servers using their regular AD account. Instead, admins must check out a time-limited credential from a vault, which automatically rotates after each session ends.",
+      "questionText": "Which security practice is described by vaulting privileged credentials and automatically rotating them after each use?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Privileged Access Management (PAM)"
+        },
+        {
+          "letter": "B",
+          "text": "Network Access Control"
+        },
+        {
+          "letter": "C",
+          "text": "Role-Based Access Control"
+        },
+        {
+          "letter": "D",
+          "text": "Multi-factor authentication"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Vaulting, check-out workflows, session recording, and automatic rotation are the hallmark capabilities of a Privileged Access Management solution."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Privileged Access Management (PAM) solutions protect, manage, and monitor privileged accounts (admin, root, service accounts). Core PAM features include credential vaulting (storing passwords in an encrypted vault), just-in-time access (time-limited check-out), automatic password rotation after each session, and session recording for audit. MFA verifies identity but does not vault or rotate credentials. RBAC assigns permissions by role but does not manage the lifecycle of privileged credentials. NAC controls device access to the network, not privileged credential governance."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>PAM tiers: account vaulting, session management (proxy-based recording), privilege elevation (sudo/RunAs just-in-time), and secrets management (API keys, certificates).</li>\n              <li>Session recording: PAM solutions record keystrokes and screen video of privileged sessions — essential for forensic investigation and regulatory compliance (SOX, PCI DSS).</li>\n              <li>Service account management: PAM can rotate service account passwords in the vault and push updates to dependent applications automatically — eliminating hardcoded credentials.</li>\n              <li>Common PAM platforms: CyberArk, BeyondTrust, HashiCorp Vault (for secrets), Delinea (Thycotic) — Security+ tests PAM as a concept, not specific products.</li></ul>"
+        }
+      ],
+      "tags": [
+        "PAM",
+        "Privileged Access",
+        "Identity Management"
+      ]
+    },
+    {
+      "id": 42,
+      "categoryRef": "cat-security-ops",
+      "difficulty": "intermediate",
+      "title": "Data Loss Prevention Controls",
+      "scenario": "A healthcare organization wants to prevent employees from emailing patient records containing Social Security Numbers to personal email accounts. The security team needs a tool that can inspect outbound email content and block policy violations.",
+      "questionText": "Which security technology inspects content for sensitive data patterns and blocks or quarantines policy-violating transmissions?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Intrusion Prevention System (IPS)"
+        },
+        {
+          "letter": "B",
+          "text": "Data Loss Prevention (DLP)"
+        },
+        {
+          "letter": "C",
+          "text": "Web Application Firewall (WAF)"
+        },
+        {
+          "letter": "D",
+          "text": "Security Information and Event Management (SIEM)"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "This technology understands data content — it recognizes SSN patterns, credit card numbers, and PHI — and acts on policy violations at the point of egress."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Data Loss Prevention (DLP) solutions inspect content in motion (email, web uploads, file transfers), at rest (storage repositories), and at endpoint (USB, print) for sensitive data matching defined patterns (SSN format, PCI data, PHI keywords). When a match is found, DLP can block, quarantine, encrypt, or alert. An IPS blocks network-layer attack signatures but cannot inspect email content for data patterns. A WAF inspects inbound HTTP traffic for attack signatures. A SIEM correlates logs for threat detection but does not act inline to block email transmission."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>DLP deployment modes: Network DLP (inline email/web proxy), Endpoint DLP (agent on workstations), Cloud DLP (CASB integration for SaaS apps).</li>\n              <li>Data classification prerequisite: DLP is only as effective as the organization's data classification scheme — if data is not labeled, DLP cannot apply the right policy.</li>\n              <li>False positive management: overly aggressive DLP policies block legitimate business traffic — tuning requires close collaboration between security, legal, and business units.</li>\n              <li>HIPAA technical safeguard: the Security Rule requires covered entities to implement technical controls preventing unauthorized disclosure of PHI — DLP directly addresses this requirement.</li></ul>"
+        }
+      ],
+      "tags": [
+        "DLP",
+        "Data Protection",
+        "HIPAA"
+      ]
+    },
+    {
+      "id": 43,
+      "categoryRef": "cat-security-ops",
+      "difficulty": "advanced",
+      "title": "Threat Hunting Methodology",
+      "scenario": "A senior SOC analyst decides to proactively search the environment for evidence of LSASS memory dumping — a technique used to harvest credential hashes — even though no alerts have fired. They query EDR telemetry for processes accessing lsass.exe with specific access flags.",
+      "questionText": "This proactive search for threats using known attacker TTPs before an alert fires is best described as which security activity?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Threat hunting"
+        },
+        {
+          "letter": "B",
+          "text": "Penetration testing"
+        },
+        {
+          "letter": "C",
+          "text": "Vulnerability scanning"
+        },
+        {
+          "letter": "D",
+          "text": "Security auditing"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "The analyst is not waiting for alerts — they are proactively searching for attacker behaviors based on known techniques, which is the definition of threat hunting."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Threat hunting is the proactive, human-led search for threats that have evaded automated detection. Hunters form hypotheses based on threat intelligence (e.g., \"ransomware groups dump LSASS credentials during lateral movement\") and query telemetry to confirm or disprove them. Vulnerability scanning identifies weaknesses in systems before exploitation. Penetration testing simulates attacks to assess defenses. Security auditing evaluates controls against a policy or compliance standard. Threat hunting assumes that adversaries are already inside and looks for their footprints."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Hunt hypothesis frameworks: MITRE ATT&amp;CK provides a structured library of TTPs — hunters query telemetry for specific techniques like T1003.001 (LSASS Memory).</li>\n              <li>LSASS access flags: legitimate processes rarely request PROCESS_VM_READ on lsass.exe — Mimikatz and similar tools request specific access rights that EDR can detect.</li>\n              <li>Hunt outputs: successful hunts result in new detection rules added to the SIEM/EDR so the next occurrence triggers an automated alert — hunts improve detection coverage over time.</li>\n              <li>Maturity levels: ad-hoc (reactive) → structured (hypothesis-driven) → automated (ML-assisted) — most organizations aim for structured threat hunting as a regular practice.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Threat Hunting",
+        "SOC",
+        "MITRE ATT&CK"
+      ]
+    },
+    {
+      "id": 44,
+      "categoryRef": "cat-security-ops",
+      "difficulty": "intermediate",
+      "title": "Mobile Device Management Controls",
+      "scenario": "A company issues smartphones to field technicians who access customer databases on the road. The IT team needs to remotely wipe devices if they are lost, enforce screen lock PINs, and prevent installation of unapproved applications.",
+      "questionText": "Which technology platform enables centralized enforcement of security policies and remote management of mobile devices?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Virtual Desktop Infrastructure (VDI)"
+        },
+        {
+          "letter": "B",
+          "text": "Mobile Device Management (MDM)"
+        },
+        {
+          "letter": "C",
+          "text": "Network Access Control (NAC)"
+        },
+        {
+          "letter": "D",
+          "text": "Endpoint Detection and Response (EDR)"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Remote wipe, PIN enforcement, and app allowlisting on smartphones are the core capabilities of a Mobile Device Management platform, not a general endpoint tool."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Mobile Device Management (MDM) provides centralized management of mobile devices including remote wipe, configuration enforcement (PIN/passcode, encryption, screen lock timeout), app management (allowlist/blocklist), and compliance reporting. VDI provides virtual desktops from a server — the mobile device would be a thin client, not a managed endpoint for local data. NAC controls network admission but cannot push policies to mobile OS settings. EDR focuses on behavioral threat detection, not device policy enforcement. MDM platforms include Microsoft Intune, Jamf, and VMware Workspace ONE."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>MDM vs MAM vs EMM: MDM manages the full device; MAM (Mobile Application Management) manages only corporate apps on BYOD devices; EMM (Enterprise Mobility Management) encompasses both.</li>\n              <li>BYOD (Bring Your Own Device): MDM enrollment on personal devices raises privacy concerns — MAM containers separate corporate apps and data without full device control.</li>\n              <li>MDM enrollment methods: DEP/ADE (Apple/Android zero-touch enrollment) — devices auto-enroll in MDM during first power-on, eliminating manual setup for large deployments.</li>\n              <li>Remote wipe types: full device wipe (factory reset) vs selective wipe (remove only corporate data/apps) — selective wipe is appropriate for BYOD offboarding.</li></ul>"
+        }
+      ],
+      "tags": [
+        "MDM",
+        "Mobile Security",
+        "Endpoint Security"
+      ]
+    },
+    {
+      "id": 45,
+      "categoryRef": "cat-program-mgmt",
+      "difficulty": "basic",
+      "title": "Risk Assessment Terminology",
+      "scenario": "A risk analyst at an insurance company is quantifying the financial impact of a potential data breach. She estimates that a breach affecting 50,000 customer records would cost the company $4 million based on regulatory fines, legal fees, and notification costs.",
+      "questionText": "The estimated $4 million financial impact of a single breach event is best described as which risk term?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Exposure Factor (EF)"
+        },
+        {
+          "letter": "B",
+          "text": "Annual Loss Expectancy (ALE)"
+        },
+        {
+          "letter": "C",
+          "text": "Single Loss Expectancy (SLE)"
+        },
+        {
+          "letter": "D",
+          "text": "Annual Rate of Occurrence (ARO)"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "SLE represents the financial loss from a single occurrence of a risk event — before multiplying by likelihood to get annual expectancy."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Single Loss Expectancy (SLE) is the expected financial loss from one occurrence of a specific risk event. SLE = Asset Value × Exposure Factor. The $4 million breach cost is the SLE. Annual Rate of Occurrence (ARO) is how often the event is expected to occur per year. Annual Loss Expectancy (ALE) = SLE × ARO — the expected annual financial impact. Exposure Factor (EF) is the percentage of asset value lost in a single incident. Understanding these relationships is essential for quantitative risk analysis on Security+."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Formula chain: AV (Asset Value) × EF (Exposure Factor) = SLE; SLE × ARO = ALE. Memorize this chain — it appears directly on Security+ exams.</li>\n              <li>Quantitative risk analysis uses monetary values (SLE, ALE); qualitative risk analysis uses relative ratings (High/Medium/Low) based on likelihood and impact matrices.</li>\n              <li>Risk treatment options: Accept (tolerate residual risk), Avoid (discontinue the activity), Mitigate (reduce likelihood or impact), Transfer (insurance, third-party contract).</li>\n              <li>Residual risk: risk remaining after controls are applied — the difference between inherent risk and the risk reduction achieved by security controls.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Risk Management",
+        "Quantitative Risk",
+        "Security Metrics"
+      ]
+    },
+    {
+      "id": 46,
+      "categoryRef": "cat-program-mgmt",
+      "difficulty": "intermediate",
+      "title": "Compliance Framework Selection",
+      "scenario": "A retail company processes credit card transactions for millions of customers. An external auditor informs the company that they must comply with a specific security standard or risk losing their ability to accept card payments.",
+      "questionText": "Which compliance framework specifically governs the security of payment card data and is required by the major card brands?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "PCI DSS"
+        },
+        {
+          "letter": "B",
+          "text": "SOX (Sarbanes-Oxley)"
+        },
+        {
+          "letter": "C",
+          "text": "GDPR"
+        },
+        {
+          "letter": "D",
+          "text": "HIPAA"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "The clue is payment card data and card brand enforcement — one framework was created specifically by Visa, Mastercard, Amex, and Discover to protect cardholder data."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "PCI DSS (Payment Card Industry Data Security Standard) is the security standard created and enforced by the major card brands (Visa, Mastercard, American Express, Discover) through the PCI Security Standards Council. Any organization that stores, processes, or transmits cardholder data must comply. HIPAA protects health information (PHI) in the US healthcare sector. SOX governs financial reporting controls for publicly traded companies. GDPR is the EU data privacy regulation applicable to personal data of EU residents — it may also apply to the retailer but is not specific to payment card security."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>PCI DSS v4.0 (2022): updated requirements include customized implementation approach (flexible control design), targeted risk analysis, and stronger authentication requirements.</li>\n              <li>Merchant levels: Level 1 (over 6M transactions/year) requires annual QSA audit and quarterly network scans; Level 4 (under 20K) can self-assess via SAQ.</li>\n              <li>Scope reduction: the most effective PCI DSS strategy is removing cardholder data from scope entirely — using tokenization or point-to-point encryption (P2PE) to eliminate direct card data handling.</li>\n              <li>Common PCI DSS requirements on Security+: firewall between internet and cardholder data environment, no default vendor passwords, encryption of stored CHD, restrict access on need-to-know.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Compliance",
+        "PCI DSS",
+        "Regulatory Frameworks"
+      ]
+    },
+    {
+      "id": 47,
+      "categoryRef": "cat-program-mgmt",
+      "difficulty": "intermediate",
+      "title": "Business Continuity vs Disaster Recovery",
+      "scenario": "A regional bank has two separate planning documents: one describes how critical banking services will continue operating at a backup facility during a major outage, and another outlines how IT systems will be restored to normal operation after the outage ends.",
+      "questionText": "Which document describes the plan for restoring IT systems and infrastructure to normal operations after a disruptive event?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Incident Response Plan (IRP)"
+        },
+        {
+          "letter": "B",
+          "text": "Business Continuity Plan (BCP)"
+        },
+        {
+          "letter": "C",
+          "text": "Disaster Recovery Plan (DRP)"
+        },
+        {
+          "letter": "D",
+          "text": "Continuity of Operations Plan (COOP)"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "BCP keeps the business running during a disaster; DRP focuses on restoring the IT infrastructure that the business depends on — one is broader, the other is IT-specific."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "A Disaster Recovery Plan (DRP) is an IT-focused document that defines how technology infrastructure, systems, and data will be restored after a disruptive event. It includes RTOs, RPOs, backup procedures, and system restoration sequences. A Business Continuity Plan (BCP) is broader — it covers how the entire organization maintains critical business functions during and after a disaster, encompassing people, processes, and technology. An IRP addresses cybersecurity incidents specifically. COOP is a government-sector term similar to BCP but focused on maintaining essential government functions."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>RTO (Recovery Time Objective): maximum acceptable time to restore a system after failure — defines urgency and infrastructure investment.</li>\n              <li>RPO (Recovery Point Objective): maximum acceptable data loss measured in time — an RPO of 4 hours means backups must occur at least every 4 hours.</li>\n              <li>Recovery site types: Hot site (fully operational, near-zero RTO), Warm site (partially configured, hours to activate), Cold site (space and power only, days to activate).</li>\n              <li>Tabletop exercise: a discussion-based BCP/DRP test where stakeholders walk through scenarios verbally — less disruptive than a full failover test but identifies gaps in plans.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Business Continuity",
+        "Disaster Recovery",
+        "RTO RPO"
+      ]
+    },
+    {
+      "id": 48,
+      "categoryRef": "cat-program-mgmt",
+      "difficulty": "intermediate",
+      "title": "Data Privacy Regulations",
+      "scenario": "A US-based e-commerce company collects personal data from customers in Germany, France, and Italy. A customer in Berlin requests that the company delete all personal data associated with their account. The company's legal team assesses whether they are obligated to comply.",
+      "questionText": "Which data privacy regulation grants EU residents the right to request deletion of their personal data?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "HIPAA"
+        },
+        {
+          "letter": "B",
+          "text": "GDPR"
+        },
+        {
+          "letter": "C",
+          "text": "FERPA"
+        },
+        {
+          "letter": "D",
+          "text": "CCPA"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "The right to erasure (commonly called \"right to be forgotten\") is a specific provision of the EU data protection regulation that applies to any organization processing EU residents' data, regardless of where the company is located."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "GDPR (General Data Protection Regulation) is the EU's comprehensive data privacy law that grants data subjects multiple rights including the right to erasure (Article 17), right of access, right to data portability, and right to restrict processing. It applies to any organization processing personal data of EU residents, regardless of the organization's location — making the US-based company subject to GDPR. HIPAA applies to US healthcare data. CCPA (California Consumer Privacy Act) applies to California residents. FERPA applies to US student education records."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>GDPR key articles: Article 5 (data processing principles), Article 17 (right to erasure), Article 33 (72-hour breach notification to supervisory authority), Article 83 (fines up to 4% of global annual revenue).</li>\n              <li>Lawful basis for processing: GDPR requires one of six lawful bases — consent, contract, legal obligation, vital interests, public task, or legitimate interests — without which processing is unlawful.</li>\n              <li>Data Protection Officer (DPO): required for organizations that process large volumes of sensitive data or systematically monitor individuals — must be independent and report to top management.</li>\n              <li>CCPA vs GDPR: CCPA applies to California residents and has a higher threshold (businesses over $25M revenue or 50K consumers); GDPR applies to all EU residents with no revenue threshold.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Data Privacy",
+        "GDPR",
+        "Compliance"
+      ]
+    },
+    {
+      "id": 49,
+      "categoryRef": "cat-program-mgmt",
+      "difficulty": "intermediate",
+      "title": "Security Policy Hierarchy",
+      "scenario": "An organization is formalizing its security documentation. The CISO creates a high-level document stating that all sensitive data must be encrypted at rest. The IT team then writes a separate document specifying that AES-256 must be used with LUKS on Linux servers.",
+      "questionText": "How are the CISO's high-level statement and the IT team's technical specification best classified in a security policy hierarchy?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "The CISO's document is a procedure; the IT team's document is a standard"
+        },
+        {
+          "letter": "B",
+          "text": "The CISO's document is a policy; the IT team's document is a standard"
+        },
+        {
+          "letter": "C",
+          "text": "Both documents are policies at different classification levels"
+        },
+        {
+          "letter": "D",
+          "text": "The CISO's document is a guideline; the IT team's document is a procedure"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Policies state what must be done at a high level; standards specify how the policy is implemented with specific technical requirements — both are mandatory, but at different levels of specificity."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "In the security documentation hierarchy: Policies are high-level mandatory statements of intent (e.g., \"data must be encrypted at rest\"). Standards specify the mandatory technical or procedural requirements that implement the policy (e.g., \"use AES-256 with LUKS\"). Procedures are step-by-step instructions for implementing a standard. Guidelines are recommended but non-mandatory best practices. The CISO's encryption requirement is a policy; the IT specification of AES-256 and LUKS is a standard. Both are mandatory — they differ in specificity, not in enforceability."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Full hierarchy: Policy (why/what, mandatory) → Standard (specific mandatory requirements) → Procedure (how-to steps) → Guideline (recommendations, optional).</li>\n              <li>Acceptable Use Policy (AUP): a common policy type defining permitted and prohibited use of organizational systems — typically signed by employees at onboarding.</li>\n              <li>Policy exceptions: formal processes for temporary deviations from policy, with documented risk acceptance and expiration date — prevent unauthorized exceptions from becoming permanent.</li>\n              <li>Policy review cycle: policies should be reviewed at least annually and after significant organizational changes, regulatory updates, or security incidents that revealed policy gaps.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Security Policy",
+        "Governance",
+        "Documentation"
+      ]
+    },
+    {
+      "id": 50,
+      "categoryRef": "cat-program-mgmt",
+      "difficulty": "intermediate",
+      "title": "Third-Party Risk Management",
+      "scenario": "A financial services firm contracts with a cloud storage vendor to archive customer statements. The firm's security officer reviews the vendor's SOC 2 Type II report and right-to-audit clause before signing the contract.",
+      "questionText": "Which document type provides an independent auditor's assessment of a service provider's security controls over a defined period of time?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "SOC 2 Type II report"
+        },
+        {
+          "letter": "B",
+          "text": "Memorandum of Understanding (MOU)"
+        },
+        {
+          "letter": "C",
+          "text": "Penetration test executive summary"
+        },
+        {
+          "letter": "D",
+          "text": "Service Level Agreement (SLA)"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "The \"Type II\" designation means the auditor tested controls over an observation period — not just that controls existed at a point in time — providing stronger assurance about operational effectiveness."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "A SOC 2 Type II report is produced by an independent CPA firm and assesses whether a service organization's controls meet the AICPA's Trust Services Criteria (security, availability, confidentiality, processing integrity, privacy) over a defined audit period (typically 6-12 months). Type I reports assess design of controls at a point in time; Type II assesses operating effectiveness over a period. An SLA defines performance and uptime commitments. An MOU is a non-binding expression of intent between parties. A pen test executive summary reports specific vulnerability findings, not ongoing control effectiveness."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>SOC 1 vs SOC 2: SOC 1 addresses controls relevant to financial reporting (SSAE 18); SOC 2 addresses security, availability, and related Trust Service Criteria — the right choice for cloud and SaaS vendor assessment.</li>\n              <li>SOC 2 Trust Service Criteria: Security (mandatory) + optional criteria: Availability, Confidentiality, Processing Integrity, Privacy — vendors can include any combination.</li>\n              <li>Right-to-audit clause: contractual provision allowing the customer or their auditor to directly assess the vendor's controls — valuable when a SOC 2 report is not available or not sufficient for the customer's scope.</li>\n              <li>Vendor risk management lifecycle: initial due diligence (SOC 2 review) → contract (SLA, right-to-audit, data handling addenda) → ongoing monitoring (annual reassessment) → offboarding (data return/destruction verification).</li></ul>"
+        }
+      ],
+      "tags": [
+        "Third-Party Risk",
+        "Vendor Management",
+        "Compliance"
+      ]
+    }
+  ],
+  "glossary": {}
+}

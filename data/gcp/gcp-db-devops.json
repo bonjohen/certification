@@ -1,0 +1,2604 @@
+{
+  "version": "1.0",
+  "metadata": {
+    "examCode": "GCP-DB-DEVOPS",
+    "examTitle": "Database, Big Data, and DevOps Services in GCP",
+    "provider": "Google Cloud",
+    "description": "Scenario-Based Study Companion covering DevOps and data platform services including Cloud Build, Cloud Deploy, Artifact Registry, Cloud Source Repositories, BigQuery, Dataflow, Dataproc, Pub/Sub, and Cloud Composer.",
+    "totalQuestions": 50,
+    "createdDate": "2026-01-21",
+    "lastModified": "2026-01-21T00:00:00Z",
+    "categories": {
+      "cat-cicd": "CI/CD Pipeline",
+      "cat-container": "Container Management",
+      "cat-bigdata": "Big Data Services",
+      "cat-workflow": "Workflow Orchestration",
+      "cat-monitoring": "Monitoring and Operations"
+    }
+  },
+  "questions": [
+    {
+      "id": 1,
+      "categoryRef": "cat-cicd",
+      "difficulty": "basic",
+      "title": "Cloud Build Triggers",
+      "scenario": "A development team wants to automatically build and test their application whenever code is pushed to the main branch of their repository.",
+      "questionText": "Which Cloud Build feature should be configured to automatically start builds when code changes are pushed?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Scheduled builds"
+        },
+        {
+          "letter": "B",
+          "text": "Build triggers"
+        },
+        {
+          "letter": "C",
+          "text": "Manual builds"
+        },
+        {
+          "letter": "D",
+          "text": "Cloud Scheduler"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Think about which Cloud Build feature reacts to repository events such as pushes and pull requests to start builds automatically."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Cloud Build triggers automatically start a build in response to source code events like pushes to a branch, pull requests, or tag creation. They can connect to Cloud Source Repositories, GitHub, or Bitbucket. Manual builds (B) require explicit invocation and do not react to code changes. Scheduled builds (C) run on a timer rather than in response to pushes. Cloud Scheduler (D) is a general-purpose cron service unrelated to build orchestration."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Triggers support branch, tag, and file-path glob filters so you can restrict which changes start a build, such as only triggering on changes under the src/ directory.</li>\n              <li>Substitution variables like $BRANCH_NAME and $SHORT_SHA are injected at trigger time, letting cloudbuild.yaml adapt dynamically to the triggering event.</li>\n              <li>Triggers can require manual approval before the build proceeds, giving teams a gate for production-bound pipelines without losing the automation on the detection side.</li>\n              <li>Webhook triggers extend the pattern beyond Git hosts, allowing any HTTP caller to start a build by posting to a Cloud Build webhook URL.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Cloud Build",
+        "CI/CD",
+        "Automation"
+      ]
+    },
+    {
+      "id": 2,
+      "categoryRef": "cat-cicd",
+      "difficulty": "intermediate",
+      "title": "Cloud Build Configuration",
+      "scenario": "An engineer needs to define a multi-step build process that compiles code, runs tests, and pushes a container image to Artifact Registry.",
+      "questionText": "Which file format does Cloud Build use to define build steps and their configuration?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Jenkinsfile"
+        },
+        {
+          "letter": "B",
+          "text": "buildspec.yml"
+        },
+        {
+          "letter": "C",
+          "text": "cloudbuild.yaml"
+        },
+        {
+          "letter": "D",
+          "text": "azure-pipelines.yml"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Cloud Build has its own YAML configuration file with a naming convention that mirrors the service name. Consider which filename is GCP-native."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Cloud Build uses cloudbuild.yaml (or the equivalent cloudbuild.json) to define an ordered list of build steps, each running inside a container image. Jenkinsfile (A) belongs to Jenkins CI, azure-pipelines.yml (C) is Azure DevOps, and buildspec.yml (D) is AWS CodeBuild. Each step in cloudbuild.yaml specifies a builder image, a command, and optional arguments, making the pipeline portable across any environment that can run containers."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Build steps run sequentially by default; adding a waitFor field with a list of step IDs lets independent steps run in parallel, reducing total build time significantly.</li>\n              <li>Built-in substitutions such as $PROJECT_ID, $BUILD_ID, and $COMMIT_SHA are available in every build. Custom substitutions prefixed with underscore (e.g., $_DEPLOY_ENV) can be passed from triggers or the CLI.</li>\n              <li>The availableSecrets field lets Cloud Build pull values from Secret Manager and inject them as environment variables, keeping credentials out of source control entirely.</li>\n              <li>A /workspace volume is shared across all steps, so artifacts produced by one step (compiled binaries, test reports) are automatically available to subsequent steps.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Cloud Build",
+        "YAML",
+        "Configuration"
+      ]
+    },
+    {
+      "id": 3,
+      "categoryRef": "cat-container",
+      "difficulty": "basic",
+      "title": "Artifact Registry Purpose",
+      "scenario": "A company needs a secure, private location to store Docker container images and npm packages used by their applications.",
+      "questionText": "Which Google Cloud service provides managed repositories for container images and language packages?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Cloud Source Repositories"
+        },
+        {
+          "letter": "B",
+          "text": "Cloud Storage"
+        },
+        {
+          "letter": "C",
+          "text": "Artifact Registry"
+        },
+        {
+          "letter": "D",
+          "text": "Container Registry"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Google Cloud recommends a single universal package manager that supports Docker, npm, Maven, and Python packages with fine-grained IAM controls."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Artifact Registry is Google Cloud's universal artifact repository that stores Docker images, language packages (npm, Maven, Python, Go), and OS packages in a single managed service. Cloud Source Repositories (A) hosts Git source code, not build artifacts. Cloud Storage (B) is general object storage without registry protocol support. Container Registry (C) is the legacy service that Artifact Registry replaces, offering only Docker images and fewer security features."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Artifact Registry supports regional and multi-regional repository locations, letting you keep artifacts close to your build and deployment infrastructure for lower latency.</li>\n              <li>Integration with Binary Authorization enables deploy-time policies that require cryptographic attestations before a container image can run on GKE or Cloud Run.</li>\n              <li>Container Analysis (Artifact Analysis) provides automatic vulnerability scanning of stored images, covering both OS packages and language-level dependencies with CVE severity ratings.</li>\n              <li>Remote repositories proxy and cache artifacts from upstream registries like Docker Hub and Maven Central, reducing external dependencies and improving reliability during upstream outages.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Artifact Registry",
+        "Containers",
+        "Package Management"
+      ]
+    },
+    {
+      "id": 4,
+      "categoryRef": "cat-cicd",
+      "difficulty": "intermediate",
+      "title": "Cloud Deploy Pipelines",
+      "scenario": "A team needs to implement a progressive delivery strategy where applications are deployed to dev, staging, and production environments in sequence with manual approvals between stages.",
+      "questionText": "Which Google Cloud service provides managed continuous delivery pipelines with promotion between targets?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Cloud Build"
+        },
+        {
+          "letter": "B",
+          "text": "Cloud Functions"
+        },
+        {
+          "letter": "C",
+          "text": "Cloud Scheduler"
+        },
+        {
+          "letter": "D",
+          "text": "Cloud Deploy"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Look for the GCP service that specializes in continuous delivery with progressive rollouts, promotion gates, and rollback support across ordered environments."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Cloud Deploy is a managed continuous delivery service that defines a delivery pipeline as an ordered sequence of targets (e.g., dev, staging, production). It supports approval gates between promotions, automated rollbacks, and canary deployments. Cloud Functions (A) is a serverless compute service. Cloud Scheduler (C) triggers jobs on a timer. Cloud Build (D) handles CI and build steps but does not model multi-environment promotion pipelines natively."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>A delivery pipeline is defined in YAML and lists targets in promotion order; each target maps to a GKE cluster, Cloud Run service, or Anthos cluster.</li>\n              <li>A release represents a specific application version entering the pipeline, while a rollout is the physical deployment of that release to a particular target, with its own status and logs.</li>\n              <li>Cloud Deploy integrates tightly with Skaffold, using skaffold.yaml to render and deploy Kubernetes manifests, ensuring the same tooling works locally and in the pipeline.</li>\n              <li>Deploy policies let platform teams enforce rules such as blocking deployments during maintenance windows or requiring two approvers for production promotions.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Cloud Deploy",
+        "Continuous Delivery",
+        "Progressive Delivery"
+      ]
+    },
+    {
+      "id": 5,
+      "categoryRef": "cat-cicd",
+      "difficulty": "basic",
+      "title": "Cloud Source Repositories",
+      "scenario": "A startup wants to host their private Git repositories on Google Cloud with tight integration to Cloud Build for CI/CD.",
+      "questionText": "Which service provides fully managed private Git repositories on Google Cloud?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Cloud Source Repositories"
+        },
+        {
+          "letter": "B",
+          "text": "GitHub Enterprise"
+        },
+        {
+          "letter": "C",
+          "text": "Artifact Registry"
+        },
+        {
+          "letter": "D",
+          "text": "Cloud Storage"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Google Cloud has a native Git hosting service that integrates directly with Cloud Build triggers and other GCP development tools."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Cloud Source Repositories (CSR) provides fully managed, private Git repositories hosted on Google Cloud infrastructure. It integrates natively with Cloud Build for CI/CD triggers, supports automatic mirroring from GitHub and Bitbucket, and includes code search. Artifact Registry (A) stores build artifacts, not source code. GitHub Enterprise (B) is a third-party product. Cloud Storage (D) is object storage without Git protocol support."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>CSR can mirror external GitHub or Bitbucket repositories automatically, keeping a synchronized copy inside GCP for tighter integration with Cloud Build triggers and lower-latency clones.</li>\n              <li>IAM policies control repository access at both the project and individual repository level, leveraging the same identity model used across all Google Cloud resources.</li>\n              <li>Cloud Debugger and Error Reporting can link stack traces and error locations directly to source code in CSR, streamlining the debugging workflow in the GCP console.</li>\n              <li>Pub/Sub notifications can be configured on repository events, enabling custom automation such as notifying a Slack channel or triggering a Cloud Function when code is pushed.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Cloud Source Repositories",
+        "Git",
+        "Version Control"
+      ]
+    },
+    {
+      "id": 6,
+      "categoryRef": "cat-bigdata",
+      "difficulty": "basic",
+      "title": "BigQuery Overview",
+      "scenario": "A data analyst needs to run SQL queries on terabytes of data without managing infrastructure or worrying about capacity planning.",
+      "questionText": "Which Google Cloud service provides a serverless, highly scalable data warehouse for analytics?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Cloud SQL"
+        },
+        {
+          "letter": "B",
+          "text": "Bigtable"
+        },
+        {
+          "letter": "C",
+          "text": "Cloud Spanner"
+        },
+        {
+          "letter": "D",
+          "text": "BigQuery"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Consider which GCP service is fully serverless, uses standard SQL, and is purpose-built for analytical queries at petabyte scale."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "BigQuery is Google Cloud's fully managed, serverless enterprise data warehouse. It separates storage and compute so each scales independently, and it offers pay-per-query pricing for on-demand use. Cloud SQL (A) is a managed relational database for OLTP workloads. Bigtable (B) is a wide-column NoSQL store optimized for high-throughput reads and writes. Cloud Spanner (C) provides globally distributed relational transactions, not analytics-focused warehousing."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>BigQuery uses a columnar storage format (Capacitor) and a distributed execution engine (Dremel) that together enable sub-minute scans across petabytes of data without index tuning.</li>\n              <li>Two pricing models are available: on-demand (per TB scanned) for variable workloads, and capacity-based slot reservations for predictable costs on heavy, sustained analytics.</li>\n              <li>BigQuery ML lets analysts create and run machine learning models entirely in SQL, supporting classification, regression, time-series forecasting, and recommendation models without data export.</li>\n              <li>Federated queries can read data in-place from Cloud Storage, Bigtable, Cloud SQL, and Spanner without loading it into BigQuery, useful for ad-hoc exploration of external datasets.</li></ul>"
+        }
+      ],
+      "tags": [
+        "BigQuery",
+        "Data Warehouse",
+        "Analytics"
+      ]
+    },
+    {
+      "id": 7,
+      "categoryRef": "cat-bigdata",
+      "difficulty": "intermediate",
+      "title": "BigQuery Partitioning",
+      "scenario": "A company stores billions of transaction records in BigQuery and queries primarily filter by date. They want to reduce query costs and improve performance.",
+      "questionText": "Which BigQuery feature should be used to organize data by date for more efficient queries?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Table partitioning"
+        },
+        {
+          "letter": "B",
+          "text": "Table clustering"
+        },
+        {
+          "letter": "C",
+          "text": "Materialized views"
+        },
+        {
+          "letter": "D",
+          "text": "Table sharding"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "The feature you need physically divides a single table into date-aligned segments so that queries filtering on date skip irrelevant data entirely."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Table partitioning in BigQuery divides a table into segments based on a column value, typically a timestamp or date. When queries include a WHERE clause on the partition column, BigQuery scans only the relevant partitions, dramatically reducing bytes processed and cost. Clustering (A) sorts data within partitions but does not create the top-level date segments. Sharding (B) uses separate tables per date, which is harder to manage. Materialized views (C) precompute results but do not reorganize the underlying storage."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>BigQuery supports three partitioning strategies: ingestion-time partitioning (based on load timestamp), column-based partitioning on a TIMESTAMP, DATE, or DATETIME column, and integer-range partitioning for non-date use cases.</li>\n              <li>Partition pruning only activates when the partition column appears in the WHERE clause; wrapping it in a function like CAST() can defeat pruning and cause a full table scan.</li>\n              <li>Combining partitioning with clustering on high-cardinality columns (e.g., customer_id) provides a two-level optimization: partitions eliminate date ranges, clustering eliminates data blocks within each partition.</li>\n              <li>The partition expiration setting automatically deletes partitions older than a specified number of days, providing a built-in data lifecycle policy without external orchestration.</li></ul>"
+        }
+      ],
+      "tags": [
+        "BigQuery",
+        "Partitioning",
+        "Cost Optimization"
+      ]
+    },
+    {
+      "id": 8,
+      "categoryRef": "cat-bigdata",
+      "difficulty": "intermediate",
+      "title": "BigQuery Clustering",
+      "scenario": "After implementing date partitioning, a team still observes slow queries that filter on customer_id within date ranges. The table has millions of customers.",
+      "questionText": "Which BigQuery feature sorts data within partitions to further optimize queries with specific filter columns?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Table indexing"
+        },
+        {
+          "letter": "B",
+          "text": "Table clustering"
+        },
+        {
+          "letter": "C",
+          "text": "Primary keys"
+        },
+        {
+          "letter": "D",
+          "text": "Secondary partitioning"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "After partitioning handles date ranges, you need a feature that physically sorts data within each partition by additional columns to eliminate unnecessary block scans."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Clustering in BigQuery sorts data within each partition based on one or more specified columns. When queries filter or aggregate on clustering columns, BigQuery skips irrelevant data blocks, reducing bytes scanned and improving performance. Table indexing (A) does not exist as a BigQuery feature. Secondary partitioning (B) is not supported; BigQuery allows only one partition column. Primary keys (C) exist for data integrity hints but do not sort storage blocks for query optimization."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Up to four clustering columns can be specified, and their order matters: the first column provides the most granular sort, with subsequent columns refining sort order within blocks that share the same leading values.</li>\n              <li>Clustering is most effective on high-cardinality columns like customer_id or product_sku, where the sort order lets BigQuery eliminate a large fraction of blocks for selective filters.</li>\n              <li>BigQuery automatically re-clusters data in the background as new data is ingested; there is no manual maintenance step, and re-clustering is free of charge.</li>\n              <li>Clustering benefits extend beyond filters to GROUP BY and ORDER BY operations on clustering columns, as the pre-sorted storage reduces shuffle and sort work at query time.</li></ul>"
+        }
+      ],
+      "tags": [
+        "BigQuery",
+        "Clustering",
+        "Query Optimization"
+      ]
+    },
+    {
+      "id": 9,
+      "categoryRef": "cat-bigdata",
+      "difficulty": "advanced",
+      "title": "BigQuery ML",
+      "scenario": "A marketing team wants to predict customer churn using historical data stored in BigQuery but lacks machine learning expertise.",
+      "questionText": "Which BigQuery feature enables creating and training machine learning models using SQL?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Vertex AI"
+        },
+        {
+          "letter": "B",
+          "text": "AI Platform"
+        },
+        {
+          "letter": "C",
+          "text": "BigQuery ML"
+        },
+        {
+          "letter": "D",
+          "text": "AutoML Tables"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Look for the BigQuery feature that lets SQL users build, train, and run machine learning models without leaving the BigQuery environment or learning Python."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "BigQuery ML enables users to create, train, and execute machine learning models using standard SQL queries directly within BigQuery. It removes the need to export data or learn a separate ML framework. Vertex AI (B) is the full-featured ML platform requiring Python SDK knowledge. AI Platform (C) is the predecessor to Vertex AI. AutoML Tables (D) is now part of Vertex AI and requires a different workflow with a dedicated UI, not SQL statements."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>The CREATE MODEL statement trains models on BigQuery data, supporting logistic regression, k-means clustering, matrix factorization, time-series ARIMA, boosted trees, and deep neural networks.</li>\n              <li>ML.PREDICT applies a trained model to new data for inference, and ML.EVALUATE returns accuracy metrics like precision, recall, and AUC so analysts can assess model quality in SQL.</li>\n              <li>BigQuery ML can import pre-trained TensorFlow and ONNX models, and export trained BQML models to Vertex AI for serving behind a low-latency prediction endpoint.</li>\n              <li>Feature preprocessing functions like ML.BUCKETIZE, ML.FEATURE_CROSS, and ML.POLYNOMIAL_EXPAND let analysts engineer features directly in the CREATE MODEL statement without separate ETL.</li></ul>"
+        }
+      ],
+      "tags": [
+        "BigQuery ML",
+        "Machine Learning",
+        "SQL"
+      ]
+    },
+    {
+      "id": 10,
+      "categoryRef": "cat-bigdata",
+      "difficulty": "basic",
+      "title": "Dataflow Overview",
+      "scenario": "A company needs to process both real-time streaming data from IoT sensors and batch data from daily log files using the same processing logic.",
+      "questionText": "Which Google Cloud service provides unified batch and stream data processing?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Cloud Composer"
+        },
+        {
+          "letter": "B",
+          "text": "Dataproc"
+        },
+        {
+          "letter": "C",
+          "text": "Dataflow"
+        },
+        {
+          "letter": "D",
+          "text": "Pub/Sub"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "The service you need executes Apache Beam pipelines and provides a single programming model that works identically for both batch and streaming workloads."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Dataflow is a fully managed service for executing Apache Beam pipelines with a unified programming model for batch and streaming data. It handles automatic scaling, worker management, and provides exactly-once processing semantics. Pub/Sub (A) is a messaging service, not a processing engine. Dataproc (B) runs Spark and Hadoop, which use separate batch and streaming APIs. Cloud Composer (C) orchestrates pipelines but does not execute data transformations itself."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Apache Beam SDKs are available in Java, Python, and Go; the same pipeline code runs on Dataflow, Spark, or Flink without modification, providing portability across runners.</li>\n              <li>Dataflow handles worker provisioning, horizontal autoscaling, and work rebalancing automatically, so engineers focus on transform logic rather than cluster sizing.</li>\n              <li>Streaming Engine offloads shuffle and windowing state from worker VMs to a Google-managed backend, reducing worker memory requirements and improving streaming pipeline stability.</li>\n              <li>Dataflow Prime adds vertical autoscaling of worker resources (CPU and memory) alongside horizontal scaling, optimizing cost for pipelines with variable resource demands.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Dataflow",
+        "Apache Beam",
+        "Stream Processing"
+      ]
+    },
+    {
+      "id": 11,
+      "categoryRef": "cat-bigdata",
+      "difficulty": "intermediate",
+      "title": "Dataflow Templates",
+      "scenario": "A data engineer wants to create reusable Dataflow pipelines that business users can run without writing code, just by providing parameters.",
+      "questionText": "Which Dataflow feature allows creating parameterized, reusable pipeline definitions?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Dataflow snapshots"
+        },
+        {
+          "letter": "B",
+          "text": "Dataflow Prime"
+        },
+        {
+          "letter": "C",
+          "text": "Dataflow SQL"
+        },
+        {
+          "letter": "D",
+          "text": "Dataflow templates"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Consider which Dataflow feature packages a pipeline so that non-developers can launch it by filling in runtime parameters, without access to source code."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Dataflow templates package a pipeline definition so that users can execute it with different runtime parameters without needing the source code or a development environment. Snapshots (A) capture streaming pipeline state for migration or duplication, not for reuse by end users. Dataflow SQL (C) provides a SQL interface for simple transforms but does not create reusable packaged pipelines. Dataflow Prime (D) is an autoscaling enhancement, not a packaging mechanism."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Classic templates compile and stage pipeline code as a JSON template in Cloud Storage; Flex templates containerize the pipeline in Docker, enabling dynamic pipeline construction at launch time with arbitrary runtime parameters.</li>\n              <li>Google provides dozens of pre-built templates for common patterns like GCS-to-BigQuery, Pub/Sub-to-BigQuery, and JDBC-to-BigQuery, saving significant development time for standard ETL flows.</li>\n              <li>Templates can be launched via the Console, gcloud CLI, REST API, Cloud Scheduler, or Cloud Functions, making them easy to integrate into automated workflows and event-driven architectures.</li>\n              <li>Flex templates support custom container images, so teams can bundle specific library versions, native dependencies, or ML models alongside the pipeline code.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Dataflow",
+        "Templates",
+        "Reusability"
+      ]
+    },
+    {
+      "id": 12,
+      "categoryRef": "cat-bigdata",
+      "difficulty": "intermediate",
+      "title": "Dataflow Windowing",
+      "scenario": "A streaming pipeline processes clickstream data and needs to compute statistics every 5 minutes based on event timestamps, not processing time.",
+      "questionText": "Which Dataflow concept groups elements into finite chunks for aggregation in streaming pipelines?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Sharding"
+        },
+        {
+          "letter": "B",
+          "text": "Windowing"
+        },
+        {
+          "letter": "C",
+          "text": "Partitioning"
+        },
+        {
+          "letter": "D",
+          "text": "Bucketing"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Streaming data is unbounded, so you need a concept that divides the infinite stream into finite, time-based chunks that aggregations can operate on."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Windowing in Dataflow (and Apache Beam) subdivides unbounded streaming data into finite windows based on event timestamps. Common window types include fixed (tumbling), sliding, and session windows. This enables bounded aggregations like counts and averages on infinite streams. Sharding (A) distributes data across parallel workers but does not create time-based groups. Partitioning (C) is a storage concept in BigQuery. Bucketing (D) is not an Apache Beam or Dataflow concept."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Fixed (tumbling) windows divide time into non-overlapping intervals of equal duration, such as every 5 minutes; each element belongs to exactly one window.</li>\n              <li>Sliding windows overlap by a specified slide interval (e.g., 10-minute windows every 5 minutes), producing rolling aggregations where a single element can appear in multiple windows.</li>\n              <li>Session windows group events that arrive within a configurable gap duration; they close after no new events arrive for the gap period, making them ideal for user-activity analysis.</li>\n              <li>Watermarks track event-time progress and trigger window completion; late-arriving data can still be included via allowed-lateness settings that keep windows open for additional processing.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Dataflow",
+        "Windowing",
+        "Streaming"
+      ]
+    },
+    {
+      "id": 13,
+      "categoryRef": "cat-bigdata",
+      "difficulty": "basic",
+      "title": "Dataproc Overview",
+      "scenario": "A company has existing Apache Spark and Hadoop jobs they want to migrate to the cloud with minimal code changes.",
+      "questionText": "Which Google Cloud service provides managed Spark and Hadoop clusters?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Dataproc"
+        },
+        {
+          "letter": "B",
+          "text": "Dataflow"
+        },
+        {
+          "letter": "C",
+          "text": "BigQuery"
+        },
+        {
+          "letter": "D",
+          "text": "Compute Engine"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "The service you need provides managed clusters for open-source big data frameworks like Spark, Hadoop, Hive, and Pig with minimal migration effort."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Dataproc is a managed service for running Apache Spark, Hadoop, Hive, and Pig workloads. Clusters spin up in about 90 seconds and include autoscaling, Cloud Storage connector integration, and per-second billing. Compute Engine (A) provides raw VMs but requires manual cluster setup and management. Dataflow (B) runs Apache Beam pipelines, not Spark or Hadoop jobs. BigQuery (C) is a SQL-based warehouse, not an open-source cluster service."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Dataproc Serverless runs Spark batch workloads and interactive sessions without any cluster provisioning, ideal for ad-hoc exploration and jobs that do not justify a persistent cluster.</li>\n              <li>Initialization actions are scripts executed at cluster creation time to install custom packages, configure services, or download data, enabling repeatable cluster customization.</li>\n              <li>The ephemeral cluster pattern (create cluster, submit job, delete cluster) maximizes cost efficiency by paying only for the minutes a job runs, and workflow templates automate this entire lifecycle.</li>\n              <li>Dataproc integrates natively with Cloud Storage as HDFS-compatible storage via the gs:// connector, so existing Spark and Hadoop jobs require only a path change from hdfs:// to gs://.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Dataproc",
+        "Spark",
+        "Hadoop"
+      ]
+    },
+    {
+      "id": 14,
+      "categoryRef": "cat-bigdata",
+      "difficulty": "intermediate",
+      "title": "Dataproc Serverless",
+      "scenario": "A data scientist wants to run ad-hoc Spark jobs for data exploration without the overhead of cluster management or waiting for cluster startup.",
+      "questionText": "Which Dataproc option runs Spark workloads without requiring cluster provisioning?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Dataproc Serverless"
+        },
+        {
+          "letter": "B",
+          "text": "Dataproc Autoscaling"
+        },
+        {
+          "letter": "C",
+          "text": "Dataproc Hub"
+        },
+        {
+          "letter": "D",
+          "text": "Dataproc Metastore"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Consider which Dataproc option eliminates cluster lifecycle management entirely, letting you submit Spark jobs that auto-provision and auto-release resources."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Dataproc Serverless lets you submit Spark batch workloads or launch interactive sessions without provisioning or managing clusters. Resources are automatically allocated, scaled, and released, and billing is per-second for actual resource usage. Dataproc Hub (A) provides a JupyterHub interface but still requires clusters. Autoscaling (B) adjusts an existing cluster's size but you must still create and manage the cluster. Metastore (C) is a managed Hive metadata service, not a compute option."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Dataproc Serverless supports both batch jobs (submitted via gcloud or API) and interactive Spark sessions through Jupyter notebooks, covering both production and exploration workflows.</li>\n              <li>Custom container images can be specified to bundle specific library versions, native dependencies, or ML frameworks, ensuring reproducible environments without initialization actions.</li>\n              <li>Network configuration options allow Serverless jobs to access resources inside a VPC, such as Cloud SQL instances or on-premises systems connected via Cloud VPN or Interconnect.</li>\n              <li>Serverless for Spark auto-scales executor count based on workload demand during job execution, so short-running stages release resources immediately while heavy shuffle stages scale up.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Dataproc",
+        "Serverless",
+        "Spark"
+      ]
+    },
+    {
+      "id": 15,
+      "categoryRef": "cat-bigdata",
+      "difficulty": "intermediate",
+      "title": "Pub/Sub Basics",
+      "scenario": "Multiple microservices need to communicate asynchronously. When one service publishes an event, several other services should receive and process it independently.",
+      "questionText": "Which Google Cloud service provides global, real-time messaging with at-least-once delivery?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Cloud Scheduler"
+        },
+        {
+          "letter": "B",
+          "text": "Eventarc"
+        },
+        {
+          "letter": "C",
+          "text": "Pub/Sub"
+        },
+        {
+          "letter": "D",
+          "text": "Cloud Tasks"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "The service you need decouples publishers from subscribers using topics, delivers messages globally in real time, and supports fan-out to multiple independent consumers."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Pub/Sub is a fully managed, real-time messaging service that decouples services through a topic-and-subscription model. Publishers send messages to topics, and each subscription receives an independent copy, enabling fan-out. Eventarc (A) routes events to targets like Cloud Run but relies on Pub/Sub or audit logs as its transport. Cloud Scheduler (C) triggers jobs on a timer, not in response to messages. Cloud Tasks (D) dispatches tasks to a single handler with rate limiting, lacking the fan-out pattern."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Multiple subscriptions attached to a single topic enable the fan-out pattern, where every subscriber gets its own copy of each message for independent processing at its own pace.</li>\n              <li>Dead letter topics capture messages that fail processing after a configurable number of delivery attempts, preventing poison messages from blocking consumers while preserving them for investigation.</li>\n              <li>Ordering keys guarantee that messages sharing the same key are delivered in publish order within a region, essential for scenarios like maintaining event sequence per user or device.</li>\n              <li>Pub/Sub Lite offers a zonal, lower-cost alternative for high-throughput workloads that do not require global availability, with provisioned capacity instead of per-message pricing.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Pub/Sub",
+        "Messaging",
+        "Event-Driven"
+      ]
+    },
+    {
+      "id": 16,
+      "categoryRef": "cat-bigdata",
+      "difficulty": "intermediate",
+      "title": "Pub/Sub Subscription Types",
+      "scenario": "A service needs to receive Pub/Sub messages via HTTP webhooks rather than polling, minimizing latency and infrastructure.",
+      "questionText": "Which Pub/Sub subscription type pushes messages to an HTTP endpoint?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "BigQuery subscription"
+        },
+        {
+          "letter": "B",
+          "text": "Streaming pull"
+        },
+        {
+          "letter": "C",
+          "text": "Push subscription"
+        },
+        {
+          "letter": "D",
+          "text": "Pull subscription"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "One subscription type delivers messages by making HTTP POST requests to an endpoint you configure, eliminating the need for your application to poll for new messages."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Push subscriptions deliver messages to a configured HTTPS endpoint via HTTP POST requests. Pub/Sub handles delivery, retries, and exponential backoff automatically. BigQuery subscriptions (A) write messages directly to a BigQuery table without an HTTP endpoint. Pull subscriptions (B) require the client to request messages, adding latency. Streaming pull (C) is a variation of pull that holds an open connection but still requires a running client process rather than a simple webhook endpoint."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Push endpoints must acknowledge receipt by returning an HTTP 2xx status code; any other status triggers automatic retry with configurable exponential backoff up to a maximum delay.</li>\n              <li>Authentication is enforced via OIDC tokens attached to each push request, allowing the receiving service to verify that the message truly originates from the configured Pub/Sub subscription.</li>\n              <li>Push subscriptions are ideal for serverless targets like Cloud Functions and Cloud Run that scale to zero, since the push request itself triggers the container or function invocation.</li>\n              <li>Pull subscriptions give consumers more control over message batching, flow control, and processing rate, making them better suited for high-throughput pipelines where the consumer manages its own concurrency.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Pub/Sub",
+        "Subscriptions",
+        "Webhooks"
+      ]
+    },
+    {
+      "id": 17,
+      "categoryRef": "cat-bigdata",
+      "difficulty": "advanced",
+      "title": "Pub/Sub Exactly-Once Delivery",
+      "scenario": "A financial application processes payment events from Pub/Sub and requires exactly-once processing semantics to prevent duplicate transactions.",
+      "questionText": "Which Pub/Sub feature enables exactly-once delivery semantics within a cloud region?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Exactly-once delivery"
+        },
+        {
+          "letter": "B",
+          "text": "Message deduplication"
+        },
+        {
+          "letter": "C",
+          "text": "Ordering keys"
+        },
+        {
+          "letter": "D",
+          "text": "Dead letter topics"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Pub/Sub offers a subscription-level setting that tracks acknowledgments to guarantee each message is delivered and processed exactly once within a single cloud region."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Pub/Sub's exactly-once delivery feature, enabled at the subscription level, ensures each message is delivered exactly once within a cloud region by tracking acknowledgment state. Ordering keys (A) guarantee message order but do not prevent redelivery. Message deduplication (B) is a publisher-side concept for suppressing duplicate publishes, not a subscription delivery guarantee. Dead letter topics (D) handle failed messages but do not affect delivery semantics for successful processing."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Exactly-once delivery requires pull subscriptions with streaming pull; push subscriptions do not support exactly-once because the HTTP acknowledgment model cannot provide the needed transactional guarantee.</li>\n              <li>Client libraries must use the acknowledge IDs returned in the same StreamingPull response; reusing stale ack IDs after reconnection can cause the acknowledgment to be rejected and the message redelivered.</li>\n              <li>Exactly-once delivery adds slightly higher latency and lower throughput compared to at-least-once, because the broker must coordinate acknowledgment state across replicas before confirming delivery.</li>\n              <li>For cross-region exactly-once semantics, applications must implement their own idempotency layer (e.g., a deduplication table in Cloud SQL or Firestore) since the Pub/Sub guarantee is scoped to a single region.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Pub/Sub",
+        "Exactly-Once",
+        "Reliability"
+      ]
+    },
+    {
+      "id": 18,
+      "categoryRef": "cat-workflow",
+      "difficulty": "basic",
+      "title": "Cloud Composer Overview",
+      "scenario": "A data engineering team needs to orchestrate complex data pipelines that run Dataflow jobs, BigQuery queries, and external API calls in a specific sequence with dependencies.",
+      "questionText": "Which Google Cloud service provides managed Apache Airflow for workflow orchestration?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Cloud Scheduler"
+        },
+        {
+          "letter": "B",
+          "text": "Cloud Tasks"
+        },
+        {
+          "letter": "C",
+          "text": "Cloud Workflows"
+        },
+        {
+          "letter": "D",
+          "text": "Cloud Composer"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "The service you need is a fully managed version of Apache Airflow that uses Python DAGs to define complex task dependencies and integrates natively with GCP data services."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Cloud Composer is Google Cloud's fully managed Apache Airflow service for workflow orchestration. It lets teams author, schedule, and monitor data pipelines using Python DAGs with rich integration to BigQuery, Dataflow, GCS, and other services. Cloud Scheduler (A) triggers single jobs on a cron schedule but cannot model task dependencies. Cloud Workflows (C) is a lightweight serverless orchestrator using YAML, not suited for complex data pipelines. Cloud Tasks (D) is a task queue service for asynchronous dispatch, not workflow orchestration."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>DAGs (Directed Acyclic Graphs) define tasks and their dependencies in Python code, giving teams full programmatic control over branching, looping, and conditional execution logic.</li>\n              <li>Cloud Composer 2 runs on GKE Autopilot, providing better autoscaling of Airflow workers and scheduler resources compared to the original Composer 1 architecture.</li>\n              <li>Pre-built operators and hooks exist for BigQuery, Dataflow, GCS, Cloud SQL, Dataproc, and many third-party systems, reducing the code needed to integrate pipeline steps.</li>\n              <li>Cloud Composer environments include a built-in Airflow web UI for monitoring DAG runs, viewing task logs, and manually triggering or retrying individual tasks.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Cloud Composer",
+        "Apache Airflow",
+        "Orchestration"
+      ]
+    },
+    {
+      "id": 19,
+      "categoryRef": "cat-workflow",
+      "difficulty": "intermediate",
+      "title": "Airflow DAGs",
+      "scenario": "An engineer is writing a Cloud Composer workflow and needs to define tasks that should run in parallel after an initial data extraction task completes.",
+      "questionText": "What is the programming construct in Apache Airflow that defines task dependencies and execution order?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Workflow YAML"
+        },
+        {
+          "letter": "B",
+          "text": "DAG (Directed Acyclic Graph)"
+        },
+        {
+          "letter": "C",
+          "text": "Pipeline"
+        },
+        {
+          "letter": "D",
+          "text": "Job specification"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Airflow uses a graph-based abstraction defined in Python where tasks are nodes, edges represent dependencies, and no circular paths are allowed."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "A DAG (Directed Acyclic Graph) is Apache Airflow's core abstraction for defining workflows. Each DAG is a Python file that declares tasks and their dependencies, and the acyclic property ensures there are no circular dependency chains. Tasks with no dependency relationship run in parallel automatically. Workflow YAML (A) describes Cloud Workflows, not Airflow. Pipeline (C) and Job specification (D) are generic terms not specific to Airflow's programming model."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>The &gt;&gt; and &lt;&lt; bitshift operators set task dependencies concisely; for example, extract_task &gt;&gt; [transform_task_a, transform_task_b] &gt;&gt; load_task defines a fan-out and fan-in pattern.</li>\n              <li>Sensors are special operators that pause execution until an external condition is met, such as waiting for a file to appear in GCS or a partition to exist in BigQuery before proceeding.</li>\n              <li>XCom (cross-communication) allows tasks to pass small pieces of data to downstream tasks, such as a file path produced by one task that another task needs to process.</li>\n              <li>TaskGroups visually organize related tasks in the Airflow UI without affecting execution logic, making complex DAGs with dozens of tasks easier to navigate and debug.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Cloud Composer",
+        "DAG",
+        "Airflow"
+      ]
+    },
+    {
+      "id": 20,
+      "categoryRef": "cat-workflow",
+      "difficulty": "intermediate",
+      "title": "Cloud Workflows",
+      "scenario": "A developer needs to orchestrate a simple sequence of Cloud Functions and API calls without deploying and managing an Airflow environment.",
+      "questionText": "Which Google Cloud service provides serverless workflow orchestration using YAML or JSON syntax?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Cloud Tasks"
+        },
+        {
+          "letter": "B",
+          "text": "Cloud Composer"
+        },
+        {
+          "letter": "C",
+          "text": "Cloud Workflows"
+        },
+        {
+          "letter": "D",
+          "text": "Cloud Scheduler"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "The service you need is fully serverless, uses declarative YAML or JSON to define step sequences, and requires no infrastructure management unlike Apache Airflow."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Cloud Workflows is a fully managed, serverless orchestration service that executes steps defined in YAML or JSON. It supports error handling, conditional logic, and integrates with Cloud Functions, Cloud Run, and any REST API. Cloud Scheduler (A) triggers single actions on a timer. Cloud Composer (B) provides managed Airflow but requires a persistent GKE-based environment. Cloud Tasks (C) dispatches individual tasks to handlers with rate limiting but does not define multi-step workflows with branching logic."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Workflows support conditional logic (switch statements), for-each loops, parallel branch execution, and subworkflows, providing substantial orchestration power in a declarative format.</li>\n              <li>Built-in connectors simplify calls to Google Cloud APIs like BigQuery, Firestore, and Cloud Functions by handling authentication, retries, and response parsing automatically.</li>\n              <li>Workflows vs Composer: Workflows is ideal for lightweight HTTP-based orchestration (API calls, Cloud Run invocations) while Composer is better for complex data pipelines with heavy operator ecosystems and scheduling needs.</li>\n              <li>Workflow executions are durable and can run for up to one year, with automatic state persistence so that long-running workflows survive infrastructure failures without losing progress.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Cloud Workflows",
+        "Serverless",
+        "Orchestration"
+      ]
+    },
+    {
+      "id": 21,
+      "categoryRef": "cat-monitoring",
+      "difficulty": "basic",
+      "title": "Cloud Monitoring Overview",
+      "scenario": "An SRE team needs to collect metrics from their GKE clusters, set up alerts for high CPU usage, and create dashboards for visualization.",
+      "questionText": "Which Google Cloud service provides metrics collection, alerting, and dashboards for cloud resources?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Cloud Monitoring"
+        },
+        {
+          "letter": "B",
+          "text": "Cloud Logging"
+        },
+        {
+          "letter": "C",
+          "text": "Cloud Profiler"
+        },
+        {
+          "letter": "D",
+          "text": "Cloud Trace"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "The core observability service for GCP provides metrics ingestion, customizable dashboards, alerting policies, and uptime checks across all cloud resources."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Cloud Monitoring collects metrics, events, and metadata from Google Cloud, AWS, and on-premises resources. It provides customizable dashboards for visualization, alerting policies with multiple notification channels, and uptime checks for endpoint availability. Cloud Profiler (A) analyzes application CPU and memory usage at the function level. Cloud Logging (B) handles log ingestion and search. Cloud Trace (D) provides distributed tracing for request latency analysis."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Custom metrics can be created via the Monitoring API or OpenTelemetry SDK, letting applications publish application-specific business metrics alongside infrastructure metrics in the same dashboards.</li>\n              <li>Alerting policies support multiple notification channels (email, Slack, PagerDuty, webhooks) and can be configured with condition duration and alignment periods to reduce false positives.</li>\n              <li>Metrics Explorer enables ad-hoc exploration of any metric with filters, grouping, and aggregation, making it easy to investigate anomalies before building a persistent dashboard.</li>\n              <li>Monitoring integrates with Managed Service for Prometheus, so teams using Prometheus instrumentation and PromQL queries can store metrics in Google-managed infrastructure without running their own Prometheus server.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Cloud Monitoring",
+        "Observability",
+        "Alerting"
+      ]
+    },
+    {
+      "id": 22,
+      "categoryRef": "cat-monitoring",
+      "difficulty": "basic",
+      "title": "Cloud Logging Overview",
+      "scenario": "An operations team needs to centrally store and search application logs from multiple services for debugging and compliance purposes.",
+      "questionText": "Which Google Cloud service provides centralized log management and analysis?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Cloud Monitoring"
+        },
+        {
+          "letter": "B",
+          "text": "Cloud Trace"
+        },
+        {
+          "letter": "C",
+          "text": "Cloud Logging"
+        },
+        {
+          "letter": "D",
+          "text": "Error Reporting"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "The service you need automatically ingests logs from GCP services, provides a powerful query language for searching, and supports routing logs to multiple destinations."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Cloud Logging is a fully managed service for storing, searching, analyzing, and alerting on log data. It automatically ingests logs from Google Cloud services and supports custom logs from applications and on-premises systems. Cloud Monitoring (A) handles metrics and alerting, not log storage and search. Cloud Trace (B) analyzes request latency across distributed services. Error Reporting (D) groups and tracks application exceptions but relies on Cloud Logging as its data source."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>The Log Router controls log destinations: logs can be sent to Cloud Logging buckets for search, BigQuery for SQL analysis, Pub/Sub for streaming export, or Cloud Storage for long-term archival.</li>\n              <li>Log-based metrics let you create Cloud Monitoring metrics from log entry patterns, such as counting specific error strings or extracting numeric values from structured log fields.</li>\n              <li>Logs Explorer uses the Logging query language with filters on resource type, severity, timestamp, and JSON payload fields, enabling rapid root-cause analysis during incidents.</li>\n              <li>Log retention is configurable per bucket: the default _Required bucket retains admin activity audit logs for 400 days, while custom buckets can be set from 1 day to 3,650 days to balance cost and compliance.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Cloud Logging",
+        "Observability",
+        "Log Management"
+      ]
+    },
+    {
+      "id": 23,
+      "categoryRef": "cat-monitoring",
+      "difficulty": "intermediate",
+      "title": "Log Sinks and Exports",
+      "scenario": "A security team requires all audit logs to be exported to BigQuery for long-term retention and analysis, while keeping standard logs in Cloud Logging.",
+      "questionText": "Which Cloud Logging feature routes logs to different destinations based on filters?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Log scopes"
+        },
+        {
+          "letter": "B",
+          "text": "Log buckets"
+        },
+        {
+          "letter": "C",
+          "text": "Log sinks"
+        },
+        {
+          "letter": "D",
+          "text": "Log views"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "The Log Router uses a specific feature to match log entries against inclusion filters and forward them to destinations like BigQuery, Cloud Storage, or Pub/Sub."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Log sinks are components of the Cloud Logging Router that route log entries to destinations based on inclusion filters. Each sink specifies a filter query and a target (Cloud Storage, BigQuery, Pub/Sub, or another log bucket). Log scopes (A) control which logs are visible in the Logs Explorer UI. Log buckets (B) are storage containers for logs but do not perform routing. Log views (C) provide filtered read access to logs within a bucket for access control, not routing."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Aggregated sinks created at the organization or folder level capture logs from all child projects, enabling centralized security log collection without configuring sinks in every individual project.</li>\n              <li>Exclusion filters on the default sink prevent specific log types from being ingested into Cloud Logging, reducing storage costs for high-volume, low-value logs like health-check entries.</li>\n              <li>Sinks to BigQuery create date-partitioned tables automatically, enabling SQL-based analysis of log data for compliance reporting, anomaly detection, and long-term trend analysis.</li>\n              <li>Each sink requires appropriate IAM permissions on the destination; for example, a sink to BigQuery needs the logging service account to have bigquery.dataEditor role on the target dataset.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Cloud Logging",
+        "Log Sinks",
+        "Data Export"
+      ]
+    },
+    {
+      "id": 24,
+      "categoryRef": "cat-monitoring",
+      "difficulty": "intermediate",
+      "title": "Cloud Trace",
+      "scenario": "A microservices application is experiencing latency issues, and the team needs to identify which service in the request chain is causing delays.",
+      "questionText": "Which Google Cloud service provides distributed tracing to analyze request latency across services?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Cloud Profiler"
+        },
+        {
+          "letter": "B",
+          "text": "Cloud Trace"
+        },
+        {
+          "letter": "C",
+          "text": "Cloud Debugger"
+        },
+        {
+          "letter": "D",
+          "text": "Cloud Monitoring"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "The service you need collects latency data as requests flow through multiple services and visualizes the timing breakdown in a waterfall trace view."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Cloud Trace collects latency data from applications and displays it in a waterfall trace view showing time spent in each service for a given request. It helps pinpoint bottlenecks in distributed systems and integrates with OpenTelemetry for portable instrumentation. Cloud Profiler (A) profiles CPU and memory usage at the function level within a single service. Cloud Monitoring (B) tracks aggregate metrics but does not trace individual requests. Cloud Debugger (C) inspects application state at specific code locations without stopping execution."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Trace context propagates through standard HTTP headers (W3C Trace Context or X-Cloud-Trace-Context) across service boundaries, linking spans from different services into a single end-to-end trace.</li>\n              <li>Analysis reports show latency distributions, percentile breakdowns (p50, p95, p99), and trends over time, helping teams identify whether latency regressions are gradual or tied to specific deployments.</li>\n              <li>OpenTelemetry SDK provides vendor-neutral instrumentation for traces, so applications instrumented with OpenTelemetry can export to Cloud Trace, Jaeger, or Zipkin without code changes.</li>\n              <li>Cloud Trace automatically correlates with Cloud Logging entries, so clicking a trace span links directly to the log entries emitted during that span's execution window.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Cloud Trace",
+        "Distributed Tracing",
+        "Latency"
+      ]
+    },
+    {
+      "id": 25,
+      "categoryRef": "cat-monitoring",
+      "difficulty": "intermediate",
+      "title": "Error Reporting",
+      "scenario": "A development team wants to automatically detect, group, and track application errors with stack traces across their Cloud Run services.",
+      "questionText": "Which Google Cloud service automatically groups and tracks application errors and exceptions?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Cloud Logging"
+        },
+        {
+          "letter": "B",
+          "text": "Cloud Monitoring"
+        },
+        {
+          "letter": "C",
+          "text": "Error Reporting"
+        },
+        {
+          "letter": "D",
+          "text": "Cloud Trace"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "The service you need automatically parses stack traces from log entries, groups similar errors together, and tracks error frequency over time with notifications."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Error Reporting aggregates and displays errors produced by cloud services by automatically parsing stack traces from Cloud Logging entries, grouping similar errors, and tracking their frequency over time. Cloud Logging (A) stores the raw log data that Error Reporting reads from but does not group or track errors. Cloud Monitoring (C) handles metrics and alerting for numeric thresholds, not stack-trace-based error grouping. Cloud Trace (D) analyzes request latency, not application exceptions."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Error Reporting extracts exceptions automatically from Cloud Logging entries for supported languages (Java, Python, Go, Node.js, .NET, Ruby, PHP), requiring no additional instrumentation beyond structured logging.</li>\n              <li>Each error group has a resolution status (open, acknowledged, resolved, muted) that teams can update as they investigate and fix issues, providing a lightweight error-tracking workflow.</li>\n              <li>Notifications can be configured to alert when a new error group appears or when the frequency of an existing group spikes, helping teams catch regressions quickly after deployments.</li>\n              <li>Error groups link to source code in Cloud Source Repositories when configured, letting developers jump directly from an error group to the exact line of code that threw the exception.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Error Reporting",
+        "Debugging",
+        "Observability"
+      ]
+    },
+    {
+      "id": 26,
+      "categoryRef": "cat-cicd",
+      "difficulty": "intermediate",
+      "title": "Cloud Build Workers",
+      "scenario": "A company's Cloud Build jobs need to access resources in a private VPC network that is not accessible from the public internet.",
+      "questionText": "Which Cloud Build feature allows builds to run within a customer's VPC network?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Default pools"
+        },
+        {
+          "letter": "B",
+          "text": "Regional pools"
+        },
+        {
+          "letter": "C",
+          "text": "Worker pools"
+        },
+        {
+          "letter": "D",
+          "text": "Private pools"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Cloud Build offers a pool type that connects to your VPC via peering, allowing build steps to reach internal resources like private registries and databases."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Cloud Build private pools are dedicated worker resources that run within a VPC network you control via VPC peering. This enables builds to access private resources like internal package registries, databases, and services that are not internet-accessible. Default pools (A) run on Google-managed infrastructure with no VPC connectivity. Worker pools (C) is a generic term; the specific feature is called private pools. Regional pools (D) is not a Cloud Build concept."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Private pools connect to your VPC via VPC Network Peering, allowing build steps to resolve private DNS names and reach internal IP addresses just as if they were running inside your network.</li>\n              <li>Custom machine types (CPU and memory) can be specified for private pool workers, enabling resource-intensive builds like large C++ compilations or ML model training to get the compute they need.</li>\n              <li>Private pools enforce data residency by restricting builds to run only in the region where the pool is created, which is important for compliance with data sovereignty regulations.</li>\n              <li>Access to private pools is controlled via IAM, so platform teams can provision pools centrally and grant specific teams permission to use them without exposing VPC configuration details.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Cloud Build",
+        "Private Pools",
+        "VPC"
+      ]
+    },
+    {
+      "id": 27,
+      "categoryRef": "cat-container",
+      "difficulty": "intermediate",
+      "title": "Binary Authorization",
+      "scenario": "A security team requires that only container images that have passed security scanning and been signed can be deployed to production GKE clusters.",
+      "questionText": "Which Google Cloud service enforces deploy-time security policies for container images?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Security Command Center"
+        },
+        {
+          "letter": "B",
+          "text": "Binary Authorization"
+        },
+        {
+          "letter": "C",
+          "text": "Container Analysis"
+        },
+        {
+          "letter": "D",
+          "text": "Artifact Registry"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "The service you need enforces policies at deploy time by requiring cryptographic attestations that verify container images have passed required security checks."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Binary Authorization is a deploy-time security control that ensures only trusted container images run on GKE or Cloud Run. It uses attestations (cryptographic signatures from designated attestors) to verify that images have passed required checks. Security Command Center (A) provides organization-wide security posture visibility. Container Analysis (B) scans images for vulnerabilities but does not enforce deployment policies. Artifact Registry (D) stores images but does not gate deployments based on trust policies."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Attestors are authorities that verify images meet specific requirements (e.g., vulnerability scan passed, code review completed); each attestor uses a cryptographic key pair to sign attestations stored in Container Analysis notes.</li>\n              <li>Policies can require multiple attestations from different attestors for defense in depth, ensuring that no single compromised signing key can authorize a malicious deployment.</li>\n              <li>Break-glass procedures allow emergency deployments that bypass Binary Authorization policies, but all bypass events are logged in Cloud Audit Logs for post-incident review and compliance.</li>\n              <li>Binary Authorization integrates into CI/CD pipelines by having Cloud Build create attestations after successful vulnerability scans, automating the trust chain from build to deploy.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Binary Authorization",
+        "Container Security",
+        "GKE"
+      ]
+    },
+    {
+      "id": 28,
+      "categoryRef": "cat-container",
+      "difficulty": "basic",
+      "title": "Container Analysis",
+      "scenario": "Before deploying container images to production, a team wants to automatically scan them for known vulnerabilities in OS packages and language dependencies.",
+      "questionText": "Which Google Cloud feature provides automated vulnerability scanning for container images?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Container Analysis"
+        },
+        {
+          "letter": "B",
+          "text": "Binary Authorization"
+        },
+        {
+          "letter": "C",
+          "text": "Security Command Center"
+        },
+        {
+          "letter": "D",
+          "text": "Cloud Armor"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Look for the GCP feature that automatically scans container images in Artifact Registry for known CVEs in both OS-level and language-level dependencies."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Container Analysis (also called Artifact Analysis) automatically scans container images stored in Artifact Registry for known vulnerabilities, providing CVE identifiers, severity ratings, and fix recommendations. Cloud Armor (A) is a web application firewall for DDoS and application-layer protection. Binary Authorization (B) enforces deploy-time policies based on attestations but does not perform vulnerability scanning. Security Command Center (C) aggregates security findings across GCP but relies on Container Analysis for image vulnerability data."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Scanning covers both OS packages (Debian, Alpine, Red Hat) and language-level dependencies (Java, Python, Go, Node.js), providing comprehensive vulnerability detection across the full image stack.</li>\n              <li>On-demand scanning is available for images not stored in Artifact Registry, allowing teams to scan locally built images before pushing them to any registry.</li>\n              <li>Pub/Sub notifications can be configured to fire when new vulnerabilities are discovered in previously scanned images, enabling automated responses like blocking deployments or creating tickets.</li>\n              <li>Container Analysis stores vulnerability findings as occurrences attached to notes, using the Grafeas open-source metadata API, which allows integration with third-party security tools and custom policy engines.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Container Analysis",
+        "Vulnerability Scanning",
+        "Security"
+      ]
+    },
+    {
+      "id": 29,
+      "categoryRef": "cat-bigdata",
+      "difficulty": "intermediate",
+      "title": "BigQuery Scheduled Queries",
+      "scenario": "A data team needs to refresh summary tables daily by running the same aggregation query at 2 AM every morning.",
+      "questionText": "Which BigQuery feature enables automatic execution of queries on a recurring schedule?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Query cache"
+        },
+        {
+          "letter": "B",
+          "text": "Table snapshots"
+        },
+        {
+          "letter": "C",
+          "text": "Materialized views"
+        },
+        {
+          "letter": "D",
+          "text": "Scheduled queries"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "BigQuery has a built-in feature that runs SQL statements on a recurring schedule and writes results to a destination table, ideal for daily ETL refreshes."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "BigQuery scheduled queries run SQL statements automatically at specified times using cron-like schedules or simple intervals. Results can be written to a destination table with append or overwrite semantics. Query cache (A) stores results of recent identical queries but is automatic and not scheduled. Table snapshots (C) capture point-in-time table state for backup, not recurring query execution. Materialized views (D) precompute results incrementally but are not user-scheduled SQL executions."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Schedules use cron syntax (e.g., \"every day 02:00\") or simple intervals (e.g., \"every 24 hours\"), and a specific time zone can be set to ensure the query runs at the intended local time.</li>\n              <li>Runtime parameters like @run_date and @run_time are injected automatically, enabling queries to filter data relative to the execution time for incremental processing patterns.</li>\n              <li>Scheduled queries support DML statements (INSERT, UPDATE, MERGE) in addition to SELECT, so they can perform upserts and incremental updates on destination tables rather than just overwrites.</li>\n              <li>Failure notifications can be sent via email, and the BigQuery Data Transfer Service API exposes run history and status, enabling integration with monitoring tools for alerting on failed refreshes.</li></ul>"
+        }
+      ],
+      "tags": [
+        "BigQuery",
+        "Scheduled Queries",
+        "Automation"
+      ]
+    },
+    {
+      "id": 30,
+      "categoryRef": "cat-bigdata",
+      "difficulty": "advanced",
+      "title": "BigQuery Data Transfer Service",
+      "scenario": "A company needs to regularly import data from Google Ads, YouTube Analytics, and Amazon S3 into BigQuery for unified reporting.",
+      "questionText": "Which BigQuery feature automates data movement from external sources into BigQuery?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "BigQuery scheduled queries"
+        },
+        {
+          "letter": "B",
+          "text": "BigQuery Data Transfer Service"
+        },
+        {
+          "letter": "C",
+          "text": "Storage Transfer Service"
+        },
+        {
+          "letter": "D",
+          "text": "Dataflow"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "BigQuery has a dedicated transfer service that handles scheduled data imports from SaaS applications like Google Ads and YouTube, as well as cloud storage sources like Amazon S3."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "BigQuery Data Transfer Service automates data movement into BigQuery on a managed, scheduled basis. It supports Google SaaS applications (Ads, Analytics, YouTube), cloud storage (S3, GCS), and data warehouses (Redshift, Teradata). Storage Transfer Service (A) moves data between storage systems (GCS, S3) but does not load into BigQuery tables. Scheduled queries (B) run SQL within BigQuery but do not import from external sources. Dataflow (D) can load data but requires pipeline development and is not a managed transfer service."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Transfer configurations support cross-region and cross-cloud movements, with built-in connectors for Google Ads, Campaign Manager, YouTube, Amazon S3, Amazon Redshift, and Teradata.</li>\n              <li>Backfill mode allows loading historical data by specifying a date range, useful for initial migration or recovering from missed transfer windows without manual intervention.</li>\n              <li>Each transfer run is tracked with detailed status, row counts, and error messages, and email notifications can be configured for both successful completions and failures.</li>\n              <li>The Data Transfer Service uses the BigQuery Data Transfer API, which can be automated via Terraform or gcloud CLI to provision and manage transfer configurations as code across environments.</li></ul>"
+        }
+      ],
+      "tags": [
+        "BigQuery",
+        "Data Transfer",
+        "ETL"
+      ]
+    },
+    {
+      "id": 31,
+      "categoryRef": "cat-cicd",
+      "difficulty": "advanced",
+      "title": "Cloud Deploy Canary Deployments",
+      "scenario": "A team wants to minimize risk when deploying new versions by first routing a small percentage of traffic to the new version before full rollout.",
+      "questionText": "Which deployment strategy gradually shifts traffic from old to new versions?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Canary deployment"
+        },
+        {
+          "letter": "B",
+          "text": "Recreate deployment"
+        },
+        {
+          "letter": "C",
+          "text": "Rolling update"
+        },
+        {
+          "letter": "D",
+          "text": "Blue-green deployment"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "The deployment strategy you need sends a small percentage of production traffic to the new version first, verifies health, and then gradually increases to full rollout."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Canary deployments release changes to a small subset of users or traffic before rolling out to the entire infrastructure. Cloud Deploy supports canary strategies with configurable traffic percentages (e.g., 10%, 50%, 100%) and the ability to roll back if issues are detected. Recreate (A) terminates all old instances before starting new ones, causing downtime. Blue-green (B) maintains two full environments and switches all traffic at once. Rolling update (C) replaces instances incrementally but does not provide percentage-based traffic control."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Canary phases define specific traffic percentages and verification periods; for example, 5% for 10 minutes, then 25% for 30 minutes, then 100%, with health checks at each stage before advancing.</li>\n              <li>Automated rollback can be configured to trigger when Cloud Monitoring metrics (error rate, latency percentile) exceed defined thresholds during any canary phase, reverting traffic without human intervention.</li>\n              <li>Blue-green deployments maintain two complete, identical environments and switch traffic atomically, which provides instant rollback but doubles resource costs during deployment; canary shares the same infrastructure.</li>\n              <li>Cloud Deploy canary strategies integrate with GKE Gateway API and Cloud Run traffic splitting to manage the percentage-based routing at the infrastructure level without custom load balancer configuration.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Cloud Deploy",
+        "Canary",
+        "Progressive Delivery"
+      ]
+    },
+    {
+      "id": 32,
+      "categoryRef": "cat-workflow",
+      "difficulty": "intermediate",
+      "title": "Cloud Scheduler",
+      "scenario": "An application needs to trigger a Cloud Function every hour to check for and process new files in a Cloud Storage bucket.",
+      "questionText": "Which Google Cloud service provides fully managed cron job scheduling?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Cloud Tasks"
+        },
+        {
+          "letter": "B",
+          "text": "Cloud Scheduler"
+        },
+        {
+          "letter": "C",
+          "text": "Cloud Composer"
+        },
+        {
+          "letter": "D",
+          "text": "Cloud Workflows"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "The service you need is a managed cron scheduler that triggers HTTP endpoints, Pub/Sub topics, or App Engine handlers on a user-defined schedule using unix-cron syntax."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Cloud Scheduler is a fully managed cron job service that triggers targets on a schedule defined using unix-cron syntax. It supports HTTP/S endpoints, Pub/Sub topics, and App Engine applications as targets. Cloud Tasks (A) manages task queues for asynchronous dispatch but does not provide cron scheduling. Cloud Composer (B) orchestrates complex data pipelines with Airflow, which is heavy for a simple hourly trigger. Cloud Workflows (C) orchestrates multi-step processes but is not a cron scheduler itself."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Cloud Scheduler supports OIDC and OAuth tokens for authenticated HTTP requests, enabling secure triggering of Cloud Functions, Cloud Run, and other identity-aware endpoints without exposing public URLs.</li>\n              <li>Retry configuration allows specifying maximum retry attempts, minimum and maximum backoff intervals, and retry duration, handling transient failures gracefully without manual intervention.</li>\n              <li>Time zones can be specified per job using IANA time zone identifiers (e.g., America/Los_Angeles), ensuring schedules align with business hours regardless of the GCP region hosting the job.</li>\n              <li>Cloud Scheduler is commonly paired with Pub/Sub to decouple the schedule from the handler: the scheduler publishes a message on schedule, and any number of subscribers can react independently.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Cloud Scheduler",
+        "Cron",
+        "Automation"
+      ]
+    },
+    {
+      "id": 33,
+      "categoryRef": "cat-workflow",
+      "difficulty": "intermediate",
+      "title": "Cloud Tasks",
+      "scenario": "A web application needs to offload time-consuming email sending to a background queue so users don't wait for email delivery before seeing a response.",
+      "questionText": "Which Google Cloud service provides managed task queues for asynchronous task execution?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Cloud Tasks"
+        },
+        {
+          "letter": "B",
+          "text": "Cloud Workflows"
+        },
+        {
+          "letter": "C",
+          "text": "Pub/Sub"
+        },
+        {
+          "letter": "D",
+          "text": "Cloud Scheduler"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "The service you need provides managed queues where the producer explicitly targets a specific handler endpoint, with built-in rate limiting, retries, and deferred scheduling."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Cloud Tasks is a fully managed service for queuing and dispatching tasks to HTTP handlers or App Engine services. It provides rate limiting to control dispatch throughput, automatic retries with configurable backoff, and the ability to schedule tasks for future execution. Cloud Workflows (A) orchestrates multi-step processes, not individual task dispatch. Pub/Sub (B) provides pub-sub messaging with fan-out but lacks explicit targeting and rate limiting per queue. Cloud Scheduler (D) triggers jobs on a cron schedule, not on demand."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Tasks can include a scheduled execution time, allowing producers to defer work to a specific future moment (e.g., send a reminder email in 24 hours) without a separate scheduling service.</li>\n              <li>Task-level deduplication uses a task name as an idempotency key: if a task with the same name exists in the queue, the duplicate is rejected, preventing double-processing of the same work item.</li>\n              <li>Cloud Tasks vs Pub/Sub: Cloud Tasks is designed for explicit invocation of a single target with rate control, while Pub/Sub excels at fan-out to multiple independent subscribers with at-least-once delivery.</li>\n              <li>Queue-level rate limits (max dispatches per second, max concurrent dispatches) protect downstream services from being overwhelmed, acting as a traffic-shaping layer between producers and handlers.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Cloud Tasks",
+        "Queue",
+        "Asynchronous"
+      ]
+    },
+    {
+      "id": 34,
+      "categoryRef": "cat-bigdata",
+      "difficulty": "advanced",
+      "title": "Dataflow Streaming Exactly-Once",
+      "scenario": "A financial services company processes real-time transactions with Dataflow and requires exactly-once processing to ensure no transactions are processed twice or lost.",
+      "questionText": "Which Dataflow feature guarantees that each record is processed exactly once in streaming pipelines?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Watermarks"
+        },
+        {
+          "letter": "B",
+          "text": "Exactly-once semantics with checkpointing"
+        },
+        {
+          "letter": "C",
+          "text": "At-least-once delivery"
+        },
+        {
+          "letter": "D",
+          "text": "Dead letter queues"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Dataflow's Streaming Engine combines checkpointing, state management, and record deduplication to guarantee each record is processed exactly once even when workers fail."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Dataflow provides exactly-once processing semantics in streaming pipelines through a combination of checkpointing, persistent state management, and record-level deduplication. Even when workers fail and restart, each record is guaranteed to be processed exactly once. Watermarks (A) track event-time progress for windowing but do not provide delivery guarantees. At-least-once (B) guarantees delivery but allows duplicates. Dead letter queues (D) handle failed messages but do not ensure processing exactly once."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Checkpoints persist intermediate processing state to durable storage at regular intervals, enabling the system to resume from the last consistent state after a worker failure without reprocessing already-committed records.</li>\n              <li>Record IDs assigned by the source (e.g., Pub/Sub message IDs) enable deduplication: if a record is replayed after a failure, the system recognizes the duplicate and discards it before applying transforms.</li>\n              <li>Exactly-once semantics extend end-to-end to supported sinks like BigQuery (using buffered writes) and Cloud Storage, so the guarantee covers the full pipeline from ingestion through output.</li>\n              <li>Streaming Engine mode offloads shuffle and state storage from worker VMs to a Google-managed backend, improving checkpoint reliability and reducing the blast radius of individual worker failures.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Dataflow",
+        "Exactly-Once",
+        "Streaming"
+      ]
+    },
+    {
+      "id": 35,
+      "categoryRef": "cat-monitoring",
+      "difficulty": "advanced",
+      "title": "SLOs and Error Budgets",
+      "scenario": "An SRE team wants to define a 99.9% availability target for their service and track how much downtime budget remains before breaching the target.",
+      "questionText": "Which concept represents the allowable amount of unreliability based on an SLO?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Error budget"
+        },
+        {
+          "letter": "B",
+          "text": "SLA penalty"
+        },
+        {
+          "letter": "C",
+          "text": "Mean time to repair"
+        },
+        {
+          "letter": "D",
+          "text": "Recovery point objective"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "The concept you need is the mathematical inverse of an SLO, representing the maximum unreliability permitted before the service level objective is breached."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "An error budget is the inverse of an SLO: for a 99.9% availability SLO, the error budget is 0.1%, representing approximately 43.8 minutes of allowed downtime per month. It helps teams balance reliability investments with feature development velocity. SLA penalty (B) is a contractual consequence of missing an SLA, not a tracking mechanism. Mean time to repair (C) measures how quickly incidents are resolved. Recovery point objective (D) defines acceptable data loss in disaster recovery, not service availability tracking."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Cloud Monitoring supports SLO monitoring with built-in error budget tracking, showing a burn-down chart of remaining budget and historical consumption patterns over configurable time windows.</li>\n              <li>Burn rate alerts warn when the error budget is being consumed faster than expected; for example, if 10% of the monthly budget is consumed in one hour, the alert fires before the full budget is exhausted.</li>\n              <li>Error budget policies can automatically gate deployments: when the budget is exhausted, the team shifts focus to reliability work (fixing bugs, improving observability) and pauses new feature releases until budget recovers.</li>\n              <li>Multiple SLIs (Service Level Indicators) can feed a single SLO, such as combining availability (successful request ratio) and latency (p99 under 200ms), each consuming the same shared error budget.</li></ul>"
+        }
+      ],
+      "tags": [
+        "SRE",
+        "SLO",
+        "Error Budget"
+      ]
+    },
+    {
+      "id": 36,
+      "categoryRef": "cat-cicd",
+      "difficulty": "intermediate",
+      "title": "GitOps with Config Sync",
+      "scenario": "A platform team wants to manage GKE cluster configurations declaratively in Git, with automatic synchronization when changes are committed.",
+      "questionText": "Which GKE feature implements GitOps by syncing cluster state from a Git repository?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Config Sync"
+        },
+        {
+          "letter": "B",
+          "text": "Config Connector"
+        },
+        {
+          "letter": "C",
+          "text": "Policy Controller"
+        },
+        {
+          "letter": "D",
+          "text": "Cloud Build"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "The GKE feature you need continuously monitors a Git repository containing Kubernetes manifests and automatically applies changes to ensure cluster state matches the desired configuration in Git."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Config Sync is a GKE Enterprise feature that implements GitOps by continuously monitoring a Git repository and automatically applying Kubernetes manifests to clusters. It ensures cluster state matches the declared state in Git and detects drift. Config Connector (B) manages GCP resources via Kubernetes custom resources, not cluster configuration sync. Policy Controller (C) enforces compliance policies on cluster resources. Cloud Build (D) runs CI/CD pipelines but does not continuously reconcile cluster state with a Git repo."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Config Sync supports hierarchical repositories with structured directories for namespaces, cluster-scoped resources, and abstract namespace configurations, enabling multi-team setups with shared base policies.</li>\n              <li>Drift detection continuously compares actual cluster state against the Git source and automatically corrects any manual changes (kubectl edits) that diverge from the declared configuration.</li>\n              <li>Config Sync works with Policy Controller to enforce guardrails: Policy Controller validates resources before they are applied, and Config Sync ensures only policy-compliant configurations reach the cluster.</li>\n              <li>Config Sync supports OCI images and Helm charts as configuration sources in addition to Git, giving teams flexibility to use their preferred packaging format for Kubernetes manifests.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Config Sync",
+        "GitOps",
+        "GKE"
+      ]
+    },
+    {
+      "id": 37,
+      "categoryRef": "cat-bigdata",
+      "difficulty": "intermediate",
+      "title": "BigQuery BI Engine",
+      "scenario": "Business users complain that their Looker dashboards connected to BigQuery are too slow. The queries involve the same tables and filters repeatedly.",
+      "questionText": "Which BigQuery feature provides in-memory analysis for sub-second query response times?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "BI Engine"
+        },
+        {
+          "letter": "B",
+          "text": "Materialized views"
+        },
+        {
+          "letter": "C",
+          "text": "Query cache"
+        },
+        {
+          "letter": "D",
+          "text": "Slot reservations"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "BigQuery offers an in-memory analysis acceleration layer that intelligently caches frequently accessed data, delivering sub-second response times for interactive BI dashboards."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "BigQuery BI Engine is an in-memory analysis service that accelerates SQL queries by caching frequently accessed data in memory. It integrates seamlessly with BI tools like Looker and Looker Studio for sub-second interactive dashboard performance. Query cache (A) stores exact result sets for identical queries but does not accelerate new or parameterized queries. Materialized views (C) precompute aggregations but still require compute slots for queries. Slot reservations (D) guarantee compute capacity but do not provide in-memory acceleration."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>BI Engine reservations specify memory capacity in GB at the project level; the engine automatically decides which table columns and partitions to cache based on query patterns and access frequency.</li>\n              <li>BI Engine accelerates queries transparently, requiring no query modifications or special syntax; existing dashboards and reports automatically benefit once a reservation is provisioned.</li>\n              <li>Preferred tables can be configured to prioritize which datasets are cached when memory capacity is limited, ensuring the most business-critical dashboards always get in-memory performance.</li>\n              <li>BI Engine works alongside BigQuery's standard query cache and materialized views; the optimizer chooses the fastest execution path automatically, combining all available acceleration features.</li></ul>"
+        }
+      ],
+      "tags": [
+        "BigQuery",
+        "BI Engine",
+        "Performance"
+      ]
+    },
+    {
+      "id": 38,
+      "categoryRef": "cat-container",
+      "difficulty": "advanced",
+      "title": "Artifact Registry Remote Repositories",
+      "scenario": "A company wants to cache public Docker Hub images locally to reduce external dependencies and improve pull times, while also scanning them for vulnerabilities.",
+      "questionText": "Which Artifact Registry feature proxies and caches artifacts from external registries?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Mirror repositories"
+        },
+        {
+          "letter": "B",
+          "text": "Virtual repositories"
+        },
+        {
+          "letter": "C",
+          "text": "Remote repositories"
+        },
+        {
+          "letter": "D",
+          "text": "Standard repositories"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Artifact Registry has a repository type that acts as a caching proxy for upstream external sources like Docker Hub, transparently storing copies of pulled artifacts locally."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Remote repositories in Artifact Registry proxy requests to upstream external registries (Docker Hub, Maven Central, npm, PyPI) and cache artifacts locally on first pull. Subsequent requests are served from the cache, reducing latency and external dependencies. Mirror repositories (A) is not an Artifact Registry concept. Virtual repositories (B) provide a single endpoint that aggregates multiple repositories but do not proxy external sources. Standard repositories (D) store artifacts you push directly but do not proxy upstream registries."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Remote repositories improve reliability by serving cached artifacts even during upstream outages, ensuring that builds and deployments are not blocked by Docker Hub rate limits or third-party registry downtime.</li>\n              <li>Virtual repositories combine standard, remote, and other repository types under a single endpoint with configurable priority ordering, giving consumers a unified pull URL regardless of where artifacts originate.</li>\n              <li>Cached artifacts in remote repositories are automatically scanned by Container Analysis for known vulnerabilities, applying the same security posture to third-party images as to internally built ones.</li>\n              <li>Authentication credentials for private upstream registries can be stored in Secret Manager and referenced in the remote repository configuration, enabling caching from authenticated sources like GitHub Packages or private Docker registries.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Artifact Registry",
+        "Remote Repositories",
+        "Caching"
+      ]
+    },
+    {
+      "id": 39,
+      "categoryRef": "cat-workflow",
+      "difficulty": "advanced",
+      "title": "Cloud Composer DAG Serialization",
+      "scenario": "A Cloud Composer environment with many complex DAGs is experiencing slow web UI performance and scheduler delays.",
+      "questionText": "Which Cloud Composer 2 feature improves scheduler performance by storing parsed DAGs in the database?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "DAG serialization"
+        },
+        {
+          "letter": "B",
+          "text": "DAG parsing"
+        },
+        {
+          "letter": "C",
+          "text": "DAG versioning"
+        },
+        {
+          "letter": "D",
+          "text": "DAG bundling"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "The feature you need stores pre-parsed DAG representations in the Airflow metadata database so the webserver can display DAG structures without re-executing Python files."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "DAG serialization stores the parsed DAG structure in the Airflow metadata database, allowing the webserver to load DAG information from the database rather than re-parsing Python files on every page load. This dramatically improves web UI responsiveness and reduces scheduler overhead. DAG parsing (B) is the process serialization replaces for the webserver. DAG versioning (C) is not an Airflow feature. DAG bundling (D) does not exist as a Composer or Airflow concept."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>DAG serialization is enabled by default in Cloud Composer 2; the scheduler serializes DAGs after parsing and stores the JSON representation in the metadata database, where the webserver reads it directly.</li>\n              <li>With serialization enabled, the webserver does not import DAG Python code at all, significantly reducing CPU and memory usage on the webserver pods, especially for environments with hundreds of DAGs.</li>\n              <li>The scheduler still parses DAG Python files on its configured interval (dag_dir_list_interval), so DAG code must remain syntactically valid and parseable even though the webserver no longer executes it.</li>\n              <li>Serialized DAG data includes task dependencies, default arguments, and schedule intervals but not task execution logic, maintaining separation between the UI rendering path and the actual task execution path.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Cloud Composer",
+        "DAG Serialization",
+        "Performance"
+      ]
+    },
+    {
+      "id": 40,
+      "categoryRef": "cat-monitoring",
+      "difficulty": "intermediate",
+      "title": "Cloud Profiler",
+      "scenario": "A production service has CPU spikes, and engineers need to identify which functions consume the most CPU time without adding significant overhead.",
+      "questionText": "Which Google Cloud service provides continuous CPU and memory profiling for production applications?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Cloud Trace"
+        },
+        {
+          "letter": "B",
+          "text": "Cloud Debugger"
+        },
+        {
+          "letter": "C",
+          "text": "Cloud Monitoring"
+        },
+        {
+          "letter": "D",
+          "text": "Cloud Profiler"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "The service you need uses statistical sampling to continuously profile CPU and memory usage in production applications with minimal overhead, typically less than 1%."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Cloud Profiler continuously gathers CPU and memory usage data from production applications using statistical sampling with minimal overhead (typically under 1%). It displays flame graphs that visualize call stacks and resource consumption, making it easy to find optimization targets. Cloud Trace (A) analyzes request latency across distributed services, not function-level CPU usage. Cloud Debugger (B) inspects application state at specific code locations. Cloud Monitoring (C) tracks aggregate metrics but does not profile individual function performance."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Cloud Profiler supports Java, Go, Python, and Node.js applications through lightweight profiling agents that integrate with the application runtime and periodically upload profile data.</li>\n              <li>Flame graphs show hierarchical call stacks with width proportional to resource consumption, making it immediately visible which functions and call paths are the heaviest consumers of CPU or heap memory.</li>\n              <li>Profile comparison allows overlaying two time periods side-by-side to detect performance regressions introduced by specific deployments, showing exactly which functions got slower or started consuming more memory.</li>\n              <li>Profiling types include CPU time, wall time, heap allocation, contention (thread lock waits), and threads, giving engineers a multi-dimensional view of application performance characteristics.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Cloud Profiler",
+        "Performance",
+        "Observability"
+      ]
+    },
+    {
+      "id": 41,
+      "categoryRef": "cat-cicd",
+      "difficulty": "basic",
+      "title": "Cloud Build Substitutions",
+      "scenario": "An engineer needs to pass the Git branch name and commit SHA into their build steps for tagging container images appropriately.",
+      "questionText": "Which Cloud Build feature provides built-in variables like branch name and commit SHA in build configurations?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Substitution variables"
+        },
+        {
+          "letter": "B",
+          "text": "Environment variables"
+        },
+        {
+          "letter": "C",
+          "text": "Build secrets"
+        },
+        {
+          "letter": "D",
+          "text": "Build parameters"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Cloud Build injects dynamic values into cloudbuild.yaml at runtime using a variable mechanism that includes built-in values like $BRANCH_NAME and $COMMIT_SHA."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Substitution variables in Cloud Build are placeholders in cloudbuild.yaml that get replaced with actual values when a build executes. Built-in substitutions include $BRANCH_NAME, $COMMIT_SHA, $PROJECT_ID, $BUILD_ID, and others. Build parameters (A) is not a Cloud Build concept. Environment variables (B) are set within individual build steps but are not the mechanism for injecting Git metadata globally. Build secrets (C) inject sensitive values from Secret Manager, not Git metadata."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Built-in substitutions use the $ prefix without underscore (e.g., $BRANCH_NAME, $SHORT_SHA, $REPO_NAME), while custom substitutions must start with an underscore (e.g., $_DEPLOY_ENV, $_REGION).</li>\n              <li>Custom substitutions can be defined in trigger configurations or passed via the gcloud builds submit command, with default values specified in cloudbuild.yaml for optional parameters.</li>\n              <li>Substitutions are resolved before build execution begins, so they appear as literal strings in step arguments; they are not environment variables and cannot be modified during the build.</li>\n              <li>Dynamic substitutions using bash expressions (e.g., $(date +%Y%m%d)) require the dynamic_substitutions option to be enabled in the build config, expanding the range of computable values beyond Git metadata.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Cloud Build",
+        "Substitutions",
+        "Variables"
+      ]
+    },
+    {
+      "id": 42,
+      "categoryRef": "cat-bigdata",
+      "difficulty": "advanced",
+      "title": "Dataproc Metastore",
+      "scenario": "Multiple Dataproc clusters and Dataflow jobs need to share a common Hive metastore for consistent table definitions without managing a separate metastore service.",
+      "questionText": "Which Google Cloud service provides a fully managed Hive metastore?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Data Catalog"
+        },
+        {
+          "letter": "B",
+          "text": "Cloud SQL"
+        },
+        {
+          "letter": "C",
+          "text": "Dataproc Metastore"
+        },
+        {
+          "letter": "D",
+          "text": "BigQuery"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Google Cloud offers a fully managed, highly available Hive metastore service that multiple Dataproc clusters and other big data tools can share as a central metadata repository."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Dataproc Metastore is a fully managed, highly available Hive metastore that serves as a central metadata repository shared across Dataproc clusters, Dataflow pipelines, and other big data services. Data Catalog (A) provides metadata discovery and governance but is not a Hive-compatible metastore. Cloud SQL (B) could host a metastore database manually, but managing the schema, availability, and compatibility is your responsibility. BigQuery (D) has its own metadata system and is not a Hive metastore."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Dataproc Metastore supports Apache Hive Metastore protocol and AWS Glue-compatible mode, enabling migration from on-premises Hive environments or AWS-based data lakes with minimal schema changes.</li>\n              <li>Integration with Data Catalog provides unified metadata search and discovery, so table definitions stored in the Hive metastore are automatically visible in Data Catalog's search and lineage views.</li>\n              <li>Managed metastore instances eliminate the per-cluster metastore startup penalty, since ephemeral Dataproc clusters can connect to the persistent metastore immediately on creation rather than initializing their own.</li>\n              <li>Scheduled backups and point-in-time restore protect metastore data, and multi-region configurations provide high availability, ensuring that metadata is not lost even during regional outages.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Dataproc",
+        "Metastore",
+        "Hive"
+      ]
+    },
+    {
+      "id": 43,
+      "categoryRef": "cat-cicd",
+      "difficulty": "intermediate",
+      "title": "Cloud Build Approval Gates",
+      "scenario": "Before deploying to production, a manager must review and approve the build. Builds should wait until approval is granted.",
+      "questionText": "Which Cloud Build feature pauses a build until manual approval is received?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Build queues"
+        },
+        {
+          "letter": "B",
+          "text": "Build triggers"
+        },
+        {
+          "letter": "C",
+          "text": "Build notifications"
+        },
+        {
+          "letter": "D",
+          "text": "Approval gates"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Cloud Build has a feature that pauses pipeline execution at a defined point and waits for a designated approver to manually approve or reject before the build continues."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Approval gates in Cloud Build pause a build until a designated approver manually approves or rejects it. This is essential for production deployments that require human review and sign-off. Build queues (A) manage build execution order but do not pause for approval. Build triggers (B) start builds based on source events. Build notifications (C) send alerts about build status but do not gate execution on human decisions."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Approvers are specified via IAM roles (cloudbuild.builds.approve permission), and approval requests can be routed to specific teams or individuals based on the trigger or pipeline configuration.</li>\n              <li>Builds waiting for approval have a configurable timeout window (default 24 hours); if no approval or rejection is received before the timeout, the build is automatically canceled.</li>\n              <li>Rejection cancels the build with an optional reason message that is recorded in build history, providing an audit trail of who rejected what and why for compliance purposes.</li>\n              <li>Approval gates are commonly combined with Cloud Deploy promotion approvals to create a multi-layer governance model: Cloud Build gates the build artifact creation, and Cloud Deploy gates the deployment to each environment.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Cloud Build",
+        "Approvals",
+        "Governance"
+      ]
+    },
+    {
+      "id": 44,
+      "categoryRef": "cat-bigdata",
+      "difficulty": "intermediate",
+      "title": "Pub/Sub Dead Letter Topics",
+      "scenario": "Messages that repeatedly fail processing should be moved to a separate topic for investigation rather than blocking the queue or being lost.",
+      "questionText": "Which Pub/Sub feature captures messages that cannot be processed after multiple retries?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Message retention"
+        },
+        {
+          "letter": "B",
+          "text": "Dead letter topics"
+        },
+        {
+          "letter": "C",
+          "text": "Snapshot restore"
+        },
+        {
+          "letter": "D",
+          "text": "Message filtering"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Pub/Sub can redirect messages that fail processing after a configurable number of delivery attempts to a separate topic, preventing poison messages from blocking the main subscription."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Dead letter topics in Pub/Sub capture messages that cannot be successfully acknowledged after a specified number of delivery attempts. This prevents poison messages from blocking healthy message processing and preserves them for later investigation and reprocessing. Message retention (A) keeps acknowledged messages available for replay but does not handle failures. Message filtering (B) routes messages based on attributes at subscription time, not based on processing failures. Snapshot restore (D) resets a subscription to a previous point in time but does not isolate failed messages."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Maximum delivery attempts is configurable per subscription (range 5 to 100); after exceeding this threshold, the message is forwarded to the dead letter topic with metadata indicating the original subscription and delivery attempt count.</li>\n              <li>Dead-lettered messages retain their original attributes and payload, plus Pub/Sub adds a CloudPubSubDeadLetterSourceSubscription attribute so consumers can identify which subscription produced the failure.</li>\n              <li>Monitoring the dead letter topic's message count and publish rate with Cloud Monitoring alerts enables teams to detect processing failures early, before they accumulate into a backlog.</li>\n              <li>A common operational pattern is to create a pull subscription on the dead letter topic, periodically review failed messages, fix the processing bug, and then replay messages back to the original topic for reprocessing.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Pub/Sub",
+        "Dead Letter",
+        "Error Handling"
+      ]
+    },
+    {
+      "id": 45,
+      "categoryRef": "cat-monitoring",
+      "difficulty": "intermediate",
+      "title": "Managed Service for Prometheus",
+      "scenario": "A team uses Prometheus for metrics collection but wants to reduce operational burden while maintaining compatibility with existing Prometheus queries and Grafana dashboards.",
+      "questionText": "Which Google Cloud service provides fully managed, Prometheus-compatible metrics collection?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Cloud Monitoring"
+        },
+        {
+          "letter": "B",
+          "text": "Prometheus on GKE"
+        },
+        {
+          "letter": "C",
+          "text": "Managed Service for Prometheus"
+        },
+        {
+          "letter": "D",
+          "text": "Cloud Trace"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Google Cloud offers a fully managed Prometheus-compatible backend that ingests metrics from existing Prometheus exporters and supports PromQL queries without running your own Prometheus server."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Managed Service for Prometheus (part of Cloud Monitoring) provides a globally scalable, Prometheus-compatible metrics backend managed by Google. Teams keep their existing Prometheus instrumentation, exporters, and PromQL queries while offloading storage, scaling, and operations. Cloud Monitoring (A) is the broader platform that includes Managed Prometheus but uses its own query language (MQL) by default, not PromQL. Cloud Trace (C) handles distributed tracing, not metrics. Prometheus on GKE (D) is self-managed Prometheus, which is exactly the operational burden the team wants to eliminate."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Managed Service for Prometheus supports both managed collection (Google deploys and manages the collector) and self-deployed collection (you run the collector with Google's remote-write endpoint as the storage backend).</li>\n              <li>PromQL queries work with minimal modification, and existing Grafana dashboards that query Prometheus can be pointed at the managed backend by updating the data source URL to the Google-managed frontend.</li>\n              <li>Metrics stored in Managed Prometheus are available alongside native Cloud Monitoring metrics, enabling unified dashboards and alerting policies that combine both Prometheus and GCP infrastructure metrics.</li>\n              <li>Global replication ensures high availability and durability of metrics data; unlike self-hosted Prometheus, there is no single-node storage bottleneck or risk of data loss from pod eviction or disk failure.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Prometheus",
+        "Monitoring",
+        "GKE"
+      ]
+    },
+    {
+      "id": 46,
+      "categoryRef": "cat-cicd",
+      "difficulty": "advanced",
+      "title": "Skaffold Integration",
+      "scenario": "Developers want a tool that handles building, pushing, and deploying applications during local development with the same configuration used in CI/CD.",
+      "questionText": "Which tool provides continuous development for Kubernetes with Cloud Build and Cloud Deploy integration?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Helm"
+        },
+        {
+          "letter": "B",
+          "text": "kubectl"
+        },
+        {
+          "letter": "C",
+          "text": "Kustomize"
+        },
+        {
+          "letter": "D",
+          "text": "Skaffold"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "The tool you need manages the full build-push-deploy lifecycle for Kubernetes applications, with native integration to both Cloud Build and Cloud Deploy for consistent local and CI/CD workflows."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Skaffold is an open-source command-line tool by Google that automates the build, push, and deploy workflow for Kubernetes applications. It integrates natively with Cloud Build for remote builds and Cloud Deploy for production delivery. Helm (A) is a package manager for Kubernetes that templates manifests but does not manage the build-push-deploy loop. kubectl (B) is the Kubernetes CLI for applying manifests. Kustomize (C) generates Kubernetes manifests through overlay composition but does not handle building or pushing container images."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>skaffold.yaml defines build, test, and deploy configurations in a single file; Cloud Deploy uses the same skaffold.yaml to render and deploy manifests, ensuring development and production use identical deployment logic.</li>\n              <li>File sync enables rapid inner-loop iteration by syncing changed source files directly into running containers, avoiding full image rebuilds for interpreted languages like Python and Node.js.</li>\n              <li>Profiles in skaffold.yaml support different configurations for dev, staging, and production, such as using local Docker builds for development and Cloud Build for CI, all switchable via a command-line flag.</li>\n              <li>Skaffold's dev mode watches for file changes and automatically rebuilds, pushes, and redeploys the application, providing a hot-reload development experience for Kubernetes-native applications.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Skaffold",
+        "Kubernetes",
+        "Developer Tools"
+      ]
+    },
+    {
+      "id": 47,
+      "categoryRef": "cat-bigdata",
+      "difficulty": "intermediate",
+      "title": "BigQuery Materialized Views",
+      "scenario": "A complex aggregation query runs frequently and always produces the same results for the same input data. The team wants to avoid recomputing it every time.",
+      "questionText": "Which BigQuery feature automatically precomputes and caches query results that update incrementally?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Query cache"
+        },
+        {
+          "letter": "B",
+          "text": "Scheduled queries"
+        },
+        {
+          "letter": "C",
+          "text": "Materialized views"
+        },
+        {
+          "letter": "D",
+          "text": "Table snapshots"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "BigQuery has a feature that stores precomputed aggregation results, updates them incrementally as base data changes, and automatically rewrites matching queries to use the cached results."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Materialized views in BigQuery precompute and cache the results of a query definition. When base table data changes, only the delta is recomputed and applied incrementally. BigQuery's smart tuning automatically rewrites queries that match the view's pattern to use the cached results. Scheduled queries (A) run SQL on a timer but do not integrate with query optimization. Query cache (C) stores results of identical queries but expires when base data changes. Table snapshots (D) capture point-in-time table state for backup, not query acceleration."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Smart tuning automatically detects when a user's query can be satisfied by a materialized view and rewrites the execution plan to read from the cached results, even if the user did not explicitly reference the view.</li>\n              <li>Materialized views can be refreshed automatically (BigQuery manages the refresh interval) or manually via the REFRESH MATERIALIZED VIEW statement, giving teams control over freshness versus cost trade-offs.</li>\n              <li>Materialized views incur storage costs for the cached data, but the compute savings from avoiding repeated full-table aggregation scans typically outweigh the storage cost for frequently queried patterns.</li>\n              <li>Materialized views support aggregation functions (SUM, COUNT, AVG, MIN, MAX), filters, GROUP BY, and INNER JOIN, covering the most common dashboard and reporting query patterns.</li></ul>"
+        }
+      ],
+      "tags": [
+        "BigQuery",
+        "Materialized Views",
+        "Performance"
+      ]
+    },
+    {
+      "id": 48,
+      "categoryRef": "cat-workflow",
+      "difficulty": "intermediate",
+      "title": "Eventarc",
+      "scenario": "A service needs to automatically trigger when specific events occur in Google Cloud, such as when files are uploaded to Cloud Storage or when Pub/Sub messages arrive.",
+      "questionText": "Which Google Cloud service provides event-driven architecture by routing events to targets like Cloud Run?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Pub/Sub"
+        },
+        {
+          "letter": "B",
+          "text": "Eventarc"
+        },
+        {
+          "letter": "C",
+          "text": "Cloud Functions"
+        },
+        {
+          "letter": "D",
+          "text": "Cloud Scheduler"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "The service you need is a centralized event routing layer that connects events from GCP services, Pub/Sub, and third parties to targets like Cloud Run, Cloud Functions, and Workflows."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Eventarc is a fully managed event routing service that connects event sources (GCP services, Pub/Sub, third-party providers) to event handlers (Cloud Run, Cloud Functions, Workflows) using declarative triggers. Pub/Sub (A) is a messaging layer that Eventarc uses as transport but does not provide the trigger-routing abstraction. Cloud Functions (C) can be an event target but is not an event routing service itself. Cloud Scheduler (D) triggers actions on a timer, not in response to system events."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Event triggers define a source, event type filter, and target destination; for example, a trigger can fire when a specific Cloud Storage bucket receives an object.finalize event and route it to a Cloud Run service.</li>\n              <li>Eventarc uses the CloudEvents specification (CNCF standard) for event format, providing a consistent, vendor-neutral envelope structure with type, source, subject, and data fields.</li>\n              <li>Audit Log event triggers enable reacting to any audited GCP API call, such as creating a Compute Engine instance or modifying an IAM policy, making virtually any GCP action an event source.</li>\n              <li>Eventarc Advanced supports cross-project and cross-region event routing with message buses, enabling enterprise-scale event architectures where producers and consumers span multiple GCP projects.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Eventarc",
+        "Event-Driven",
+        "Cloud Run"
+      ]
+    },
+    {
+      "id": 49,
+      "categoryRef": "cat-monitoring",
+      "difficulty": "advanced",
+      "title": "Service Mesh Observability",
+      "scenario": "A microservices application running on GKE needs automatic mTLS, traffic management, and observability without modifying application code.",
+      "questionText": "Which GKE feature provides service mesh capabilities with built-in observability?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "GKE Ingress"
+        },
+        {
+          "letter": "B",
+          "text": "Cloud Load Balancing"
+        },
+        {
+          "letter": "C",
+          "text": "Anthos Service Mesh (or Cloud Service Mesh)"
+        },
+        {
+          "letter": "D",
+          "text": "Cloud Armor"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "The GKE feature you need provides a managed Istio-based service mesh that handles mTLS encryption, traffic routing, and telemetry collection via sidecar proxies without application code changes."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Anthos Service Mesh (also called Cloud Service Mesh) is a managed Istio-based service mesh that provides mutual TLS encryption, traffic management, and observability for microservices on GKE. It automatically collects telemetry and provides topology dashboards without code modifications. GKE Ingress (B) manages external HTTP/S traffic routing to services but does not provide service-to-service encryption, traffic splitting, or mesh-level observability. Cloud Load Balancing (C) distributes traffic at the infrastructure level. Cloud Armor (D) provides WAF and DDoS protection for external endpoints."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Envoy sidecar proxies are injected alongside each application container and handle all inbound and outbound traffic transparently, providing mTLS, retries, circuit breaking, and telemetry without any application code changes.</li>\n              <li>Service-level SLOs can be defined and monitored directly in the Cloud Service Mesh dashboard, showing error rates, latency percentiles, and availability against configured targets for each service.</li>\n              <li>Traffic splitting enables canary deployments and A/B testing at the mesh level by routing a configurable percentage of requests to different service versions based on HTTP headers, weights, or other criteria.</li>\n              <li>The service topology graph provides a real-time visualization of service dependencies, request rates, error rates, and latency between services, making it easy to identify the blast radius of a failing service.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Service Mesh",
+        "Anthos",
+        "Observability"
+      ]
+    },
+    {
+      "id": 50,
+      "categoryRef": "cat-cicd",
+      "difficulty": "intermediate",
+      "title": "Secret Manager Integration",
+      "scenario": "A Cloud Build pipeline needs to access database credentials securely without storing them in the repository or build configuration.",
+      "questionText": "Which Google Cloud service should be used to securely store and access secrets in CI/CD pipelines?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Secret Manager"
+        },
+        {
+          "letter": "B",
+          "text": "Cloud KMS"
+        },
+        {
+          "letter": "C",
+          "text": "IAM"
+        },
+        {
+          "letter": "D",
+          "text": "Config Connector"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Google Cloud provides a dedicated service for storing, versioning, and accessing sensitive data like API keys, passwords, and certificates, with native Cloud Build integration via the availableSecrets field."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Secret Manager is Google Cloud's secure storage service for API keys, passwords, certificates, and other sensitive data. Cloud Build accesses secrets using the availableSecrets field in cloudbuild.yaml, which injects them as environment variables or mounted files during build execution. Cloud KMS (B) manages encryption keys for encrypting and decrypting data but is not designed for storing secret values directly. IAM (C) controls who can access resources but does not store secrets. Config Connector (D) manages GCP resources via Kubernetes CRDs, not secret storage."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Secrets are versioned automatically: each update creates a new version, enabling rotation strategies where new versions are deployed gradually while old versions remain accessible for rollback.</li>\n              <li>IAM policies control access at both the secret level and the version level, so you can grant a service account access to only the latest version while restricting access to historical versions for audit purposes.</li>\n              <li>Automatic replication policies (user-managed or automatic) replicate secret data across specified regions, ensuring high availability and enabling low-latency access from any region where your workloads run.</li>\n              <li>Secret Manager integrates with Pub/Sub notifications to fire events on secret version creation, rotation, or deletion, enabling automated workflows like restarting services when credentials are rotated.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Secret Manager",
+        "Security",
+        "CI/CD"
+      ]
+    }
+  ],
+  "glossary": {
+    "gl-cloud-build": {
+      "id": "gl-cloud-build",
+      "category": "CI/CD",
+      "name": "Cloud Build",
+      "definition": "A fully managed CI/CD platform that executes builds on Google Cloud infrastructure using customizable build steps defined in YAML.",
+      "examNote": "Cloud Build uses cloudbuild.yaml for configuration and supports triggers for automated builds.",
+      "relatedTerms": [
+        "Cloud Deploy",
+        "Artifact Registry"
+      ]
+    },
+    "gl-cloud-deploy": {
+      "id": "gl-cloud-deploy",
+      "category": "CI/CD",
+      "name": "Cloud Deploy",
+      "definition": "A managed continuous delivery service that automates the deployment of applications to GKE, Cloud Run, and other targets with approval gates and rollback support.",
+      "examNote": "Use Cloud Deploy for progressive delivery with promotion between dev, staging, and production targets.",
+      "relatedTerms": []
+    },
+    "gl-artifact-registry": {
+      "id": "gl-artifact-registry",
+      "category": "Container Management",
+      "name": "Artifact Registry",
+      "definition": "A universal artifact management service that stores Docker images, language packages (npm, Maven, Python), and OS packages with integrated vulnerability scanning.",
+      "examNote": "Artifact Registry is the recommended replacement for Container Registry with additional format support.",
+      "relatedTerms": []
+    },
+    "gl-bigquery": {
+      "id": "gl-bigquery",
+      "category": "Big Data",
+      "name": "BigQuery",
+      "definition": "A serverless, highly scalable enterprise data warehouse that enables SQL queries on petabytes of data with separation of storage and compute.",
+      "examNote": "BigQuery supports partitioning, clustering, and BigQuery ML for machine learning with SQL.",
+      "relatedTerms": [
+        "BigQuery ML",
+        "BI Engine"
+      ]
+    },
+    "gl-dataflow": {
+      "id": "gl-dataflow",
+      "category": "Big Data",
+      "name": "Dataflow",
+      "definition": "A fully managed service for executing Apache Beam pipelines that provides unified batch and stream data processing with automatic scaling.",
+      "examNote": "Dataflow provides exactly-once processing semantics and supports templates for reusable pipelines.",
+      "relatedTerms": []
+    },
+    "gl-dataproc": {
+      "id": "gl-dataproc",
+      "category": "Big Data",
+      "name": "Dataproc",
+      "definition": "A managed Spark and Hadoop service that enables running open-source data analytics workloads with fast cluster creation and autoscaling.",
+      "examNote": "Dataproc Serverless runs Spark jobs without cluster management.",
+      "relatedTerms": []
+    },
+    "gl-pubsub": {
+      "id": "gl-pubsub",
+      "category": "Messaging",
+      "name": "Pub/Sub",
+      "definition": "A global, real-time messaging service that decouples services by allowing asynchronous communication through topics and subscriptions.",
+      "examNote": "Pub/Sub supports both push and pull delivery modes with at-least-once or exactly-once semantics.",
+      "relatedTerms": []
+    },
+    "gl-cloud-composer": {
+      "id": "gl-cloud-composer",
+      "category": "Orchestration",
+      "name": "Cloud Composer",
+      "definition": "A fully managed workflow orchestration service built on Apache Airflow that allows authoring, scheduling, and monitoring data pipelines using Python DAGs.",
+      "examNote": "Use Cloud Composer for complex data pipelines; use Cloud Workflows for simpler orchestration.",
+      "relatedTerms": [
+        "Cloud Workflows"
+      ]
+    },
+    "gl-dag": {
+      "id": "gl-dag",
+      "category": "Orchestration",
+      "name": "DAG (Directed Acyclic Graph)",
+      "definition": "A collection of tasks with dependencies that defines the execution order in Apache Airflow, where the acyclic property ensures no circular dependencies.",
+      "examNote": "DAGs are defined in Python and uploaded to the Cloud Composer DAGs folder.",
+      "relatedTerms": []
+    },
+    "gl-cloud-monitoring": {
+      "id": "gl-cloud-monitoring",
+      "category": "Operations",
+      "name": "Cloud Monitoring",
+      "definition": "A service that collects metrics, events, and metadata from Google Cloud resources, enabling dashboards, alerting, and uptime monitoring.",
+      "examNote": "Cloud Monitoring supports SLO monitoring and includes Managed Service for Prometheus.",
+      "relatedTerms": [
+        "Cloud Logging",
+        "Cloud Trace"
+      ]
+    },
+    "gl-cloud-logging": {
+      "id": "gl-cloud-logging",
+      "category": "Operations",
+      "name": "Cloud Logging",
+      "definition": "A fully managed service for storing, searching, analyzing, and alerting on log data from Google Cloud and custom sources.",
+      "examNote": "Use log sinks to route logs to BigQuery, Cloud Storage, or Pub/Sub.",
+      "relatedTerms": []
+    },
+    "gl-binary-auth": {
+      "id": "gl-binary-auth",
+      "category": "Security",
+      "name": "Binary Authorization",
+      "definition": "A deploy-time security control that ensures only trusted container images are deployed based on attestations (cryptographic signatures).",
+      "examNote": "Binary Authorization integrates with Artifact Registry vulnerability scanning.",
+      "relatedTerms": []
+    },
+    "gl-secret-manager": {
+      "id": "gl-secret-manager",
+      "category": "Security",
+      "name": "Secret Manager",
+      "definition": "A secure storage service for API keys, passwords, certificates, and other sensitive data with versioning, access control, and automatic replication.",
+      "examNote": "Cloud Build can inject secrets from Secret Manager as environment variables.",
+      "relatedTerms": []
+    },
+    "gl-error-budget": {
+      "id": "gl-error-budget",
+      "category": "SRE",
+      "name": "Error Budget",
+      "definition": "The inverse of an SLO that represents the maximum amount of unreliability (downtime or errors) allowed before breaching the service level objective.",
+      "examNote": "Error budgets help balance reliability with feature velocity in SRE practices.",
+      "relatedTerms": []
+    },
+    "gl-canary": {
+      "id": "gl-canary",
+      "category": "Deployment",
+      "name": "Canary Deployment",
+      "definition": "A deployment strategy that releases changes to a small subset of users before rolling out to the entire infrastructure, enabling early detection of issues.",
+      "examNote": "Cloud Deploy supports canary deployments with configurable traffic percentages.",
+      "relatedTerms": []
+    }
+  }
+}

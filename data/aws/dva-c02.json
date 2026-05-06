@@ -1,0 +1,2471 @@
+{
+  "version": "1.0",
+  "metadata": {
+    "examCode": "DVA-C02",
+    "examTitle": "AWS Certified Developer - Associate",
+    "provider": "Amazon Web Services",
+    "description": "Scenario-Based Study Guide for DVA-C02 certification - validates the ability to develop, deploy, and debug cloud-based applications using AWS services and best practices.",
+    "totalQuestions": 50,
+    "createdDate": "2026-01-21",
+    "lastModified": "2026-01-21T00:00:00Z",
+    "categories": {
+      "cat-development": "Development with AWS Services",
+      "cat-security": "Security",
+      "cat-deployment": "Deployment",
+      "cat-troubleshooting": "Troubleshooting and Optimization"
+    }
+  },
+  "questions": [
+    {
+      "id": 1,
+      "categoryRef": "cat-development",
+      "difficulty": "intermediate",
+      "title": "Lambda Function Handler",
+      "scenario": "A developer is creating a Lambda function in Python to process API Gateway requests. They need to understand the function signature and how to access the incoming request data.",
+      "questionText": "What are the two arguments passed to a Lambda function handler in Python?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "body and headers"
+        },
+        {
+          "letter": "B",
+          "text": "event (request data) and context (runtime information)"
+        },
+        {
+          "letter": "C",
+          "text": "request and response"
+        },
+        {
+          "letter": "D",
+          "text": "input and output"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Think about what information a function needs from its caller and what metadata the runtime itself can provide."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Lambda function handlers receive two arguments: event and context. The event object contains data from the trigger source (API Gateway request details, S3 event info, SQS messages, etc.). The context object provides runtime information including the function name, memory limit, remaining execution time (context.get_remaining_time_in_millis()), and request ID for logging."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>The event structure varies by trigger type - API Gateway proxy integration includes body, headers, pathParameters, queryStringParameters.</li>\n              <li>context.aws_request_id is useful for correlating logs across distributed systems.</li>\n              <li>context.log_group_name and context.log_stream_name identify where CloudWatch Logs are written.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Lambda",
+        "Python",
+        "Handler"
+      ]
+    },
+    {
+      "id": 2,
+      "categoryRef": "cat-development",
+      "difficulty": "intermediate",
+      "title": "Lambda Environment Variables",
+      "scenario": "A developer needs to configure a Lambda function with connection strings and API keys without hardcoding them in the source code.",
+      "questionText": "How should the developer store configuration values that the Lambda function can access at runtime?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Store in the deployment package"
+        },
+        {
+          "letter": "B",
+          "text": "Lambda environment variables"
+        },
+        {
+          "letter": "C",
+          "text": "Pass as function arguments"
+        },
+        {
+          "letter": "D",
+          "text": "Hardcode in function code"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Consider the twelve-factor app principle of separating configuration from code using key-value pairs set outside the function."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Lambda environment variables are key-value pairs configured outside the function code. They're accessible in code using standard mechanisms (os.environ in Python, process.env in Node.js). Environment variables can be encrypted using KMS for sensitive data. This follows the twelve-factor app methodology of separating configuration from code."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Environment variables are encrypted at rest and can use customer-managed KMS keys.</li>\n              <li>For secrets like database passwords, consider Secrets Manager with caching for automatic rotation.</li>\n              <li>Total environment variable size limit is 4 KB; use Parameter Store or Secrets Manager for larger configs.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Lambda",
+        "Environment Variables",
+        "Configuration"
+      ]
+    },
+    {
+      "id": 3,
+      "categoryRef": "cat-development",
+      "difficulty": "intermediate",
+      "title": "DynamoDB Primary Keys",
+      "scenario": "A developer is designing a DynamoDB table to store user orders. Each order belongs to a user, and they need to efficiently query all orders for a specific user while also being able to retrieve individual orders.",
+      "questionText": "What primary key structure best supports querying all orders for a user and retrieving individual orders?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Simple primary key with orderId only"
+        },
+        {
+          "letter": "B",
+          "text": "Composite primary key with userId as partition key and orderId as sort key"
+        },
+        {
+          "letter": "C",
+          "text": "Simple primary key with userId only"
+        },
+        {
+          "letter": "D",
+          "text": "Composite primary key with orderId as partition key and userId as sort key"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Think about which field groups items for efficient queries and which field uniquely identifies items within that group."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "A composite primary key with userId (partition key) and orderId (sort key) optimally supports both access patterns. Query operations retrieve all items with the same partition key (all orders for a user), while GetItem retrieves specific items using both keys. Data is stored together by partition key, making queries efficient. The sort key enables sorting and range queries within a partition."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Items with the same partition key are stored in the same partition, enabling efficient queries.</li>\n              <li>Sort key supports operators like begins_with, between, greater than for flexible queries.</li>\n              <li>Global Secondary Indexes (GSIs) can add additional query patterns with different partition/sort keys.</li></ul>"
+        }
+      ],
+      "tags": [
+        "DynamoDB",
+        "Primary Key",
+        "Data Modeling"
+      ]
+    },
+    {
+      "id": 4,
+      "categoryRef": "cat-development",
+      "difficulty": "intermediate",
+      "title": "DynamoDB Read Consistency",
+      "scenario": "A developer's application reads an item immediately after updating it, but sometimes receives the old value. The application requires reading the most recent data.",
+      "questionText": "Which DynamoDB read consistency option ensures the application reads the most recent data?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Strongly consistent read"
+        },
+        {
+          "letter": "B",
+          "text": "Eventually consistent read"
+        },
+        {
+          "letter": "C",
+          "text": "Cached read"
+        },
+        {
+          "letter": "D",
+          "text": "Transactional read"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Consider which read option trades higher cost and latency for a guarantee that you always see the latest written value."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "DynamoDB offers two read consistency options: Eventually consistent reads (default) might return stale data as changes propagate, while strongly consistent reads always return the most recent data. Strongly consistent reads cost twice as many read capacity units and may have higher latency. Use them when your application requires read-after-write consistency."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Eventually consistent reads typically achieve consistency within a second.</li>\n              <li>Strongly consistent reads are not supported on Global Secondary Indexes.</li>\n              <li>TransactGetItems provides strongly consistent reads with ACID guarantees across multiple items.</li></ul>"
+        }
+      ],
+      "tags": [
+        "DynamoDB",
+        "Consistency",
+        "Read Operations"
+      ]
+    },
+    {
+      "id": 5,
+      "categoryRef": "cat-development",
+      "difficulty": "intermediate",
+      "title": "API Gateway Integration Types",
+      "scenario": "A developer wants API Gateway to proxy requests directly to a Lambda function without any request/response transformation. The Lambda function should receive the full HTTP request details.",
+      "questionText": "Which API Gateway integration type should be used for direct Lambda proxy integration?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "MOCK"
+        },
+        {
+          "letter": "B",
+          "text": "AWS (Lambda Integration)"
+        },
+        {
+          "letter": "C",
+          "text": "HTTP"
+        },
+        {
+          "letter": "D",
+          "text": "AWS_PROXY (Lambda Proxy Integration)"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Look for the integration type that forwards the full HTTP request without any mapping templates or transformations."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Lambda proxy integration (AWS_PROXY) passes the entire HTTP request to the Lambda function including headers, query parameters, body, and context. The Lambda function must return a response in a specific format with statusCode, headers, and body. This simplifies API development by eliminating mapping templates and letting the function handle request/response formatting."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Lambda proxy response format: {statusCode: 200, headers: {}, body: \"string\", isBase64Encoded: false}</li>\n              <li>Non-proxy (AWS) integration allows request/response transformation with mapping templates.</li>\n              <li>HTTP_PROXY integration similarly proxies to HTTP endpoints without transformation.</li></ul>"
+        }
+      ],
+      "tags": [
+        "API Gateway",
+        "Lambda",
+        "Integration"
+      ]
+    },
+    {
+      "id": 6,
+      "categoryRef": "cat-development",
+      "difficulty": "intermediate",
+      "title": "SQS Message Visibility",
+      "scenario": "A Lambda function processes SQS messages but occasionally fails mid-processing. When it fails, the message should become available for reprocessing, but when it succeeds, the message should be removed from the queue.",
+      "questionText": "What happens to an SQS message after successful Lambda processing with the SQS trigger?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "The message must be manually deleted using the DeleteMessage API"
+        },
+        {
+          "letter": "B",
+          "text": "The message remains in the queue for eventual consumption"
+        },
+        {
+          "letter": "C",
+          "text": "The message moves to a DLQ automatically"
+        },
+        {
+          "letter": "D",
+          "text": "Lambda automatically deletes the message when the function returns successfully"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Think about who manages the message lifecycle when a polling-based event source mapping handles the integration."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "When using Lambda's SQS event source mapping, Lambda manages the polling and message lifecycle. Upon successful function execution, Lambda automatically deletes the message from the queue. If the function fails or times out, the message returns to the queue after the visibility timeout expires, enabling retry. After the maximum receive count, messages move to the dead-letter queue if configured."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Lambda processes messages in batches (configurable, 1-10,000 for standard, 1-10 for FIFO).</li>\n              <li>Partial batch response allows reporting individual message failures without failing the entire batch.</li>\n              <li>Function timeout should be less than queue visibility timeout to prevent duplicate processing.</li></ul>"
+        }
+      ],
+      "tags": [
+        "SQS",
+        "Lambda",
+        "Message Processing"
+      ]
+    },
+    {
+      "id": 7,
+      "categoryRef": "cat-development",
+      "difficulty": "intermediate",
+      "title": "S3 Event Notifications",
+      "scenario": "A developer needs to trigger a Lambda function whenever a new image is uploaded to an S3 bucket. The function should only process .jpg files uploaded to the images/ prefix.",
+      "questionText": "How should the developer configure S3 to trigger Lambda for specific uploads?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Configure S3 event notification with prefix (images/) and suffix (.jpg) filters"
+        },
+        {
+          "letter": "B",
+          "text": "Configure CloudWatch Events to monitor S3"
+        },
+        {
+          "letter": "C",
+          "text": "Use S3 replication to trigger Lambda"
+        },
+        {
+          "letter": "D",
+          "text": "Have Lambda poll S3 for new objects"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Consider S3's built-in mechanism for reacting to object creation, and how you can narrow which keys trigger the action."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "S3 event notifications can trigger Lambda (or SNS/SQS) when objects are created or deleted. You configure event types (s3:ObjectCreated:*), and optionally filter by key prefix (images/) and suffix (.jpg). The Lambda function receives an event containing the bucket name, object key, size, and other metadata. This creates an event-driven architecture without polling."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Lambda needs resource-based policy allowing S3 to invoke it (or use EventBridge for more complex routing).</li>\n              <li>EventBridge can receive S3 events for more sophisticated filtering and multiple targets.</li>\n              <li>S3 event notifications are at-least-once delivery; design handlers to be idempotent.</li></ul>"
+        }
+      ],
+      "tags": [
+        "S3",
+        "Lambda",
+        "Event-Driven"
+      ]
+    },
+    {
+      "id": 8,
+      "categoryRef": "cat-development",
+      "difficulty": "intermediate",
+      "title": "Cognito User Pools vs Identity Pools",
+      "scenario": "A developer is building a mobile app that needs user registration, authentication, and access to AWS services. Users should sign up with email/password and then access S3 and DynamoDB.",
+      "questionText": "Which Cognito components provide user authentication AND AWS credentials for accessing AWS services?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Cognito User Pools only"
+        },
+        {
+          "letter": "B",
+          "text": "Cognito User Pools for authentication, Identity Pools for AWS credentials"
+        },
+        {
+          "letter": "C",
+          "text": "Cognito Identity Pools only"
+        },
+        {
+          "letter": "D",
+          "text": "IAM users for each mobile user"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Think about which Cognito component handles sign-in and which one exchanges tokens for temporary AWS service credentials."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Amazon Cognito has two main components: User Pools handle user authentication - sign-up, sign-in, password reset, MFA - and issue JWT tokens. Identity Pools (Federated Identities) exchange tokens (from User Pools, social providers, or SAML) for temporary AWS credentials, enabling direct access to AWS services like S3 and DynamoDB. For this use case, use both together."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>User Pool tokens: ID token (user claims), Access token (API authorization), Refresh token.</li>\n              <li>Identity Pools map authenticated/unauthenticated users to different IAM roles.</li>\n              <li>Fine-grained access control uses IAM policy variables like ${cognito-identity.amazonaws.com:sub}.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Cognito",
+        "Authentication",
+        "Authorization"
+      ]
+    },
+    {
+      "id": 9,
+      "categoryRef": "cat-security",
+      "difficulty": "intermediate",
+      "title": "Lambda Execution Role",
+      "scenario": "A Lambda function needs to read from DynamoDB and write to S3. The developer receives \"AccessDeniedException\" when the function tries to access these services.",
+      "questionText": "What grants a Lambda function permissions to access other AWS services?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "VPC configuration"
+        },
+        {
+          "letter": "B",
+          "text": "IAM user credentials in environment variables"
+        },
+        {
+          "letter": "C",
+          "text": "Lambda execution role (IAM role attached to the function)"
+        },
+        {
+          "letter": "D",
+          "text": "Resource-based policies on the function"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Consider what IAM construct a service assumes at runtime to obtain permissions for accessing other AWS resources."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Every Lambda function has an execution role - an IAM role that Lambda assumes when running your code. The role's policies define what AWS services and resources the function can access. To fix AccessDeniedException, add the necessary permissions (dynamodb:GetItem, s3:PutObject, etc.) to the execution role's policy. Never use long-term credentials in Lambda."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Basic execution role includes CloudWatch Logs permissions (logs:CreateLogGroup, CreateLogStream, PutLogEvents).</li>\n              <li>Resource-based policies on Lambda control what can invoke the function, not what it can access.</li>\n              <li>For VPC-attached functions, add VPC-related permissions (ec2:CreateNetworkInterface, etc.).</li></ul>"
+        }
+      ],
+      "tags": [
+        "Lambda",
+        "IAM",
+        "Execution Role"
+      ]
+    },
+    {
+      "id": 10,
+      "categoryRef": "cat-security",
+      "difficulty": "intermediate",
+      "title": "API Gateway Authorization",
+      "scenario": "A developer needs to secure an API Gateway REST API so only authenticated users can access it. They're using Cognito User Pools for authentication.",
+      "questionText": "Which API Gateway authorizer type validates Cognito User Pool tokens?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "IAM Authorization"
+        },
+        {
+          "letter": "B",
+          "text": "Cognito User Pool Authorizer"
+        },
+        {
+          "letter": "C",
+          "text": "Lambda Authorizer"
+        },
+        {
+          "letter": "D",
+          "text": "API Key"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Look for the authorizer type purpose-built to validate tokens from the same identity provider already in use."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "API Gateway supports multiple authorization methods. Cognito User Pool Authorizer directly validates JWT tokens (ID or Access token) from a Cognito User Pool without custom code. The client includes the token in the Authorization header; API Gateway validates it against the configured User Pool. Claims from the token can be accessed in Lambda via event.requestContext.authorizer.claims."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Lambda Authorizers provide custom authentication logic (validate any token, call external services).</li>\n              <li>IAM authorization uses SigV4 signatures - good for AWS-to-AWS calls.</li>\n              <li>Authorization caching reduces latency and Cognito/Lambda costs for repeated requests.</li></ul>"
+        }
+      ],
+      "tags": [
+        "API Gateway",
+        "Cognito",
+        "Authorization"
+      ]
+    },
+    {
+      "id": 11,
+      "categoryRef": "cat-security",
+      "difficulty": "intermediate",
+      "title": "Secrets Manager in Lambda",
+      "scenario": "A Lambda function needs to connect to an RDS database. The developer wants to avoid hardcoding credentials and enable automatic credential rotation.",
+      "questionText": "What is the best practice for managing database credentials in Lambda?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Store credentials in environment variables"
+        },
+        {
+          "letter": "B",
+          "text": "Store credentials in Secrets Manager with rotation, cache them in Lambda"
+        },
+        {
+          "letter": "C",
+          "text": "Hardcode credentials in the function code"
+        },
+        {
+          "letter": "D",
+          "text": "Store credentials in a config file in the deployment package"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Think about which AWS service combines secure credential storage, automatic rotation for databases, and SDK-based retrieval."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "AWS Secrets Manager is the recommended way to manage database credentials in Lambda. It provides secure storage, automatic rotation for supported databases (RDS, Redshift, DocumentDB), and encryption. Use the AWS SDK to retrieve secrets, and cache them outside the handler to reuse across invocations. The Secrets Manager Lambda extension can simplify caching."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Initialize secret retrieval outside the handler for connection reuse across warm invocations.</li>\n              <li>Secrets Manager extension caches secrets and handles rotation transparently.</li>\n              <li>For non-rotating secrets, Parameter Store SecureString is a lower-cost alternative.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Secrets Manager",
+        "Lambda",
+        "Security"
+      ]
+    },
+    {
+      "id": 12,
+      "categoryRef": "cat-security",
+      "difficulty": "intermediate",
+      "title": "KMS Encryption in Applications",
+      "scenario": "A developer needs to encrypt sensitive data in their application before storing it in DynamoDB. They want to use AWS-managed encryption keys.",
+      "questionText": "Which KMS API operations are used to encrypt and decrypt data in application code?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "EnableKey and DisableKey"
+        },
+        {
+          "letter": "B",
+          "text": "CreateKey and DeleteKey"
+        },
+        {
+          "letter": "C",
+          "text": "PutKeyPolicy and GetKeyPolicy"
+        },
+        {
+          "letter": "D",
+          "text": "Encrypt and Decrypt (for small data) or GenerateDataKey for envelope encryption"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Consider which API calls let your application perform client-side encryption, and how the approach differs for small vs. large data."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "For client-side encryption, use KMS Encrypt API to encrypt data up to 4 KB directly with a KMS key. For larger data, use envelope encryption: call GenerateDataKey to get a plaintext and encrypted data key, encrypt your data with the plaintext key, discard the plaintext key, and store the encrypted data key alongside your encrypted data. For decryption, call Decrypt on the encrypted data key."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Envelope encryption is more efficient - you only call KMS once to encrypt/decrypt the data key.</li>\n              <li>AWS Encryption SDK simplifies envelope encryption with best practices built in.</li>\n              <li>KMS has API rate limits; use data key caching for high-throughput encryption.</li></ul>"
+        }
+      ],
+      "tags": [
+        "KMS",
+        "Encryption",
+        "Client-Side"
+      ]
+    },
+    {
+      "id": 13,
+      "categoryRef": "cat-deployment",
+      "difficulty": "intermediate",
+      "title": "Lambda Deployment Packages",
+      "scenario": "A developer's Lambda deployment package exceeds the 50 MB zipped limit due to large dependencies. They need to deploy the function.",
+      "questionText": "What is the solution for Lambda deployment packages larger than 50 MB?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Upload to S3 and reference the S3 location, or use container images up to 10 GB"
+        },
+        {
+          "letter": "B",
+          "text": "Compress the package more aggressively"
+        },
+        {
+          "letter": "C",
+          "text": "Split the code across multiple Lambda functions"
+        },
+        {
+          "letter": "D",
+          "text": "Request a limit increase from AWS"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Think about alternate deployment methods that bypass the direct upload size limit, including one with a much higher ceiling."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Lambda deployment package limits: 50 MB zipped for direct upload, 250 MB unzipped for S3-based deployment. For packages exceeding these limits, use Lambda container images which support up to 10 GB. Container images can include the runtime, dependencies, and code, making them ideal for ML models, large frameworks, or custom runtimes."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Lambda Layers can reduce package size by separating common dependencies (up to 5 layers, 250 MB total unzipped).</li>\n              <li>Container images are stored in ECR; Lambda pulls them when creating execution environments.</li>\n              <li>Use multi-stage Docker builds to minimize final image size.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Lambda",
+        "Deployment",
+        "Container Images"
+      ]
+    },
+    {
+      "id": 14,
+      "categoryRef": "cat-deployment",
+      "difficulty": "intermediate",
+      "title": "Lambda Versions and Aliases",
+      "scenario": "A developer wants to deploy a new Lambda version while keeping the previous version available for quick rollback. They also need to gradually shift traffic to the new version.",
+      "questionText": "Which Lambda features support versioning and traffic shifting for safe deployments?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Lambda versions for immutable snapshots, aliases for traffic routing with weighted percentages"
+        },
+        {
+          "letter": "B",
+          "text": "Lambda environment variables for version control"
+        },
+        {
+          "letter": "C",
+          "text": "S3 versioning for deployment packages"
+        },
+        {
+          "letter": "D",
+          "text": "API Gateway stages only"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Consider how you can create immutable snapshots of your function and then use named pointers to gradually shift traffic between them."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Lambda versions are immutable snapshots of function code and configuration. Aliases are pointers to versions (like \"prod\" pointing to version 5). Aliases support weighted traffic routing - send 10% to version 6 and 90% to version 5 for canary deployments. If issues arise, instantly shift 100% back to the previous version by updating the alias. API Gateway and other triggers should invoke the alias, not $LATEST."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>$LATEST is mutable (latest code); versions are immutable snapshots.</li>\n              <li>CodeDeploy can automate Lambda traffic shifting with automatic rollback on CloudWatch alarms.</li>\n              <li>Provisioned concurrency is configured per alias or version, not on $LATEST.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Lambda",
+        "Versions",
+        "Aliases"
+      ]
+    },
+    {
+      "id": 15,
+      "categoryRef": "cat-deployment",
+      "difficulty": "intermediate",
+      "title": "SAM Template Structure",
+      "scenario": "A developer is using AWS SAM to define their serverless application. They need to understand the relationship between SAM and CloudFormation.",
+      "questionText": "What is the relationship between AWS SAM templates and CloudFormation?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "SAM templates are CloudFormation extensions with simplified syntax for serverless resources"
+        },
+        {
+          "letter": "B",
+          "text": "SAM and CloudFormation are completely separate services"
+        },
+        {
+          "letter": "C",
+          "text": "SAM replaces CloudFormation for all AWS deployments"
+        },
+        {
+          "letter": "D",
+          "text": "CloudFormation cannot deploy Lambda functions"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Think about whether SAM is a standalone service or builds on top of an existing infrastructure-as-code framework."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "AWS SAM (Serverless Application Model) templates are CloudFormation templates with a Transform (AWS::Serverless-2016-10-31) that adds simplified resource types. AWS::Serverless::Function, AWS::Serverless::Api, and AWS::Serverless::SimpleTable expand to multiple CloudFormation resources. SAM CLI provides local testing, building, and deployment commands. SAM templates can include any CloudFormation resource type."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>sam build compiles code and dependencies; sam deploy packages and deploys via CloudFormation.</li>\n              <li>sam local invoke/start-api enables local Lambda testing with Docker.</li>\n              <li>SAM Globals section applies properties to all functions, reducing repetition.</li></ul>"
+        }
+      ],
+      "tags": [
+        "SAM",
+        "CloudFormation",
+        "Infrastructure as Code"
+      ]
+    },
+    {
+      "id": 16,
+      "categoryRef": "cat-deployment",
+      "difficulty": "intermediate",
+      "title": "CodePipeline Stages",
+      "scenario": "A developer is setting up a CI/CD pipeline using AWS CodePipeline. They need to understand the typical stages and actions in a pipeline.",
+      "questionText": "What are the typical stages in an AWS CodePipeline for deploying a Lambda function?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Source (CodeCommit/GitHub), Build (CodeBuild), Deploy (CloudFormation/SAM)"
+        },
+        {
+          "letter": "B",
+          "text": "Build, Test, and Release stages only"
+        },
+        {
+          "letter": "C",
+          "text": "Only Source and Deploy stages"
+        },
+        {
+          "letter": "D",
+          "text": "Commit, Merge, and Publish stages"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Think about the three fundamental phases of getting code from a repository into a running serverless application."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "AWS CodePipeline orchestrates the stages of a CI/CD pipeline. A typical serverless pipeline includes: Source stage (CodeCommit, GitHub, S3) to fetch code on commits; Build stage (CodeBuild) to run tests, compile, and package the SAM template; Deploy stage (CloudFormation or SAM deploy action) to deploy resources. Additional stages can include approval gates and test environments."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>CodeBuild buildspec.yml defines build commands, including sam build and sam package.</li>\n              <li>Artifacts pass between stages - build outputs become deploy inputs.</li>\n              <li>Manual approval actions can gate production deployments.</li></ul>"
+        }
+      ],
+      "tags": [
+        "CodePipeline",
+        "CI/CD",
+        "DevOps"
+      ]
+    },
+    {
+      "id": 17,
+      "categoryRef": "cat-deployment",
+      "difficulty": "intermediate",
+      "title": "Elastic Beanstalk Deployment Policies",
+      "scenario": "A developer needs to deploy updates to an Elastic Beanstalk environment with zero downtime. The application must maintain full capacity during deployment.",
+      "questionText": "Which Elastic Beanstalk deployment policy maintains full capacity throughout the deployment?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Immutable or Blue/Green deployment"
+        },
+        {
+          "letter": "B",
+          "text": "All at once"
+        },
+        {
+          "letter": "C",
+          "text": "Rolling with additional batch"
+        },
+        {
+          "letter": "D",
+          "text": "Rolling"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Consider which deployment strategies keep the full fleet running while bringing up a completely separate set of new instances."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Immutable deployment creates a new Auto Scaling group with new instances running the updated version. After health checks pass, instances are moved to the existing ASG and old instances are terminated. Blue/Green creates an entirely new environment and swaps URLs. Both maintain full capacity. Rolling deploys batches sequentially, temporarily reducing capacity."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>All at once is fastest but causes downtime; use only for development.</li>\n              <li>Rolling with additional batch adds instances before removing old ones, maintaining capacity.</li>\n              <li>Immutable allows quick rollback by terminating new instances; Blue/Green by swapping back.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Elastic Beanstalk",
+        "Deployment",
+        "Zero Downtime"
+      ]
+    },
+    {
+      "id": 18,
+      "categoryRef": "cat-troubleshooting",
+      "difficulty": "intermediate",
+      "title": "CloudWatch Logs Insights",
+      "scenario": "A developer needs to search through millions of Lambda log entries to find specific errors and analyze patterns. Standard log viewing is too slow.",
+      "questionText": "Which service enables fast, interactive querying of CloudWatch Logs?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "CloudWatch Metrics"
+        },
+        {
+          "letter": "B",
+          "text": "CloudWatch Alarms"
+        },
+        {
+          "letter": "C",
+          "text": "CloudWatch Logs Insights"
+        },
+        {
+          "letter": "D",
+          "text": "AWS X-Ray"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Look for the CloudWatch capability that lets you run structured queries directly against log data at scale."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "CloudWatch Logs Insights enables interactive log analysis with a purpose-built query language. You can filter logs, extract fields, aggregate data, and visualize results. Queries like \"fields @timestamp, @message | filter @message like /ERROR/ | stats count(*) by bin(5m)\" efficiently analyze millions of log entries. Auto-discovered fields make querying structured logs easy."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>@message, @timestamp, @logStream are default fields; Lambda adds @requestId.</li>\n              <li>parse command extracts fields from unstructured log lines using regex or glob patterns.</li>\n              <li>Queries can span multiple log groups for cross-service analysis.</li></ul>"
+        }
+      ],
+      "tags": [
+        "CloudWatch",
+        "Logs Insights",
+        "Debugging"
+      ]
+    },
+    {
+      "id": 19,
+      "categoryRef": "cat-troubleshooting",
+      "difficulty": "intermediate",
+      "title": "X-Ray Tracing",
+      "scenario": "A developer is debugging a serverless application where requests pass through API Gateway, multiple Lambda functions, and DynamoDB. They need to identify which component is causing latency.",
+      "questionText": "Which service provides distributed tracing to visualize request flow and identify bottlenecks?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "CloudWatch Logs"
+        },
+        {
+          "letter": "B",
+          "text": "CloudWatch Metrics"
+        },
+        {
+          "letter": "C",
+          "text": "CloudTrail"
+        },
+        {
+          "letter": "D",
+          "text": "AWS X-Ray"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Think about which AWS service visualizes the path of a request across multiple services and pinpoints where time is spent."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "AWS X-Ray traces requests as they flow through your application, providing a service map visualization and detailed timing for each component. Enable X-Ray tracing on API Gateway and Lambda functions; the X-Ray SDK automatically traces AWS SDK calls to DynamoDB, S3, etc. X-Ray shows where time is spent, helping identify performance bottlenecks."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>X-Ray trace IDs propagate via the X-Amzn-Trace-Id header across services.</li>\n              <li>Active tracing (Lambda) vs passive tracing (sampling incoming traced requests).</li>\n              <li>Add custom subsegments and annotations for application-specific tracing.</li></ul>"
+        }
+      ],
+      "tags": [
+        "X-Ray",
+        "Tracing",
+        "Performance"
+      ]
+    },
+    {
+      "id": 20,
+      "categoryRef": "cat-troubleshooting",
+      "difficulty": "intermediate",
+      "title": "Lambda Cold Starts",
+      "scenario": "A developer notices that their Lambda function occasionally takes several seconds to respond, while most responses are under 100ms. The slow responses correspond to new function invocations.",
+      "questionText": "What causes the occasional slow Lambda responses, and how can it be mitigated?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Network latency to DynamoDB; use DAX"
+        },
+        {
+          "letter": "B",
+          "text": "Memory allocation is too low; increase memory"
+        },
+        {
+          "letter": "C",
+          "text": "Cold starts when initializing new execution environments; mitigate with provisioned concurrency"
+        },
+        {
+          "letter": "D",
+          "text": "Timeout is configured too high; reduce timeout"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Consider what happens the very first time an execution environment is created, and how you can pre-initialize environments."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Cold starts occur when Lambda creates a new execution environment - downloading code, initializing the runtime, and running initialization code. This adds latency to the first request. Mitigate with: provisioned concurrency (pre-warms environments), keeping functions warm with scheduled pings, optimizing initialization code, using smaller deployment packages, and choosing faster runtimes."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>VPC-attached functions had longer cold starts historically; this is now improved with Hyperplane ENIs.</li>\n              <li>Move database connections and SDK clients outside the handler for reuse in warm invocations.</li>\n              <li>SnapStart (for Java) reduces cold start by caching initialized snapshots.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Lambda",
+        "Cold Starts",
+        "Performance"
+      ]
+    },
+    {
+      "id": 21,
+      "categoryRef": "cat-development",
+      "difficulty": "intermediate",
+      "title": "DynamoDB Query vs Scan",
+      "scenario": "A developer needs to retrieve all items from a DynamoDB table where a specific attribute equals a certain value. The attribute is not the partition key.",
+      "questionText": "Which operation should be used, and what is the performance implication?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "BatchGetItem"
+        },
+        {
+          "letter": "B",
+          "text": "Query on the main table"
+        },
+        {
+          "letter": "C",
+          "text": "GetItem with filter"
+        },
+        {
+          "letter": "D",
+          "text": "Scan (reads entire table) or create a GSI on the attribute for efficient Query"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Think about the cost of reading every item to filter in memory, versus adding a secondary index that makes the attribute directly queryable."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Query requires a partition key value; it cannot search by non-key attributes directly. Scan reads every item in the table and applies a filter, consuming capacity proportional to table size regardless of results. For frequent queries on non-key attributes, create a Global Secondary Index (GSI) with the attribute as partition key, enabling efficient Query operations on the GSI."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>GSIs are eventually consistent by default; strongly consistent reads are not supported.</li>\n              <li>Scan can be parallelized with Segment and TotalSegments parameters.</li>\n              <li>ProjectionExpression reduces data transfer by returning only needed attributes.</li></ul>"
+        }
+      ],
+      "tags": [
+        "DynamoDB",
+        "Query",
+        "GSI"
+      ]
+    },
+    {
+      "id": 22,
+      "categoryRef": "cat-development",
+      "difficulty": "intermediate",
+      "title": "Step Functions Task States",
+      "scenario": "A developer is building a Step Functions workflow that needs to call a Lambda function, wait for the result, and then proceed based on the output.",
+      "questionText": "Which Step Functions state type invokes a Lambda function and waits for completion?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Task state with Lambda integration"
+        },
+        {
+          "letter": "B",
+          "text": "Wait state"
+        },
+        {
+          "letter": "C",
+          "text": "Pass state"
+        },
+        {
+          "letter": "D",
+          "text": "Choice state"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Consider which Step Functions state type is designed to invoke external services and wait for their result before continuing."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Step Functions Task states perform work by integrating with AWS services. For Lambda, use Resource: arn:aws:states:::lambda:invoke with synchronous invocation (default) - the workflow waits for Lambda to complete and receives the output. Task states support error handling (Catch), retries with exponential backoff (Retry), and timeouts."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Optimized integrations (arn:aws:states:::dynamodb:putItem) call services directly without Lambda.</li>\n              <li>.waitForTaskToken pattern enables callbacks from external systems or long-running processes.</li>\n              <li>Choice state routes execution based on conditions; Pass state transforms data without invoking services.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Step Functions",
+        "Task State",
+        "Orchestration"
+      ]
+    },
+    {
+      "id": 23,
+      "categoryRef": "cat-development",
+      "difficulty": "intermediate",
+      "title": "SNS Message Filtering",
+      "scenario": "A single SNS topic receives order events. Different Lambda functions should process only specific order types: one for electronics, another for clothing.",
+      "questionText": "How can subscribers receive only relevant messages without filtering in application code?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Configure filter policies on SNS subscriptions based on message attributes"
+        },
+        {
+          "letter": "B",
+          "text": "Create separate SNS topics for each order type"
+        },
+        {
+          "letter": "C",
+          "text": "Use SQS between SNS and Lambda for filtering"
+        },
+        {
+          "letter": "D",
+          "text": "Filter in the Lambda function code"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Think about how subscribers can declare which message attributes they care about so the service delivers only relevant messages."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "SNS subscription filter policies evaluate message attributes against a filter policy attached to the subscription. Only messages matching the filter are delivered. Publishers include message attributes (like orderType: \"electronics\"); the filter policy specifies allowed values. This reduces Lambda invocations and simplifies architecture compared to multiple topics or in-function filtering."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Filter policies support exact match, prefix, numeric range, and boolean operators.</li>\n              <li>Messages without matching attributes are still delivered unless the filter explicitly excludes them.</li>\n              <li>Filter policies apply to message attributes, not the message body (unless using payload-based filtering).</li></ul>"
+        }
+      ],
+      "tags": [
+        "SNS",
+        "Filter Policies",
+        "Messaging"
+      ]
+    },
+    {
+      "id": 24,
+      "categoryRef": "cat-security",
+      "difficulty": "intermediate",
+      "title": "S3 Presigned URLs",
+      "scenario": "A web application needs to allow users to upload files directly to S3 without the files passing through the application server. The application should control who can upload and to which path.",
+      "questionText": "What S3 feature enables secure direct uploads from clients?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "S3 public bucket access"
+        },
+        {
+          "letter": "B",
+          "text": "Presigned URLs or presigned POST policies"
+        },
+        {
+          "letter": "C",
+          "text": "CORS configuration only"
+        },
+        {
+          "letter": "D",
+          "text": "S3 Access Points"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Consider the S3 mechanism that lets a server generate time-limited, credential-embedded links so untrusted clients can upload directly."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Presigned URLs provide temporary access to S3 objects without requiring AWS credentials in the client. The server generates a URL signed with its credentials, valid for a specified duration. For uploads, presigned PUT URLs or presigned POST policies (which can set conditions like file size, content type) enable direct browser-to-S3 uploads while the application controls access."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Presigned URLs use the signer's permissions; if the signer loses permission, the URL becomes invalid.</li>\n              <li>Presigned POST allows HTML form uploads with conditions (max size, key prefix, content-type).</li>\n              <li>CORS must be configured on the bucket to allow browser-based uploads.</li></ul>"
+        }
+      ],
+      "tags": [
+        "S3",
+        "Presigned URLs",
+        "Security"
+      ]
+    },
+    {
+      "id": 25,
+      "categoryRef": "cat-development",
+      "difficulty": "advanced",
+      "title": "DynamoDB Transactions",
+      "scenario": "A developer needs to update multiple DynamoDB items atomically - if any update fails, all updates should be rolled back. This is for transferring credits between user accounts.",
+      "questionText": "Which DynamoDB feature provides atomic operations across multiple items?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "DynamoDB Streams with Lambda"
+        },
+        {
+          "letter": "B",
+          "text": "Conditional expressions on each item"
+        },
+        {
+          "letter": "C",
+          "text": "BatchWriteItem"
+        },
+        {
+          "letter": "D",
+          "text": "TransactWriteItems for atomic multi-item writes"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Look for the DynamoDB API that guarantees all-or-nothing writes across multiple items in a single atomic operation."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "DynamoDB transactions (TransactWriteItems, TransactGetItems) provide atomicity, consistency, isolation, and durability (ACID) across up to 100 items. For a credit transfer, TransactWriteItems can deduct from one account and credit another atomically - if either operation fails, both are rolled back. This prevents inconsistent states that could occur with separate writes."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Transactions consume 2x the write capacity of non-transactional writes.</li>\n              <li>BatchWriteItem is NOT atomic - individual items can fail independently.</li>\n              <li>TransactWriteItems supports Put, Update, Delete, and ConditionCheck operations.</li></ul>"
+        }
+      ],
+      "tags": [
+        "DynamoDB",
+        "Transactions",
+        "ACID"
+      ]
+    },
+    {
+      "id": 26,
+      "categoryRef": "cat-troubleshooting",
+      "difficulty": "intermediate",
+      "title": "Lambda Error Handling",
+      "scenario": "A Lambda function processing SQS messages sometimes fails due to transient errors. The developer wants automatic retries with exponential backoff before messages go to a dead-letter queue.",
+      "questionText": "How should retries be configured for Lambda functions triggered by SQS?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Configure Lambda destination on failure"
+        },
+        {
+          "letter": "B",
+          "text": "Implement retry logic in the Lambda function code"
+        },
+        {
+          "letter": "C",
+          "text": "Configure maxReceiveCount on SQS queue; Lambda retries automatically via visibility timeout"
+        },
+        {
+          "letter": "D",
+          "text": "Use Step Functions for retry logic"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Think about whether the compute service or the queue service owns the retry behavior when using a polling-based trigger."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "For SQS-triggered Lambda, retries are handled by SQS, not Lambda's retry configuration. When Lambda fails to process a message (throws an error), the message returns to the queue after visibility timeout expires. After maxReceiveCount attempts (set in redrive policy), it moves to the DLQ. Configure visibility timeout longer than Lambda timeout to prevent duplicate processing."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Lambda retries (with backoff) apply to asynchronous invocations, not SQS polling.</li>\n              <li>Partial batch failure response allows reporting individual message failures.</li>\n              <li>Event source mapping configuration controls batch size and maximum batching window.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Lambda",
+        "SQS",
+        "Error Handling"
+      ]
+    },
+    {
+      "id": 27,
+      "categoryRef": "cat-deployment",
+      "difficulty": "intermediate",
+      "title": "CodeDeploy with Lambda",
+      "scenario": "A developer wants to automatically roll back a Lambda deployment if error rates increase after deploying a new version.",
+      "questionText": "Which service automates Lambda deployments with automatic rollback based on CloudWatch alarms?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "AWS CodeDeploy with Lambda deployment configuration"
+        },
+        {
+          "letter": "B",
+          "text": "Lambda versions and aliases only"
+        },
+        {
+          "letter": "C",
+          "text": "CloudFormation stack updates"
+        },
+        {
+          "letter": "D",
+          "text": "SAM deploy command"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Consider which AWS deployment service supports traffic-shifting strategies and can trigger automatic rollback based on alarm thresholds."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "AWS CodeDeploy supports Lambda deployments with configurable traffic shifting strategies: Canary (shift percentage, wait, shift rest), Linear (incremental shifts), and All-at-once. You can configure CloudWatch alarms (like error rate thresholds) that trigger automatic rollback if metrics exceed thresholds during deployment. Pre-traffic and post-traffic hooks run validation Lambda functions."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Deployment configurations: Canary10Percent5Minutes, Linear10PercentEvery1Minute, AllAtOnce, or custom.</li>\n              <li>SAM templates can specify AutoPublishAlias and DeploymentPreference for CodeDeploy integration.</li>\n              <li>AppSpec.yml defines the Lambda function, version, hooks, and alarms for CodeDeploy.</li></ul>"
+        }
+      ],
+      "tags": [
+        "CodeDeploy",
+        "Lambda",
+        "Deployment"
+      ]
+    },
+    {
+      "id": 28,
+      "categoryRef": "cat-development",
+      "difficulty": "intermediate",
+      "title": "API Gateway Caching",
+      "scenario": "A developer wants to reduce Lambda invocations for an API that returns data that doesn't change frequently. They want to cache responses at API Gateway.",
+      "questionText": "How can API Gateway caching be implemented to reduce backend calls?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Implement caching in the Lambda function"
+        },
+        {
+          "letter": "B",
+          "text": "Use DynamoDB DAX for caching"
+        },
+        {
+          "letter": "C",
+          "text": "Enable caching on the API Gateway stage and configure TTL"
+        },
+        {
+          "letter": "D",
+          "text": "Add CloudFront in front of API Gateway"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Think about where in the request path you can store responses with a time-to-live so repeated identical requests skip the backend."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "API Gateway provides a caching layer at the stage level. When enabled, API Gateway caches endpoint responses for a specified TTL (up to 3600 seconds). Subsequent identical requests are served from cache without invoking Lambda. Cache capacity is configurable (0.5 GB to 237 GB). Caching can be overridden per method, and cache keys can include query parameters and headers."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Cache invalidation: clients can pass Cache-Control: max-age=0 header (if authorized).</li>\n              <li>Method-level cache settings override stage defaults; caching can be disabled per method.</li>\n              <li>Caching has hourly costs based on cache size; evaluate cost vs Lambda invocation savings.</li></ul>"
+        }
+      ],
+      "tags": [
+        "API Gateway",
+        "Caching",
+        "Performance"
+      ]
+    },
+    {
+      "id": 29,
+      "categoryRef": "cat-security",
+      "difficulty": "intermediate",
+      "title": "Parameter Store SecureString",
+      "scenario": "A developer needs to store configuration values including some sensitive data like API keys. They want a free or low-cost solution that integrates with IAM for access control.",
+      "questionText": "Which service provides secure parameter storage with IAM-based access control at low cost?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "AWS Systems Manager Parameter Store with SecureString parameters"
+        },
+        {
+          "letter": "B",
+          "text": "AWS Secrets Manager"
+        },
+        {
+          "letter": "C",
+          "text": "S3 with server-side encryption"
+        },
+        {
+          "letter": "D",
+          "text": "AWS KMS only"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Consider the AWS service that offers hierarchical key-value storage with KMS encryption at no cost in its standard tier."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "AWS Systems Manager Parameter Store provides hierarchical storage for configuration data. SecureString parameters encrypt values using KMS keys. The standard tier is free (up to 10,000 parameters, 4 KB each) with IAM-based access control. While it lacks Secrets Manager's automatic rotation, Parameter Store is more cost-effective for configuration that doesn't need rotation."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Parameter Store supports parameter hierarchies (/app/prod/db/password) for organized access control.</li>\n              <li>Advanced tier (paid) supports larger values (8 KB), higher throughput, and parameter policies.</li>\n              <li>Lambda can use the Parameter Store Lambda Extension for caching and reduced API calls.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Parameter Store",
+        "SecureString",
+        "Configuration"
+      ]
+    },
+    {
+      "id": 30,
+      "categoryRef": "cat-troubleshooting",
+      "difficulty": "intermediate",
+      "title": "Lambda Timeout Configuration",
+      "scenario": "A Lambda function occasionally times out when processing large files. The function takes up to 5 minutes for large files but the default timeout is 3 seconds.",
+      "questionText": "What is the maximum timeout that can be configured for a Lambda function?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "30 minutes (1800 seconds)"
+        },
+        {
+          "letter": "B",
+          "text": "5 minutes (300 seconds)"
+        },
+        {
+          "letter": "C",
+          "text": "1 minute (60 seconds)"
+        },
+        {
+          "letter": "D",
+          "text": "15 minutes (900 seconds)"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Think about the hard ceiling on how long a single invocation can execute before the platform terminates it."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Lambda's maximum timeout is 15 minutes (900 seconds). The default is 3 seconds, which is too short for most real workloads. Set timeout based on expected execution time plus buffer. For processing that exceeds 15 minutes, consider breaking work into chunks, using Step Functions for orchestration, or AWS Batch for long-running jobs."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>When processing SQS, set visibility timeout greater than Lambda timeout to prevent duplicates.</li>\n              <li>API Gateway has a 29-second integration timeout - can't wait for 15-minute Lambda execution.</li>\n              <li>Use context.get_remaining_time_in_millis() to gracefully handle approaching timeouts.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Lambda",
+        "Timeout",
+        "Configuration"
+      ]
+    },
+    {
+      "id": 31,
+      "categoryRef": "cat-development",
+      "difficulty": "intermediate",
+      "title": "Kinesis Client Library",
+      "scenario": "A developer is building a consumer application for Kinesis Data Streams that must process records in order within each shard and handle shard splits/merges automatically.",
+      "questionText": "What is the recommended way to consume Kinesis streams with automatic checkpoint and shard management?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Lambda with Kinesis trigger"
+        },
+        {
+          "letter": "B",
+          "text": "Direct GetRecords API calls"
+        },
+        {
+          "letter": "C",
+          "text": "Kinesis Client Library (KCL)"
+        },
+        {
+          "letter": "D",
+          "text": "Kinesis Data Firehose"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Consider the client-side library that handles checkpoint tracking, shard assignment, and resharding so your consumer code stays simple."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "The Kinesis Client Library (KCL) simplifies building Kinesis consumers by handling: checkpointing (tracking which records have been processed using DynamoDB), load balancing (distributing shards across workers), and resharding (adapting to shard splits and merges). KCL ensures each shard is processed by exactly one worker in a consumer group."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>KCL uses a DynamoDB table for lease coordination and checkpointing.</li>\n              <li>Lambda with Kinesis trigger is simpler but processes each shard with one concurrent invocation.</li>\n              <li>KCL supports enhanced fan-out for dedicated 2 MB/sec read throughput per consumer.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Kinesis",
+        "KCL",
+        "Stream Processing"
+      ]
+    },
+    {
+      "id": 32,
+      "categoryRef": "cat-deployment",
+      "difficulty": "intermediate",
+      "title": "CloudFormation Intrinsic Functions",
+      "scenario": "A developer needs to reference a Lambda function's ARN in an API Gateway resource within the same CloudFormation template.",
+      "questionText": "Which CloudFormation intrinsic function returns the ARN of a resource defined in the same template?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "!Ref"
+        },
+        {
+          "letter": "B",
+          "text": "!GetAtt (Fn::GetAtt)"
+        },
+        {
+          "letter": "C",
+          "text": "!Sub"
+        },
+        {
+          "letter": "D",
+          "text": "!Join"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Think about which intrinsic function retrieves a specific attribute (like an ARN) rather than just the resource's primary identifier."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Fn::GetAtt (shorthand !GetAtt) returns an attribute value from a resource. For Lambda functions, !GetAtt MyFunction.Arn returns the function ARN. !Ref returns the resource's primary identifier (for Lambda, the function name). Different resources expose different attributes - check documentation for available attributes like ARN, Endpoint, DomainName."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>!Ref for Lambda returns function name; !GetAtt MyFunction.Arn returns the ARN.</li>\n              <li>!Sub substitutes variables in strings: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${MyFunction}'</li>\n              <li>!Join concatenates values: !Join ['-', ['prefix', !Ref MyResource, 'suffix']]</li></ul>"
+        }
+      ],
+      "tags": [
+        "CloudFormation",
+        "Intrinsic Functions",
+        "Templates"
+      ]
+    },
+    {
+      "id": 33,
+      "categoryRef": "cat-troubleshooting",
+      "difficulty": "intermediate",
+      "title": "CloudWatch Custom Metrics",
+      "scenario": "A developer wants to track business metrics from their Lambda function, such as the number of orders processed and average order value. These aren't available in standard CloudWatch metrics.",
+      "questionText": "How can the developer send custom application metrics to CloudWatch?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Use PutMetricData API or embedded metric format in logs"
+        },
+        {
+          "letter": "B",
+          "text": "Write to CloudWatch Logs only"
+        },
+        {
+          "letter": "C",
+          "text": "Create CloudWatch Alarms"
+        },
+        {
+          "letter": "D",
+          "text": "Use CloudWatch Insights queries"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Consider the two approaches for publishing application-defined metrics: one via direct API calls and another embedded in log output."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Custom metrics can be published using the CloudWatch PutMetricData API or by using the Embedded Metric Format (EMF) - specially formatted JSON in CloudWatch Logs that CloudWatch automatically extracts as metrics. EMF is recommended for Lambda as it batches metrics efficiently, avoids API calls during function execution, and reduces costs through log-based metric extraction."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>EMF: console.log(JSON.stringify({_aws:{Timestamp, CloudWatchMetrics:[...]}, OrderCount: 1}))</li>\n              <li>AWS Lambda Powertools provides utilities for EMF across Python, TypeScript, and Java.</li>\n              <li>Custom metrics are charged per metric; use dimensions wisely to avoid metric explosion.</li></ul>"
+        }
+      ],
+      "tags": [
+        "CloudWatch",
+        "Custom Metrics",
+        "Monitoring"
+      ]
+    },
+    {
+      "id": 34,
+      "categoryRef": "cat-development",
+      "difficulty": "advanced",
+      "title": "DynamoDB Conditional Writes",
+      "scenario": "A developer needs to update a DynamoDB item only if a specific condition is met - for example, decrement inventory count only if the current count is greater than zero.",
+      "questionText": "Which DynamoDB feature enables conditional write operations?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "ProjectionExpression"
+        },
+        {
+          "letter": "B",
+          "text": "ConditionExpression in UpdateItem"
+        },
+        {
+          "letter": "C",
+          "text": "FilterExpression in Query"
+        },
+        {
+          "letter": "D",
+          "text": "KeyConditionExpression"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Look for the write-operation parameter that evaluates a boolean condition and rejects the operation if the condition is not met."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "ConditionExpression evaluates conditions before executing PutItem, UpdateItem, or DeleteItem. If the condition is false, the operation fails with ConditionalCheckFailedException. This enables optimistic locking patterns, ensuring data consistency without explicit locks. Example: only decrement if inventory greater than 0, or only update if version matches expected value."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>attribute_exists(), attribute_not_exists() check for attribute presence.</li>\n              <li>Combine with UpdateExpression: SET, REMOVE, ADD, DELETE for atomic updates.</li>\n              <li>Use version numbers or timestamps for optimistic concurrency control.</li></ul>"
+        }
+      ],
+      "tags": [
+        "DynamoDB",
+        "Conditional Writes",
+        "Concurrency"
+      ]
+    },
+    {
+      "id": 35,
+      "categoryRef": "cat-security",
+      "difficulty": "intermediate",
+      "title": "Lambda Resource Policies",
+      "scenario": "A developer needs to allow API Gateway to invoke their Lambda function. The function and API are in the same account.",
+      "questionText": "What type of policy allows other AWS services to invoke a Lambda function?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "IAM user policy"
+        },
+        {
+          "letter": "B",
+          "text": "VPC endpoint policy"
+        },
+        {
+          "letter": "C",
+          "text": "Resource-based policy (Lambda permission)"
+        },
+        {
+          "letter": "D",
+          "text": "Execution role"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Think about the distinction between what a function can do (outbound permissions) and what is allowed to call the function (inbound permissions)."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Lambda has two types of policies: the execution role (what the function can access) and resource-based policy (what can invoke the function). When API Gateway, S3, or other services need to invoke Lambda, add a permission to the function's resource-based policy. This is done via add-permission CLI or automatically by SAM/Console when configuring triggers."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>aws lambda add-permission --function-name MyFunc --principal apigateway.amazonaws.com --action lambda:InvokeFunction</li>\n              <li>Resource-based policies also enable cross-account function invocation.</li>\n              <li>SAM automatically adds permissions when you define event sources in the template.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Lambda",
+        "Resource Policy",
+        "Permissions"
+      ]
+    },
+    {
+      "id": 36,
+      "categoryRef": "cat-development",
+      "difficulty": "intermediate",
+      "title": "AppSync GraphQL",
+      "scenario": "A developer is building a mobile app that needs real-time data synchronization and offline support. The app uses GraphQL for its API.",
+      "questionText": "Which AWS service provides a managed GraphQL API with real-time subscriptions and offline capabilities?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "AWS AppSync"
+        },
+        {
+          "letter": "B",
+          "text": "Amazon API Gateway"
+        },
+        {
+          "letter": "C",
+          "text": "Amazon EventBridge"
+        },
+        {
+          "letter": "D",
+          "text": "AWS Amplify"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Consider which managed AWS service natively supports a schema-based query language with built-in real-time and offline capabilities."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "AWS AppSync provides managed GraphQL APIs with built-in support for real-time data (WebSocket subscriptions), offline data synchronization (for mobile apps), and multiple data sources (DynamoDB, Lambda, RDS, HTTP). AppSync handles WebSocket connection management, conflict resolution for offline edits, and authentication through Cognito, IAM, API keys, or OIDC."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Resolvers map GraphQL operations to data sources using VTL (Velocity Template Language) or JavaScript.</li>\n              <li>Pipeline resolvers chain multiple data source operations for complex queries.</li>\n              <li>AppSync caching reduces resolver execution for improved performance.</li></ul>"
+        }
+      ],
+      "tags": [
+        "AppSync",
+        "GraphQL",
+        "Real-time"
+      ]
+    },
+    {
+      "id": 37,
+      "categoryRef": "cat-troubleshooting",
+      "difficulty": "intermediate",
+      "title": "DynamoDB Throttling",
+      "scenario": "A developer's application is receiving ProvisionedThroughputExceededException errors from DynamoDB during peak traffic periods.",
+      "questionText": "What should the developer check and potentially adjust to resolve throughput exceptions?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Increase provisioned capacity, enable auto-scaling, or switch to on-demand capacity mode"
+        },
+        {
+          "letter": "B",
+          "text": "Increase Lambda memory allocation"
+        },
+        {
+          "letter": "C",
+          "text": "Add more DynamoDB tables"
+        },
+        {
+          "letter": "D",
+          "text": "Use eventually consistent reads only"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Think about whether the issue is insufficient throughput capacity and what approaches exist to match capacity to demand dynamically."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "ProvisionedThroughputExceededException indicates requests exceeded the table's capacity. Solutions: 1) Increase provisioned RCU/WCU, 2) Enable auto-scaling to adjust capacity automatically, 3) Switch to on-demand capacity mode for unpredictable workloads. Also check for hot partitions - uneven distribution of requests to specific partition keys can cause throttling even with sufficient total capacity."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>AWS SDKs implement automatic retries with exponential backoff for transient throttling.</li>\n              <li>Hot partitions: each partition handles up to 3000 RCU or 1000 WCU; design keys for even distribution.</li>\n              <li>Burst capacity: DynamoDB saves unused capacity for short traffic bursts.</li></ul>"
+        }
+      ],
+      "tags": [
+        "DynamoDB",
+        "Throttling",
+        "Capacity"
+      ]
+    },
+    {
+      "id": 38,
+      "categoryRef": "cat-deployment",
+      "difficulty": "intermediate",
+      "title": "Lambda Layers",
+      "scenario": "A developer has multiple Lambda functions that all use the same set of libraries. They want to share these dependencies across functions without including them in each deployment package.",
+      "questionText": "Which Lambda feature allows sharing code and dependencies across multiple functions?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Lambda Aliases"
+        },
+        {
+          "letter": "B",
+          "text": "Lambda Layers"
+        },
+        {
+          "letter": "C",
+          "text": "Lambda Versions"
+        },
+        {
+          "letter": "D",
+          "text": "Lambda Extensions"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Consider the Lambda feature that lets you extract common dependencies into reusable archives attached at deployment time."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Lambda Layers are ZIP archives containing libraries, custom runtimes, or other dependencies. A function can use up to 5 layers, and layers are extracted to /opt in the execution environment. Layers reduce deployment package size, enable code reuse across functions, and simplify dependency management. Update a layer to update all functions using it."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Layer content goes in specific paths: /opt/python for Python, /opt/nodejs for Node.js.</li>\n              <li>Total unzipped size (function + all layers) cannot exceed 250 MB.</li>\n              <li>Public layers can be shared across accounts; AWS provides managed layers (like SDK).</li></ul>"
+        }
+      ],
+      "tags": [
+        "Lambda",
+        "Layers",
+        "Dependencies"
+      ]
+    },
+    {
+      "id": 39,
+      "categoryRef": "cat-security",
+      "difficulty": "advanced",
+      "title": "STS AssumeRole",
+      "scenario": "A developer's application running on EC2 needs to access resources in another AWS account. They need to obtain temporary credentials for the cross-account access.",
+      "questionText": "Which STS operation allows assuming a role to get temporary credentials for cross-account access?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "AssumeRole"
+        },
+        {
+          "letter": "B",
+          "text": "GetSessionToken"
+        },
+        {
+          "letter": "C",
+          "text": "GetFederationToken"
+        },
+        {
+          "letter": "D",
+          "text": "AssumeRoleWithSAML"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Think about the STS operation that lets a principal temporarily adopt the permissions of a role in another account."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "AWS STS AssumeRole allows an IAM entity (user, role, or service) to obtain temporary security credentials for a role. For cross-account access, the target account's role must have a trust policy allowing the source account's principal. The caller uses AssumeRole with the role's ARN to get temporary credentials with the role's permissions."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Temporary credentials include AccessKeyId, SecretAccessKey, SessionToken, and Expiration.</li>\n              <li>External ID can be required in the trust policy for additional security with third parties.</li>\n              <li>AWS SDK's assume role credential provider handles automatic credential refresh.</li></ul>"
+        }
+      ],
+      "tags": [
+        "STS",
+        "AssumeRole",
+        "Cross-Account"
+      ]
+    },
+    {
+      "id": 40,
+      "categoryRef": "cat-development",
+      "difficulty": "intermediate",
+      "title": "EventBridge Rules",
+      "scenario": "A developer needs to trigger a Lambda function whenever an EC2 instance changes state (starts, stops, terminates). They want an event-driven approach without polling.",
+      "questionText": "Which service enables event-driven triggering based on AWS service state changes?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "AWS CloudTrail"
+        },
+        {
+          "letter": "B",
+          "text": "Amazon SNS"
+        },
+        {
+          "letter": "C",
+          "text": "Amazon EventBridge"
+        },
+        {
+          "letter": "D",
+          "text": "Amazon SQS"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Consider the serverless event bus that natively ingests state-change events from AWS services and routes them via pattern-matching rules."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Amazon EventBridge is a serverless event bus that receives events from AWS services (EC2, S3, etc.), custom applications, and SaaS providers. You create rules with event patterns to match specific events (like EC2 instance state changes) and route them to targets (Lambda, SQS, Step Functions, etc.). EventBridge enables loosely coupled, event-driven architectures."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Event patterns match on event structure: source, detail-type, and detail fields.</li>\n              <li>Scheduled rules (rate or cron expressions) enable time-based Lambda invocation.</li>\n              <li>Input transformers can customize what data is passed to targets.</li></ul>"
+        }
+      ],
+      "tags": [
+        "EventBridge",
+        "Events",
+        "Event-Driven"
+      ]
+    },
+    {
+      "id": 41,
+      "categoryRef": "cat-troubleshooting",
+      "difficulty": "intermediate",
+      "title": "API Gateway Request Validation",
+      "scenario": "A developer wants to validate incoming API requests (required parameters, data types) before invoking the Lambda function to reject invalid requests early.",
+      "questionText": "Which API Gateway feature validates requests against a schema before invoking the backend?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Stage variables"
+        },
+        {
+          "letter": "B",
+          "text": "Lambda authorizers"
+        },
+        {
+          "letter": "C",
+          "text": "Usage plans"
+        },
+        {
+          "letter": "D",
+          "text": "Request validators with models"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Think about the API Gateway feature that rejects malformed requests at the gateway level, before any backend invocation occurs."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "API Gateway request validators validate incoming requests against defined models (JSON Schema) before invoking the backend. Validators can check: request body against a schema, required request parameters, and required headers. Invalid requests receive a 400 error without invoking Lambda, reducing costs and improving security by rejecting malformed requests early."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Models define the structure using JSON Schema draft 4.</li>\n              <li>Validators can validate body only, parameters only, or both.</li>\n              <li>Gateway responses can customize the error message for validation failures.</li></ul>"
+        }
+      ],
+      "tags": [
+        "API Gateway",
+        "Validation",
+        "Models"
+      ]
+    },
+    {
+      "id": 42,
+      "categoryRef": "cat-development",
+      "difficulty": "intermediate",
+      "title": "FIFO Queue Ordering",
+      "scenario": "A developer needs to process messages in exact order with no duplicates. The messages represent financial transactions that must be processed sequentially.",
+      "questionText": "Which SQS queue type guarantees message ordering and exactly-once processing?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "FIFO queue with message group ID"
+        },
+        {
+          "letter": "B",
+          "text": "Standard queue with visibility timeout"
+        },
+        {
+          "letter": "C",
+          "text": "Dead letter queue"
+        },
+        {
+          "letter": "D",
+          "text": "Standard queue with deduplication"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Consider which queue type trades throughput for strict ordering guarantees and duplicate elimination within a deduplication window."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "SQS FIFO queues guarantee first-in-first-out ordering and exactly-once processing (within a 5-minute deduplication window). Messages with the same Message Group ID are processed in order. Different message groups can be processed in parallel. FIFO queue names must end with .fifo and support up to 3000 messages/second with batching (300 without)."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Message deduplication ID prevents duplicate sends; content-based deduplication is an alternative.</li>\n              <li>FIFO queues with Lambda maintain order within each message group ID.</li>\n              <li>Standard queues offer higher throughput but best-effort ordering and at-least-once delivery.</li></ul>"
+        }
+      ],
+      "tags": [
+        "SQS",
+        "FIFO",
+        "Message Ordering"
+      ]
+    },
+    {
+      "id": 43,
+      "categoryRef": "cat-deployment",
+      "difficulty": "intermediate",
+      "title": "Elastic Beanstalk .ebextensions",
+      "scenario": "A developer needs to customize their Elastic Beanstalk environment by installing additional packages, configuring files, and running commands during deployment.",
+      "questionText": "How can developers customize Elastic Beanstalk environment configuration and software?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Directly modifying EC2 instances"
+        },
+        {
+          "letter": "B",
+          "text": "Only through the Elastic Beanstalk console"
+        },
+        {
+          "letter": "C",
+          "text": ".ebextensions directory with YAML/JSON configuration files"
+        },
+        {
+          "letter": "D",
+          "text": "Using Lambda functions"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Look for the convention of placing YAML/JSON configuration files in a special directory inside your application source bundle."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "The .ebextensions directory in your application source contains configuration files (*.config) in YAML or JSON format. These files can install packages, create files, run commands, configure environment options, and set up container commands. Configuration files are processed alphabetically during deployment, allowing ordered customization of the environment."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Sections: packages, groups, users, files, commands, container_commands, services, option_settings.</li>\n              <li>container_commands run after the app is extracted but before it's deployed (leader_only for single execution).</li>\n              <li>Platform hooks (.platform/hooks/) provide another customization mechanism in newer platforms.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Elastic Beanstalk",
+        "Configuration",
+        "Customization"
+      ]
+    },
+    {
+      "id": 44,
+      "categoryRef": "cat-security",
+      "difficulty": "intermediate",
+      "title": "Cognito Lambda Triggers",
+      "scenario": "A developer wants to add custom logic during the Cognito sign-up process - validating email domains, adding custom claims to tokens, or migrating users from an existing system.",
+      "questionText": "Which Cognito feature allows custom logic at various points in the authentication flow?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Cognito hosted UI"
+        },
+        {
+          "letter": "B",
+          "text": "Lambda triggers"
+        },
+        {
+          "letter": "C",
+          "text": "Identity Pool role mappings"
+        },
+        {
+          "letter": "D",
+          "text": "User Pool groups"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Think about which Cognito feature lets you hook custom code into specific points of the sign-up and authentication lifecycle."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Cognito User Pools support Lambda triggers at various authentication events: Pre Sign-up (validate/auto-confirm), Post Confirmation (welcome email), Pre Authentication (custom validation), Post Authentication (logging), Pre Token Generation (add custom claims), User Migration (import from existing system), Custom Message (customize emails). Functions receive event data and return modified data."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Pre Token Generation can add, suppress, or modify claims in ID and access tokens.</li>\n              <li>User Migration trigger enables seamless migration - authenticate against old system on first login.</li>\n              <li>Custom Authentication triggers enable passwordless authentication flows.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Cognito",
+        "Lambda Triggers",
+        "Authentication"
+      ]
+    },
+    {
+      "id": 45,
+      "categoryRef": "cat-troubleshooting",
+      "difficulty": "advanced",
+      "title": "Lambda VPC Configuration",
+      "scenario": "A Lambda function configured in a VPC cannot access the internet to call external APIs, even though it can access RDS in the same VPC.",
+      "questionText": "What is required for a VPC-attached Lambda function to access the internet?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Place Lambda in a private subnet with a route to NAT Gateway in a public subnet"
+        },
+        {
+          "letter": "B",
+          "text": "Configure VPC endpoints for all internet services"
+        },
+        {
+          "letter": "C",
+          "text": "Attach an Elastic IP to the Lambda function"
+        },
+        {
+          "letter": "D",
+          "text": "Place Lambda in a public subnet with an Internet Gateway"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Consider how a function running inside a private subnet can reach the public internet when it has no public IP of its own."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "When Lambda is attached to a VPC, it runs in your VPC using ENIs in the specified subnets. Lambda cannot use public subnets with Internet Gateway for outbound traffic. For internet access, place Lambda in private subnets with a route table entry directing 0.0.0.0/0 to a NAT Gateway (in a public subnet). Alternatively, use VPC endpoints for AWS services to avoid internet routing."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Lambda functions without VPC config have internet access by default.</li>\n              <li>VPC endpoints for S3, DynamoDB (Gateway) and other services (Interface) avoid NAT Gateway costs.</li>\n              <li>NAT Gateway charges: hourly plus data processing; consider VPC endpoints for high-traffic AWS services.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Lambda",
+        "VPC",
+        "Networking"
+      ]
+    },
+    {
+      "id": 46,
+      "categoryRef": "cat-development",
+      "difficulty": "intermediate",
+      "title": "S3 Multipart Upload",
+      "scenario": "A developer needs to upload large files (several GB) to S3. Single PUT requests are failing due to timeouts and the upload progress cannot be tracked.",
+      "questionText": "Which S3 feature enables uploading large files in parts with resumable uploads?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "S3 Transfer Acceleration"
+        },
+        {
+          "letter": "B",
+          "text": "Multipart upload"
+        },
+        {
+          "letter": "C",
+          "text": "S3 Select"
+        },
+        {
+          "letter": "D",
+          "text": "S3 Batch Operations"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Think about the S3 upload strategy that breaks a large object into independently uploadable pieces with resume support."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "S3 Multipart Upload allows uploading large objects in parts independently and in parallel. Benefits: improved throughput (parallel uploads), quick recovery from failures (re-upload only failed parts), pause and resume capability, and begin upload before knowing final size. Recommended for objects over 100 MB; required for objects over 5 GB. Parts can be 5 MB to 5 GB each."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>AWS SDK high-level APIs (TransferManager, upload_file) automatically use multipart.</li>\n              <li>Abort incomplete multipart uploads to avoid storage charges for uploaded parts.</li>\n              <li>Lifecycle rules can automatically abort incomplete uploads after specified days.</li></ul>"
+        }
+      ],
+      "tags": [
+        "S3",
+        "Multipart Upload",
+        "Large Files"
+      ]
+    },
+    {
+      "id": 47,
+      "categoryRef": "cat-deployment",
+      "difficulty": "intermediate",
+      "title": "CodeBuild Buildspec",
+      "scenario": "A developer is configuring AWS CodeBuild for their project. They need to specify build commands, environment variables, and artifacts.",
+      "questionText": "What file defines the build commands and settings for CodeBuild?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "package.json"
+        },
+        {
+          "letter": "B",
+          "text": "buildspec.yml"
+        },
+        {
+          "letter": "C",
+          "text": "template.yml"
+        },
+        {
+          "letter": "D",
+          "text": "Dockerfile"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Consider which file in your source root tells the build service what commands to run, what to output, and in what order."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "The buildspec.yml file (or buildspec.yaml) in the source root defines the CodeBuild project's build commands. It includes: version, env (environment variables, secrets), phases (install, pre_build, build, post_build), artifacts (output files), cache (dependencies to cache). Each phase contains a sequence of commands to run."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Environment variables can reference Parameter Store (parameter-store) or Secrets Manager (secrets-manager).</li>\n              <li>Reports section enables publishing test reports to CodeBuild's test reporting feature.</li>\n              <li>Buildspec can be defined in the CodeBuild project configuration instead of a file.</li></ul>"
+        }
+      ],
+      "tags": [
+        "CodeBuild",
+        "Buildspec",
+        "CI/CD"
+      ]
+    },
+    {
+      "id": 48,
+      "categoryRef": "cat-troubleshooting",
+      "difficulty": "intermediate",
+      "title": "SQS Dead Letter Queue",
+      "scenario": "A developer wants to capture messages that repeatedly fail processing for later analysis. They need to ensure failed messages don't block the queue indefinitely.",
+      "questionText": "What SQS feature captures messages that cannot be processed after multiple attempts?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Message retention period"
+        },
+        {
+          "letter": "B",
+          "text": "Long polling"
+        },
+        {
+          "letter": "C",
+          "text": "Visibility timeout"
+        },
+        {
+          "letter": "D",
+          "text": "Dead Letter Queue (DLQ) with redrive policy"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Think about where messages go when they have been received too many times without being successfully deleted from the source queue."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "A Dead Letter Queue (DLQ) is a separate SQS queue that receives messages from a source queue after they've been received (and not deleted) more than maxReceiveCount times. The redrive policy on the source queue specifies the DLQ ARN and maxReceiveCount threshold. DLQs help isolate problematic messages for debugging without blocking normal processing."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>DLQ must be the same type (Standard or FIFO) as the source queue.</li>\n              <li>DLQ redrive allows moving messages back to the source queue after fixing issues.</li>\n              <li>Monitor DLQ depth with CloudWatch alarms to detect processing problems.</li></ul>"
+        }
+      ],
+      "tags": [
+        "SQS",
+        "Dead Letter Queue",
+        "Error Handling"
+      ]
+    },
+    {
+      "id": 49,
+      "categoryRef": "cat-development",
+      "difficulty": "intermediate",
+      "title": "DynamoDB TTL",
+      "scenario": "A developer stores session data in DynamoDB and wants sessions to automatically expire and be deleted after 24 hours without manual cleanup.",
+      "questionText": "Which DynamoDB feature automatically deletes expired items?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Conditional deletes"
+        },
+        {
+          "letter": "B",
+          "text": "Global Secondary Index"
+        },
+        {
+          "letter": "C",
+          "text": "Time to Live (TTL)"
+        },
+        {
+          "letter": "D",
+          "text": "DynamoDB Streams"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Consider the DynamoDB feature that uses a timestamp attribute to automatically clean up expired items at no write-capacity cost."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "DynamoDB Time to Live (TTL) allows automatic deletion of items after a specified time. You designate an attribute to hold the expiration timestamp (Unix epoch seconds), and DynamoDB automatically deletes items after that time. Deletion occurs within 48 hours of expiration (typically sooner) and doesn't consume write capacity. TTL is free."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>TTL attribute must be a Number type containing Unix epoch time in seconds.</li>\n              <li>Deleted items appear in DynamoDB Streams with eventName: REMOVE for processing.</li>\n              <li>TTL deletions don't contribute to write throttling but do count toward CloudWatch metrics.</li></ul>"
+        }
+      ],
+      "tags": [
+        "DynamoDB",
+        "TTL",
+        "Expiration"
+      ]
+    },
+    {
+      "id": 50,
+      "categoryRef": "cat-security",
+      "difficulty": "intermediate",
+      "title": "API Gateway CORS",
+      "scenario": "A developer's web application running in a browser makes API calls to API Gateway. The browser blocks the requests with CORS errors.",
+      "questionText": "What must be configured to allow browser-based applications to call API Gateway from a different origin?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Disable browser security features"
+        },
+        {
+          "letter": "B",
+          "text": "Enable CORS on API Gateway and return appropriate CORS headers from the integration"
+        },
+        {
+          "letter": "C",
+          "text": "Use HTTPS only"
+        },
+        {
+          "letter": "D",
+          "text": "Add API keys to requests"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Think about the browser security mechanism that blocks requests to a different origin, and what headers the API must return to allow them."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Cross-Origin Resource Sharing (CORS) allows browsers to make requests to different origins. For API Gateway, enable CORS in the console (which configures OPTIONS method and headers) or manually configure. The integration response (Lambda) must also return CORS headers: Access-Control-Allow-Origin, Access-Control-Allow-Headers, Access-Control-Allow-Methods for non-proxy integrations."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Proxy integration: Lambda must return CORS headers; API Gateway doesn't add them automatically.</li>\n              <li>Preflight OPTIONS requests must be handled - can use MOCK integration for simple cases.</li>\n              <li>Access-Control-Allow-Credentials: true required if sending cookies (can't use wildcard origin then).</li></ul>"
+        }
+      ],
+      "tags": [
+        "API Gateway",
+        "CORS",
+        "Browser Security"
+      ]
+    }
+  ],
+  "glossary": {}
+}

@@ -1,0 +1,2473 @@
+{
+  "version": "1.0",
+  "metadata": {
+    "examCode": "SOA-C02",
+    "examTitle": "AWS Certified SysOps Administrator - Associate",
+    "provider": "Amazon Web Services",
+    "description": "Scenario-Based Study Guide for SOA-C02 certification - validates the ability to deploy, manage, and operate scalable, highly available, and fault-tolerant systems on AWS.",
+    "totalQuestions": 50,
+    "createdDate": "2026-01-21",
+    "lastModified": "2026-01-21T00:00:00Z",
+    "categories": {
+      "cat-monitoring": "Monitoring, Logging, and Remediation",
+      "cat-reliability": "Reliability and Business Continuity",
+      "cat-deployment": "Deployment, Provisioning, and Automation",
+      "cat-security": "Security and Compliance",
+      "cat-networking": "Networking and Content Delivery",
+      "cat-cost": "Cost and Performance Optimization"
+    }
+  },
+  "questions": [
+    {
+      "id": 1,
+      "categoryRef": "cat-monitoring",
+      "difficulty": "intermediate",
+      "title": "CloudWatch Alarm States",
+      "scenario": "A SysOps administrator is configuring CloudWatch alarms to monitor EC2 CPU utilization. They need to understand alarm behavior when data points are missing due to instance stops.",
+      "questionText": "What are the three possible states of a CloudWatch alarm, and what state should be configured when data is missing?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "OK, ALARM, INSUFFICIENT_DATA; configure \"treat missing data as\" setting"
+        },
+        {
+          "letter": "B",
+          "text": "Active, Inactive, Pending"
+        },
+        {
+          "letter": "C",
+          "text": "Running, Stopped, Terminated"
+        },
+        {
+          "letter": "D",
+          "text": "Green, Yellow, Red"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Think about how many distinct states a CloudWatch alarm can be in — and what should happen when data stops arriving."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "CloudWatch alarms have three states: OK (metric within threshold), ALARM (metric breached threshold), and INSUFFICIENT_DATA (not enough data to evaluate). The \"treat missing data as\" setting controls behavior when data points are missing: missing (maintain current state), notBreaching (treat as OK), breaching (treat as ALARM), or ignore (skip evaluation)."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>For instance monitoring, \"missing\" often works best - stopped instances don't trigger false alarms.</li>\n              <li>Evaluation periods and datapoints to alarm settings control alarm sensitivity.</li>\n              <li>Composite alarms combine multiple alarms using AND/OR logic for complex conditions.</li></ul>"
+        }
+      ],
+      "tags": [
+        "CloudWatch",
+        "Alarms",
+        "Monitoring"
+      ]
+    },
+    {
+      "id": 2,
+      "categoryRef": "cat-monitoring",
+      "difficulty": "intermediate",
+      "title": "CloudWatch Agent Installation",
+      "scenario": "A SysOps administrator needs to collect memory utilization and disk space metrics from EC2 instances. These metrics are not available in standard CloudWatch metrics.",
+      "questionText": "How can the administrator collect memory and disk metrics from EC2 instances?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Configure VPC Flow Logs"
+        },
+        {
+          "letter": "B",
+          "text": "Enable detailed monitoring in EC2"
+        },
+        {
+          "letter": "C",
+          "text": "Use CloudWatch Logs Insights"
+        },
+        {
+          "letter": "D",
+          "text": "Install and configure the CloudWatch agent on the instances"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Standard EC2 metrics don't include memory or disk space. What would need to run on the instance itself to collect OS-level data?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Standard EC2 metrics include CPU, network, and disk I/O, but not memory or disk space utilization. The CloudWatch agent (unified agent) must be installed on instances to collect these OS-level metrics. The agent is configured via JSON configuration file specifying which metrics to collect and can also collect logs. Systems Manager can automate agent deployment across instances."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Agent configuration wizard: aws cloudwatch-agent-config-wizard generates configuration.</li>\n              <li>Store configuration in Parameter Store for centralized management across instances.</li>\n              <li>StatsD and collectd protocol support enables custom application metrics.</li></ul>"
+        }
+      ],
+      "tags": [
+        "CloudWatch Agent",
+        "EC2",
+        "Custom Metrics"
+      ]
+    },
+    {
+      "id": 3,
+      "categoryRef": "cat-monitoring",
+      "difficulty": "intermediate",
+      "title": "EventBridge Automated Remediation",
+      "scenario": "A SysOps administrator wants to automatically stop EC2 instances when they receive a specific CloudWatch alarm. They need an event-driven solution.",
+      "questionText": "Which service combination enables automatic remediation actions based on CloudWatch alarms?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "CloudWatch Logs metric filters"
+        },
+        {
+          "letter": "B",
+          "text": "EventBridge rule triggered by alarm state change invoking Lambda or SSM Automation"
+        },
+        {
+          "letter": "C",
+          "text": "CloudTrail with Lambda triggers"
+        },
+        {
+          "letter": "D",
+          "text": "SNS notifications only"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Which AWS service acts as an event bus that can react to alarm state changes and invoke downstream automation targets?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "CloudWatch alarms can trigger EventBridge rules when they change state. EventBridge rules can then invoke targets like Lambda functions, SSM Automation documents, or Step Functions for automated remediation. For example, when a CPU alarm goes to ALARM state, EventBridge can trigger SSM Automation to stop or restart the instance automatically."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>CloudWatch alarm actions can also directly invoke EC2 actions (stop, terminate, reboot, recover).</li>\n              <li>SSM Automation provides pre-built runbooks for common remediation tasks.</li>\n              <li>EventBridge event pattern matches on detail-type \"CloudWatch Alarm State Change\".</li></ul>"
+        }
+      ],
+      "tags": [
+        "EventBridge",
+        "Automation",
+        "Remediation"
+      ]
+    },
+    {
+      "id": 4,
+      "categoryRef": "cat-monitoring",
+      "difficulty": "intermediate",
+      "title": "CloudWatch Log Metric Filters",
+      "scenario": "A SysOps administrator needs to create a CloudWatch alarm when a specific error message appears in application logs more than 5 times in 5 minutes.",
+      "questionText": "How can the administrator create an alarm based on log content?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Create a metric filter on the log group, then create an alarm on the custom metric"
+        },
+        {
+          "letter": "B",
+          "text": "Use CloudWatch Logs Insights to create an alarm"
+        },
+        {
+          "letter": "C",
+          "text": "Configure CloudTrail to monitor logs"
+        },
+        {
+          "letter": "D",
+          "text": "Use X-Ray to trace the errors"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Consider the two-step process: first turn log patterns into numeric data, then alert on that data. Which CloudWatch feature bridges logs to metrics?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "CloudWatch metric filters scan log events for specific patterns and create custom metrics when matches occur. Define a filter pattern (e.g., \"ERROR\" or JSON field matches), specify the metric name and value to publish. Then create a CloudWatch alarm on this custom metric with appropriate threshold and evaluation period to alert when errors exceed the limit."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Filter patterns support exact match, prefix match, and JSON field extraction.</li>\n              <li>Metric value can be count (1 per match) or extracted numeric value from logs.</li>\n              <li>Metric filters process logs in near real-time; slight delay compared to Logs Insights queries.</li></ul>"
+        }
+      ],
+      "tags": [
+        "CloudWatch",
+        "Metric Filters",
+        "Log Analysis"
+      ]
+    },
+    {
+      "id": 5,
+      "categoryRef": "cat-reliability",
+      "difficulty": "intermediate",
+      "title": "EC2 Status Checks",
+      "scenario": "An EC2 instance is running but users cannot connect to the application. The SysOps administrator needs to diagnose whether the issue is with the underlying hardware or the instance's operating system.",
+      "questionText": "What do EC2 system status checks and instance status checks indicate?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "System status checks monitor AWS infrastructure; instance status checks monitor the guest OS/network configuration"
+        },
+        {
+          "letter": "B",
+          "text": "Both check the same underlying hardware"
+        },
+        {
+          "letter": "C",
+          "text": "System checks monitor the OS; instance checks monitor hardware"
+        },
+        {
+          "letter": "D",
+          "text": "They only monitor network connectivity"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "EC2 has two layers of health checks — one for what AWS controls and one for what runs inside the VM. Which layer maps to which?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "EC2 provides two status check types: System status checks monitor the AWS systems required for the instance (host hardware, power, network). Instance status checks monitor software and network configuration on the instance (OS boot, network reachability). System check failures require AWS intervention or instance stop/start; instance check failures often require OS-level troubleshooting."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Automatic recovery can restart instances on new hardware when system status check fails.</li>\n              <li>System status check failure: try stop/start to migrate to new hardware.</li>\n              <li>Instance status check failure: check OS logs, security groups, network configuration.</li></ul>"
+        }
+      ],
+      "tags": [
+        "EC2",
+        "Status Checks",
+        "Troubleshooting"
+      ]
+    },
+    {
+      "id": 6,
+      "categoryRef": "cat-reliability",
+      "difficulty": "intermediate",
+      "title": "AWS Backup Service",
+      "scenario": "A SysOps administrator needs to implement centralized backup management across EC2, RDS, EFS, and DynamoDB resources with consistent policies and cross-region copy.",
+      "questionText": "Which service provides centralized backup management across multiple AWS services?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "AWS Backup"
+        },
+        {
+          "letter": "B",
+          "text": "Amazon Data Lifecycle Manager"
+        },
+        {
+          "letter": "C",
+          "text": "AWS Storage Gateway"
+        },
+        {
+          "letter": "D",
+          "text": "Amazon S3 Cross-Region Replication"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Think about which service was purpose-built to unify backup scheduling, retention, and cross-region copy across many AWS resource types."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "AWS Backup is a fully managed service that centralizes and automates data protection across AWS services including EC2, EBS, RDS, Aurora, DynamoDB, EFS, FSx, and Storage Gateway. You create backup plans specifying schedule, retention, lifecycle (transition to cold storage), and cross-region/cross-account copy rules. Backup vaults store recovery points with access policies."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>AWS Backup Audit Manager monitors backup compliance and generates reports.</li>\n              <li>Vault Lock enables WORM (write-once-read-many) for compliance requirements.</li>\n              <li>Resource assignments use tags to automatically include resources in backup plans.</li></ul>"
+        }
+      ],
+      "tags": [
+        "AWS Backup",
+        "Disaster Recovery",
+        "Data Protection"
+      ]
+    },
+    {
+      "id": 7,
+      "categoryRef": "cat-reliability",
+      "difficulty": "intermediate",
+      "title": "RDS Automated Backups",
+      "scenario": "A SysOps administrator needs to understand RDS backup capabilities including point-in-time recovery and how backup retention affects recovery options.",
+      "questionText": "What does RDS automated backup provide and what is the maximum retention period?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Weekly snapshots with 14-day retention"
+        },
+        {
+          "letter": "B",
+          "text": "Manual snapshots only with unlimited retention"
+        },
+        {
+          "letter": "C",
+          "text": "Daily snapshots plus transaction logs enabling point-in-time recovery; up to 35 days retention"
+        },
+        {
+          "letter": "D",
+          "text": "Continuous backup with 7-day retention maximum"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Consider what combination of snapshot frequency and log capture enables restoring a database to any second within a retention window."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "RDS automated backups include daily storage volume snapshots during the backup window and continuous transaction log backups. Together they enable point-in-time recovery to any second within the retention period (1-35 days). Setting retention to 0 disables automated backups. Manual snapshots persist indefinitely until deleted and are not affected by retention settings."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Automated backups are deleted when the DB instance is deleted unless you create a final snapshot.</li>\n              <li>Point-in-time recovery creates a new DB instance (cannot restore to existing instance).</li>\n              <li>Backup storage is free up to the provisioned database storage size.</li></ul>"
+        }
+      ],
+      "tags": [
+        "RDS",
+        "Backup",
+        "Point-in-Time Recovery"
+      ]
+    },
+    {
+      "id": 8,
+      "categoryRef": "cat-reliability",
+      "difficulty": "intermediate",
+      "title": "Auto Scaling Lifecycle Hooks",
+      "scenario": "A SysOps administrator needs to run configuration scripts on EC2 instances before they start receiving traffic from the load balancer, and cleanup scripts before termination.",
+      "questionText": "Which Auto Scaling feature allows custom actions during instance launch or termination?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Lifecycle hooks"
+        },
+        {
+          "letter": "B",
+          "text": "Scaling policies"
+        },
+        {
+          "letter": "C",
+          "text": "Health checks"
+        },
+        {
+          "letter": "D",
+          "text": "Launch templates"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Which Auto Scaling feature lets you insert a pause between \"instance created\" and \"instance receiving traffic\" for custom setup?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Auto Scaling lifecycle hooks pause instances in a pending state during launch (Pending:Wait) or termination (Terminating:Wait) while custom actions execute. You can trigger Lambda functions, SSM commands, or custom scripts. After completing actions, signal the hook to continue (CONTINUE) or abandon (ABANDON) the instance. Hooks have a default timeout of 1 hour."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Use EventBridge to trigger actions when lifecycle hooks are invoked.</li>\n              <li>complete-lifecycle-action API or heartbeat extends the timeout.</li>\n              <li>Common uses: install software, register with config management, drain connections before termination.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Auto Scaling",
+        "Lifecycle Hooks",
+        "Automation"
+      ]
+    },
+    {
+      "id": 9,
+      "categoryRef": "cat-deployment",
+      "difficulty": "intermediate",
+      "title": "Systems Manager Run Command",
+      "scenario": "A SysOps administrator needs to run a script on 100 EC2 instances across multiple regions without SSH access. They want centralized output collection.",
+      "questionText": "Which service allows running commands on managed instances without direct access?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "EC2 Instance Connect"
+        },
+        {
+          "letter": "B",
+          "text": "AWS Systems Manager Run Command"
+        },
+        {
+          "letter": "C",
+          "text": "AWS Lambda"
+        },
+        {
+          "letter": "D",
+          "text": "AWS Batch"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Think about which Systems Manager capability lets you execute scripts across a fleet without needing direct SSH or RDP access."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "AWS Systems Manager Run Command enables running commands on managed instances without SSH bastion hosts or key management. Select targets by instance IDs, tags, or resource groups. Commands use documents (pre-built like AWS-RunShellScript or custom). Output is captured in S3 or CloudWatch Logs. Rate controls and error thresholds prevent runaway execution."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Requires SSM Agent installed and IAM instance profile with SSM permissions.</li>\n              <li>Rate control: concurrency (percentage or number) and error threshold limits.</li>\n              <li>Run Command works on EC2, on-premises servers, and edge devices with SSM Agent.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Systems Manager",
+        "Run Command",
+        "Operations"
+      ]
+    },
+    {
+      "id": 10,
+      "categoryRef": "cat-deployment",
+      "difficulty": "intermediate",
+      "title": "Systems Manager Patch Manager",
+      "scenario": "A SysOps administrator needs to automate OS patching for Windows and Linux instances on a schedule while ensuring critical patches are applied within 48 hours.",
+      "questionText": "Which Systems Manager capability automates patching with baselines and maintenance windows?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "State Manager"
+        },
+        {
+          "letter": "B",
+          "text": "Run Command with custom scripts"
+        },
+        {
+          "letter": "C",
+          "text": "OpsCenter"
+        },
+        {
+          "letter": "D",
+          "text": "Patch Manager with patch baselines and maintenance windows"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Which Systems Manager capability combines approval rules for which patches to apply with scheduled time windows for when to apply them?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Systems Manager Patch Manager automates OS and application patching. Patch baselines define which patches to approve (by classification, severity, auto-approval delay). Maintenance windows schedule when patching occurs. Patch groups associate instances with baselines. Compliance reports show patch status across the fleet. AWS provides default baselines for common OS types."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Scan vs Install: scan-only mode reports compliance without applying patches.</li>\n              <li>Custom baselines can include/exclude specific patches or use approval rules.</li>\n              <li>Integration with AWS-RunPatchBaseline document for patch execution.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Patch Manager",
+        "Systems Manager",
+        "Compliance"
+      ]
+    },
+    {
+      "id": 11,
+      "categoryRef": "cat-deployment",
+      "difficulty": "intermediate",
+      "title": "CloudFormation Stack Updates",
+      "scenario": "A SysOps administrator needs to update a CloudFormation stack but wants to preview what changes will occur before applying them.",
+      "questionText": "Which CloudFormation feature shows the proposed changes before executing a stack update?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "StackSets"
+        },
+        {
+          "letter": "B",
+          "text": "Stack policies"
+        },
+        {
+          "letter": "C",
+          "text": "Drift detection"
+        },
+        {
+          "letter": "D",
+          "text": "Change sets"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "CloudFormation offers a way to see exactly what will be added, modified, or removed before you commit to a stack update. What is it?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "CloudFormation change sets provide a preview of proposed changes to a stack before executing them. You create a change set from an updated template, review the changes (Add, Modify, Remove resources and their properties), and then execute or delete the change set. This enables review and approval workflows before changes impact running infrastructure."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Changes show replacement behavior: whether updates require resource replacement.</li>\n              <li>Change sets can be created for existing stacks or to create new stacks.</li>\n              <li>Direct update (without change set) applies changes immediately without preview.</li></ul>"
+        }
+      ],
+      "tags": [
+        "CloudFormation",
+        "Change Sets",
+        "Infrastructure as Code"
+      ]
+    },
+    {
+      "id": 12,
+      "categoryRef": "cat-deployment",
+      "difficulty": "intermediate",
+      "title": "AMI Creation and Management",
+      "scenario": "A SysOps administrator needs to create a standardized AMI from a running EC2 instance and share it with other AWS accounts in the organization.",
+      "questionText": "What is the recommended process for creating and sharing AMIs?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Use EC2 Image Builder only"
+        },
+        {
+          "letter": "B",
+          "text": "Create image from instance, modify launch permissions to share with specific accounts or publicly"
+        },
+        {
+          "letter": "C",
+          "text": "Export the instance to S3 and share the bucket"
+        },
+        {
+          "letter": "D",
+          "text": "Copy the EBS volume and share it"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Think about the two-step process: first capture a golden image from a running instance, then control who else can launch from it."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "To create an AMI: use \"Create Image\" from the EC2 console or create-image API on a running or stopped instance. For sharing, modify the AMI's launch permissions to add specific AWS account IDs or make it public. For encrypted AMIs, you must also share the encryption key. Consider using EC2 Image Builder for automated, repeatable image pipelines."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>No-reboot option creates AMI without stopping instance but risks filesystem inconsistency.</li>\n              <li>AMI copy enables cross-region AMI distribution with optional re-encryption.</li>\n              <li>EC2 Image Builder automates AMI creation pipelines with testing and distribution.</li></ul>"
+        }
+      ],
+      "tags": [
+        "AMI",
+        "EC2",
+        "Image Management"
+      ]
+    },
+    {
+      "id": 13,
+      "categoryRef": "cat-security",
+      "difficulty": "intermediate",
+      "title": "IAM Policy Evaluation",
+      "scenario": "A SysOps administrator is troubleshooting why a user cannot access an S3 bucket despite having an allow policy attached. They need to understand IAM policy evaluation.",
+      "questionText": "In IAM policy evaluation, what happens when both allow and deny statements apply to the same action?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "The most recent policy wins"
+        },
+        {
+          "letter": "B",
+          "text": "Allow statements take precedence"
+        },
+        {
+          "letter": "C",
+          "text": "Explicit deny always wins over allow"
+        },
+        {
+          "letter": "D",
+          "text": "The first matching statement wins"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "In IAM, one type of policy statement always wins when there is a conflict. Think about which direction the tiebreaker favors — security or access."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "IAM policy evaluation follows: 1) By default, all requests are implicitly denied. 2) An explicit allow overrides the implicit deny. 3) An explicit deny overrides any allow. So if any policy (identity, resource, SCP, permission boundary) contains an explicit deny for an action, it is denied regardless of allow statements elsewhere. This is crucial for security guardrails."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Use IAM Policy Simulator to test and troubleshoot policy evaluation.</li>\n              <li>For cross-account access, both identity policy AND resource policy must allow.</li>\n              <li>Permission boundaries and SCPs are additional layers that can only restrict, not grant.</li></ul>"
+        }
+      ],
+      "tags": [
+        "IAM",
+        "Policy Evaluation",
+        "Security"
+      ]
+    },
+    {
+      "id": 14,
+      "categoryRef": "cat-security",
+      "difficulty": "intermediate",
+      "title": "AWS Config Rules",
+      "scenario": "A SysOps administrator needs to ensure all EBS volumes are encrypted and receive alerts when non-compliant resources are detected.",
+      "questionText": "Which service continuously monitors AWS resource configurations for compliance?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "AWS Config with managed or custom rules"
+        },
+        {
+          "letter": "B",
+          "text": "AWS CloudTrail"
+        },
+        {
+          "letter": "C",
+          "text": "Amazon Inspector"
+        },
+        {
+          "letter": "D",
+          "text": "AWS Trusted Advisor"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Which service continuously records resource configurations and evaluates them against compliance rules you define?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "AWS Config continuously records resource configurations and evaluates them against rules. Managed rules (pre-built by AWS) cover common compliance checks like encrypted-volumes, required-tags, and restricted-ssh. Custom rules use Lambda for specific requirements. Config tracks compliance over time and can trigger remediation actions through SSM Automation when resources become non-compliant."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Conformance packs deploy collections of rules for compliance frameworks (PCI-DSS, HIPAA).</li>\n              <li>Auto-remediation with SSM Automation documents can fix non-compliant resources automatically.</li>\n              <li>Config aggregators combine compliance data across accounts and regions.</li></ul>"
+        }
+      ],
+      "tags": [
+        "AWS Config",
+        "Compliance",
+        "Governance"
+      ]
+    },
+    {
+      "id": 15,
+      "categoryRef": "cat-security",
+      "difficulty": "intermediate",
+      "title": "CloudTrail Log Integrity",
+      "scenario": "A SysOps administrator needs to ensure CloudTrail logs haven't been tampered with for forensic and compliance purposes.",
+      "questionText": "Which CloudTrail feature validates that log files have not been modified or deleted?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "CloudTrail Insights"
+        },
+        {
+          "letter": "B",
+          "text": "AWS Config"
+        },
+        {
+          "letter": "C",
+          "text": "S3 versioning"
+        },
+        {
+          "letter": "D",
+          "text": "Log file integrity validation"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Think about how you would cryptographically prove that audit logs have not been altered after delivery. What mechanism provides this?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "CloudTrail log file integrity validation produces a digest file for each hour of log delivery. Digest files contain hashes of log files and are signed with a private key. Using the aws cloudtrail validate-logs CLI command, you can verify that log files haven't been modified or deleted since delivery. This supports forensic investigations and compliance requirements."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Digest files are delivered to the same S3 bucket in a separate prefix.</li>\n              <li>Validation uses SHA-256 hashing and RSA digital signatures.</li>\n              <li>S3 Object Lock (Governance or Compliance mode) adds additional protection against deletion.</li></ul>"
+        }
+      ],
+      "tags": [
+        "CloudTrail",
+        "Log Integrity",
+        "Compliance"
+      ]
+    },
+    {
+      "id": 16,
+      "categoryRef": "cat-security",
+      "difficulty": "intermediate",
+      "title": "Security Hub Findings",
+      "scenario": "A SysOps administrator needs a single place to view security findings from GuardDuty, Inspector, Macie, and third-party tools with prioritized remediation guidance.",
+      "questionText": "Which service aggregates and prioritizes security findings from multiple AWS services?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "AWS Security Hub"
+        },
+        {
+          "letter": "B",
+          "text": "AWS CloudTrail"
+        },
+        {
+          "letter": "C",
+          "text": "Amazon Detective"
+        },
+        {
+          "letter": "D",
+          "text": "Amazon CloudWatch"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Which service acts as a single pane of glass for security findings from multiple AWS detection services and third-party integrations?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "AWS Security Hub provides a comprehensive view of security alerts and compliance status. It aggregates findings from GuardDuty, Inspector, Macie, IAM Access Analyzer, Firewall Manager, and third-party tools using AWS Security Finding Format (ASFF). Security Hub runs automated compliance checks against standards like CIS AWS Foundations and AWS Foundational Security Best Practices."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Finding aggregation across regions and accounts with a designated administrator account.</li>\n              <li>Custom actions can trigger automated remediation via EventBridge and Lambda.</li>\n              <li>Controls provide specific remediation steps for each finding type.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Security Hub",
+        "Security",
+        "Compliance"
+      ]
+    },
+    {
+      "id": 17,
+      "categoryRef": "cat-networking",
+      "difficulty": "intermediate",
+      "title": "VPC Flow Logs Analysis",
+      "scenario": "A SysOps administrator is troubleshooting connectivity issues between EC2 instances. They need to see whether traffic is being accepted or rejected at the network level.",
+      "questionText": "Which feature captures IP traffic information for VPC network interfaces?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Amazon VPC Traffic Mirroring"
+        },
+        {
+          "letter": "B",
+          "text": "AWS CloudTrail"
+        },
+        {
+          "letter": "C",
+          "text": "VPC Flow Logs"
+        },
+        {
+          "letter": "D",
+          "text": "Network Access Analyzer"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "When troubleshooting network connectivity, which VPC feature shows whether packets were accepted or rejected at the interface level?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "VPC Flow Logs capture information about IP traffic going to and from network interfaces in your VPC. Logs include source/destination IP, ports, protocol, bytes, packets, and action (ACCEPT/REJECT). Flow logs can be created at VPC, subnet, or ENI level and published to CloudWatch Logs, S3, or Kinesis Data Firehose for analysis."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Flow logs don't capture packet contents - use VPC Traffic Mirroring for deep inspection.</li>\n              <li>Custom log format allows selecting specific fields and adding metadata fields.</li>\n              <li>Analyze with CloudWatch Logs Insights or Athena (for S3-stored logs).</li></ul>"
+        }
+      ],
+      "tags": [
+        "VPC",
+        "Flow Logs",
+        "Networking"
+      ]
+    },
+    {
+      "id": 18,
+      "categoryRef": "cat-networking",
+      "difficulty": "intermediate",
+      "title": "Route 53 Health Checks",
+      "scenario": "A SysOps administrator needs to configure DNS failover so traffic routes to a secondary site when the primary becomes unhealthy.",
+      "questionText": "What Route 53 features enable automatic DNS failover based on endpoint health?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Simple routing with TTL"
+        },
+        {
+          "letter": "B",
+          "text": "Latency-based routing only"
+        },
+        {
+          "letter": "C",
+          "text": "Health checks with failover routing policy"
+        },
+        {
+          "letter": "D",
+          "text": "Geolocation routing"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "DNS-based failover needs two pieces: something to detect the primary is down, and a routing policy that acts on that signal. What combination does Route 53 use?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Route 53 health checks monitor the health of endpoints via HTTP, HTTPS, or TCP checks. When combined with failover routing policy (primary/secondary records), Route 53 automatically routes traffic to the secondary when the primary fails health checks. Health checks can monitor endpoints directly, other health checks (calculated), or CloudWatch alarms."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Health checks run from multiple regions; configurable threshold determines healthy/unhealthy.</li>\n              <li>String matching health checks verify response body contains expected text.</li>\n              <li>Private hosted zone health checks require CloudWatch alarms since checkers can't reach private IPs.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Route 53",
+        "Health Checks",
+        "DNS Failover"
+      ]
+    },
+    {
+      "id": 19,
+      "categoryRef": "cat-networking",
+      "difficulty": "intermediate",
+      "title": "ALB Access Logs",
+      "scenario": "A SysOps administrator needs to analyze Application Load Balancer request patterns including client IPs, request paths, and response times for troubleshooting.",
+      "questionText": "How can detailed request information be captured from an Application Load Balancer?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Enable ALB access logs to S3"
+        },
+        {
+          "letter": "B",
+          "text": "Use VPC Flow Logs"
+        },
+        {
+          "letter": "C",
+          "text": "Configure CloudTrail data events"
+        },
+        {
+          "letter": "D",
+          "text": "Enable CloudWatch detailed monitoring"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Think about which load balancer feature writes per-request details — client IP, latency, path, response code — to a durable store for later analysis."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Application Load Balancer access logs provide detailed information about requests including: client IP and port, request processing time, target processing time, response time, request path, user agent, SSL cipher, and response code. Logs are stored in S3 with configurable prefix. Analyze with Athena, CloudWatch Logs Insights (via S3 export), or third-party tools."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>S3 bucket policy must allow ELB service principal to write logs.</li>\n              <li>Logs are published every 5 minutes if there's traffic.</li>\n              <li>Connection logs (separate from access logs) track TLS connection details.</li></ul>"
+        }
+      ],
+      "tags": [
+        "ALB",
+        "Access Logs",
+        "Troubleshooting"
+      ]
+    },
+    {
+      "id": 20,
+      "categoryRef": "cat-cost",
+      "difficulty": "intermediate",
+      "title": "S3 Storage Analysis",
+      "scenario": "A SysOps administrator needs to analyze S3 storage usage patterns to identify opportunities for cost savings through lifecycle policies or storage class changes.",
+      "questionText": "Which S3 feature provides analytics on storage access patterns and recommendations?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "AWS Cost Explorer only"
+        },
+        {
+          "letter": "B",
+          "text": "S3 Inventory only"
+        },
+        {
+          "letter": "C",
+          "text": "CloudWatch S3 metrics"
+        },
+        {
+          "letter": "D",
+          "text": "S3 Storage Lens and S3 Storage Class Analysis"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "S3 has built-in tools that analyze access patterns and recommend when objects should move to a different storage tier. What are they?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "S3 Storage Lens provides organization-wide visibility into storage usage, activity trends, and recommendations across all buckets and accounts. S3 Storage Class Analysis monitors access patterns for specific prefixes/buckets and provides recommendations for transitioning to Infrequent Access storage classes. Together they help optimize storage costs based on actual usage patterns."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Storage Lens free tier provides 28 metrics; advanced tier adds 35+ metrics and recommendations.</li>\n              <li>Storage Class Analysis runs for at least 30 days to provide accurate recommendations.</li>\n              <li>S3 Inventory provides flat file reports of objects and metadata for custom analysis.</li></ul>"
+        }
+      ],
+      "tags": [
+        "S3",
+        "Storage Lens",
+        "Cost Optimization"
+      ]
+    },
+    {
+      "id": 21,
+      "categoryRef": "cat-cost",
+      "difficulty": "intermediate",
+      "title": "Trusted Advisor Checks",
+      "scenario": "A SysOps administrator wants automated recommendations for cost savings, security improvements, and performance optimization based on AWS best practices.",
+      "questionText": "Which service provides best practice recommendations across cost, performance, security, and fault tolerance?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "AWS Trusted Advisor"
+        },
+        {
+          "letter": "B",
+          "text": "AWS Well-Architected Tool"
+        },
+        {
+          "letter": "C",
+          "text": "AWS Compute Optimizer"
+        },
+        {
+          "letter": "D",
+          "text": "AWS Config"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Which service gives automated best-practice recommendations spanning cost, performance, security, fault tolerance, and service limits?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "AWS Trusted Advisor analyzes your AWS environment and provides recommendations in five categories: Cost Optimization (unused resources), Performance (overprovisioned), Security (open ports, IAM), Fault Tolerance (missing backups), and Service Limits (approaching quotas). All accounts get 7 core checks; Business/Enterprise Support unlocks all checks plus API access."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Core checks include S3 bucket permissions, security groups, IAM use, MFA on root, and service limits.</li>\n              <li>Trusted Advisor can trigger EventBridge events for check status changes.</li>\n              <li>Organizational view aggregates Trusted Advisor findings across accounts.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Trusted Advisor",
+        "Best Practices",
+        "Optimization"
+      ]
+    },
+    {
+      "id": 22,
+      "categoryRef": "cat-monitoring",
+      "difficulty": "intermediate",
+      "title": "CloudWatch Dashboards",
+      "scenario": "A SysOps administrator needs to create a centralized view displaying metrics from EC2, RDS, Lambda, and custom application metrics on a single screen.",
+      "questionText": "Which CloudWatch feature enables creating customizable visualizations of metrics?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "CloudWatch Dashboards"
+        },
+        {
+          "letter": "B",
+          "text": "CloudWatch Alarms"
+        },
+        {
+          "letter": "C",
+          "text": "CloudWatch Insights"
+        },
+        {
+          "letter": "D",
+          "text": "CloudWatch Contributor Insights"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Which CloudWatch feature lets you build a single-screen view combining graphs, numbers, and alarm status from multiple services?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "CloudWatch Dashboards are customizable pages displaying metrics from multiple AWS services and accounts. Widgets include line graphs, stacked areas, numbers, gauges, text, and alarm status. Dashboards can display metrics from different regions (cross-region) and accounts (cross-account with appropriate setup). Automatic dashboards are pre-built for common services."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Up to 3 dashboards with 50 metrics each are free; additional dashboards cost $3/month each.</li>\n              <li>Dashboard can include CloudWatch Logs Insights query results.</li>\n              <li>Share dashboards publicly or with specific IAM users without console access.</li></ul>"
+        }
+      ],
+      "tags": [
+        "CloudWatch",
+        "Dashboards",
+        "Visualization"
+      ]
+    },
+    {
+      "id": 23,
+      "categoryRef": "cat-reliability",
+      "difficulty": "advanced",
+      "title": "EBS Volume Recovery",
+      "scenario": "A SysOps administrator notices an EBS volume has entered an error state. They need to understand recovery options and data protection.",
+      "questionText": "What happens when an EBS volume becomes impaired or enters an error state?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Contact AWS to restore the volume"
+        },
+        {
+          "letter": "B",
+          "text": "EBS automatically recovers the volume"
+        },
+        {
+          "letter": "C",
+          "text": "Create a snapshot if possible, then create a new volume from the snapshot; data may be lost if no recent snapshot exists"
+        },
+        {
+          "letter": "D",
+          "text": "Reboot the EC2 instance to fix the volume"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "When an EBS volume fails, what is the first thing you should try to do with any remaining data before replacing the volume?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "When an EBS volume becomes impaired (I/O disabled) or enters an error state, try to create a snapshot immediately to preserve any recoverable data. If successful, create a new volume from the snapshot. EBS volumes can become impaired due to hardware failures; regular automated snapshots are critical for data protection. Failed volume data may be unrecoverable without backups."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Volume events are reported in EC2 console and can trigger EventBridge rules.</li>\n              <li>io1/io2 volumes with Multi-Attach can survive single instance failures.</li>\n              <li>EBS automatic snapshots via Data Lifecycle Manager provide regular protection.</li></ul>"
+        }
+      ],
+      "tags": [
+        "EBS",
+        "Recovery",
+        "Data Protection"
+      ]
+    },
+    {
+      "id": 24,
+      "categoryRef": "cat-deployment",
+      "difficulty": "intermediate",
+      "title": "CloudFormation Drift Detection",
+      "scenario": "A SysOps administrator suspects that resources in a CloudFormation stack have been manually modified outside of CloudFormation.",
+      "questionText": "Which CloudFormation feature identifies resources that have been modified outside of stack updates?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Stack policies"
+        },
+        {
+          "letter": "B",
+          "text": "Change sets"
+        },
+        {
+          "letter": "C",
+          "text": "Drift detection"
+        },
+        {
+          "letter": "D",
+          "text": "Resource import"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "When someone modifies a resource outside of CloudFormation, which feature reveals the gap between the template and the live state?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "CloudFormation drift detection identifies resources whose actual configuration differs from the expected configuration defined in the stack template. It detects added, deleted, or modified properties. Run drift detection on a stack to see which resources have drifted and the specific property differences. This helps maintain infrastructure consistency and identify unauthorized changes."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Not all resources and properties support drift detection; check documentation.</li>\n              <li>Drift doesn't automatically fix; update template or resource to resolve.</li>\n              <li>Use AWS Config rules to continuously monitor for CloudFormation drift.</li></ul>"
+        }
+      ],
+      "tags": [
+        "CloudFormation",
+        "Drift Detection",
+        "Configuration Management"
+      ]
+    },
+    {
+      "id": 25,
+      "categoryRef": "cat-security",
+      "difficulty": "intermediate",
+      "title": "EC2 Instance Connect",
+      "scenario": "A SysOps administrator needs to provide secure SSH access to EC2 instances without managing SSH keys or using bastion hosts.",
+      "questionText": "Which service enables browser-based or CLI SSH access to EC2 instances using IAM permissions?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "AWS Direct Connect"
+        },
+        {
+          "letter": "B",
+          "text": "AWS Systems Manager Session Manager"
+        },
+        {
+          "letter": "C",
+          "text": "AWS VPN"
+        },
+        {
+          "letter": "D",
+          "text": "EC2 Instance Connect"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Think about which service uses short-lived SSH keys and IAM-based authorization rather than long-lived key pairs for instance access."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "EC2 Instance Connect provides a simple way to connect to Linux instances using SSH. It pushes a one-time-use SSH public key to the instance metadata, and IAM policies control who can connect. Access via browser-based console, EC2 Instance Connect CLI, or standard SSH client. No need to manage long-term SSH keys. Requires Instance Connect installed on the instance."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Session Manager (SSM) provides similar access without requiring open SSH ports or key management.</li>\n              <li>Instance Connect requires security group allowing inbound SSH from AWS IP ranges.</li>\n              <li>EC2 Instance Connect Endpoint enables private connectivity without public IPs.</li></ul>"
+        }
+      ],
+      "tags": [
+        "EC2",
+        "Instance Connect",
+        "Access Management"
+      ]
+    },
+    {
+      "id": 26,
+      "categoryRef": "cat-reliability",
+      "difficulty": "intermediate",
+      "title": "EBS Snapshot Sharing",
+      "scenario": "A SysOps administrator needs to share EBS snapshots with another AWS account for disaster recovery purposes.",
+      "questionText": "How can EBS snapshots be shared with other AWS accounts?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Use VPC peering to share snapshots"
+        },
+        {
+          "letter": "B",
+          "text": "Copy the snapshot to S3 and share the bucket"
+        },
+        {
+          "letter": "C",
+          "text": "Export snapshot and import in target account"
+        },
+        {
+          "letter": "D",
+          "text": "Modify snapshot permissions to add the target account ID"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "EBS snapshots have a permissions model — think about how you grant another account the ability to use your snapshot."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "EBS snapshots can be shared by modifying their permissions to add specific AWS account IDs. The target account can then copy the snapshot to their account or create volumes from it. For encrypted snapshots, you must also share the KMS key used for encryption. Shared snapshots remain in the source account; recipients should copy for full control."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Public snapshots are visible to all AWS accounts; avoid for sensitive data.</li>\n              <li>For encrypted snapshots: share KMS key grant or re-encrypt with target's key when copying.</li>\n              <li>Cross-account snapshot copy enables disaster recovery in separate accounts.</li></ul>"
+        }
+      ],
+      "tags": [
+        "EBS",
+        "Snapshots",
+        "Sharing"
+      ]
+    },
+    {
+      "id": 27,
+      "categoryRef": "cat-monitoring",
+      "difficulty": "intermediate",
+      "title": "CloudWatch Anomaly Detection",
+      "scenario": "A SysOps administrator wants to detect unusual metric patterns that don't fit normal historical baselines without manually setting static thresholds.",
+      "questionText": "Which CloudWatch feature automatically detects metric anomalies based on historical patterns?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "CloudWatch Anomaly Detection"
+        },
+        {
+          "letter": "B",
+          "text": "CloudWatch Logs Insights"
+        },
+        {
+          "letter": "C",
+          "text": "CloudWatch Contributor Insights"
+        },
+        {
+          "letter": "D",
+          "text": "CloudWatch ServiceLens"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Which CloudWatch feature replaces static thresholds with dynamically learned baselines to flag metrics that deviate from normal patterns?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "CloudWatch Anomaly Detection applies machine learning algorithms to metrics to establish expected value bands based on historical patterns (hourly, daily, weekly seasonality). Instead of static thresholds, alarms trigger when metrics fall outside the dynamically calculated band. This is useful for metrics with variable baselines that are hard to set static thresholds for."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Model training requires 2 weeks of data; continues learning over time.</li>\n              <li>Exclusion windows can remove known anomaly periods (maintenance, deployments) from training.</li>\n              <li>Anomaly detection bands can be widened or narrowed with threshold multiplier.</li></ul>"
+        }
+      ],
+      "tags": [
+        "CloudWatch",
+        "Anomaly Detection",
+        "Machine Learning"
+      ]
+    },
+    {
+      "id": 28,
+      "categoryRef": "cat-deployment",
+      "difficulty": "intermediate",
+      "title": "Systems Manager State Manager",
+      "scenario": "A SysOps administrator needs to ensure all EC2 instances maintain a specific configuration state, like having the CloudWatch agent installed and running.",
+      "questionText": "Which Systems Manager capability enforces and maintains desired state on managed instances?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Automation"
+        },
+        {
+          "letter": "B",
+          "text": "Run Command"
+        },
+        {
+          "letter": "C",
+          "text": "State Manager with associations"
+        },
+        {
+          "letter": "D",
+          "text": "Patch Manager"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Which Systems Manager capability continuously enforces a desired configuration on instances, reapplying it automatically if it drifts?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Systems Manager State Manager maintains consistent configuration on managed instances through associations. An association links a document (defining desired state) with targets (instances). State Manager applies the association on a schedule, ensuring instances maintain the desired configuration. If configuration drifts, State Manager automatically reapplies. Common uses include installing agents, configuring services, and domain joining."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Associations can run on schedule, on instance startup, or when rate-based triggering conditions are met.</li>\n              <li>Compliance dashboard shows which instances are in/out of compliance with associations.</li>\n              <li>Apply configurations to new instances automatically using tag-based targeting.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Systems Manager",
+        "State Manager",
+        "Configuration Management"
+      ]
+    },
+    {
+      "id": 29,
+      "categoryRef": "cat-networking",
+      "difficulty": "intermediate",
+      "title": "NAT Gateway High Availability",
+      "scenario": "A SysOps administrator notices that when a NAT Gateway fails or is deleted, private subnet instances lose internet access. They need to ensure high availability.",
+      "questionText": "How should NAT Gateways be deployed for high availability?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Deploy a NAT Gateway in each Availability Zone with route tables directing traffic to the local NAT Gateway"
+        },
+        {
+          "letter": "B",
+          "text": "Deploy a single NAT Gateway and it will automatically failover"
+        },
+        {
+          "letter": "C",
+          "text": "Use NAT instances with Auto Scaling"
+        },
+        {
+          "letter": "D",
+          "text": "Deploy NAT Gateway in private subnets"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "NAT Gateways are scoped to a single AZ. How would you eliminate a single point of failure for outbound internet across multiple AZs?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "NAT Gateways are AZ-scoped resources. For high availability, create a NAT Gateway in each Availability Zone and configure route tables so private subnets in each AZ route to their local NAT Gateway. This prevents cross-AZ traffic (reducing cost) and ensures that if one AZ fails, other AZs maintain internet access through their own NAT Gateways."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Single NAT Gateway is a single point of failure for that AZ's private subnets.</li>\n              <li>Cross-AZ data transfer charges apply when routing through NAT Gateway in another AZ.</li>\n              <li>NAT Gateway has built-in redundancy within an AZ but not across AZs.</li></ul>"
+        }
+      ],
+      "tags": [
+        "NAT Gateway",
+        "High Availability",
+        "VPC"
+      ]
+    },
+    {
+      "id": 30,
+      "categoryRef": "cat-cost",
+      "difficulty": "intermediate",
+      "title": "Reserved Instance Coverage",
+      "scenario": "A SysOps administrator needs to monitor Reserved Instance utilization to ensure purchased reservations are being used and identify opportunities to purchase additional reservations.",
+      "questionText": "Which tools help analyze Reserved Instance coverage and utilization?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "CloudWatch EC2 metrics only"
+        },
+        {
+          "letter": "B",
+          "text": "AWS Config"
+        },
+        {
+          "letter": "C",
+          "text": "Cost Explorer Reserved Instance reports and Trusted Advisor RI checks"
+        },
+        {
+          "letter": "D",
+          "text": "AWS Budgets only"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Think about which AWS tools show both how much of your reserved capacity is being used and how much on-demand usage could be covered."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Cost Explorer provides Reserved Instance utilization reports (how much of purchased RIs are used) and coverage reports (what percentage of usage is covered by RIs). These help identify underutilized reservations and opportunities to purchase more. Trusted Advisor RI checks (Business/Enterprise Support) provide recommendations for RI purchases based on usage patterns."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>RI Coverage: percentage of instance hours covered by reservations vs On-Demand.</li>\n              <li>RI Utilization: percentage of reserved hours actually used vs purchased.</li>\n              <li>AWS Budgets can alert on RI utilization dropping below thresholds.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Reserved Instances",
+        "Cost Explorer",
+        "Cost Optimization"
+      ]
+    },
+    {
+      "id": 31,
+      "categoryRef": "cat-monitoring",
+      "difficulty": "intermediate",
+      "title": "X-Ray Service Map",
+      "scenario": "A SysOps administrator needs to visualize the architecture of a distributed application and identify which services are causing latency issues.",
+      "questionText": "Which feature provides a visual representation of application components and their interactions?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "CloudWatch Dashboard"
+        },
+        {
+          "letter": "B",
+          "text": "X-Ray Service Map"
+        },
+        {
+          "letter": "C",
+          "text": "AWS Config resource inventory"
+        },
+        {
+          "letter": "D",
+          "text": "VPC Flow Logs"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Which AWS tracing service builds a visual topology of your distributed application showing where latency and errors originate?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "AWS X-Ray Service Map provides a visual representation of your application's components and their connections. It shows services (Lambda, EC2, external APIs), their relationships, latency percentiles, error rates, and request counts. Color-coded health indicators quickly identify problematic services. Click on nodes to drill down into traces and identify root causes."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Service Map updates as traces flow through the system, reflecting current architecture.</li>\n              <li>X-Ray Groups filter traces to focus on specific applications or user segments.</li>\n              <li>X-Ray Analytics provides statistical views of trace data for pattern identification.</li></ul>"
+        }
+      ],
+      "tags": [
+        "X-Ray",
+        "Service Map",
+        "Observability"
+      ]
+    },
+    {
+      "id": 32,
+      "categoryRef": "cat-reliability",
+      "difficulty": "advanced",
+      "title": "RDS Multi-AZ Failover",
+      "scenario": "A SysOps administrator needs to understand what triggers RDS Multi-AZ failover and how applications should handle it.",
+      "questionText": "What happens during an RDS Multi-AZ failover event?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "DNS endpoint is updated to point to standby; applications reconnect using the same endpoint"
+        },
+        {
+          "letter": "B",
+          "text": "Applications must update connection strings to new endpoint"
+        },
+        {
+          "letter": "C",
+          "text": "Data is replicated to standby during failover"
+        },
+        {
+          "letter": "D",
+          "text": "Manual intervention is required to complete failover"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Think about how RDS keeps the connection endpoint stable during a failover — what changes behind the scenes so applications don't need new connection strings?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "During RDS Multi-AZ failover (triggered by AZ outage, instance failure, or maintenance), AWS automatically updates the DNS CNAME record for the DB instance endpoint to point to the standby. The endpoint name doesn't change, so applications reconnect using the same connection string. Failover typically completes in 60-120 seconds. Applications should implement connection retry logic."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Failover triggers: AZ outage, primary instance failure, instance type change, DB engine maintenance.</li>\n              <li>Replication is synchronous, so no data loss during planned or unplanned failover.</li>\n              <li>EventBridge captures RDS events for monitoring and automation during failovers.</li></ul>"
+        }
+      ],
+      "tags": [
+        "RDS",
+        "Multi-AZ",
+        "Failover"
+      ]
+    },
+    {
+      "id": 33,
+      "categoryRef": "cat-security",
+      "difficulty": "intermediate",
+      "title": "S3 Access Points",
+      "scenario": "A SysOps administrator needs to provide different teams with customized access to specific prefixes in a shared S3 bucket without complex bucket policies.",
+      "questionText": "Which S3 feature simplifies managing access for different applications or teams?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "S3 ACLs"
+        },
+        {
+          "letter": "B",
+          "text": "S3 Bucket Policies"
+        },
+        {
+          "letter": "C",
+          "text": "S3 Access Points"
+        },
+        {
+          "letter": "D",
+          "text": "S3 Object Lock"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Instead of one massive bucket policy, what S3 feature lets you create per-team or per-application endpoints each with their own access policy?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "S3 Access Points are named network endpoints with dedicated access policies that simplify managing data access at scale. Each access point has its own hostname and access point policy. You can restrict access points to specific VPCs (no internet access), specific prefixes, or specific actions. This simplifies complex bucket policies into manageable per-application access points."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Access point ARN format: arn:aws:s3:region:account:accesspoint/name</li>\n              <li>VPC-restricted access points require VPC endpoint for S3.</li>\n              <li>Bucket policy can delegate access control to access point policies.</li></ul>"
+        }
+      ],
+      "tags": [
+        "S3",
+        "Access Points",
+        "Access Management"
+      ]
+    },
+    {
+      "id": 34,
+      "categoryRef": "cat-deployment",
+      "difficulty": "intermediate",
+      "title": "EC2 Launch Templates",
+      "scenario": "A SysOps administrator needs to standardize EC2 instance configurations for Auto Scaling groups, including instance type, AMI, security groups, and user data.",
+      "questionText": "What is the recommended method for defining standardized EC2 instance configurations?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Launch configurations"
+        },
+        {
+          "letter": "B",
+          "text": "AMIs only"
+        },
+        {
+          "letter": "C",
+          "text": "Launch templates"
+        },
+        {
+          "letter": "D",
+          "text": "CloudFormation only"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "AWS recommends one method over another for defining reusable EC2 configurations — think about which one supports versioning and the full feature set."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Launch templates are the recommended way to define EC2 instance configurations. They support versioning (update configurations while keeping history), multiple instance types (for Spot Fleet/Auto Scaling), and all EC2 features including Dedicated Hosts, Capacity Reservations, and placement groups. Launch configurations (older) are being deprecated and lack these capabilities."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Launch templates can specify partial configurations, with remaining parameters provided at launch.</li>\n              <li>Auto Scaling groups can use mixed instances policy with multiple instance types from template.</li>\n              <li>Templates support tagging resources on launch and setting metadata options.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Launch Templates",
+        "EC2",
+        "Auto Scaling"
+      ]
+    },
+    {
+      "id": 35,
+      "categoryRef": "cat-networking",
+      "difficulty": "intermediate",
+      "title": "Transit Gateway Attachments",
+      "scenario": "A SysOps administrator needs to connect 10 VPCs to each other and to on-premises networks. Managing individual VPC peering connections has become complex.",
+      "questionText": "Which service provides hub-and-spoke connectivity for multiple VPCs and on-premises networks?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "AWS PrivateLink"
+        },
+        {
+          "letter": "B",
+          "text": "VPC Peering"
+        },
+        {
+          "letter": "C",
+          "text": "AWS Transit Gateway"
+        },
+        {
+          "letter": "D",
+          "text": "VPC Endpoints"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "With many VPCs, full-mesh peering becomes unmanageable. Which service replaces that mesh with a single central hub?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "AWS Transit Gateway is a network transit hub that connects VPCs and on-premises networks through a central gateway. Instead of meshed VPC peering (45 connections for 10 VPCs), attach each VPC once to Transit Gateway (10 attachments). Transit Gateway supports VPC attachments, VPN attachments, Direct Connect Gateway attachments, and peering with other Transit Gateways."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Route tables on Transit Gateway control routing between attachments.</li>\n              <li>Transit Gateway can be shared across accounts using Resource Access Manager.</li>\n              <li>Transit Gateway Network Manager provides visualization and monitoring.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Transit Gateway",
+        "Networking",
+        "Hybrid"
+      ]
+    },
+    {
+      "id": 36,
+      "categoryRef": "cat-cost",
+      "difficulty": "intermediate",
+      "title": "EC2 Spot Instance Interruption",
+      "scenario": "A SysOps administrator is using Spot Instances for batch processing. They need to handle instance interruptions gracefully.",
+      "questionText": "How can applications detect and prepare for Spot Instance interruptions?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Spot instances cannot be interrupted once running"
+        },
+        {
+          "letter": "B",
+          "text": "Monitor instance metadata for termination notice (2-minute warning) or use EventBridge for interruption events"
+        },
+        {
+          "letter": "C",
+          "text": "AWS sends email notifications before interruption"
+        },
+        {
+          "letter": "D",
+          "text": "Use CloudWatch alarms for Spot price changes"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Spot Instances can be reclaimed by AWS at any time. How does an application learn that reclamation is imminent so it can save state?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "When AWS needs Spot capacity back, instances receive a 2-minute warning. Applications can detect this by polling the instance metadata endpoint (http://169.254.169.254/latest/meta-data/spot/termination-time) or by configuring EventBridge rules for EC2 Spot Instance Interruption Warning events. This allows graceful shutdown, checkpointing, or transferring work to other instances."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Spot Instance interruption behavior: terminate (default), stop, or hibernate.</li>\n              <li>Capacity Rebalancing recommendation provides earlier warning before actual interruption.</li>\n              <li>Spot Fleet and EC2 Fleet automatically request replacement capacity.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Spot Instances",
+        "Interruption",
+        "Cost Optimization"
+      ]
+    },
+    {
+      "id": 37,
+      "categoryRef": "cat-monitoring",
+      "difficulty": "intermediate",
+      "title": "CloudWatch Synthetics",
+      "scenario": "A SysOps administrator needs to continuously monitor website availability and functionality by simulating user interactions, even during low-traffic periods.",
+      "questionText": "Which service provides automated synthetic monitoring of endpoints and user flows?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "CloudWatch Synthetics with canaries"
+        },
+        {
+          "letter": "B",
+          "text": "CloudWatch RUM"
+        },
+        {
+          "letter": "C",
+          "text": "X-Ray"
+        },
+        {
+          "letter": "D",
+          "text": "CloudWatch Contributor Insights"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Which CloudWatch capability simulates real user interactions on a schedule to catch availability or functionality issues before real users do?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "CloudWatch Synthetics creates canaries - configurable scripts that run on schedule to monitor endpoints and APIs. Canaries can check availability, latency, UI workflows (using headless Chrome), and data integrity. They provide consistent monitoring regardless of actual user traffic, helping detect issues before users are affected. Canary results integrate with CloudWatch alarms and dashboards."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Canary blueprints: heartbeat (simple availability), API, broken link checker, GUI workflow.</li>\n              <li>Screenshots and HAR files are captured for visual debugging.</li>\n              <li>Canaries run on Lambda; specify VPC config for monitoring internal endpoints.</li></ul>"
+        }
+      ],
+      "tags": [
+        "CloudWatch",
+        "Synthetics",
+        "Monitoring"
+      ]
+    },
+    {
+      "id": 38,
+      "categoryRef": "cat-security",
+      "difficulty": "intermediate",
+      "title": "AWS Inspector Findings",
+      "scenario": "A SysOps administrator needs to scan EC2 instances and container images for software vulnerabilities and unintended network exposure.",
+      "questionText": "Which service provides automated vulnerability scanning for EC2 instances and container images?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Amazon GuardDuty"
+        },
+        {
+          "letter": "B",
+          "text": "Amazon Inspector"
+        },
+        {
+          "letter": "C",
+          "text": "AWS Config"
+        },
+        {
+          "letter": "D",
+          "text": "AWS Shield"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Which AWS service continuously scans EC2 instances and container images for known CVEs and unintended network exposure?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Amazon Inspector is an automated vulnerability management service that continuously scans EC2 instances, Lambda functions, and container images in ECR for software vulnerabilities (CVEs) and unintended network exposure. Inspector uses Systems Manager Agent on EC2 for agentless scanning capabilities. Findings are prioritized by severity and include remediation guidance."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Inspector scanning triggers automatically on new ECR image push or instance launch.</li>\n              <li>Risk scores combine CVE severity with factors like network exposure and exploitability.</li>\n              <li>SBOM (Software Bill of Materials) export provides detailed software inventory.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Inspector",
+        "Vulnerability Scanning",
+        "Security"
+      ]
+    },
+    {
+      "id": 39,
+      "categoryRef": "cat-reliability",
+      "difficulty": "intermediate",
+      "title": "S3 Object Versioning",
+      "scenario": "A SysOps administrator needs to protect S3 objects from accidental deletion and enable recovery of previous versions.",
+      "questionText": "Which S3 feature maintains multiple versions of objects and protects against accidental deletion?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "S3 Lifecycle Rules"
+        },
+        {
+          "letter": "B",
+          "text": "S3 Replication"
+        },
+        {
+          "letter": "C",
+          "text": "S3 Versioning"
+        },
+        {
+          "letter": "D",
+          "text": "S3 Object Lock"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Which S3 feature ensures that overwrites and deletes don't permanently destroy previous copies of an object?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "S3 Versioning keeps multiple versions of an object in the same bucket. When enabled, uploads create new versions while preserving previous ones. Deletions add a delete marker (current version) rather than permanently removing objects - previous versions remain accessible. This protects against accidental deletions and overwrites. MFA Delete adds additional protection for version deletion."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Once enabled, versioning can only be suspended, not disabled.</li>\n              <li>Lifecycle rules can automatically delete old versions or transition them to cheaper storage.</li>\n              <li>MFA Delete requires MFA to delete versions or change versioning state.</li></ul>"
+        }
+      ],
+      "tags": [
+        "S3",
+        "Versioning",
+        "Data Protection"
+      ]
+    },
+    {
+      "id": 40,
+      "categoryRef": "cat-deployment",
+      "difficulty": "intermediate",
+      "title": "SSM Automation Documents",
+      "scenario": "A SysOps administrator needs to create an automated multi-step workflow for patching, backing up, and restarting EC2 instances with approval gates.",
+      "questionText": "Which Systems Manager feature provides automated multi-step workflows?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Automation with runbooks (documents)"
+        },
+        {
+          "letter": "B",
+          "text": "Patch Manager only"
+        },
+        {
+          "letter": "C",
+          "text": "State Manager"
+        },
+        {
+          "letter": "D",
+          "text": "Run Command"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Which Systems Manager feature orchestrates complex multi-step workflows — not just single commands, but sequences with branching and approval gates?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Systems Manager Automation enables creating runbooks (documents) that define multi-step automated workflows. Actions can include AWS API calls, Run Command execution, Lambda invocations, approvals, and more. AWS provides pre-built runbooks for common tasks (patching, AMI creation, remediation). Custom runbooks can include branching logic, rate control, and integration with Change Manager for approvals."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Change Manager provides approval workflows for Automation executions.</li>\n              <li>Automation can be triggered by EventBridge, Config rules, or manual execution.</li>\n              <li>Run Command executes single commands; Automation orchestrates complex multi-step workflows.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Systems Manager",
+        "Automation",
+        "Runbooks"
+      ]
+    },
+    {
+      "id": 41,
+      "categoryRef": "cat-networking",
+      "difficulty": "intermediate",
+      "title": "PrivateLink Endpoints",
+      "scenario": "A SysOps administrator needs to allow private subnet instances to access S3 and DynamoDB without using NAT Gateway or internet access.",
+      "questionText": "Which VPC feature enables private connectivity to AWS services without internet access?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Internet Gateway"
+        },
+        {
+          "letter": "B",
+          "text": "NAT Gateway"
+        },
+        {
+          "letter": "C",
+          "text": "VPC Endpoints (Gateway for S3/DynamoDB, Interface for other services)"
+        },
+        {
+          "letter": "D",
+          "text": "VPC Peering"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "How can instances in a private subnet reach AWS services without traversing the internet? Think about the two flavors of private connectivity AWS offers."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "VPC Endpoints enable private connectivity between VPCs and AWS services without traversing the internet. Gateway endpoints (free, for S3 and DynamoDB) add routes to route tables. Interface endpoints (PrivateLink, for most other services) create ENIs in your subnets with private IPs. Traffic stays on the AWS network, improving security and potentially reducing data transfer costs."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Endpoint policies can restrict which S3 buckets or actions are accessible through the endpoint.</li>\n              <li>PrivateLink can also expose your own services to other VPCs or accounts.</li>\n              <li>Interface endpoint DNS resolution can use private DNS to override public service endpoints.</li></ul>"
+        }
+      ],
+      "tags": [
+        "VPC Endpoints",
+        "PrivateLink",
+        "Security"
+      ]
+    },
+    {
+      "id": 42,
+      "categoryRef": "cat-cost",
+      "difficulty": "intermediate",
+      "title": "Cost Allocation Tags",
+      "scenario": "A SysOps administrator needs to track AWS costs by project and department for internal chargeback reporting.",
+      "questionText": "How can AWS costs be tracked and allocated to different business units?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Manually categorize costs in spreadsheets"
+        },
+        {
+          "letter": "B",
+          "text": "Create separate AWS accounts for each department"
+        },
+        {
+          "letter": "C",
+          "text": "Use CloudWatch metrics only"
+        },
+        {
+          "letter": "D",
+          "text": "Apply cost allocation tags to resources and activate them in Billing console"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Think about how you label AWS resources so that billing reports can break down costs by project, team, or environment."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Cost allocation tags are key-value pairs assigned to AWS resources that appear in billing reports when activated. User-defined tags (like Project, Department, Environment) must be activated in the Billing console to appear in Cost Explorer and Cost and Usage Reports. AWS-generated tags (like aws:createdBy) can also be activated. Use tag policies in Organizations to enforce consistent tagging."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Tags take up to 24 hours to appear in billing reports after activation.</li>\n              <li>Untagged resources show as \"Not tagged\" in reports.</li>\n              <li>AWS Config rules can check for required tags on resources.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Cost Allocation",
+        "Tags",
+        "Billing"
+      ]
+    },
+    {
+      "id": 43,
+      "categoryRef": "cat-monitoring",
+      "difficulty": "intermediate",
+      "title": "EventBridge Archive and Replay",
+      "scenario": "A SysOps administrator needs to retain EventBridge events for debugging and replay them to test event handlers after making code changes.",
+      "questionText": "Which EventBridge feature stores events for later analysis or replay?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Event rules"
+        },
+        {
+          "letter": "B",
+          "text": "Event archive and replay"
+        },
+        {
+          "letter": "C",
+          "text": "Event bus"
+        },
+        {
+          "letter": "D",
+          "text": "Schema registry"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Which EventBridge capability lets you store past events and re-send them through your rules to test handler changes or debug issues?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "EventBridge event archive captures and stores events from an event bus with configurable retention (indefinite or up to specific days). Archived events can be replayed to an event bus, sending them through rules again. This is useful for debugging (replay events that caused issues), testing (verify handler changes with real events), and disaster recovery (replay events to catch up after an outage)."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Archive can filter which events to store using event patterns.</li>\n              <li>Replay sends events at the same rate they were originally generated or faster.</li>\n              <li>Replayed events include replay-name field to distinguish from live events.</li></ul>"
+        }
+      ],
+      "tags": [
+        "EventBridge",
+        "Archive",
+        "Replay"
+      ]
+    },
+    {
+      "id": 44,
+      "categoryRef": "cat-security",
+      "difficulty": "advanced",
+      "title": "Control Tower Guardrails",
+      "scenario": "A SysOps administrator needs to implement governance across multiple AWS accounts, preventing certain actions (like disabling CloudTrail) while detecting compliance issues.",
+      "questionText": "Which AWS Control Tower components enforce governance policies?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "IAM policies only"
+        },
+        {
+          "letter": "B",
+          "text": "Guardrails (preventive using SCPs, detective using Config rules)"
+        },
+        {
+          "letter": "C",
+          "text": "AWS Config rules only"
+        },
+        {
+          "letter": "D",
+          "text": "CloudWatch alarms"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Control Tower enforces governance at two levels — one that blocks prohibited actions outright, and one that detects non-compliant state after the fact."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "AWS Control Tower guardrails are governance rules for multi-account environments. Preventive guardrails use SCPs to prevent non-compliant actions (like disabling CloudTrail). Detective guardrails use AWS Config rules to detect non-compliant resources and alert. Guardrails can be mandatory (always on), strongly recommended, or elective, and apply to organizational units."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Control Tower Account Factory provisions new accounts with guardrails automatically applied.</li>\n              <li>Proactive guardrails check CloudFormation templates before resource creation.</li>\n              <li>Guardrail compliance status is visible in the Control Tower dashboard.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Control Tower",
+        "Guardrails",
+        "Governance"
+      ]
+    },
+    {
+      "id": 45,
+      "categoryRef": "cat-reliability",
+      "difficulty": "intermediate",
+      "title": "ELB Connection Draining",
+      "scenario": "A SysOps administrator notices that when instances are removed from a load balancer during deployment, in-flight requests are being dropped.",
+      "questionText": "Which load balancer feature ensures in-flight requests complete before deregistering targets?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Idle timeout"
+        },
+        {
+          "letter": "B",
+          "text": "Sticky sessions"
+        },
+        {
+          "letter": "C",
+          "text": "Health check grace period"
+        },
+        {
+          "letter": "D",
+          "text": "Connection draining (deregistration delay)"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "When a target is being removed from a load balancer, what mechanism ensures existing requests finish rather than being abruptly dropped?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Connection draining (called deregistration delay in ALB/NLB) keeps deregistering targets available to complete in-flight requests while preventing new requests. Default is 300 seconds. During this period, existing connections complete normally but no new connections are sent. This ensures graceful removal during deployments, scale-in, or health check failures."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Set deregistration delay based on expected request completion time.</li>\n              <li>Auto Scaling lifecycle hooks can extend instance termination to allow draining.</li>\n              <li>For WebSocket connections, consider longer deregistration delay values.</li></ul>"
+        }
+      ],
+      "tags": [
+        "ELB",
+        "Connection Draining",
+        "Deployment"
+      ]
+    },
+    {
+      "id": 46,
+      "categoryRef": "cat-deployment",
+      "difficulty": "intermediate",
+      "title": "CloudFormation StackSets",
+      "scenario": "A SysOps administrator needs to deploy the same CloudFormation stack to multiple AWS accounts and regions in an organization.",
+      "questionText": "Which CloudFormation feature enables deploying stacks across multiple accounts and regions?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "StackSets"
+        },
+        {
+          "letter": "B",
+          "text": "Change sets"
+        },
+        {
+          "letter": "C",
+          "text": "Nested stacks"
+        },
+        {
+          "letter": "D",
+          "text": "Stack policies"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Which CloudFormation feature lets you manage a single template deployment across many accounts and regions simultaneously?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "CloudFormation StackSets extend stack functionality across multiple AWS accounts and regions. You create a stack set from a template, specify target accounts (by ID or OU), and target regions. StackSets deploy stack instances to each account/region combination. With AWS Organizations integration, StackSets can automatically deploy to new accounts added to OUs."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Service-managed StackSets use Organizations permissions; self-managed require IAM roles.</li>\n              <li>Automatic deployments maintain stacks when accounts join/leave OUs.</li>\n              <li>Concurrent deployments with failure tolerance control rollout behavior.</li></ul>"
+        }
+      ],
+      "tags": [
+        "CloudFormation",
+        "StackSets",
+        "Multi-Account"
+      ]
+    },
+    {
+      "id": 47,
+      "categoryRef": "cat-networking",
+      "difficulty": "intermediate",
+      "title": "CloudFront Cache Invalidation",
+      "scenario": "A SysOps administrator updated content on the origin, but users are still seeing cached stale content from CloudFront edge locations.",
+      "questionText": "How can stale content be removed from CloudFront edge caches?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Wait for TTL to expire (only option)"
+        },
+        {
+          "letter": "B",
+          "text": "Delete and recreate the CloudFront distribution"
+        },
+        {
+          "letter": "C",
+          "text": "Update the origin content again"
+        },
+        {
+          "letter": "D",
+          "text": "Create an invalidation request for the updated paths"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "When origin content changes but edge caches still serve stale data, what operation forces those caches to fetch fresh copies before TTL expires?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "CloudFront invalidations force removal of objects from edge location caches. Specify exact paths (/images/logo.png) or use wildcards (/images/*). Invalidations typically complete within minutes. The first 1,000 invalidation paths per month are free; additional paths cost $0.005 each. Alternative: use versioned filenames (logo-v2.png) to immediately serve new content without invalidation."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Invalidation time varies by number of edge locations and paths.</li>\n              <li>Versioned URLs (query strings or path versioning) avoid invalidation needs and improve caching.</li>\n              <li>Wildcard (*) counts as one path for billing but invalidates all matching objects.</li></ul>"
+        }
+      ],
+      "tags": [
+        "CloudFront",
+        "Cache Invalidation",
+        "CDN"
+      ]
+    },
+    {
+      "id": 48,
+      "categoryRef": "cat-cost",
+      "difficulty": "intermediate",
+      "title": "EBS Volume Type Selection",
+      "scenario": "A SysOps administrator needs to choose the right EBS volume type for a database workload requiring sustained IOPS performance.",
+      "questionText": "Which EBS volume type provides the highest and most consistent IOPS performance?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "io2 Block Express (Provisioned IOPS SSD)"
+        },
+        {
+          "letter": "B",
+          "text": "gp3 (General Purpose SSD)"
+        },
+        {
+          "letter": "C",
+          "text": "st1 (Throughput Optimized HDD)"
+        },
+        {
+          "letter": "D",
+          "text": "sc1 (Cold HDD)"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Among EBS volume types, which tier is designed for the most demanding I/O workloads — databases needing six-figure IOPS with sub-millisecond latency?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "EBS io2 Block Express provides the highest performance with up to 256,000 IOPS, 4,000 MB/s throughput, sub-millisecond latency, and 99.999% durability. It's ideal for I/O-intensive databases and critical applications. gp3 is cost-effective for general workloads (up to 16,000 IOPS). io1/io2 provide provisioned IOPS guarantees. HDD types (st1/sc1) are for throughput workloads, not IOPS."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>gp3 baseline: 3,000 IOPS included, up to 16,000 IOPS provisioned.</li>\n              <li>io2 Block Express requires Nitro-based instances.</li>\n              <li>Multi-Attach for io1/io2 enables attaching to multiple instances in same AZ.</li></ul>"
+        }
+      ],
+      "tags": [
+        "EBS",
+        "Volume Types",
+        "Performance"
+      ]
+    },
+    {
+      "id": 49,
+      "categoryRef": "cat-security",
+      "difficulty": "intermediate",
+      "title": "Systems Manager Session Manager",
+      "scenario": "A SysOps administrator needs to provide secure shell access to EC2 instances without opening SSH ports in security groups or managing SSH keys.",
+      "questionText": "Which service provides secure shell access to instances without requiring open inbound ports?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "AWS VPN"
+        },
+        {
+          "letter": "B",
+          "text": "EC2 Instance Connect"
+        },
+        {
+          "letter": "C",
+          "text": "Systems Manager Session Manager"
+        },
+        {
+          "letter": "D",
+          "text": "Bastion hosts"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Which service provides shell access to instances using only an outbound-connected agent — no inbound SSH ports, no key pairs required?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Systems Manager Session Manager provides secure, auditable shell access to EC2 instances (and on-premises servers) without SSH keys, bastion hosts, or open inbound ports. Access is controlled via IAM policies. All session activity can be logged to S3 and CloudWatch Logs for auditing. Sessions work through the SSM Agent which initiates outbound HTTPS connections."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Requires SSM Agent (pre-installed on Amazon Linux 2, Windows Server AMIs).</li>\n              <li>Instance must have IAM role with SSM permissions and internet/VPC endpoint connectivity.</li>\n              <li>Port forwarding through Session Manager enables accessing private services (RDS, etc.).</li></ul>"
+        }
+      ],
+      "tags": [
+        "Session Manager",
+        "Systems Manager",
+        "Secure Access"
+      ]
+    },
+    {
+      "id": 50,
+      "categoryRef": "cat-reliability",
+      "difficulty": "advanced",
+      "title": "Disaster Recovery Strategies",
+      "scenario": "A SysOps administrator is designing a disaster recovery plan. The business requires RTO of 1 hour and RPO of 15 minutes for critical applications.",
+      "questionText": "Which DR strategy best meets RTO of 1 hour and RPO of 15 minutes?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Pilot light with core services only"
+        },
+        {
+          "letter": "B",
+          "text": "Warm standby with synchronized data and scaled-down infrastructure ready to scale up"
+        },
+        {
+          "letter": "C",
+          "text": "Backup and restore from S3"
+        },
+        {
+          "letter": "D",
+          "text": "Multi-site active-active"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Consider the DR strategies on the cost/speed spectrum. Which approach keeps a functional but smaller copy of production running, ready to scale up?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Warm standby maintains a scaled-down but fully functional copy of the production environment in the DR region with continuous data replication. During failover, scale up resources and switch traffic. This typically achieves RTO in minutes to hours and RPO in seconds to minutes. Pilot light keeps only critical core components running (longer RTO). Multi-site is overkill and costly for these requirements."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>DR strategies by cost/recovery time: Backup/Restore &lt; Pilot Light &lt; Warm Standby &lt; Multi-Site.</li>\n              <li>Use Auto Scaling or CloudFormation for rapid scale-up during failover.</li>\n              <li>Route 53 health checks and failover routing automate DNS cutover.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Disaster Recovery",
+        "RTO/RPO",
+        "Business Continuity"
+      ]
+    }
+  ],
+  "glossary": {}
+}

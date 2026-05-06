@@ -1,0 +1,2521 @@
+{
+  "version": "1.0",
+  "metadata": {
+    "examCode": "MLA-C01",
+    "examTitle": "AWS Certified Machine Learning Engineer - Associate",
+    "provider": "Amazon Web Services",
+    "description": "Validates expertise in building, training, tuning, and deploying machine learning models on AWS using SageMaker and related services.",
+    "totalQuestions": 50,
+    "createdDate": "2026-01-21",
+    "lastModified": "2026-01-21T00:00:00Z",
+    "categories": {
+      "data-preparation": "Data Preparation for ML",
+      "model-development": "Model Development",
+      "deployment": "Deployment and Orchestration",
+      "monitoring": "Monitoring and Maintenance"
+    }
+  },
+  "questions": [
+    {
+      "id": 1,
+      "categoryRef": "data-preparation",
+      "difficulty": "intermediate",
+      "title": "Feature Engineering at Scale",
+      "scenario": "A retail company has 500 million transaction records and wants to create customer features for a recommendation model. Features include purchase frequency, average basket size, and category preferences calculated over various time windows (7 days, 30 days, 90 days). The feature engineering process must be reproducible and features should be available for both training and real-time inference.",
+      "questionText": "Which approach provides scalable feature engineering with training-serving consistency?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Amazon SageMaker Feature Store with SageMaker Data Wrangler for feature definitions"
+        },
+        {
+          "letter": "B",
+          "text": "Pandas DataFrames in Jupyter notebooks"
+        },
+        {
+          "letter": "C",
+          "text": "Custom Python scripts running on a single EC2 instance"
+        },
+        {
+          "letter": "D",
+          "text": "SQL views in Amazon Redshift only"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "What challenge arises when features computed for training differ from those served at inference time?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "SageMaker Feature Store with Data Wrangler provides enterprise feature engineering. Data Wrangler enables visual feature definition with 300+ built-in transforms for aggregations and time windows. Feature Store maintains both offline store (S3/Parquet for training) and online store (low-latency for inference), ensuring training-serving consistency. Features are versioned and discoverable. Processing scales with SageMaker Processing or Glue for 500M records. Single EC2 can't handle volume. Notebooks aren't reproducible. SQL views don't serve real-time inference."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Feature Store online store provides single-digit millisecond feature retrieval</li>\n            <li>Data Wrangler export generates SageMaker Processing or Glue jobs for production</li>\n            <li>Time-travel queries retrieve point-in-time feature values for backtesting</li>\n            <li>Feature groups organize related features with schema versioning</li>\n            <li>Streaming ingestion via Kinesis enables real-time feature updates</li></ul>"
+        }
+      ],
+      "tags": [
+        "Feature Store",
+        "Data Wrangler",
+        "features",
+        "SageMaker"
+      ]
+    },
+    {
+      "id": 2,
+      "categoryRef": "model-development",
+      "difficulty": "advanced",
+      "title": "Hyperparameter Optimization Strategy",
+      "scenario": "A data science team is training a deep learning model for image classification. Training one model takes 8 hours on ml.p3.2xlarge. The team has identified 6 hyperparameters to tune with continuous and categorical values. They have budget for approximately 50 training jobs. The goal is to find optimal hyperparameters efficiently.",
+      "questionText": "Which hyperparameter tuning strategy maximizes optimization efficiency?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "SageMaker Hyperparameter Tuning with Bayesian optimization and early stopping"
+        },
+        {
+          "letter": "B",
+          "text": "Manual grid search trying all combinations"
+        },
+        {
+          "letter": "C",
+          "text": "Random search with uniform sampling"
+        },
+        {
+          "letter": "D",
+          "text": "Train with default hyperparameters only"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Consider optimization strategies that learn from previous trials to focus on promising regions."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "SageMaker Hyperparameter Tuning with Bayesian optimization efficiently explores the 6-dimensional parameter space. Bayesian optimization builds a probabilistic model of the objective function, focusing trials on promising regions rather than random sampling. With 50 jobs and 8-hour training time, efficiency is critical. Early stopping terminates poorly-performing jobs quickly, saving compute. Warm start reuses learning from previous tuning jobs. Grid search is infeasible with 6 continuous parameters. Random search doesn't learn from results. Default hyperparameters won't optimize performance."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Bayesian optimization uses Gaussian Process regression to model the objective surface</li>\n            <li>Acquisition function (Expected Improvement) balances exploration and exploitation</li>\n            <li>Early stopping monitors objective metric and terminates jobs unlikely to improve</li>\n            <li>Warm start transfers knowledge from previous tuning jobs for related models</li>\n            <li>Hyperband strategy enables aggressive early stopping for faster convergence</li></ul>"
+        }
+      ],
+      "tags": [
+        "hyperparameter tuning",
+        "SageMaker",
+        "Bayesian",
+        "optimization"
+      ]
+    },
+    {
+      "id": 3,
+      "categoryRef": "deployment",
+      "difficulty": "intermediate",
+      "title": "Model Deployment Pattern Selection",
+      "scenario": "An e-commerce company deploys a recommendation model serving 10,000 requests per second at peak. Traffic varies significantly - 5x difference between peak and off-peak hours. Inference latency must be under 50 milliseconds. The model is 500 MB and requires GPU for efficient inference. Cost optimization is important.",
+      "questionText": "Which deployment configuration meets these requirements?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "SageMaker Batch Transform processing requests hourly"
+        },
+        {
+          "letter": "B",
+          "text": "Lambda with container image for inference"
+        },
+        {
+          "letter": "C",
+          "text": "SageMaker Real-time Inference with auto-scaling and Inference Recommender for instance selection"
+        },
+        {
+          "letter": "D",
+          "text": "Single ml.p3.2xlarge instance running continuously"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "How should a deployment handle 5x traffic swings while keeping latency low and costs reasonable?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "SageMaker Real-time Inference with auto-scaling optimizes for this workload. Auto-scaling adjusts instance count based on traffic, scaling up for peak 10K TPS and down during off-peak for cost efficiency. Inference Recommender benchmarks the model across instance types to find optimal GPU configuration meeting 50ms latency. Application Auto Scaling uses CloudWatch metrics (InvocationsPerInstance) for scaling decisions. Batch Transform doesn't meet real-time requirements. Lambda has cold start issues and 15-minute timeout limits. Single instance can't handle peak load."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Inference Recommender tests ml.g4dn, ml.g5, ml.p3 instances for price-performance</li>\n            <li>Auto-scaling target tracking maintains target invocations per instance</li>\n            <li>Multi-model endpoints share infrastructure across multiple models</li>\n            <li>Provisioned concurrency eliminates cold start for predictable latency</li>\n            <li>Model compilation with Neo optimizes inference on specific hardware</li></ul>"
+        }
+      ],
+      "tags": [
+        "SageMaker",
+        "deployment",
+        "auto-scaling",
+        "real-time"
+      ]
+    },
+    {
+      "id": 4,
+      "categoryRef": "monitoring",
+      "difficulty": "intermediate",
+      "title": "Model Performance Monitoring",
+      "scenario": "A credit scoring model in production shows declining approval rates over the past month. The data science team suspects data drift as economic conditions have changed. They need to detect when input feature distributions shift from training data and when model predictions deviate from expected patterns, with automated alerting.",
+      "questionText": "Which monitoring approach detects these issues?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "CloudWatch metrics for endpoint invocation counts only"
+        },
+        {
+          "letter": "B",
+          "text": "Manual weekly review of prediction distributions"
+        },
+        {
+          "letter": "C",
+          "text": "SageMaker Model Monitor with data quality and model quality monitoring schedules"
+        },
+        {
+          "letter": "D",
+          "text": "A/B testing with holdout traffic"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Consider automated monitoring solutions that detect statistical drift in features and predictions."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "SageMaker Model Monitor provides comprehensive drift detection. Data quality monitoring compares incoming feature distributions against training baselines using statistical tests, detecting feature drift. Model quality monitoring tracks prediction distributions and, with ground truth labels, actual model performance metrics. Scheduled monitoring jobs run continuously with configurable thresholds. CloudWatch integration enables alerts when violations occur. Manual review is reactive and slow. Invocation counts don't show drift. A/B testing compares models, not drift."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Data quality uses Deequ library for statistical constraint validation</li>\n            <li>Baseline constraints define expected feature ranges, types, and distributions</li>\n            <li>Model quality metrics include accuracy, precision, recall, and custom metrics</li>\n            <li>Model bias monitoring detects discriminatory prediction patterns</li>\n            <li>Feature attribution drift shows which features contribute to prediction changes</li></ul>"
+        }
+      ],
+      "tags": [
+        "Model Monitor",
+        "drift",
+        "monitoring",
+        "SageMaker"
+      ]
+    },
+    {
+      "id": 5,
+      "categoryRef": "data-preparation",
+      "difficulty": "basic",
+      "title": "Data Labeling for Supervised Learning",
+      "scenario": "A company is building an object detection model for warehouse inventory. They have 100,000 images that need bounding box annotations. The labeling team has 5 annotators with varying expertise levels. Quality control is essential as mislabeled data will degrade model performance. Budget is limited for this labeling project.",
+      "questionText": "Which service provides cost-effective labeling with quality control?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Amazon SageMaker Ground Truth with automated labeling and annotation consolidation"
+        },
+        {
+          "letter": "B",
+          "text": "Using only synthetic data without real annotations"
+        },
+        {
+          "letter": "C",
+          "text": "Outsourcing to a general crowdsourcing platform"
+        },
+        {
+          "letter": "D",
+          "text": "Manual labeling by each annotator working independently"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "What matters most when annotators have varying skill levels and the budget is tight?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "SageMaker Ground Truth provides cost-effective labeling with quality control. Automated labeling uses active learning - as annotators label initial data, Ground Truth trains a model to pre-label remaining images, reducing human effort by up to 70%. Annotation consolidation combines multiple annotator labels using consensus algorithms, improving quality. Built-in workforce management supports private teams with configurable workflows. Quality metrics track annotator accuracy. Manual labeling lacks quality controls. Generic crowdsourcing may lack domain expertise. Synthetic data doesn't replace real annotations."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Active learning selects most informative samples for human annotation</li>\n            <li>Annotation consolidation uses expectation maximization for label consensus</li>\n            <li>Custom workflows define approval processes and quality thresholds</li>\n            <li>Ground Truth Plus provides fully managed labeling by AWS experts</li>\n            <li>Pre-built task templates support bounding boxes, semantic segmentation, and more</li></ul>"
+        }
+      ],
+      "tags": [
+        "Ground Truth",
+        "labeling",
+        "annotation",
+        "SageMaker"
+      ]
+    },
+    {
+      "id": 6,
+      "categoryRef": "model-development",
+      "difficulty": "advanced",
+      "title": "Distributed Training Strategy",
+      "scenario": "A research team is training a 10-billion parameter language model. Training on a single GPU would take 6 months. The model is too large to fit in a single GPU's memory. The team needs to reduce training time to 2 weeks using distributed training across multiple nodes while maintaining training stability.",
+      "questionText": "Which distributed training approach handles this large model efficiently?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Sequential training on multiple smaller models"
+        },
+        {
+          "letter": "B",
+          "text": "Data parallelism with synchronized gradient updates"
+        },
+        {
+          "letter": "C",
+          "text": "Training on a single ml.p4d.24xlarge instance"
+        },
+        {
+          "letter": "D",
+          "text": "SageMaker distributed training with model parallelism and tensor parallelism"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "What happens when a model simply cannot fit into one GPU's memory, no matter how large the instance?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "SageMaker distributed training with model parallelism is required for 10B parameter models. Model parallelism partitions the model across GPUs - different layers on different devices - when the model exceeds single GPU memory. Tensor parallelism splits individual layers across devices for very large layers. SageMaker's library automatically optimizes partition placement and communication. Pipeline parallelism overlaps computation and communication for efficiency. Data parallelism alone can't handle models larger than GPU memory. Single instance lacks sufficient memory. Sequential training doesn't reduce time."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Model parallelism uses device placement to split transformer layers across GPUs</li>\n            <li>Tensor parallelism shards attention heads and feed-forward layers across devices</li>\n            <li>Pipeline parallelism processes micro-batches in parallel stages</li>\n            <li>Mixed precision (FP16/BF16) reduces memory and accelerates training</li>\n            <li>Gradient checkpointing trades compute for memory by recomputing activations</li></ul>"
+        }
+      ],
+      "tags": [
+        "distributed training",
+        "model parallelism",
+        "SageMaker",
+        "LLM"
+      ]
+    },
+    {
+      "id": 7,
+      "categoryRef": "deployment",
+      "difficulty": "intermediate",
+      "title": "Multi-Model Endpoint Optimization",
+      "scenario": "A SaaS company provides personalized ML models for 500 customers. Each customer has their own trained model (average 100 MB). Models receive varying traffic - some customers have 1000 requests/day, others have 10. Deploying 500 separate endpoints is cost-prohibitive. Inference latency should be under 200 milliseconds.",
+      "questionText": "Which deployment strategy optimizes cost for many models with variable traffic?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "500 individual SageMaker endpoints with minimum instances"
+        },
+        {
+          "letter": "B",
+          "text": "SageMaker Multi-Model Endpoints with dynamic model loading"
+        },
+        {
+          "letter": "C",
+          "text": "Single model trained on all customer data"
+        },
+        {
+          "letter": "D",
+          "text": "Lambda functions with embedded models for each customer"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Is there a way to avoid paying for 500 separate endpoints when most models see very little traffic?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "SageMaker Multi-Model Endpoints (MME) provide cost-effective multi-tenancy. MME hosts all 500 models on shared infrastructure. Models load dynamically when invoked - frequently accessed models stay in memory, infrequently used models load on-demand from S3. This dramatically reduces costs versus 500 endpoints. Memory sizing accommodates active model working set. The 100 MB model size fits well within instance memory. 500 endpoints would cost 500x minimum instance costs. Single model loses personalization. Lambda has cold start latency issues."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>MME uses LRU caching - popular models stay loaded, others evict when memory full</li>\n            <li>TargetModel header in inference request specifies which model to invoke</li>\n            <li>Instance sizing: model_count * model_size / memory_ratio estimates required memory</li>\n            <li>CloudWatch metrics show model loading latency and cache hit rates</li>\n            <li>Multi-model with GPU supports GPU inference for multiple models</li></ul>"
+        }
+      ],
+      "tags": [
+        "multi-model",
+        "SageMaker",
+        "cost optimization",
+        "deployment"
+      ]
+    },
+    {
+      "id": 8,
+      "categoryRef": "monitoring",
+      "difficulty": "advanced",
+      "title": "Explainability for Model Debugging",
+      "scenario": "A loan approval model is rejecting applications at a higher rate than expected. Regulators require explanations for individual decisions. The team needs to understand which features drive specific predictions and identify potential bias in model decisions across different demographic groups.",
+      "questionText": "Which approach provides prediction explainability and bias detection?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Correlation analysis between features and outcomes"
+        },
+        {
+          "letter": "B",
+          "text": "SageMaker Clarify for feature attribution, bias metrics, and model explainability reports"
+        },
+        {
+          "letter": "C",
+          "text": "Examining model weights directly"
+        },
+        {
+          "letter": "D",
+          "text": "Manual review of rejected applications"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Regulators want per-decision reasoning and group-level fairness evidence. Which capabilities does that require?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "SageMaker Clarify provides comprehensive explainability and bias detection. Clarify uses SHAP (SHapley Additive exPlanations) for feature attribution, showing which features drive individual predictions - essential for regulatory compliance. Bias metrics (demographic parity, equalized odds) detect disparate impact across groups. Pre-training bias analysis identifies bias in training data. Post-training analysis detects model-introduced bias. Reports document findings for auditors. Model weights don't explain predictions. Correlation misses interaction effects. Manual review doesn't scale."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>SHAP values quantify each feature's contribution to moving prediction from baseline</li>\n            <li>Clarify supports both tabular and NLP model explanations</li>\n            <li>Bias metrics include CI (Class Imbalance), DPL (Difference in Positive Proportions)</li>\n            <li>Partial dependence plots show feature impact across value ranges</li>\n            <li>Real-time explainability provides per-request feature attributions</li></ul>"
+        }
+      ],
+      "tags": [
+        "Clarify",
+        "explainability",
+        "bias",
+        "SHAP"
+      ]
+    },
+    {
+      "id": 9,
+      "categoryRef": "data-preparation",
+      "difficulty": "intermediate",
+      "title": "Handling Imbalanced Classification Data",
+      "scenario": "A fraud detection model is trained on transaction data where only 0.1% of transactions are fraudulent. The model achieves 99.9% accuracy but fails to detect actual fraud. The team needs techniques to handle this severe class imbalance and improve fraud detection recall without generating too many false positives.",
+      "questionText": "Which combination of techniques addresses class imbalance effectively?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Remove majority class samples to balance dataset"
+        },
+        {
+          "letter": "B",
+          "text": "Collect more data until classes are balanced"
+        },
+        {
+          "letter": "C",
+          "text": "Use accuracy as the sole evaluation metric"
+        },
+        {
+          "letter": "D",
+          "text": "SMOTE oversampling of minority class, class weights in loss function, and threshold tuning on precision-recall curve"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Consider sampling techniques combined with algorithm modifications for imbalanced data."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "The combination of SMOTE, class weights, and threshold tuning addresses imbalance comprehensively. SMOTE (Synthetic Minority Over-sampling Technique) generates synthetic fraud samples by interpolating between existing frauds, increasing minority representation. Class weights in the loss function penalize misclassifying fraud more heavily. Threshold tuning on precision-recall curve finds optimal decision boundary balancing recall (catching fraud) and precision (avoiding false positives). Accuracy misleads with imbalanced data. More data rarely achieves balance. Removing majority loses information."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>SMOTE creates synthetic samples along lines connecting minority class neighbors</li>\n            <li>Class weights: weight = total_samples / (n_classes * class_samples)</li>\n            <li>Precision-Recall AUC better evaluates imbalanced classifiers than ROC AUC</li>\n            <li>Focal loss down-weights easy examples, focusing training on hard cases</li>\n            <li>Ensemble methods (balanced random forest) help with severe imbalance</li></ul>"
+        }
+      ],
+      "tags": [
+        "imbalanced data",
+        "SMOTE",
+        "class weights",
+        "fraud detection"
+      ]
+    },
+    {
+      "id": 10,
+      "categoryRef": "model-development",
+      "difficulty": "basic",
+      "title": "Algorithm Selection for Regression",
+      "scenario": "A real estate company wants to predict house prices based on features like square footage, location, bedrooms, and age. They have 50,000 historical sales records. The relationship between features and price may be non-linear. Model interpretability is important for explaining predictions to clients. Training should complete within a few hours.",
+      "questionText": "Which SageMaker built-in algorithm is most appropriate?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Image Classification for visual analysis"
+        },
+        {
+          "letter": "B",
+          "text": "XGBoost for gradient-boosted tree regression with feature importance"
+        },
+        {
+          "letter": "C",
+          "text": "BlazingText for text classification"
+        },
+        {
+          "letter": "D",
+          "text": "DeepAR for time series forecasting"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Which family of algorithms naturally handles non-linear tabular data while staying interpretable?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "XGBoost is ideal for this tabular regression task. XGBoost's gradient-boosted trees naturally capture non-linear relationships between features and price. Built-in feature importance scores explain which factors (location, size) most influence predictions - essential for client explanations. SageMaker's XGBoost trains efficiently on 50K records within hours. The algorithm handles mixed feature types without extensive preprocessing. DeepAR is for time series. BlazingText is for text. Image Classification is for images."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>XGBoost feature importance: gain (improvement), cover (samples), and weight (frequency)</li>\n            <li>SageMaker XGBoost supports distributed training for larger datasets</li>\n            <li>Early stopping prevents overfitting by monitoring validation metrics</li>\n            <li>SHAP values provide more detailed feature attribution than built-in importance</li>\n            <li>Hyperparameters: max_depth, eta (learning rate), num_round control complexity</li></ul>"
+        }
+      ],
+      "tags": [
+        "XGBoost",
+        "regression",
+        "SageMaker",
+        "algorithms"
+      ]
+    },
+    {
+      "id": 11,
+      "categoryRef": "deployment",
+      "difficulty": "advanced",
+      "title": "Blue-Green Deployment for ML Models",
+      "scenario": "A production recommendation model serves 1 million daily users. The team is deploying a new model version that was trained on recent data. They need to safely roll out the new model, monitor for performance degradation, and have the ability to quickly rollback if issues arise. The transition should not impact user experience.",
+      "questionText": "Which deployment strategy enables safe model updates?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Deploy new model to separate endpoint and switch DNS"
+        },
+        {
+          "letter": "B",
+          "text": "SageMaker deployment guardrails with canary deployment and automatic rollback"
+        },
+        {
+          "letter": "C",
+          "text": "Direct endpoint update replacing the old model"
+        },
+        {
+          "letter": "D",
+          "text": "Manual A/B testing with 50/50 split"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "How do you validate a new model on real traffic without risking all users if something goes wrong?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "SageMaker deployment guardrails with canary deployment provides safe model updates. Canary deployment routes a small percentage (e.g., 5%) of traffic to the new model initially. CloudWatch alarms monitor latency, errors, and custom metrics. If metrics degrade, automatic rollback reverts to the previous model within seconds. Traffic gradually shifts to new model if metrics remain healthy. This prevents full user impact from model issues. Direct update risks all users. Manual A/B lacks automation. DNS switching is slow for rollback."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Canary steps: 5% for 10 minutes, 25% for 10 minutes, 100% if healthy</li>\n            <li>Auto-rollback triggers on CloudWatch alarm breach for error rate or latency</li>\n            <li>Linear deployment shifts traffic incrementally (10% every 10 minutes)</li>\n            <li>All-at-once deployment available for non-critical updates</li>\n            <li>Shadow testing routes traffic to new model without serving responses</li></ul>"
+        }
+      ],
+      "tags": [
+        "deployment",
+        "canary",
+        "rollback",
+        "SageMaker"
+      ]
+    },
+    {
+      "id": 12,
+      "categoryRef": "monitoring",
+      "difficulty": "intermediate",
+      "title": "Cost Optimization for ML Workloads",
+      "scenario": "A data science team runs training jobs that take 4-8 hours each, with 20 experiments per week. They also maintain 5 real-time inference endpoints running 24/7. Current monthly costs are $50,000. Management wants 40% cost reduction without impacting model quality or inference latency.",
+      "questionText": "Which combination of strategies achieves the cost reduction?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Reduce number of training experiments"
+        },
+        {
+          "letter": "B",
+          "text": "Spot instances for training, right-sized inference instances with auto-scaling, and SageMaker Savings Plans"
+        },
+        {
+          "letter": "C",
+          "text": "Use smaller instance types for all workloads"
+        },
+        {
+          "letter": "D",
+          "text": "Move all workloads to on-premises infrastructure"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Think about which workloads can tolerate interruption versus which need guaranteed uptime."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "The combination of Spot instances, right-sizing, auto-scaling, and Savings Plans achieves 40%+ reduction. Spot instances provide 60-90% savings for training jobs - checkpointing handles interruptions. Inference Recommender right-sizes endpoints to actual requirements. Auto-scaling reduces instance count during low-traffic periods. SageMaker Savings Plans provide additional 30% savings on committed compute. Reducing experiments impacts innovation. Undersized instances hurt performance. On-premises adds complexity without guaranteed savings."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Managed Spot Training automatically checkpoints and resumes interrupted jobs</li>\n            <li>Inference Recommender benchmarks model across 20+ instance types</li>\n            <li>Scale-to-zero endpoints start from 0 instances for infrequent workloads</li>\n            <li>Savings Plans apply to SageMaker Studio notebooks, training, and inference</li>\n            <li>Multi-model endpoints share infrastructure cost across models</li></ul>"
+        }
+      ],
+      "tags": [
+        "cost optimization",
+        "Spot",
+        "Savings Plans",
+        "SageMaker"
+      ]
+    },
+    {
+      "id": 13,
+      "categoryRef": "data-preparation",
+      "difficulty": "advanced",
+      "title": "Time Series Feature Engineering",
+      "scenario": "A utility company wants to forecast electricity demand 24 hours ahead. Historical data includes hourly demand, weather, holidays, and events. Demand shows daily, weekly, and seasonal patterns. The team needs to engineer features that capture temporal patterns, lagged relationships, and external factors for accurate forecasting.",
+      "questionText": "Which feature engineering approach captures temporal patterns effectively?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Simple moving average of demand"
+        },
+        {
+          "letter": "B",
+          "text": "Only current hour's weather data"
+        },
+        {
+          "letter": "C",
+          "text": "Lag features, rolling statistics, Fourier transforms for seasonality, and calendar features"
+        },
+        {
+          "letter": "D",
+          "text": "One-hot encoding of hour only"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Consider multiple feature types that capture different aspects of temporal behavior."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Comprehensive temporal features capture the complex demand patterns. Lag features (demand at t-1, t-24, t-168) capture autocorrelation at different horizons. Rolling statistics (mean, std over 24h, 7d) smooth noise and capture trends. Fourier transforms encode daily/weekly/yearly seasonality as continuous features. Calendar features (hour, day of week, holiday flags) capture cyclical patterns and special events. Weather features with appropriate lags account for temperature's delayed impact. Single features miss pattern complexity."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Lag selection: partial autocorrelation function (PACF) identifies significant lags</li>\n            <li>Fourier features: sin(2*pi*hour/24), cos(2*pi*hour/24) for daily cycle</li>\n            <li>Rolling windows should match forecast horizon to prevent data leakage</li>\n            <li>Holiday effects often span multiple days (pre/post holiday patterns)</li>\n            <li>Weather lags: temperature impacts demand with 1-2 hour delay for HVAC</li></ul>"
+        }
+      ],
+      "tags": [
+        "time series",
+        "features",
+        "forecasting",
+        "seasonality"
+      ]
+    },
+    {
+      "id": 14,
+      "categoryRef": "model-development",
+      "difficulty": "intermediate",
+      "title": "Transfer Learning for Computer Vision",
+      "scenario": "A manufacturing company needs to detect defects in products using images. They have only 2,000 labeled images across 5 defect types. Training a deep CNN from scratch would require millions of images. The team wants to leverage pre-trained models to achieve high accuracy with limited data.",
+      "questionText": "Which transfer learning approach maximizes performance with limited data?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Train a simple CNN from scratch on the 2,000 images"
+        },
+        {
+          "letter": "B",
+          "text": "Generate synthetic images to reach millions of samples"
+        },
+        {
+          "letter": "C",
+          "text": "Fine-tune a pre-trained ImageNet model, freezing early layers and training later layers and classifier"
+        },
+        {
+          "letter": "D",
+          "text": "Use pre-trained model features without any fine-tuning"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "With only 2,000 images, how do you leverage knowledge already learned on millions of other images?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Fine-tuning a pre-trained model with layer freezing optimizes for limited data. Pre-trained ImageNet models (ResNet, EfficientNet) have learned general visual features (edges, textures, shapes) transferable to defect detection. Freezing early layers preserves these general features. Training later layers and the classifier adapts the model to defect-specific patterns. This requires far fewer images than training from scratch. Data augmentation further extends the effective dataset. Scratch training overfits on 2,000 images. No fine-tuning may miss domain-specific features. Synthetic generation is complex."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Layer freezing: set trainable=False for convolutional base during initial training</li>\n            <li>Gradual unfreezing: unfreeze layers progressively for fine control</li>\n            <li>Lower learning rates for fine-tuning prevent destroying pre-trained weights</li>\n            <li>SageMaker JumpStart provides pre-trained models with fine-tuning scripts</li>\n            <li>Augmentation (rotation, flip, brightness) effectively multiplies dataset size</li></ul>"
+        }
+      ],
+      "tags": [
+        "transfer learning",
+        "fine-tuning",
+        "computer vision",
+        "SageMaker"
+      ]
+    },
+    {
+      "id": 15,
+      "categoryRef": "deployment",
+      "difficulty": "basic",
+      "title": "Batch Inference for Large Datasets",
+      "scenario": "A marketing team needs to score 50 million customer records with a churn prediction model monthly. The scoring job should complete within 4 hours. There's no requirement for real-time predictions. Cost efficiency is important as this is a monthly batch process.",
+      "questionText": "Which inference approach is most appropriate?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Real-time endpoint processing records sequentially"
+        },
+        {
+          "letter": "B",
+          "text": "Lambda function invoked for each record"
+        },
+        {
+          "letter": "C",
+          "text": "SageMaker Batch Transform with multiple instances for parallel processing"
+        },
+        {
+          "letter": "D",
+          "text": "SageMaker Processing job with custom inference script"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Does this workload need responses in real time, or can all records be scored in one run?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "SageMaker Batch Transform is designed for this exact use case. Batch Transform spins up multiple instances, distributes input data automatically, runs inference in parallel, and writes results to S3. For 50M records in 4 hours, configure sufficient instance count for throughput. Infrastructure terminates after job completion - no ongoing costs. Data parallelism across instances handles volume efficiently. Real-time endpoints waste resources when no real-time need exists. Lambda has 15-minute limits and invocation overhead. Processing jobs require custom inference code."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Batch Transform auto-splits input files across instances for parallelism</li>\n            <li>Instance count calculation: total_records / (throughput_per_instance * time_limit)</li>\n            <li>Max concurrent transforms limit parallel batch jobs organization-wide</li>\n            <li>Join source data with predictions using input filter and join source settings</li>\n            <li>GPU instances accelerate batch inference for deep learning models</li></ul>"
+        }
+      ],
+      "tags": [
+        "Batch Transform",
+        "inference",
+        "batch",
+        "SageMaker"
+      ]
+    },
+    {
+      "id": 16,
+      "categoryRef": "monitoring",
+      "difficulty": "advanced",
+      "title": "A/B Testing ML Models",
+      "scenario": "An online retailer has two recommendation models: the current production model and a new model claiming 10% improvement. They need to validate the new model with real users before full deployment. The test should detect a 10% improvement with 95% confidence within 2 weeks. Business impact must be measured accurately.",
+      "questionText": "Which approach provides statistically valid A/B testing for ML models?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "SageMaker endpoint with production variants and traffic splitting, with statistical significance monitoring"
+        },
+        {
+          "letter": "B",
+          "text": "Compare offline evaluation metrics from test datasets"
+        },
+        {
+          "letter": "C",
+          "text": "Run both models on same requests and compare outputs"
+        },
+        {
+          "letter": "D",
+          "text": "Deploy new model to 50% of users immediately"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Consider controlled experiments with random traffic assignment and proper statistical analysis."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "SageMaker production variants enable proper A/B testing. Configure endpoint with two variants - assign 90% traffic to production model (control) and 10% to new model (treatment). Random user assignment ensures unbiased comparison. Track business metrics (click-through rate, conversion, revenue) per variant. Calculate sample size for 10% effect detection with 95% confidence. Monitor until statistical significance reached. Offline metrics don't reflect real behavior. 50% immediately risks business impact. Shadow testing doesn't measure actual user response."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Sample size calculation: n = 16 * variance / (effect_size^2) for 95% confidence</li>\n            <li>Variant weights control traffic percentage: VariantWeight parameter</li>\n            <li>CloudWatch metrics per variant enable comparison dashboards</li>\n            <li>Sequential testing methods allow early stopping when significance reached</li>\n            <li>Multi-armed bandit algorithms dynamically shift traffic to better performers</li></ul>"
+        }
+      ],
+      "tags": [
+        "A/B testing",
+        "production variants",
+        "experimentation",
+        "SageMaker"
+      ]
+    },
+    {
+      "id": 17,
+      "categoryRef": "data-preparation",
+      "difficulty": "intermediate",
+      "title": "Data Validation Pipeline",
+      "scenario": "A credit risk model retrains weekly on new application data. Last month, a data pipeline bug caused missing values in key features, leading to degraded model performance. The team needs automated data validation that catches quality issues before training, including schema validation, statistical checks, and anomaly detection.",
+      "questionText": "Which approach implements comprehensive data validation?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Unit tests checking file existence only"
+        },
+        {
+          "letter": "B",
+          "text": "Manual review of sample data before each training"
+        },
+        {
+          "letter": "C",
+          "text": "Train model and evaluate performance to detect issues"
+        },
+        {
+          "letter": "D",
+          "text": "SageMaker Processing job with data validation rules, integrated into training pipeline with conditional execution"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Consider automated validation integrated into ML pipelines with quality gates."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "SageMaker Processing with validation rules in the training pipeline provides systematic data quality checks. Define validation rules: schema checks (column types, names), statistical checks (null rates, distributions, value ranges), and anomaly detection (drift from baseline). Processing jobs execute these checks as a pipeline step. Conditional execution halts training if validation fails, preventing bad models. Results publish to CloudWatch for alerting. Manual review doesn't scale weekly. Training then detecting wastes resources. File existence doesn't validate content."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Great Expectations library provides declarative data validation rules</li>\n            <li>SageMaker Pipelines ConditionStep branches based on validation results</li>\n            <li>Baseline statistics from training data establish expected distributions</li>\n            <li>Data profiling reports track quality metrics over time</li>\n            <li>Integration with Model Registry blocks registration of poorly-trained models</li></ul>"
+        }
+      ],
+      "tags": [
+        "data validation",
+        "Processing",
+        "pipelines",
+        "quality"
+      ]
+    },
+    {
+      "id": 18,
+      "categoryRef": "model-development",
+      "difficulty": "advanced",
+      "title": "Neural Architecture Search",
+      "scenario": "A computer vision team is designing a CNN architecture for mobile deployment with strict latency (50ms) and model size (10 MB) constraints. Manual architecture design hasn't achieved the accuracy target. The team wants to automatically search for optimal architectures within the hardware constraints.",
+      "questionText": "Which approach automates architecture discovery with constraints?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Use the largest ResNet variant"
+        },
+        {
+          "letter": "B",
+          "text": "SageMaker Autopilot or AutoGluon with custom objective including latency and size penalties"
+        },
+        {
+          "letter": "C",
+          "text": "Try all published architectures manually"
+        },
+        {
+          "letter": "D",
+          "text": "Randomly generate architectures until one meets constraints"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "When manual design can't hit the accuracy target under hardware constraints, what can search the design space for you?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "AutoML tools with custom objectives enable constrained architecture search. AutoGluon (SageMaker integration) supports multi-objective optimization combining accuracy, latency, and model size. The search explores architectures meeting size/latency constraints while maximizing accuracy. Techniques include efficient architectures (MobileNet, EfficientNet variants) and neural architecture search algorithms. Custom evaluators measure actual inference latency on target hardware. Manual enumeration is slow. Largest models violate constraints. Random search is inefficient."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>AutoGluon TabularPredictor supports time_limit and memory constraints</li>\n            <li>Multi-objective: accuracy - lambda*(latency - target) - mu*(size - limit)</li>\n            <li>Efficient architectures: MobileNetV3, EfficientNet-Lite designed for mobile</li>\n            <li>Quantization reduces model size 4x with minimal accuracy impact</li>\n            <li>SageMaker Neo compiles models optimized for target deployment hardware</li></ul>"
+        }
+      ],
+      "tags": [
+        "AutoML",
+        "AutoGluon",
+        "architecture search",
+        "optimization"
+      ]
+    },
+    {
+      "id": 19,
+      "categoryRef": "deployment",
+      "difficulty": "intermediate",
+      "title": "Serverless Inference for Variable Workloads",
+      "scenario": "A sentiment analysis API receives unpredictable traffic - sometimes 100 requests per minute, sometimes 0 for hours. During idle periods, maintaining warm endpoints wastes money. Cold start latency up to 30 seconds is acceptable for this non-critical workload. Model size is 200 MB.",
+      "questionText": "Which inference option minimizes costs for sporadic traffic?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "SageMaker Serverless Inference with configured memory and concurrency"
+        },
+        {
+          "letter": "B",
+          "text": "Real-time endpoint with minimum 1 instance"
+        },
+        {
+          "letter": "C",
+          "text": "Batch Transform triggered on schedule"
+        },
+        {
+          "letter": "D",
+          "text": "Lambda function with embedded model"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "What deployment model avoids paying for idle compute when traffic is bursty and unpredictable?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "SageMaker Serverless Inference optimizes costs for variable traffic. Serverless endpoints scale to zero when idle - no charges during inactive periods. When requests arrive, containers initialize and serve inference. Memory configuration (up to 6 GB) accommodates the 200 MB model. Max concurrency limits parallel requests. Cold start within 30 seconds is acceptable per requirements. Pay only for inference duration. Real-time endpoints charge continuously. Batch Transform doesn't suit on-demand requests. Lambda has 250 MB deployment limit."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Serverless pricing: per-second compute + per-request charge</li>\n            <li>Memory options: 1024 MB to 6144 MB in 1024 MB increments</li>\n            <li>Provisioned concurrency eliminates cold starts for latency-sensitive variants</li>\n            <li>Model containers remain warm for several minutes after last request</li>\n            <li>CloudWatch metrics: ModelSetupTime shows cold start duration</li></ul>"
+        }
+      ],
+      "tags": [
+        "serverless",
+        "inference",
+        "SageMaker",
+        "cost"
+      ]
+    },
+    {
+      "id": 20,
+      "categoryRef": "monitoring",
+      "difficulty": "intermediate",
+      "title": "Model Retraining Triggers",
+      "scenario": "A product recommendation model's performance degrades over time as user preferences and catalog change. The team needs to determine when retraining is necessary rather than running on a fixed schedule. Unnecessary retraining wastes compute, while delayed retraining hurts user experience. Performance metrics and data drift should both inform retraining decisions.",
+      "questionText": "Which approach optimizes retraining frequency?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "SageMaker Model Monitor for drift detection combined with business metric monitoring, triggering retraining via EventBridge"
+        },
+        {
+          "letter": "B",
+          "text": "Fixed weekly retraining schedule"
+        },
+        {
+          "letter": "C",
+          "text": "Manual decision based on user complaints"
+        },
+        {
+          "letter": "D",
+          "text": "Continuous retraining on every new data point"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Should you retrain on a fixed schedule, or let the data tell you when the model has gone stale?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Model Monitor with business metrics creates intelligent retraining triggers. Model Monitor detects data drift (feature distribution changes) and model quality drift (prediction distribution changes) automatically. CloudWatch metrics track business KPIs (click-through rate, conversion). EventBridge rules trigger retraining pipelines when drift exceeds thresholds OR business metrics decline. This balances computational cost with model freshness. Fixed schedules may retrain unnecessarily or too late. User complaints are lagging indicators. Continuous retraining is expensive."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Drift thresholds: statistical tests (KS, Chi-square) with configurable p-value</li>\n            <li>EventBridge rule: trigger on SageMaker Model Monitor constraint violation event</li>\n            <li>Combine drift and performance: trigger if drift AND performance decline</li>\n            <li>Champion/challenger: continuously train challenger models, promote when better</li>\n            <li>Retraining budget: limit maximum retraining frequency to control costs</li></ul>"
+        }
+      ],
+      "tags": [
+        "retraining",
+        "Model Monitor",
+        "automation",
+        "MLOps"
+      ]
+    },
+    {
+      "id": 21,
+      "categoryRef": "data-preparation",
+      "difficulty": "basic",
+      "title": "Text Preprocessing for NLP",
+      "scenario": "A customer service team wants to classify support tickets into categories. Tickets contain informal language, typos, special characters, and varying formats. The team needs to preprocess text before training a classification model, handling these variations while preserving the meaning needed for accurate classification.",
+      "questionText": "Which preprocessing pipeline prepares text data appropriately?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Lowercasing, punctuation removal, tokenization, stop word removal, and optional stemming/lemmatization"
+        },
+        {
+          "letter": "B",
+          "text": "No preprocessing to preserve original text"
+        },
+        {
+          "letter": "C",
+          "text": "Only removing extra whitespace"
+        },
+        {
+          "letter": "D",
+          "text": "Converting all text to ASCII codes"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Consider text normalization steps that reduce noise while preserving semantic content."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Standard NLP preprocessing normalizes text for consistent modeling. Lowercasing treats \"Help\" and \"help\" identically. Punctuation removal eliminates non-semantic characters. Tokenization splits text into words/subwords for model input. Stop word removal (optional) eliminates common words like \"the\", \"is\". Stemming/lemmatization reduces words to roots (\"running\" → \"run\"). This reduces vocabulary size and focuses on meaningful content. No preprocessing increases vocabulary and noise. Whitespace only leaves inconsistencies. ASCII codes lose semantic meaning."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Modern transformers (BERT) often prefer minimal preprocessing due to subword tokenization</li>\n            <li>Domain-specific stop words may include \"ticket\", \"support\" in this context</li>\n            <li>Lemmatization (WordNet) is more accurate than stemming (Porter) but slower</li>\n            <li>Consider preserving negations (\"not\", \"don't\") which flip meaning</li>\n            <li>SageMaker BlazingText handles basic preprocessing internally</li></ul>"
+        }
+      ],
+      "tags": [
+        "NLP",
+        "preprocessing",
+        "text",
+        "classification"
+      ]
+    },
+    {
+      "id": 22,
+      "categoryRef": "model-development",
+      "difficulty": "intermediate",
+      "title": "Ensemble Methods for Improved Accuracy",
+      "scenario": "A fraud detection team has trained multiple models: XGBoost, Random Forest, and Neural Network. Each model has different strengths - XGBoost catches amount-based fraud, Neural Network detects behavioral patterns. Individually, each achieves 92% accuracy. The team wants to combine them for better performance.",
+      "questionText": "Which ensemble approach maximizes combined model performance?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Simple averaging of all model predictions"
+        },
+        {
+          "letter": "B",
+          "text": "Random selection of which model to use per prediction"
+        },
+        {
+          "letter": "C",
+          "text": "Using only the best single model"
+        },
+        {
+          "letter": "D",
+          "text": "Stacking ensemble with meta-learner trained on base model predictions"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "How can you go beyond simple averaging to learn which model to trust in different situations?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Stacking with a meta-learner optimally combines diverse models. Each base model generates predictions (or probabilities) as features for the meta-learner. The meta-learner (typically logistic regression or XGBoost) learns which model to trust in different situations. This exploits the diversity - XGBoost's amount-based strength complements Neural Network's behavioral patterns. Cross-validation generates out-of-fold predictions to avoid overfitting. Simple averaging doesn't weight model strengths. Single model loses diversity benefit. Random selection adds variance."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Stacking uses k-fold CV: train base models on k-1 folds, predict on holdout</li>\n            <li>Meta-features: probability outputs from each base model, not just predictions</li>\n            <li>Include original features in meta-learner for richer context</li>\n            <li>Regularized meta-learner prevents overfitting to base model quirks</li>\n            <li>AutoGluon implements multi-layer stacking automatically</li></ul>"
+        }
+      ],
+      "tags": [
+        "ensemble",
+        "stacking",
+        "model combination",
+        "accuracy"
+      ]
+    },
+    {
+      "id": 23,
+      "categoryRef": "deployment",
+      "difficulty": "advanced",
+      "title": "Edge Deployment for IoT",
+      "scenario": "A manufacturing company wants to run defect detection models on cameras at 50 factory locations. Each location has limited connectivity to the cloud. Models need to process images locally with 100ms latency. Model updates should deploy centrally and roll out to all devices. Some locations have GPU-equipped edge devices, others have only CPUs.",
+      "questionText": "Which architecture enables ML at the edge with central management?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "SageMaker Edge Manager with Neo-compiled models deployed to IoT Greengrass devices"
+        },
+        {
+          "letter": "B",
+          "text": "Retraining models locally at each factory"
+        },
+        {
+          "letter": "C",
+          "text": "Manual model file copying to each device"
+        },
+        {
+          "letter": "D",
+          "text": "REST API calls to cloud endpoints for each inference"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "How do you run inference locally on heterogeneous hardware while still managing updates from a central place?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "SageMaker Edge Manager with Neo and Greengrass provides complete edge ML infrastructure. Neo compiles models optimized for specific hardware - CPU-optimized for CPU devices, GPU-optimized for GPU devices. Edge Manager deploys models to Greengrass-enabled devices centrally, managing versions across 50 locations. Local inference achieves 100ms latency without cloud dependency. Edge Manager collects inference data for model improvement. Over-the-air updates roll out new models systematically. Cloud APIs don't meet latency/connectivity requirements. Manual copying doesn't scale. Local retraining creates inconsistency."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Neo compilation targets: ARM, x86, GPU (NVIDIA, Intel), accelerators (Inferentia)</li>\n            <li>Edge Manager agent runs on device, manages model loading and inference</li>\n            <li>Greengrass components package models as deployable edge applications</li>\n            <li>Data capture samples edge inferences for continuous model improvement</li>\n            <li>Fleet deployment groups enable staged rollouts across device populations</li></ul>"
+        }
+      ],
+      "tags": [
+        "Edge Manager",
+        "Neo",
+        "Greengrass",
+        "IoT"
+      ]
+    },
+    {
+      "id": 24,
+      "categoryRef": "monitoring",
+      "difficulty": "basic",
+      "title": "Logging and Debugging ML Pipelines",
+      "scenario": "A training job failed after 3 hours with an out-of-memory error. The team needs to understand memory usage patterns, identify which training phase caused the failure, and determine appropriate instance sizing. They also need visibility into data loading and model convergence during training.",
+      "questionText": "Which tools provide visibility into SageMaker training job execution?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "SageMaker Debugger with built-in rules, CloudWatch logs, and profiling reports"
+        },
+        {
+          "letter": "B",
+          "text": "Only checking if the job succeeded or failed"
+        },
+        {
+          "letter": "C",
+          "text": "Monitoring S3 output folder only"
+        },
+        {
+          "letter": "D",
+          "text": "Print statements in training code"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "An OOM crash happened mid-training. What would help you see memory usage over time and identify the culprit phase?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "SageMaker Debugger provides comprehensive training visibility. Built-in rules automatically detect issues like vanishing gradients, overfitting, and resource bottlenecks. System profiling captures CPU, memory, and GPU utilization over time - showing the memory spike causing OOM. Framework profiling shows time spent in data loading vs forward/backward pass. Tensor collection captures weights, gradients, and activations for debugging convergence. CloudWatch logs contain training output and error details. Success/fail status lacks diagnostic detail. Print statements don't capture system metrics. S3 only shows final outputs."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Debugger rules: VanishingGradient, Overfit, LossNotDecreasing, CPUBottleneck</li>\n            <li>Profiler report shows timeline of GPU/CPU usage across training phases</li>\n            <li>Step-through debugger: smdebug.hook captures tensors at configurable intervals</li>\n            <li>Memory profiling identifies which tensors consume GPU memory</li>\n            <li>DataLoader profiling shows I/O wait time vs compute time ratio</li></ul>"
+        }
+      ],
+      "tags": [
+        "Debugger",
+        "profiling",
+        "monitoring",
+        "SageMaker"
+      ]
+    },
+    {
+      "id": 25,
+      "categoryRef": "data-preparation",
+      "difficulty": "advanced",
+      "title": "Privacy-Preserving ML",
+      "scenario": "Multiple hospitals want to train a disease prediction model on their combined patient data without sharing raw patient records due to HIPAA regulations. Each hospital has valuable data, but no single hospital has enough for a robust model. The solution must enable collaborative learning while protecting patient privacy.",
+      "questionText": "Which approach enables privacy-preserving collaborative ML?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Train separate models at each hospital"
+        },
+        {
+          "letter": "B",
+          "text": "Collect all data in a central location with anonymization"
+        },
+        {
+          "letter": "C",
+          "text": "Federated learning where models train locally and only gradients are shared"
+        },
+        {
+          "letter": "D",
+          "text": "Share encrypted patient records between hospitals"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Can multiple organizations collaborate on a model without any raw data ever crossing institutional boundaries?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Federated learning enables collaborative ML without data sharing. Each hospital trains the model locally on their patient data. Only model updates (gradients) are sent to a central aggregator - no raw patient data leaves the hospital. The aggregator combines gradients from all hospitals to improve the global model, which is then distributed back. This satisfies HIPAA as protected health information stays local. Differential privacy can add noise to gradients for additional protection. Centralized data violates privacy. Separate models lose collective benefit. Encrypted sharing still requires data movement."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Federated averaging: average gradients weighted by each participant's dataset size</li>\n            <li>Secure aggregation encrypts gradients so aggregator can't see individual contributions</li>\n            <li>Differential privacy adds calibrated noise to prevent membership inference attacks</li>\n            <li>AWS offers federated learning through partner solutions and custom implementations</li>\n            <li>Communication efficiency: gradient compression reduces bandwidth requirements</li></ul>"
+        }
+      ],
+      "tags": [
+        "federated learning",
+        "privacy",
+        "HIPAA",
+        "distributed"
+      ]
+    },
+    {
+      "id": 26,
+      "categoryRef": "model-development",
+      "difficulty": "intermediate",
+      "title": "Handling Missing Data",
+      "scenario": "A predictive maintenance dataset has 15% missing values across sensor readings. Missing data occurs due to sensor failures and varies by sensor type. Some features have 5% missing, others 30%. The team needs to handle missing data appropriately before training an XGBoost model to predict equipment failures.",
+      "questionText": "Which approach handles missing data most appropriately for this scenario?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Delete all rows with any missing values"
+        },
+        {
+          "letter": "B",
+          "text": "Fill all missing values with zero"
+        },
+        {
+          "letter": "C",
+          "text": "XGBoost's native missing value handling combined with feature-specific imputation for high-missing columns"
+        },
+        {
+          "letter": "D",
+          "text": "Fill all missing values with column means"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Does the chosen algorithm already know how to route missing values, or must you fill them in first?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "XGBoost with selective imputation optimizes missing data handling. XGBoost natively handles missing values - during training, it learns optimal directions for missing value splits. For features with 30% missing, consider domain-specific imputation (sensor reading patterns) or missingness indicators as additional features. Features with only 5% missing can rely on XGBoost's native handling. This preserves information about missingness patterns which may be predictive (sensor failure predicts equipment issues). Deleting rows loses 15%+ of data. Zero or mean imputation loses missingness signal."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>XGBoost learns split direction for missing values during tree construction</li>\n            <li>Missingness indicator: binary feature indicating original value was missing</li>\n            <li>Multiple imputation: generate several imputed datasets, train ensemble</li>\n            <li>KNN imputation uses similar samples to estimate missing values</li>\n            <li>MICE (Multiple Imputation by Chained Equations) for complex missing patterns</li></ul>"
+        }
+      ],
+      "tags": [
+        "missing data",
+        "imputation",
+        "XGBoost",
+        "preprocessing"
+      ]
+    },
+    {
+      "id": 27,
+      "categoryRef": "deployment",
+      "difficulty": "intermediate",
+      "title": "Model Serving Container Customization",
+      "scenario": "A team trained a model using a custom deep learning framework not supported by SageMaker built-in containers. The model requires specific library versions and custom preprocessing logic that must run during inference. They want to deploy this model to a SageMaker endpoint while maintaining full control over the inference logic.",
+      "questionText": "Which approach enables custom model serving on SageMaker?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Deploy to EC2 instead of SageMaker"
+        },
+        {
+          "letter": "B",
+          "text": "Bring Your Own Container (BYOC) with custom inference.py implementing model_fn, input_fn, predict_fn, output_fn"
+        },
+        {
+          "letter": "C",
+          "text": "Convert model to TensorFlow format"
+        },
+        {
+          "letter": "D",
+          "text": "Only use SageMaker built-in algorithms"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Consider SageMaker's extensibility for custom frameworks and inference logic."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Bring Your Own Container (BYOC) enables complete customization. Create a Docker container with required framework and libraries. Implement the inference contract: model_fn loads the model, input_fn handles request parsing, predict_fn runs inference, output_fn formats response. Push container to ECR and reference in endpoint configuration. SageMaker handles scaling, monitoring, and infrastructure while you control the inference logic. This maintains SageMaker benefits while accommodating custom requirements. Built-in algorithms don't support custom frameworks. EC2 loses managed benefits. Framework conversion may not preserve functionality."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Container must implement /ping (health check) and /invocations (inference) endpoints</li>\n            <li>SageMaker Inference Toolkit simplifies container creation with handler functions</li>\n            <li>Multi-Model Servers (MMS, TorchServe) provide production-ready serving</li>\n            <li>Environment variables configure model paths and worker counts</li>\n            <li>Local mode testing validates container before cloud deployment</li></ul>"
+        }
+      ],
+      "tags": [
+        "BYOC",
+        "containers",
+        "inference",
+        "SageMaker"
+      ]
+    },
+    {
+      "id": 28,
+      "categoryRef": "monitoring",
+      "difficulty": "advanced",
+      "title": "Concept Drift Detection",
+      "scenario": "A customer lifetime value model was trained on pre-pandemic data. Post-pandemic, customer behavior changed significantly - spending patterns, channel preferences, and engagement metrics all shifted. The model's predictions are now systematically wrong. The team needs to detect such fundamental changes in the underlying data-generating process.",
+      "questionText": "Which approach detects concept drift effectively?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Retrain on fixed schedule regardless of drift"
+        },
+        {
+          "letter": "B",
+          "text": "Check model accuracy on original test set periodically"
+        },
+        {
+          "letter": "C",
+          "text": "Monitor prediction performance against delayed ground truth, combined with feature distribution monitoring and domain-specific alerts"
+        },
+        {
+          "letter": "D",
+          "text": "Only monitor input feature distributions"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Consider monitoring approaches that detect changes in the relationship between features and targets."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Concept drift detection requires monitoring the feature-target relationship, not just feature distributions. Even if input distributions remain stable, the relationship to outcomes may change. Monitor prediction performance (accuracy, calibration) against actual outcomes when ground truth becomes available. Track residual distributions over time. Domain-specific alerts catch known disruption patterns (e.g., major events). Feature drift monitoring catches data drift but misses pure concept drift. Original test set doesn't reflect current distribution. Fixed schedules may miss or wastefully respond to drift."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Concept drift: P(Y|X) changes while P(X) may stay constant</li>\n            <li>Virtual drift: P(X) changes without P(Y|X) changing - may not need retraining</li>\n            <li>Page-Hinkley test detects mean changes in performance metrics over time</li>\n            <li>ADWIN (Adaptive Windowing) automatically adjusts detection window size</li>\n            <li>Prediction uncertainty increase often signals concept drift before performance drops</li></ul>"
+        }
+      ],
+      "tags": [
+        "concept drift",
+        "monitoring",
+        "performance",
+        "MLOps"
+      ]
+    },
+    {
+      "id": 29,
+      "categoryRef": "data-preparation",
+      "difficulty": "intermediate",
+      "title": "Feature Selection Methods",
+      "scenario": "A credit scoring model uses 500 features from application data, bureau data, and behavioral data. Many features are correlated, some are noisy, and model training takes 4 hours. The team wants to reduce features to improve training speed, reduce overfitting, and increase model interpretability while maintaining predictive power.",
+      "questionText": "Which feature selection approach balances these requirements?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Combine correlation filtering, recursive feature elimination with XGBoost importance, and domain expert review"
+        },
+        {
+          "letter": "B",
+          "text": "Use all 500 features for maximum information"
+        },
+        {
+          "letter": "C",
+          "text": "Randomly select 50 features"
+        },
+        {
+          "letter": "D",
+          "text": "Keep only features with highest individual correlation to target"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Can one selection technique alone handle correlation, predictive power, and business relevance?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Multi-stage feature selection optimizes the feature set systematically. First, correlation filtering removes highly correlated features (keeping most predictive of pair). Then, model-based methods like recursive feature elimination (RFE) with XGBoost importance identify features contributing to predictions. Finally, domain experts validate that selected features make business sense and aren't proxies for protected attributes. This reduces dimensions while preserving predictive signal. All features cause overfitting and slow training. Random selection ignores information content. Individual correlation misses interaction effects."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Correlation threshold: typically remove one feature if |r| &gt; 0.9</li>\n            <li>RFE iteratively removes least important features and refits model</li>\n            <li>Permutation importance measures feature contribution through shuffling</li>\n            <li>LASSO regularization provides embedded feature selection during training</li>\n            <li>Stability selection assesses which features consistently appear across resamples</li></ul>"
+        }
+      ],
+      "tags": [
+        "feature selection",
+        "correlation",
+        "RFE",
+        "preprocessing"
+      ]
+    },
+    {
+      "id": 30,
+      "categoryRef": "model-development",
+      "difficulty": "basic",
+      "title": "Evaluation Metrics Selection",
+      "scenario": "A medical diagnostic model predicts whether patients have a rare disease (1% prevalence). Missing a positive case (false negative) is much more costly than a false alarm (false positive) since early treatment saves lives. The team needs to select appropriate metrics for model evaluation and threshold tuning.",
+      "questionText": "Which metrics are most appropriate for this classification problem?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Accuracy only"
+        },
+        {
+          "letter": "B",
+          "text": "ROC AUC only"
+        },
+        {
+          "letter": "C",
+          "text": "Specificity (true negative rate)"
+        },
+        {
+          "letter": "D",
+          "text": "Recall, Precision-Recall AUC, and F2 score (weighted toward recall)"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "When missing a true positive is far more costly than a false alarm, which metric matters most?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Recall-focused metrics align with the asymmetric cost structure. Recall (sensitivity) measures the proportion of actual positives correctly identified - critical when missing cases is costly. Precision-Recall AUC better evaluates imbalanced classes than ROC AUC. F2 score weights recall twice as heavily as precision, matching the cost asymmetry. Threshold tuning on these metrics finds the operating point balancing sensitivity with practical false positive rates. Accuracy is misleading at 1% prevalence (99% accuracy by predicting all negative). ROC AUC can look good while missing most positives. Specificity focuses on negatives."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>F-beta score: (1 + beta^2) * (precision * recall) / (beta^2 * precision + recall)</li>\n            <li>Precision-Recall curve shows tradeoff at different classification thresholds</li>\n            <li>Cost-sensitive learning: weight positive class loss by cost_FN/cost_FP ratio</li>\n            <li>Calibration curves verify predicted probabilities match actual frequencies</li>\n            <li>Operating point selection: choose threshold meeting minimum recall requirement</li></ul>"
+        }
+      ],
+      "tags": [
+        "metrics",
+        "recall",
+        "imbalanced",
+        "evaluation"
+      ]
+    },
+    {
+      "id": 31,
+      "categoryRef": "deployment",
+      "difficulty": "advanced",
+      "title": "ML Pipeline Orchestration",
+      "scenario": "A data science team needs to automate their ML workflow: data preprocessing, feature engineering, training, evaluation, and conditional deployment. If model performance exceeds the current production model, it should deploy automatically. The pipeline should be versioned, reproducible, and trigger on new data arrival or schedule.",
+      "questionText": "Which service provides end-to-end ML pipeline orchestration?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "SageMaker Pipelines with conditional steps, model registry, and EventBridge triggers"
+        },
+        {
+          "letter": "B",
+          "text": "Jupyter notebooks run manually"
+        },
+        {
+          "letter": "C",
+          "text": "Lambda functions chained together"
+        },
+        {
+          "letter": "D",
+          "text": "Step Functions with custom state machines"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "What kind of orchestration can gate a deployment on whether the new model actually outperforms the old one?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "SageMaker Pipelines provides purpose-built ML orchestration. Define pipelines with processing, training, evaluation, and registration steps as code. ConditionStep branches based on model performance metrics - deploy only if better than baseline. Model Registry stores approved models with metadata and approval workflows. Pipelines are versioned and reproducible - same input produces same output. EventBridge triggers pipelines on S3 data arrival or CloudWatch schedules. Built-in lineage tracks artifacts across pipeline executions. Manual notebooks don't scale. Lambda lacks ML integration. Step Functions require custom ML orchestration."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Pipeline steps: Processing, Training, Tuning, Transform, RegisterModel, Condition, Fail</li>\n            <li>Condition step: JsonGet evaluates metrics from evaluation step output</li>\n            <li>Model Registry: model groups, versions, approval status, deployment history</li>\n            <li>Pipeline parameters enable dynamic values (data path, hyperparameters) at runtime</li>\n            <li>Caching: skip steps with unchanged inputs for faster iteration</li></ul>"
+        }
+      ],
+      "tags": [
+        "Pipelines",
+        "MLOps",
+        "orchestration",
+        "SageMaker"
+      ]
+    },
+    {
+      "id": 32,
+      "categoryRef": "monitoring",
+      "difficulty": "intermediate",
+      "title": "Model Versioning and Lineage",
+      "scenario": "A financial services company must demonstrate to auditors which model version produced specific predictions, what data trained that model, and what code was used. When issues arise, they need to trace back from predictions to training data. Multiple model versions exist in production for different customer segments.",
+      "questionText": "Which approach provides complete model lineage tracking?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Spreadsheet tracking model versions"
+        },
+        {
+          "letter": "B",
+          "text": "Git tags for code versions only"
+        },
+        {
+          "letter": "C",
+          "text": "SageMaker Model Registry with Experiments tracking, linked to code in CodeCommit and data versions in S3"
+        },
+        {
+          "letter": "D",
+          "text": "S3 bucket versioning for model files"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Consider integrated tracking systems that connect models, data, code, and metrics."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "SageMaker Model Registry with Experiments provides comprehensive lineage. Model Registry stores model versions with metadata linking to training jobs. Experiments track training runs with parameters, metrics, and input/output artifacts. Lineage tracking connects models to training data S3 paths and processing jobs. Integration with CodeCommit/CodePipeline links to code versions. When predictions need auditing, trace from endpoint → model version → training job → data artifacts → code revision. Spreadsheets can't maintain relationships. Git alone misses data and model artifacts. S3 versioning doesn't capture relationships."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Model Registry: ModelPackageGroup contains versions with approval status</li>\n            <li>Experiments: Trial components capture inputs, outputs, metrics, parameters</li>\n            <li>Lineage API: query upstream (what produced this) and downstream (what uses this)</li>\n            <li>Artifact tracking: datasets, models, endpoints linked in lineage graph</li>\n            <li>Integration with ML Governance for model cards and documentation</li></ul>"
+        }
+      ],
+      "tags": [
+        "Model Registry",
+        "lineage",
+        "Experiments",
+        "governance"
+      ]
+    },
+    {
+      "id": 33,
+      "categoryRef": "data-preparation",
+      "difficulty": "advanced",
+      "title": "Data Augmentation for Limited Training Data",
+      "scenario": "A wildlife conservation team has only 500 images of an endangered species for an identification model. Collecting more images is impractical. The model overfits severely on this small dataset. The team needs to artificially expand the training set while preserving the characteristics needed for species identification.",
+      "questionText": "Which data augmentation strategy maximizes effective training data?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Generate completely synthetic images using GAN"
+        },
+        {
+          "letter": "B",
+          "text": "Only horizontal flipping"
+        },
+        {
+          "letter": "C",
+          "text": "Duplicate images without modification"
+        },
+        {
+          "letter": "D",
+          "text": "Geometric transforms (rotation, flip, crop), color augmentation, and mixup/cutout with careful validation monitoring"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "With only 500 real images, how can you synthetically expand the training set without distorting species features?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Comprehensive augmentation significantly expands effective training data. Geometric transforms (rotation, horizontal flip, random crop, scale) simulate different viewpoints and distances. Color augmentation (brightness, contrast, saturation) handles lighting variation. Mixup blends images for regularization. Cutout masks random patches, improving robustness. Important: validate that augmentations preserve species-identifying features. Monitor validation performance to detect harmful augmentation (e.g., vertical flip may create unrealistic poses). Single augmentation provides limited benefit. GANs require large datasets to train well. Exact duplicates don't add information."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Albumentations library provides fast, diverse image augmentations</li>\n            <li>AutoAugment learns optimal augmentation policies from data</li>\n            <li>Mixup: blend images and labels, e.g., 0.7*img1 + 0.3*img2, label=[0.7, 0.3]</li>\n            <li>Cutout: random rectangular masks improve occlusion robustness</li>\n            <li>Test-time augmentation: average predictions across augmented versions for inference</li></ul>"
+        }
+      ],
+      "tags": [
+        "augmentation",
+        "computer vision",
+        "overfitting",
+        "small data"
+      ]
+    },
+    {
+      "id": 34,
+      "categoryRef": "model-development",
+      "difficulty": "intermediate",
+      "title": "Regularization Techniques",
+      "scenario": "A neural network for customer churn prediction achieves 95% accuracy on training data but only 75% on validation data - clear overfitting. The model has 10 million parameters trained on 100,000 samples. The team needs to reduce overfitting while maintaining the model's capacity to learn complex patterns.",
+      "questionText": "Which regularization techniques address this overfitting?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Increase model size"
+        },
+        {
+          "letter": "B",
+          "text": "Dropout layers, L2 weight regularization, early stopping based on validation loss, and batch normalization"
+        },
+        {
+          "letter": "C",
+          "text": "Remove validation set"
+        },
+        {
+          "letter": "D",
+          "text": "Train for more epochs"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Consider techniques that constrain model complexity and prevent memorization of training data."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Multiple regularization techniques together combat severe overfitting. Dropout randomly deactivates neurons during training, preventing co-adaptation and acting like ensemble averaging. L2 regularization penalizes large weights, encouraging simpler solutions. Early stopping halts training when validation loss stops improving, preventing over-optimization on training data. Batch normalization stabilizes training and provides mild regularization. The 20% accuracy gap requires strong regularization. More epochs worsen overfitting. Larger models have more capacity to overfit. Validation set is essential for detecting overfitting."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Dropout rate: typically 0.2-0.5, higher for larger layers</li>\n            <li>L2 regularization adds lambda * sum(weights^2) to loss function</li>\n            <li>Early stopping patience: number of epochs to wait before stopping</li>\n            <li>Data augmentation also acts as regularization by expanding effective training set</li>\n            <li>DropConnect: randomly drops weights rather than activations</li></ul>"
+        }
+      ],
+      "tags": [
+        "regularization",
+        "dropout",
+        "overfitting",
+        "neural network"
+      ]
+    },
+    {
+      "id": 35,
+      "categoryRef": "deployment",
+      "difficulty": "basic",
+      "title": "Model Compression for Deployment",
+      "scenario": "A deep learning model achieves excellent accuracy but is too large (2 GB) and slow (500ms inference) for mobile deployment. The target device has limited memory (500 MB available) and requires inference under 100ms. Model accuracy can degrade slightly (up to 2%) if deployment constraints are met.",
+      "questionText": "Which techniques reduce model size and latency for deployment?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Only optimize the inference code"
+        },
+        {
+          "letter": "B",
+          "text": "Use a larger server for inference"
+        },
+        {
+          "letter": "C",
+          "text": "Increase batch size during inference"
+        },
+        {
+          "letter": "D",
+          "text": "Quantization (FP32 to INT8), pruning of low-magnitude weights, and knowledge distillation to smaller architecture"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Consider model compression techniques that reduce size and computation while preserving accuracy."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Model compression techniques address all deployment constraints. Quantization converts 32-bit floats to 8-bit integers, reducing model size by 4x and accelerating inference on hardware with INT8 support. Pruning removes weights with small magnitudes (near-zero contribution), reducing both size and computation. Knowledge distillation trains a smaller student model to mimic the large teacher model's outputs, often achieving similar accuracy with 10x fewer parameters. Combined, these can achieve 10-20x compression. Larger servers don't address mobile deployment. Batch size doesn't reduce per-inference latency. Code optimization alone can't achieve 4x size reduction."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Post-training quantization: simple, no retraining, small accuracy loss</li>\n            <li>Quantization-aware training: fine-tune with quantization simulation for better accuracy</li>\n            <li>Structured pruning removes entire channels/filters for hardware speedup</li>\n            <li>SageMaker Neo compiles and optimizes models for target hardware</li>\n            <li>ONNX Runtime provides optimized inference across platforms</li></ul>"
+        }
+      ],
+      "tags": [
+        "quantization",
+        "pruning",
+        "distillation",
+        "compression"
+      ]
+    },
+    {
+      "id": 36,
+      "categoryRef": "monitoring",
+      "difficulty": "advanced",
+      "title": "Model Security and Adversarial Robustness",
+      "scenario": "A content moderation model classifies images as safe or unsafe. Adversaries attempt to bypass the model by adding imperceptible perturbations to unsafe images, causing misclassification. The team needs to detect adversarial inputs and improve model robustness against such attacks.",
+      "questionText": "Which approaches improve model robustness against adversarial attacks?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Add CAPTCHA before classification"
+        },
+        {
+          "letter": "B",
+          "text": "Encrypt the model weights"
+        },
+        {
+          "letter": "C",
+          "text": "Use a larger model"
+        },
+        {
+          "letter": "D",
+          "text": "Adversarial training with generated adversarial examples, input validation, and ensemble with diverse models"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Consider defense techniques that make models resilient to adversarial perturbations."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Defense-in-depth improves adversarial robustness. Adversarial training augments training data with adversarial examples (generated using FGSM, PGD attacks), teaching the model to correctly classify perturbed inputs. Input validation detects anomalous inputs - adversarial images often have unusual pixel distributions or high-frequency patterns. Ensembles of models with different architectures are harder to fool simultaneously - attacks optimized for one model often fail on others. Model encryption protects IP, not against adversarial inputs. Model size doesn't address adversarial robustness. CAPTCHA verifies humans, not content."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>FGSM (Fast Gradient Sign Method): single-step attack using gradient direction</li>\n            <li>PGD (Projected Gradient Descent): iterative attack, stronger than FGSM</li>\n            <li>Input preprocessing: JPEG compression, spatial smoothing remove perturbations</li>\n            <li>Certified defenses provide provable robustness within perturbation bounds</li>\n            <li>Adversarial detection: train classifier to distinguish clean vs adversarial inputs</li></ul>"
+        }
+      ],
+      "tags": [
+        "adversarial",
+        "security",
+        "robustness",
+        "attacks"
+      ]
+    },
+    {
+      "id": 37,
+      "categoryRef": "data-preparation",
+      "difficulty": "intermediate",
+      "title": "Embedding Generation for Similarity Search",
+      "scenario": "An e-commerce company wants to find similar products based on images and descriptions. They have 10 million products and need to support real-time similarity queries returning top-10 matches within 50ms. The solution should combine both visual and text similarity for comprehensive matching.",
+      "questionText": "Which approach enables efficient multi-modal similarity search?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Store all products in memory for exhaustive comparison"
+        },
+        {
+          "letter": "B",
+          "text": "Compare raw images pixel by pixel"
+        },
+        {
+          "letter": "C",
+          "text": "Full-text search on product descriptions only"
+        },
+        {
+          "letter": "D",
+          "text": "Generate image embeddings with CNN and text embeddings with transformer, combine into multi-modal vectors, and index in OpenSearch k-NN"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "How do you make 10 million items searchable by visual and textual similarity in under 50ms?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Multi-modal embeddings with approximate nearest neighbor (ANN) search provides efficient similarity. Pre-trained CNN (ResNet, EfficientNet) generates image embeddings capturing visual features. Transformer models (BERT, sentence-transformers) generate text embeddings from descriptions. Concatenate or fuse embeddings into unified multi-modal vectors. OpenSearch k-NN plugin indexes vectors using HNSW algorithm for sub-50ms approximate nearest neighbor search on 10M vectors. This combines visual and semantic similarity. Pixel comparison is computationally infeasible. Text-only misses visual similarity. Exhaustive comparison doesn't scale."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>CLIP model generates aligned image and text embeddings in shared space</li>\n            <li>HNSW (Hierarchical Navigable Small World) provides logarithmic search complexity</li>\n            <li>Embedding dimension reduction (PCA) reduces storage and search time</li>\n            <li>Hybrid search: combine k-NN similarity with keyword filtering</li>\n            <li>OpenSearch k-NN supports cosine similarity, L2 distance, and inner product</li></ul>"
+        }
+      ],
+      "tags": [
+        "embeddings",
+        "similarity",
+        "OpenSearch",
+        "k-NN"
+      ]
+    },
+    {
+      "id": 38,
+      "categoryRef": "model-development",
+      "difficulty": "advanced",
+      "title": "Time Series Forecasting Architecture",
+      "scenario": "A logistics company needs to forecast daily package volumes across 1,000 distribution centers for the next 30 days. Each center has unique patterns, but they share common trends (holidays, promotions). Historical data spans 3 years. Forecasts should include prediction intervals for capacity planning uncertainty.",
+      "questionText": "Which forecasting approach handles this multi-series prediction with uncertainty?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Single linear regression on total volume"
+        },
+        {
+          "letter": "B",
+          "text": "Train 1,000 separate ARIMA models"
+        },
+        {
+          "letter": "C",
+          "text": "Random walk forecast (tomorrow = today)"
+        },
+        {
+          "letter": "D",
+          "text": "Amazon Forecast or SageMaker DeepAR with related time series for external factors and quantile forecasts"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Can a single model learn shared patterns across 1,000 locations while still giving confidence intervals?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "DeepAR/Amazon Forecast excels at multi-series forecasting with uncertainty. DeepAR trains a single model across all 1,000 series, learning shared patterns (holidays, promotions) while capturing center-specific behaviors. Related time series (promotions, weather, events) improve accuracy. Probabilistic output provides prediction intervals (P10, P50, P90 quantiles) for capacity planning uncertainty. Amazon Forecast automates model selection and hyperparameter optimization. Separate ARIMA models don't share learning across series. Single regression loses center-specific patterns. Random walk doesn't capture trends."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>DeepAR uses autoregressive RNN generating probabilistic forecasts</li>\n            <li>Related time series: categorical (center type) and dynamic (promotions, weather)</li>\n            <li>Amazon Forecast AutoML tests multiple algorithms (DeepAR, Prophet, ARIMA)</li>\n            <li>Quantile forecasts: P10 for optimistic, P50 for expected, P90 for conservative planning</li>\n            <li>Cold start handling: DeepAR forecasts new series using learned global patterns</li></ul>"
+        }
+      ],
+      "tags": [
+        "forecasting",
+        "DeepAR",
+        "time series",
+        "Forecast"
+      ]
+    },
+    {
+      "id": 39,
+      "categoryRef": "deployment",
+      "difficulty": "intermediate",
+      "title": "Model Inference Optimization",
+      "scenario": "A computer vision model serves real-time image classification with strict 100ms latency requirement at P99. Currently, inference takes 80ms average but P99 reaches 200ms due to variable preprocessing time and occasional cold starts. The model runs on GPU instances with auto-scaling.",
+      "questionText": "Which optimizations reduce P99 latency below 100ms?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Add more auto-scaling capacity"
+        },
+        {
+          "letter": "B",
+          "text": "Asynchronous preprocessing, warm instance pool, request batching, and TensorRT optimization"
+        },
+        {
+          "letter": "C",
+          "text": "Increase instance size"
+        },
+        {
+          "letter": "D",
+          "text": "Cache all possible predictions"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Consider optimizations targeting both cold starts and variable processing latency."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Multiple optimizations together reduce P99 latency. Asynchronous preprocessing overlaps CPU image processing with GPU inference for previous request. Warm instance pool (minimum instances &gt; 0) eliminates cold starts that cause latency spikes. Request batching amortizes fixed overhead across multiple images when traffic allows. TensorRT optimizes the model graph for GPU, reducing inference time by 2-5x. Together, these address both the variable preprocessing (async) and cold start (warm pool) contributors to P99 spikes. Larger instances don't address cold starts. More auto-scaling capacity doesn't reduce latency. Prediction caching doesn't work for unique images."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>TensorRT: layer fusion, precision calibration (FP16/INT8), kernel auto-tuning</li>\n            <li>Dynamic batching: accumulate requests up to timeout, process together</li>\n            <li>Provisioned concurrency in Serverless Inference eliminates cold starts</li>\n            <li>GPU memory pre-allocation avoids allocation latency during inference</li>\n            <li>CUDA streams enable overlapping data transfer and computation</li></ul>"
+        }
+      ],
+      "tags": [
+        "latency",
+        "optimization",
+        "TensorRT",
+        "inference"
+      ]
+    },
+    {
+      "id": 40,
+      "categoryRef": "monitoring",
+      "difficulty": "basic",
+      "title": "Model Performance Dashboards",
+      "scenario": "An ML platform serves 20 models in production. Operations and data science teams need visibility into model health, including latency metrics, error rates, prediction distributions, and data drift alerts. Different stakeholders need different views - ops cares about system health, data scientists care about model quality.",
+      "questionText": "Which approach provides comprehensive ML observability dashboards?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "CloudWatch dashboards with SageMaker metrics, Model Monitor outputs, and custom business metrics with role-based views"
+        },
+        {
+          "letter": "B",
+          "text": "Manual log file inspection"
+        },
+        {
+          "letter": "C",
+          "text": "Email reports generated weekly"
+        },
+        {
+          "letter": "D",
+          "text": "Single dashboard showing all metrics to everyone"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Different teams care about different signals. How do you give ops and data science each the right view?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "CloudWatch dashboards with SageMaker integration provide comprehensive observability. SageMaker automatically publishes endpoint metrics (latency, invocation count, errors) to CloudWatch. Model Monitor publishes drift detection and data quality metrics. Custom metrics track business KPIs (conversion rate by model). Dashboard widgets visualize trends and anomalies. Create separate dashboards for ops (latency, errors, capacity) and data science (predictions, drift, accuracy). Alarms notify teams of issues. Log inspection doesn't scale. Weekly reports miss real-time issues. Single dashboard overwhelms users."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>SageMaker endpoint metrics: Invocations, Latency, ModelLatency, OverheadLatency</li>\n            <li>Model Monitor metrics: DatasetSize, BaselineConflicts, FeatureDrift</li>\n            <li>CloudWatch anomaly detection automatically identifies unusual metric patterns</li>\n            <li>Composite alarms combine multiple conditions for intelligent alerting</li>\n            <li>Dashboard sharing via CloudWatch Dashboard Sharing feature</li></ul>"
+        }
+      ],
+      "tags": [
+        "CloudWatch",
+        "dashboards",
+        "observability",
+        "monitoring"
+      ]
+    },
+    {
+      "id": 41,
+      "categoryRef": "data-preparation",
+      "difficulty": "intermediate",
+      "title": "Synthetic Data Generation",
+      "scenario": "A financial institution wants to share customer data with a third-party ML vendor for model development, but privacy regulations prevent sharing real customer data. They need to generate synthetic data that preserves statistical properties needed for ML while ensuring no real customer can be identified in the synthetic dataset.",
+      "questionText": "Which approach generates privacy-safe synthetic data for ML?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Train a generative model (VAE or GAN) on real data with differential privacy guarantees"
+        },
+        {
+          "letter": "B",
+          "text": "Replace names with fake names only"
+        },
+        {
+          "letter": "C",
+          "text": "Randomly shuffle columns independently"
+        },
+        {
+          "letter": "D",
+          "text": "Sample from uniform distributions for each feature"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "How can you produce realistic-looking data for a vendor while mathematically bounding re-identification risk?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Generative models with differential privacy produce useful synthetic data safely. VAEs (Variational Autoencoders) or GANs learn the joint distribution of features, preserving correlations essential for ML. Differential privacy adds calibrated noise during training, mathematically bounding information leakage about any individual. Generated samples are statistically similar but not copies of real data. Membership inference tests verify synthetic data doesn't reveal original records. Column shuffling destroys feature correlations. Name replacement leaves other PII. Uniform distributions lose statistical properties."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Differential privacy epsilon parameter controls privacy-utility tradeoff</li>\n            <li>CTGAN (Conditional Tabular GAN) designed for tabular data generation</li>\n            <li>Privacy metrics: membership inference attack success rate should be ~50% (random)</li>\n            <li>Utility metrics: compare ML model performance on real vs synthetic data</li>\n            <li>AWS Clean Rooms enables collaborative analysis without data sharing</li></ul>"
+        }
+      ],
+      "tags": [
+        "synthetic data",
+        "privacy",
+        "GAN",
+        "differential privacy"
+      ]
+    },
+    {
+      "id": 42,
+      "categoryRef": "model-development",
+      "difficulty": "advanced",
+      "title": "Foundation Model Fine-Tuning",
+      "scenario": "A legal services company wants to use a large language model for contract analysis. General-purpose LLMs lack legal domain knowledge and make errors on jurisdiction-specific terms. The company has 10,000 annotated legal documents. They want to adapt a foundation model to their domain without full model retraining, which would be prohibitively expensive.",
+      "questionText": "Which approach efficiently adapts a foundation model to the legal domain?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Train a legal LLM from scratch"
+        },
+        {
+          "letter": "B",
+          "text": "Parameter-efficient fine-tuning (LoRA or adapter layers) on Amazon Bedrock or SageMaker JumpStart"
+        },
+        {
+          "letter": "C",
+          "text": "Prompt engineering only without any fine-tuning"
+        },
+        {
+          "letter": "D",
+          "text": "Fine-tune all model parameters on the legal dataset"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Full retraining of a billion-parameter model is too expensive. Is there a way to teach it a new domain cheaply?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Parameter-efficient fine-tuning (PEFT) adapts foundation models cost-effectively. LoRA (Low-Rank Adaptation) adds small trainable matrices to frozen model layers, learning domain-specific patterns with 0.1% of original parameters. Amazon Bedrock supports fine-tuning foundation models with custom datasets. SageMaker JumpStart provides fine-tuning for open-source models. 10,000 documents are sufficient for PEFT but not from-scratch training. This approach preserves general capabilities while adding legal knowledge. From-scratch requires billions of tokens and massive compute. Prompt engineering alone can't encode domain terminology. Full fine-tuning is expensive and risks catastrophic forgetting."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>LoRA adds low-rank decomposition matrices: W + BA where B, A are small</li>\n            <li>Adapter layers insert small trainable modules between transformer layers</li>\n            <li>Bedrock custom model training supports fine-tuning Claude, Titan, and others</li>\n            <li>Instruction tuning format: input context, instruction, expected output</li>\n            <li>Evaluation: compare fine-tuned vs base model on held-out legal test set</li></ul>"
+        }
+      ],
+      "tags": [
+        "fine-tuning",
+        "LoRA",
+        "Bedrock",
+        "LLM"
+      ]
+    },
+    {
+      "id": 43,
+      "categoryRef": "deployment",
+      "difficulty": "intermediate",
+      "title": "Feature Store Real-Time Serving",
+      "scenario": "A ride-sharing app needs to make pricing decisions in real-time based on current demand features (recent trip counts, driver availability, surge indicators). Features must be computed from streaming data and available for inference within 1 second of underlying events. The same features are used for model training on historical data.",
+      "questionText": "Which architecture supports real-time feature serving with training consistency?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Kinesis for streaming, Lambda computing features, SageMaker Feature Store online store for serving and offline store for training"
+        },
+        {
+          "letter": "B",
+          "text": "Store raw events in DynamoDB and compute at inference time"
+        },
+        {
+          "letter": "C",
+          "text": "Daily batch feature computation stored in S3"
+        },
+        {
+          "letter": "D",
+          "text": "Compute features in the inference request itself"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Features must be fresh within 1 second for inference yet also available historically for training. What architecture serves both?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Streaming feature pipeline with Feature Store provides real-time serving with consistency. Kinesis ingests streaming events (trips, driver status). Lambda processes streams computing features (10-minute trip counts, driver counts). Features push to Feature Store online store for millisecond retrieval during inference. The same features automatically sync to offline store (S3) for training, ensuring training-serving consistency. Feature definitions are centralized, preventing skew. Request-time computation adds latency and duplicates logic. Daily batch has unacceptable lag. Raw event querying doesn't scale."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Feature Store online: single-digit millisecond reads via GetRecord API</li>\n            <li>Streaming ingestion: PutRecord API with automatic offline sync</li>\n            <li>Feature freshness SLA: configure acceptable staleness for each feature group</li>\n            <li>Point-in-time correctness: offline queries retrieve features as of event timestamp</li>\n            <li>Feature pipelines should be idempotent for replay and recovery</li></ul>"
+        }
+      ],
+      "tags": [
+        "Feature Store",
+        "real-time",
+        "streaming",
+        "serving"
+      ]
+    },
+    {
+      "id": 44,
+      "categoryRef": "monitoring",
+      "difficulty": "advanced",
+      "title": "Model Fairness Evaluation",
+      "scenario": "A hiring platform uses an ML model to screen resumes. Regulators require demonstrating the model doesn't discriminate based on protected attributes (gender, race, age). The company needs to measure fairness metrics, identify potential bias, and document compliance. Some protected attributes aren't explicit features but may be correlated with other features.",
+      "questionText": "Which approach provides comprehensive fairness evaluation?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Manual review of rejected candidates"
+        },
+        {
+          "letter": "B",
+          "text": "SageMaker Clarify for pre-training data bias, post-training model bias, and SHAP-based feature attribution across groups"
+        },
+        {
+          "letter": "C",
+          "text": "Compare average predictions across groups"
+        },
+        {
+          "letter": "D",
+          "text": "Check if protected attributes are used as features"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Removing protected attributes from features isn't enough. Why might bias still creep in through correlated features?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "SageMaker Clarify provides multi-faceted fairness evaluation. Pre-training bias analysis detects imbalances in training data (class imbalance across groups). Post-training model bias measures outcome disparities using multiple metrics (demographic parity, equalized odds, disparate impact). SHAP analysis shows which features drive predictions differently across groups, catching proxy discrimination (e.g., zip code correlating with race). Clarify generates compliance-ready reports documenting bias assessment. Checking explicit features misses proxy discrimination. Simple average comparison misses nuanced disparities. Manual review doesn't scale and lacks metrics."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Demographic parity: P(Y=1|A=0) ≈ P(Y=1|A=1) for protected attribute A</li>\n            <li>Equalized odds: equal TPR and FPR across groups</li>\n            <li>Disparate impact ratio: should be &gt; 0.8 (four-fifths rule)</li>\n            <li>Proxy features: Clarify identifies features correlated with protected attributes</li>\n            <li>Model cards document fairness evaluation for regulatory compliance</li></ul>"
+        }
+      ],
+      "tags": [
+        "Clarify",
+        "fairness",
+        "bias",
+        "compliance"
+      ]
+    },
+    {
+      "id": 45,
+      "categoryRef": "data-preparation",
+      "difficulty": "basic",
+      "title": "Data Splitting Strategies",
+      "scenario": "A data scientist is preparing data for a customer churn model. The dataset spans 2 years with 500,000 customers. Customer behavior changes seasonally, and the model will make predictions for future months. The team needs to split data into training, validation, and test sets appropriately to get reliable performance estimates.",
+      "questionText": "Which data splitting strategy provides reliable performance estimates?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Use all data for training, evaluate on training set"
+        },
+        {
+          "letter": "B",
+          "text": "Random 80/10/10 split across all records"
+        },
+        {
+          "letter": "C",
+          "text": "Time-based split: train on earlier months, validate on middle period, test on most recent months"
+        },
+        {
+          "letter": "D",
+          "text": "Stratified split by churn label only"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Consider temporal ordering when models will predict future outcomes."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Time-based splitting mimics real-world deployment for forecasting problems. Train on historical data (e.g., months 1-18), validate hyperparameters on middle period (months 19-21), test on most recent data (months 22-24). This prevents data leakage from future information and tests model performance on truly unseen future data. Seasonal patterns in validation/test reflect deployment reality. Random splits leak future information (model sees 2024 patterns during training then predicts 2023). Stratified split doesn't respect temporal order. Training evaluation gives optimistic, unreliable estimates."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Walk-forward validation: expanding window trains on all prior data at each step</li>\n            <li>Embargo period: gap between train and test prevents label leakage</li>\n            <li>Purging: remove samples within window of test samples for time series</li>\n            <li>Grouped time split: keep all records for a customer in same split</li>\n            <li>Seasonal holdout: ensure test set includes all seasonal patterns</li></ul>"
+        }
+      ],
+      "tags": [
+        "data splitting",
+        "train-test",
+        "time series",
+        "leakage"
+      ]
+    },
+    {
+      "id": 46,
+      "categoryRef": "model-development",
+      "difficulty": "intermediate",
+      "title": "Anomaly Detection Approaches",
+      "scenario": "A manufacturing system needs to detect equipment anomalies from sensor readings. Normal operation data is abundant, but failure examples are rare and don't cover all possible failure modes. New types of failures should be detected even if never seen before. The model must work in real-time on streaming sensor data.",
+      "questionText": "Which anomaly detection approach handles unseen failure modes?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Rule-based thresholds on individual sensors"
+        },
+        {
+          "letter": "B",
+          "text": "Binary classifier trained on normal vs failure examples"
+        },
+        {
+          "letter": "C",
+          "text": "Unsupervised anomaly detection (Isolation Forest or autoencoder) trained on normal data only"
+        },
+        {
+          "letter": "D",
+          "text": "Time series forecasting predicting exact sensor values"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "If failures are rare and come in forms you've never seen, can a classifier trained on failure examples catch them?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Unsupervised anomaly detection learns normal behavior and flags deviations. Isolation Forest identifies anomalies as points requiring few splits to isolate - normal points are in dense regions. Autoencoders learn to reconstruct normal data; high reconstruction error indicates anomaly. These methods detect any deviation from normal, including unseen failure modes. Training requires only abundant normal data. SageMaker Random Cut Forest provides managed anomaly detection. Binary classifiers only detect seen failure types. Fixed thresholds miss complex multi-sensor patterns. Exact prediction is unnecessary for anomaly detection."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Isolation Forest: anomaly score based on average path length in random trees</li>\n            <li>Autoencoder: compress to latent space and reconstruct, error = anomaly score</li>\n            <li>Random Cut Forest: streaming algorithm updates model with new data points</li>\n            <li>Contamination parameter: expected proportion of anomalies in training data</li>\n            <li>Multi-variate analysis detects anomalies in sensor combinations, not individual sensors</li></ul>"
+        }
+      ],
+      "tags": [
+        "anomaly detection",
+        "unsupervised",
+        "Isolation Forest",
+        "autoencoder"
+      ]
+    },
+    {
+      "id": 47,
+      "categoryRef": "deployment",
+      "difficulty": "advanced",
+      "title": "Multi-Region ML Deployment",
+      "scenario": "A global streaming service needs to deploy recommendation models across 5 AWS regions to serve users with low latency. Models should be consistent across regions. When models update, all regions should receive the new version within 1 hour. Regional failures shouldn't affect other regions. Model artifacts are 5 GB each.",
+      "questionText": "Which architecture enables resilient multi-region ML deployment?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Single region serving all global traffic"
+        },
+        {
+          "letter": "B",
+          "text": "S3 Cross-Region Replication for model artifacts, CodePipeline with parallel regional deployments, and Route 53 latency-based routing"
+        },
+        {
+          "letter": "C",
+          "text": "Manual model copying to each region"
+        },
+        {
+          "letter": "D",
+          "text": "CloudFront caching inference responses"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "How do you keep 5 GB model artifacts in sync across 5 regions within an hour without manual steps?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Multi-region architecture provides global low-latency with resilience. S3 Cross-Region Replication automatically copies model artifacts to regional buckets within minutes. CodePipeline deploys to all 5 regions in parallel when models update, achieving 1-hour rollout. Each region has independent SageMaker endpoints - regional failures are isolated. Route 53 latency-based routing directs users to nearest healthy region. Health checks fail over traffic if a region has issues. Single region adds latency for distant users. Manual copying doesn't meet 1-hour requirement. CloudFront can't cache dynamic recommendations."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>S3 replication time control (RTC) guarantees 15-minute replication SLA</li>\n            <li>CodePipeline cross-region actions deploy to multiple regions from single pipeline</li>\n            <li>Route 53 health checks detect endpoint failures for automatic failover</li>\n            <li>Global Accelerator provides static IPs with automatic regional failover</li>\n            <li>Endpoint naming convention includes region for deployment automation</li></ul>"
+        }
+      ],
+      "tags": [
+        "multi-region",
+        "deployment",
+        "resilience",
+        "global"
+      ]
+    },
+    {
+      "id": 48,
+      "categoryRef": "monitoring",
+      "difficulty": "intermediate",
+      "title": "Automated Model Remediation",
+      "scenario": "A production fraud detection model occasionally experiences performance degradation when fraud patterns change. Currently, the team manually investigates and retrains when issues are detected. They want to automate the response: when model performance drops below threshold, trigger investigation, and if confirmed, automatically initiate retraining with recent data.",
+      "questionText": "Which architecture automates model remediation?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Daily scheduled retraining regardless of performance"
+        },
+        {
+          "letter": "B",
+          "text": "Ignore drift until users complain"
+        },
+        {
+          "letter": "C",
+          "text": "CloudWatch alarms on Model Monitor metrics triggering Step Functions workflow for validation and conditional pipeline execution"
+        },
+        {
+          "letter": "D",
+          "text": "Manual monitoring of CloudWatch dashboards"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Manual investigation is slow. What if the system could detect degradation, verify it, and kick off retraining on its own?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Event-driven remediation automates the response to model degradation. Model Monitor publishes metrics to CloudWatch when quality violations occur. CloudWatch alarms trigger when performance drops below thresholds. Step Functions workflow receives the alarm: first validates the issue (queries additional metrics, checks data quality), then conditionally triggers SageMaker Pipeline for retraining if confirmed. Approval gates can require human confirmation for production deployment. This responds quickly to real issues without unnecessary retraining. Fixed schedules may miss rapid changes or waste compute. Manual monitoring delays response. Waiting for complaints harms users."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Step Functions error handling: retry failed steps, catch exceptions, fallback paths</li>\n            <li>Validation step queries ground truth labels to confirm performance drop</li>\n            <li>SageMaker Pipeline parameters pass recent data dates for retraining</li>\n            <li>SNS notifications keep team informed of automated actions</li>\n            <li>Rollback capability: keep previous model for quick recovery if retraining fails</li></ul>"
+        }
+      ],
+      "tags": [
+        "automation",
+        "remediation",
+        "Step Functions",
+        "MLOps"
+      ]
+    },
+    {
+      "id": 49,
+      "categoryRef": "data-preparation",
+      "difficulty": "advanced",
+      "title": "Multimodal Data Fusion",
+      "scenario": "A real estate valuation model needs to predict property prices using structured data (square footage, bedrooms, location), property images (interior, exterior), and text descriptions (agent listing descriptions). Each modality provides different information. The team needs to effectively combine these diverse data types into a unified model.",
+      "questionText": "Which architecture fuses multimodal data for unified predictions?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Separate encoders for each modality (tabular, CNN for images, transformer for text) with late fusion concatenating embeddings before final prediction layers"
+        },
+        {
+          "letter": "B",
+          "text": "Convert all data to tabular format"
+        },
+        {
+          "letter": "C",
+          "text": "Average predictions from three separate models"
+        },
+        {
+          "letter": "D",
+          "text": "Use only the most predictive single modality"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Images, text, and tabular data each need different processing. At what stage should their signals merge?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Late fusion with modality-specific encoders effectively combines multimodal data. Each encoder is optimized for its data type: tabular network for structured features, CNN (ResNet) for images extracting visual features (quality, style, views), transformer for text understanding listing language. Encoders produce fixed-size embeddings capturing modality-specific information. Concatenated embeddings feed into final prediction layers learning cross-modal interactions. This leverages each modality's strengths. Converting images/text to tabular loses rich information. Single modality ignores valuable signals. Separate model averaging misses cross-modal relationships."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Early fusion: concatenate raw features before any processing</li>\n            <li>Late fusion: combine high-level representations from separate encoders</li>\n            <li>Cross-attention fusion: modalities attend to each other for richer interaction</li>\n            <li>Pretrained encoders: use frozen ImageNet CNN, BERT for text</li>\n            <li>Modality dropout: randomly drop modalities during training for robustness</li></ul>"
+        }
+      ],
+      "tags": [
+        "multimodal",
+        "fusion",
+        "architecture",
+        "deep learning"
+      ]
+    },
+    {
+      "id": 50,
+      "categoryRef": "model-development",
+      "difficulty": "intermediate",
+      "title": "Experiment Tracking and Reproducibility",
+      "scenario": "A data science team of 10 people runs hundreds of experiments weekly testing different features, algorithms, and hyperparameters. They struggle to track which configurations produced the best results, reproduce successful experiments, and compare results across team members. Notebooks with embedded results are scattered across laptops.",
+      "questionText": "Which approach provides systematic experiment management?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Spreadsheet logging experiment results manually"
+        },
+        {
+          "letter": "B",
+          "text": "SageMaker Experiments with automatic metric logging, artifact tracking, and visual comparison tools"
+        },
+        {
+          "letter": "C",
+          "text": "Git commits for each experiment"
+        },
+        {
+          "letter": "D",
+          "text": "Email results to team members"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "When 10 people run hundreds of experiments weekly, how do you avoid losing track of what worked and why?"
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "SageMaker Experiments provides centralized experiment management. Experiments organizes related runs into logical groups. Automatic tracking captures hyperparameters, metrics, and artifacts (model files, plots) without manual logging. Trial comparison visualizes metrics across experiments for selecting best configurations. Artifact storage enables reproducing any experiment by accessing exact inputs and outputs. Team members access shared experiment history. Lineage connects experiments to deployed models. Spreadsheets require manual entry and lack artifact tracking. Git commits don't capture metrics and results well. Email doesn't enable systematic comparison."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Trial components: atomic units capturing inputs, outputs, parameters, metrics</li>\n            <li>Experiment analytics: query and filter experiments by parameter ranges</li>\n            <li>Automatic tracking in training jobs: metrics logged to Experiments automatically</li>\n            <li>Artifact versioning: track exact data and model versions for each trial</li>\n            <li>Integration with MLflow for teams already using MLflow tracking</li></ul>"
+        }
+      ],
+      "tags": [
+        "Experiments",
+        "tracking",
+        "reproducibility",
+        "MLOps"
+      ]
+    }
+  ],
+  "glossary": {}
+}

