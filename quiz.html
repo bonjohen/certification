@@ -1,138 +1,653 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://esm.sh; connect-src 'self' https://esm.sh; style-src 'self' 'unsafe-inline'; img-src 'self' data:;">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📝</text></svg>">
-    <title>Quiz - Study Guide</title>
-    <link rel="stylesheet" href="css/styles.css">
-    <link rel="stylesheet" href="css/quiz.css">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AZ-305 · Question 1 — Atlas</title>
+<link rel="stylesheet" href="system/tokens.css" />
+<link rel="stylesheet" href="system/system.css" />
+<style>
+  /* ---------- Quiz layout ---------- */
+  body { background: var(--atlas-paper); }
+
+  .quiz-shell {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 0 var(--s-7);
+  }
+
+  /* Top bar — minimal, pinned, calm */
+  .quiz-top {
+    position: sticky; top: 0; z-index: 10;
+    background: color-mix(in oklab, var(--atlas-paper) 92%, transparent);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--atlas-rule-soft);
+  }
+  .quiz-top-inner {
+    max-width: 880px; margin: 0 auto;
+    padding: var(--s-3) var(--s-7);
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: var(--s-5);
+    align-items: center;
+  }
+  .crumb {
+    font-family: var(--mono); font-size: 11px;
+    letter-spacing: .14em; text-transform: uppercase;
+    color: var(--atlas-muted);
+    text-decoration: none;
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .crumb:hover { color: var(--atlas-ink); }
+  .crumb .pchip-sm {
+    width: 16px; height: 16px; border-radius: 4px;
+    background: var(--p-azure);
+  }
+
+  .quiz-progress {
+    display: flex; align-items: center; gap: var(--s-3);
+  }
+  .quiz-progress .label {
+    font-family: var(--mono); font-size: 11px;
+    letter-spacing: .14em; text-transform: uppercase;
+    color: var(--atlas-muted);
+    white-space: nowrap;
+  }
+  .quiz-progress .label b { color: var(--atlas-ink); font-weight: 500; }
+  .quiz-progress .bar {
+    flex: 1;
+    height: 3px;
+    background: var(--atlas-rule-soft);
+    border-radius: var(--r-pill);
+    overflow: hidden;
+    min-width: 120px;
+  }
+  .quiz-progress .bar > i {
+    display: block; height: 100%;
+    background: var(--atlas-ink);
+    transition: width var(--t-slow) var(--ease);
+  }
+
+  .top-actions { display: flex; gap: 6px; }
+
+  /* ---------- Question canvas ---------- */
+  .canvas {
+    padding: var(--s-9) 0 var(--s-8);
+    min-height: calc(100vh - 60px);
+  }
+
+  .meta-row {
+    display: flex; align-items: center; gap: var(--s-3);
+    margin-bottom: var(--s-5);
+  }
+  .qnum {
+    font-family: var(--mono); font-size: 11px;
+    letter-spacing: .18em; text-transform: uppercase;
+    color: var(--atlas-muted);
+  }
+  .qnum b { color: var(--atlas-ink); font-weight: 500; }
+  .dot { width: 3px; height: 3px; border-radius: 50%; background: var(--atlas-rule-soft); }
+  .cat-chip {
+    font-family: var(--mono); font-size: 11px;
+    letter-spacing: .12em; text-transform: uppercase;
+    color: var(--atlas-ink-2);
+  }
+  .diff {
+    font-family: var(--mono); font-size: 11px;
+    letter-spacing: .12em; text-transform: uppercase;
+    padding: 2px 8px; border-radius: var(--r-sm);
+    background: color-mix(in oklab, var(--atlas-bad) 12%, transparent);
+    color: var(--atlas-bad);
+  }
+  .diff[data-d="basic"] {
+    background: color-mix(in oklab, var(--atlas-good) 12%, transparent);
+    color: var(--atlas-good);
+  }
+  .diff[data-d="intermediate"] {
+    background: color-mix(in oklab, var(--atlas-warn) 14%, transparent);
+    color: var(--atlas-warn);
+  }
+
+  .qtitle {
+    font-family: var(--serif); font-weight: 400;
+    font-size: 38px; line-height: 1.15;
+    letter-spacing: -.02em;
+    margin: 0 0 var(--s-6);
+    max-width: 28ch;
+    text-wrap: balance;
+  }
+
+  .scenario {
+    font-family: var(--serif); font-weight: 300;
+    font-size: 21px; line-height: 1.55;
+    color: var(--atlas-ink-2);
+    max-width: 64ch;
+    text-wrap: pretty;
+    margin: 0 0 var(--s-7);
+    padding-left: var(--s-5);
+    border-left: 2px solid var(--atlas-rule-soft);
+  }
+
+  .qstem {
+    font-family: var(--sans);
+    font-size: 18px; font-weight: 500;
+    line-height: 1.5;
+    color: var(--atlas-ink);
+    max-width: 60ch;
+    margin: 0 0 var(--s-6);
+  }
+
+  /* ---------- Choices ---------- */
+  .choices { display: flex; flex-direction: column; gap: var(--s-3); margin: 0 0 var(--s-7); }
+
+  .choice {
+    display: grid;
+    grid-template-columns: 36px 1fr auto;
+    gap: var(--s-4);
+    align-items: start;
+    padding: var(--s-4) var(--s-5);
+    background: var(--atlas-paper);
+    border: 1px solid var(--atlas-rule-soft);
+    border-radius: var(--r-md);
+    cursor: pointer;
+    text-align: left;
+    width: 100%;
+    color: inherit;
+    font: inherit;
+    transition: border-color var(--t-fast) var(--ease),
+                background var(--t-fast) var(--ease),
+                transform var(--t-fast) var(--ease);
+  }
+  .choice:hover {
+    border-color: var(--atlas-ink);
+  }
+  .choice .key {
+    width: 28px; height: 28px;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-family: var(--mono); font-size: 13px; font-weight: 500;
+    color: var(--atlas-ink-2);
+    border: 1px solid var(--atlas-rule-soft);
+    border-radius: var(--r-sm);
+    background: var(--atlas-paper);
+    flex-shrink: 0;
+  }
+  .choice .text {
+    font-size: 16px; line-height: 1.5;
+    color: var(--atlas-ink);
+    text-wrap: pretty;
+    padding-top: 3px;
+  }
+  .choice .indicator {
+    width: 20px; height: 20px;
+    align-self: center;
+    color: var(--atlas-muted);
+    opacity: 0;
+    transition: opacity var(--t-fast) var(--ease);
+  }
+  .choice:hover .indicator { opacity: 1; }
+
+  /* States */
+  .choice[aria-pressed="true"] {
+    border-color: var(--atlas-ink);
+    background: color-mix(in oklab, var(--atlas-ink) 4%, var(--atlas-paper));
+  }
+  .choice[aria-pressed="true"] .key {
+    background: var(--atlas-ink); color: var(--atlas-paper); border-color: var(--atlas-ink);
+  }
+  .choice[aria-pressed="true"] .indicator { opacity: 1; color: var(--atlas-ink); }
+
+  .choice[data-state="correct"] {
+    border-color: var(--atlas-good);
+    background: color-mix(in oklab, var(--atlas-good) 8%, var(--atlas-paper));
+  }
+  .choice[data-state="correct"] .key {
+    background: var(--atlas-good); color: #fff; border-color: var(--atlas-good);
+  }
+  .choice[data-state="correct"] .indicator { opacity: 1; color: var(--atlas-good); }
+
+  .choice[data-state="wrong"] {
+    border-color: var(--atlas-bad);
+    background: color-mix(in oklab, var(--atlas-bad) 6%, var(--atlas-paper));
+  }
+  .choice[data-state="wrong"] .key {
+    background: var(--atlas-bad); color: #fff; border-color: var(--atlas-bad);
+  }
+  .choice[data-state="wrong"] .indicator { opacity: 1; color: var(--atlas-bad); }
+
+  .choice[data-state="dimmed"] { opacity: .5; }
+  .choice[disabled] { cursor: default; }
+  .choice[disabled]:hover { transform: none; }
+
+  /* ---------- Footer action ---------- */
+  .actions {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: var(--s-4);
+    padding-top: var(--s-5);
+    border-top: 1px solid var(--atlas-rule-soft);
+    margin-top: var(--s-6);
+  }
+  .actions .left, .actions .right {
+    display: flex; align-items: center; gap: var(--s-3);
+  }
+  .kbd {
+    font-family: var(--mono); font-size: 11px;
+    padding: 2px 6px;
+    background: var(--atlas-paper-2);
+    border: 1px solid var(--atlas-rule-soft);
+    border-radius: 4px;
+    color: var(--atlas-ink-2);
+  }
+  .hint-text {
+    font-family: var(--mono); font-size: 11px;
+    letter-spacing: .12em; text-transform: uppercase;
+    color: var(--atlas-muted);
+  }
+
+  /* ---------- Hints ladder ---------- */
+  .hints {
+    margin: var(--s-6) 0 0;
+    border-top: 1px dashed var(--atlas-rule-soft);
+    padding-top: var(--s-5);
+  }
+  .hint {
+    border-bottom: 1px solid var(--atlas-rule-soft);
+  }
+  .hint:last-child { border-bottom: 0; }
+  .hint summary {
+    list-style: none;
+    cursor: pointer;
+    padding: var(--s-4) 0;
+    display: grid;
+    grid-template-columns: 32px 1fr auto;
+    gap: var(--s-3);
+    align-items: center;
+  }
+  .hint summary::-webkit-details-marker { display: none; }
+  .hint .level-num {
+    font-family: var(--mono); font-size: 11px;
+    width: 24px; height: 24px;
+    display: inline-flex; align-items: center; justify-content: center;
+    border: 1px solid var(--atlas-rule-soft);
+    border-radius: 50%;
+    color: var(--atlas-muted);
+  }
+  .hint[open] .level-num {
+    background: var(--atlas-ink); color: var(--atlas-paper); border-color: var(--atlas-ink);
+  }
+  .hint .level-label {
+    font-family: var(--mono); font-size: 12px;
+    letter-spacing: .1em; text-transform: uppercase;
+    color: var(--atlas-ink-2);
+  }
+  .hint[open] .level-label { color: var(--atlas-ink); }
+  .hint .chev {
+    color: var(--atlas-muted);
+    transition: transform var(--t-base) var(--ease);
+  }
+  .hint[open] .chev { transform: rotate(90deg); }
+  .hint .content {
+    padding: 0 0 var(--s-5) calc(32px + var(--s-3));
+    font-family: var(--serif);
+    font-size: 17px; line-height: 1.6;
+    color: var(--atlas-ink-2);
+    max-width: 64ch;
+    text-wrap: pretty;
+  }
+  .hint .content ul {
+    padding-left: var(--s-4); margin: var(--s-2) 0 0;
+  }
+  .hint .content li { margin: var(--s-2) 0; }
+
+  .feedback {
+    display: none;
+    margin-top: var(--s-5);
+    padding: var(--s-4) var(--s-5);
+    border-radius: var(--r-md);
+    font-family: var(--sans); font-size: 14px;
+    background: var(--atlas-paper-2);
+    border-left: 3px solid var(--atlas-ink);
+  }
+  .feedback[data-shown="true"] { display: block; }
+  .feedback[data-correct="true"] { border-left-color: var(--atlas-good); }
+  .feedback[data-correct="false"] { border-left-color: var(--atlas-bad); }
+  .feedback .verdict {
+    font-family: var(--mono); font-size: 11px;
+    letter-spacing: .14em; text-transform: uppercase;
+    color: var(--atlas-ink); margin-bottom: 4px;
+  }
+  .feedback[data-correct="true"] .verdict { color: var(--atlas-good); }
+  .feedback[data-correct="false"] .verdict { color: var(--atlas-bad); }
+
+  /* Tags */
+  .tags {
+    display: flex; gap: 6px; flex-wrap: wrap;
+    margin-top: var(--s-5);
+  }
+  .tags span {
+    font-family: var(--mono); font-size: 11px;
+    color: var(--atlas-muted);
+    padding: 2px 8px;
+    border: 1px solid var(--atlas-rule-soft);
+    border-radius: var(--r-pill);
+  }
+
+  /* Theme toggle in top */
+  .theme-toggle {
+    width: 32px; height: 32px;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: transparent; color: var(--atlas-ink);
+    border: 1px solid var(--atlas-rule-soft);
+    border-radius: var(--r-sm);
+    cursor: pointer;
+  }
+  .theme-toggle:hover { border-color: var(--atlas-ink); }
+  .theme-toggle svg { width: 16px; height: 16px; }
+
+  /* Responsive */
+  @media (max-width: 720px) {
+    .quiz-shell, .quiz-top-inner { padding-left: var(--s-5); padding-right: var(--s-5); }
+    .qtitle { font-size: 30px; }
+    .scenario { font-size: 18px; padding-left: var(--s-4); }
+    .qstem { font-size: 17px; }
+    .canvas { padding: var(--s-7) 0 var(--s-6); }
+  }
+</style>
 </head>
 <body>
-    <header class="quiz-header">
-        <div class="header-left">
-            <a href="index.html" class="back-link" id="back-link">&#8592; Back</a>
-            <div class="exam-info">
-                <span id="exam-code" class="exam-badge"></span>
-                <span id="exam-title"></span>
-                <a id="cert-org-link" class="cert-org-link" target="_blank" rel="noopener" hidden></a>
-            </div>
-        </div>
-        <div class="header-center">
-            <nav class="question-navigation" id="navigation" hidden>
-                <button id="prev-question" class="btn btn-nav">← Prev</button>
-                <span class="nav-position">Question <span id="current-num">1</span> of <span id="total-num">50</span></span>
-                <button id="next-question" class="btn btn-nav">Next →</button>
-            </nav>
-        </div>
-        <div class="header-right">
-            <div class="progress-info">
-                <div class="stat">
-                    <span class="stat-value" id="percent-complete">0%</span>
-                    <span class="stat-label">Complete</span>
-                </div>
-                <div class="stat">
-                    <span class="stat-value" id="percent-success">0%</span>
-                    <span class="stat-label">Success</span>
-                </div>
-                <div class="stat">
-                    <span class="stat-value"><span id="score">0</span>/<span id="attempted">0</span></span>
-                    <span class="stat-label">Score</span>
-                </div>
-            </div>
-            <div class="header-toolbar">
-                <button id="view-results-btn" class="btn btn-sm btn-results" hidden title="View Results">Results</button>
-                <button id="export-progress-btn" class="btn btn-sm btn-secondary" title="Export Progress">Export</button>
-                <button id="import-progress-btn" class="btn btn-sm btn-secondary" title="Import Progress">Import</button>
-                <input type="file" id="import-file-input" accept=".json" hidden>
-            </div>
-        </div>
-    </header>
 
-    <div class="quiz-layout">
-        <div id="correct-answer-display" style="color: var(--bg-color, #f5f7fa);" hidden><span id="correct-answer-letter"></span></div>
-        <main class="quiz-container">
-            <div id="loading" class="loading">
-                <div class="spinner"></div>
-                <p>Loading exam...</p>
-            </div>
-
-            <div id="error" class="error-message" hidden>
-                <h2>Error Loading Exam</h2>
-                <p id="error-text"></p>
-                <a href="index.html" class="btn btn-primary" id="error-back-link">Back</a>
-            </div>
-
-            <article class="question-card" id="question-card" hidden>
-                <header class="question-header">
-                    <div class="question-number">Question <span id="q-num"></span></div>
-                    <h2 id="question-title"></h2>
-                    <span id="question-category" class="category-badge"></span>
-                </header>
-
-                <section class="scenario" id="scenario-section">
-                    <h3>Scenario</h3>
-                    <div id="scenario-text"></div>
-                </section>
-
-                <section class="question-text">
-                    <p id="question-content"></p>
-                </section>
-
-                <section class="choices">
-                    <fieldset id="choices-fieldset">
-                        <legend class="sr-only">Select your answer</legend>
-                    </fieldset>
-                </section>
-
-                <div class="answer-actions">
-                    <button id="submit-answer" class="btn btn-primary" disabled>
-                        Submit Answer
-                    </button>
-                </div>
-
-                <section class="feedback" id="feedback-section" hidden>
-                    <div id="feedback-result"></div>
-                </section>
-            </article>
-        </main>
-
-        <aside class="hints-panel" id="hints-section" hidden>
-            <h3>Study Hints</h3>
-            <p class="hints-intro">Reveal hints progressively:</p>
-            <div class="hint-buttons">
-                <button class="hint-btn" data-level="1" id="hint-btn-1">
-                    <span class="hint-icon">1</span>
-                    Brief Hint
-                </button>
-                <button class="hint-btn" data-level="2" id="hint-btn-2" disabled>
-                    <span class="hint-icon">2</span>
-                    Complete Explanation
-                </button>
-                <button class="hint-btn" data-level="3" id="hint-btn-3" disabled>
-                    <span class="hint-icon">3</span>
-                    Deep Knowledge
-                </button>
-            </div>
-            <div class="hints-content" id="hints-content">
-            </div>
-        </aside>
+<!-- Top bar -->
+<div class="quiz-top no-print">
+  <div class="quiz-top-inner">
+    <a href="azure.html" class="crumb">
+      <span class="pchip-sm"></span>
+      AZ-305
+    </a>
+    <div class="quiz-progress" aria-label="Progress">
+      <span class="label"><b id="prog-num">1</b> / 50</span>
+      <div class="bar"><i id="prog-bar" style="width:2%"></i></div>
+      <span class="label" id="prog-score">0 correct</span>
     </div>
-
-    <div id="completion-overlay" class="completion-overlay" hidden>
-        <div class="overlay-content">
-            <h2>Congratulations!</h2>
-            <p>You have answered all questions.</p>
-            <p class="overlay-score-label">Your Score</p>
-            <p class="overlay-score"></p>
-            <div class="overlay-actions">
-                <a class="btn btn-primary overlay-view-results" href="#">View Results</a>
-                <button class="btn btn-secondary overlay-continue">Continue Reviewing</button>
-            </div>
-        </div>
+    <div class="top-actions">
+      <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme" title="Toggle theme (T)">
+        <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+        <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      </button>
     </div>
+  </div>
+</div>
 
-    <script type="module" src="js/app.js"></script>
+<main class="quiz-shell">
+  <article class="canvas" id="qroot">
+    <!-- Filled by JS -->
+  </article>
+
+  <div class="actions no-print">
+    <div class="left">
+      <span class="hint-text"><span class="kbd">A</span> <span class="kbd">B</span> <span class="kbd">C</span> <span class="kbd">D</span> select</span>
+    </div>
+    <div class="right">
+      <button class="btn ghost sm" id="prev-btn" title="Previous (←)">← Previous</button>
+      <button class="btn" id="next-btn" title="Submit / Next (Enter)">Submit</button>
+    </div>
+  </div>
+</main>
+
+<script>
+(function(){
+  // ---- Read ?exam=<slug>, default to az-305 ----
+  const params = new URLSearchParams(location.search);
+  const examSlug = (params.get('exam') || 'az-305').toLowerCase();
+  const STATE_KEY = `atlas:${examSlug}:state`;
+  const THEME_KEY = 'atlas:theme';
+
+  const defaultState = {
+    idx: 0,
+    answers: {},
+    revealed: {},
+    hintsOpen: {}
+  };
+
+  let state = loadState();
+  let questions = [];
+  let meta = {};
+
+  // ---- Load exam JSON ----
+  fetch(`data/azure/${examSlug}.json`)
+    .then(r => r.json())
+    .then(data => {
+      questions = data.questions || [];
+      meta = data.metadata || {};
+      const code = (meta.examCode || examSlug).toUpperCase();
+      const crumb = document.querySelector('.crumb');
+      if (crumb) crumb.lastChild.textContent = ' ' + code;
+      window.__examCode = code;
+      window.__categories = meta.categories || {};
+      render();
+    })
+    .catch(err => {
+      document.getElementById('qroot').innerHTML =
+        `<p style="font-family:var(--serif);font-size:20px;color:var(--atlas-ink-2);padding:40px">Could not load exam <code>${examSlug}</code>. ${err.message}</p>`;
+    });
+
+  function loadState(){
+    try {
+      const s = JSON.parse(localStorage.getItem(STATE_KEY));
+      return { ...defaultState, ...s, answers: s?.answers || {}, revealed: s?.revealed || {}, hintsOpen: s?.hintsOpen || {} };
+    } catch { return { ...defaultState }; }
+  }
+  function saveState(){
+    localStorage.setItem(STATE_KEY, JSON.stringify(state));
+  }
+
+  // ---- Theme ----
+  const savedTheme = localStorage.getItem(THEME_KEY);
+  if (savedTheme) document.documentElement.setAttribute('data-theme', savedTheme);
+  document.getElementById('theme-toggle').addEventListener('click', () => {
+    const cur = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+    const next = cur === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem(THEME_KEY, next);
+  });
+
+  // ---- Render ----
+  const root = document.getElementById('qroot');
+  const progNum = document.getElementById('prog-num');
+  const progBar = document.getElementById('prog-bar');
+  const progScore = document.getElementById('prog-score');
+  const nextBtn = document.getElementById('next-btn');
+  const prevBtn = document.getElementById('prev-btn');
+
+  function correctCount(){
+    return Object.entries(state.answers).filter(([qid, ans]) => {
+      const q = questions.find(qq => String(qq.id) === String(qid));
+      return q && q.correctAnswer === ans;
+    }).length;
+  }
+
+  function render(){
+    if (!questions.length) return;
+    const q = questions[state.idx];
+    const picked = state.answers[q.id];
+    const revealed = !!state.revealed[q.id];
+    const hintsOpen = state.hintsOpen[q.id] || [];
+
+    progNum.textContent = state.idx + 1;
+    progBar.style.width = ((state.idx + 1) / questions.length * 100) + '%';
+    const cc = correctCount();
+    progScore.textContent = cc + ' correct';
+
+    document.title = `${window.__examCode || 'Exam'} · Question ${state.idx + 1} — Atlas`;
+
+    const choicesHtml = q.choices.map(c => {
+      let state_attr = '';
+      if (revealed) {
+        if (c.letter === q.correctAnswer) state_attr = ' data-state="correct"';
+        else if (c.letter === picked) state_attr = ' data-state="wrong"';
+        else state_attr = ' data-state="dimmed"';
+      }
+      return `
+        <button class="choice" data-letter="${c.letter}" aria-pressed="${picked === c.letter}"${state_attr}${revealed ? ' disabled' : ''}>
+          <span class="key">${c.letter}</span>
+          <span class="text">${escapeHtml(c.text)}</span>
+          <span class="indicator" aria-hidden="true">
+            ${revealed && c.letter === q.correctAnswer
+              ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12l4 4 10-10"/></svg>'
+              : revealed && c.letter === picked
+              ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>'
+              : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/></svg>'
+            }
+          </span>
+        </button>`;
+    }).join('');
+
+    const hintsHtml = q.hints.map((h, i) => {
+      const open = hintsOpen.includes(h.level);
+      const content = h.content.trim().startsWith('<')
+        ? h.content
+        : `<p>${escapeHtml(h.content)}</p>`;
+      return `
+        <details class="hint" data-level="${h.level}"${open ? ' open' : ''}>
+          <summary>
+            <span class="level-num">${h.level}</span>
+            <span class="level-label">${escapeHtml(h.label)}</span>
+            <span class="chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 6l6 6-6 6"/></svg></span>
+          </summary>
+          <div class="content">${content}</div>
+        </details>`;
+    }).join('');
+
+    const feedback = revealed ? (() => {
+      const right = picked === q.correctAnswer;
+      return `
+        <div class="feedback" data-shown="true" data-correct="${right}">
+          <div class="verdict">${right ? '✓ Correct' : '✗ Not quite'}</div>
+          <div>${right
+            ? `${escapeHtml(q.correctAnswer)} is the right call. Read the hints below for the deeper reasoning.`
+            : `The correct answer is <b>${escapeHtml(q.correctAnswer)}</b>. Open the hints below to understand why.`
+          }</div>
+        </div>`;
+    })() : '';
+
+    const cat = (window.__categories && window.__categories[q.categoryRef]) || q.categoryRef;
+
+    root.innerHTML = `
+      <div class="meta-row">
+        <span class="qnum">Question <b>${state.idx + 1}</b> of ${questions.length}</span>
+        <span class="dot"></span>
+        <span class="cat-chip">${escapeHtml(cat)}</span>
+        <span class="dot"></span>
+        <span class="diff" data-d="${q.difficulty}">${escapeHtml(q.difficulty)}</span>
+      </div>
+      <h1 class="qtitle">${escapeHtml(q.title)}</h1>
+      <p class="scenario">${escapeHtml(q.scenario)}</p>
+      <p class="qstem">${escapeHtml(q.questionText)}</p>
+      <div class="choices" id="choices">
+        ${choicesHtml}
+      </div>
+      ${feedback}
+      <div class="hints">${hintsHtml}</div>
+      <div class="tags">
+        ${q.tags.map(t => `<span>${escapeHtml(t)}</span>`).join('')}
+      </div>
+    `;
+
+    // Wire choices
+    root.querySelectorAll('.choice').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (revealed) return;
+        state.answers[q.id] = btn.dataset.letter;
+        saveState();
+        render();
+      });
+    });
+
+    // Wire hint toggle persistence
+    root.querySelectorAll('.hint').forEach(d => {
+      d.addEventListener('toggle', () => {
+        const lvl = parseInt(d.dataset.level, 10);
+        const arr = state.hintsOpen[q.id] || [];
+        if (d.open && !arr.includes(lvl)) arr.push(lvl);
+        if (!d.open) {
+          const i = arr.indexOf(lvl);
+          if (i !== -1) arr.splice(i, 1);
+        }
+        state.hintsOpen[q.id] = arr;
+        saveState();
+      });
+    });
+
+    // Button states
+    prevBtn.disabled = state.idx === 0;
+    if (revealed) {
+      nextBtn.textContent = state.idx === questions.length - 1 ? 'Finish →' : 'Next →';
+    } else {
+      nextBtn.textContent = 'Submit';
+      nextBtn.disabled = !picked;
+    }
+  }
+
+  function submitOrNext(){
+    const q = questions[state.idx];
+    if (!state.revealed[q.id]) {
+      if (!state.answers[q.id]) return;
+      state.revealed[q.id] = true;
+      saveState();
+      render();
+    } else {
+      if (state.idx < questions.length - 1) {
+        state.idx += 1;
+        saveState();
+        render();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+  }
+  function prev(){
+    if (state.idx > 0) {
+      state.idx -= 1;
+      saveState();
+      render();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
+  nextBtn.addEventListener('click', submitOrNext);
+  prevBtn.addEventListener('click', prev);
+
+  // Keyboard
+  document.addEventListener('keydown', (e) => {
+    if (e.target.matches('input, textarea')) return;
+    if (!questions.length) return;
+    const k = e.key.toLowerCase();
+    const q = questions[state.idx];
+    if (['a','b','c','d'].includes(k) && !state.revealed[q.id]) {
+      state.answers[q.id] = k.toUpperCase();
+      saveState();
+      render();
+    } else if (e.key === 'Enter') {
+      submitOrNext();
+    } else if (e.key === 'ArrowLeft') {
+      prev();
+    } else if (e.key === 'ArrowRight') {
+      if (state.revealed[q.id] && state.idx < questions.length - 1) {
+        state.idx += 1; saveState(); render(); window.scrollTo({top:0});
+      }
+    } else if (k === 't') {
+      document.getElementById('theme-toggle').click();
+    } else if (['1','2','3'].includes(k)) {
+      const lvl = parseInt(k, 10);
+      const det = root.querySelector(`.hint[data-level="${lvl}"]`);
+      if (det) det.open = !det.open;
+    }
+  });
+
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  // initial render handled by fetch().then()
+})();
+</script>
 </body>
 </html>
