@@ -76,7 +76,7 @@ Open  ──>  Started  ──>  Completed
 | 2.2  | Completed | 2026-05-06 06:36 PM (PST) | 2026-05-06 06:38 PM (PST) | In `js/app.js` line ~165: change exam path from `data/${provider}/${examId}.xml` to `data/${provider}/${examId}.json`. Update `loadExam()` call site. |
 | 2.3  | Completed | 2026-05-06 06:38 PM (PST) | 2026-05-06 06:38 PM (PST) | In `quiz.html`: update any script references if needed (likely none — app.js is the entry point). |
 | 2.4  | Completed | 2026-05-06 06:38 PM (PST) | 2026-05-06 06:39 PM (PST) | Smoke-test: open quiz.html?exam=saa-c03, az-305, cca-f in browser. Verify questions load, answers submit, hints reveal, progress saves. |
-| 2.5  | Started | 2026-05-06 06:39 PM (PST) |                  | Stage all changes, commit Phase 2. |
+| 2.5  | Completed | 2026-05-06 06:39 PM (PST) | 2026-05-06 06:40 PM (PST) | Stage all changes, commit Phase 2. |
 
 ### Phase 2 Summary
 
@@ -94,16 +94,17 @@ Open  ──>  Started  ──>  Completed
 
 | Row  | Status | Started (PST) | Completed (PST) | Description |
 |------|--------|---------------|------------------|-------------|
-| 3.1  | Open   |               |                  | Verify hint system (3-level progressive reveal) works with JSON-loaded data. Hints contain HTML — confirm rendering is preserved. |
-| 3.2  | Open   |               |                  | Verify progress-tracker.js save/load/clear cycle works end-to-end with JSON-loaded exams. Check localStorage keys are consistent. |
-| 3.3  | Open   |               |                  | Verify quiz-engine.js: answer submission, scoring, result export all function correctly. |
-| 3.4  | Open   |               |                  | Keep `js/xml-parser.js` and its tests. Verify XMLParser and ExamLoader produce equivalent `{metadata, questions, glossary}` output for the same exam. |
-| 3.5  | Open   |               |                  | Verify all 10 providers load correctly: aws, azure, gcp, anthropic, comptia, isc2, github, databricks, nvidia, cisco. Spot-check one exam per provider. |
-| 3.6  | Open   |               |                  | Stage all changes, commit Phase 3. |
+| 3.1  | Completed | 2026-05-06 06:41 PM (PST) | 2026-05-06 06:42 PM (PST) | Verify hint system (3-level progressive reveal) works with JSON-loaded data. Hints contain HTML — confirm rendering is preserved. |
+| 3.2  | Completed | 2026-05-06 06:42 PM (PST) | 2026-05-06 06:42 PM (PST) | Verify progress-tracker.js save/load/clear cycle works end-to-end with JSON-loaded exams. Check localStorage keys are consistent. |
+| 3.3  | Completed | 2026-05-06 06:42 PM (PST) | 2026-05-06 06:42 PM (PST) | Verify quiz-engine.js: answer submission, scoring, result export all function correctly. |
+| 3.4  | Completed | 2026-05-06 06:42 PM (PST) | 2026-05-06 06:46 PM (PST) | Keep `js/xml-parser.js` and its tests. Verify XMLParser and ExamLoader produce equivalent `{metadata, questions, glossary}` output for the same exam. |
+| 3.5  | Completed | 2026-05-06 06:46 PM (PST) | 2026-05-06 06:47 PM (PST) | Verify all 10 providers load correctly: aws, azure, gcp, anthropic, comptia, isc2, github, databricks, nvidia, cisco. Spot-check one exam per provider. |
+| 3.6  | Started | 2026-05-06 06:47 PM (PST) |                  | Stage all changes, commit Phase 3. |
 
 ### Phase 3 Summary
 
-- **Changes:** TBD
+- **Changes:** Added `tests/integration/xml-json-equivalence.test.js` (13 tests verifying XMLParser ↔ JSON structural equivalence). Aligned test fixtures (`sample-exam.xml` and `sample-exam.json`) to use identical content matching the JSON schema (difficulty enum, 3 hints per question, date-time format). Updated test expectations in `xml-parser.test.js` and `data-flow.integration.test.js` to match. Verified all 10 providers (50 JSON exams) load correctly. All 195 tests pass.
+- **Changes hosted at:** TBD
 - **Commit:** `Verify quiz features with JSON loader, retain XMLParser for comparison`
 
 ---

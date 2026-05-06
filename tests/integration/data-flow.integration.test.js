@@ -144,7 +144,7 @@ describe('XMLParser → QuizEngine data flow', () => {
     });
 
     it('difficulty and categoryRef parsed from attributes', () => {
-        expect(engine.exam.questions[0].difficulty).toBe('beginner');
+        expect(engine.exam.questions[0].difficulty).toBe('basic');
         expect(engine.exam.questions[0].categoryRef).toBe('cat1');
         expect(engine.exam.questions[1].difficulty).toBe('intermediate');
         expect(engine.exam.questions[1].categoryRef).toBe('cat2');

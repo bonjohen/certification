@@ -57,7 +57,7 @@ describe('XMLParser', () => {
             expect(meta.description).toBe('A sample exam for unit testing');
             expect(meta.totalQuestions).toBe(3);
             expect(meta.createdDate).toBe('2024-01-01');
-            expect(meta.lastModified).toBe('2024-01-15');
+            expect(meta.lastModified).toBe('2024-01-15T00:00:00Z');
         });
 
         it('should parse categories correctly', () => {
@@ -101,7 +101,7 @@ describe('XMLParser', () => {
 
             expect(q1.id).toBe(1);
             expect(q1.categoryRef).toBe('cat1');
-            expect(q1.difficulty).toBe('beginner');
+            expect(q1.difficulty).toBe('basic');
             expect(q1.title).toBe('Sample Question 1');
         });
 
