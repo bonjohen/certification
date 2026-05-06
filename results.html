@@ -4,12 +4,68 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://esm.sh; connect-src 'self' https://esm.sh; style-src 'self' 'unsafe-inline'; img-src 'self' data:;">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📝</text></svg>">
-    <title>Results - Study Guide</title>
-    <link rel="stylesheet" href="css/styles.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='18' fill='%234A4D54'/><text x='50' y='70' font-size='62' font-family='Georgia' fill='white' text-anchor='middle' font-style='italic'>R</text></svg>" />
+    <title>Results — Atlas</title>
+    <link rel="stylesheet" href="system/tokens.css">
+    <link rel="stylesheet" href="system/system.css">
     <link rel="stylesheet" href="css/results.css">
+    <style>
+      /* Bridge legacy CSS vars to Atlas tokens */
+      :root {
+        --primary-color: var(--p-current, #0078d4);
+        --provider-color: var(--p-current, #0078d4);
+        --success-color: var(--atlas-good);
+        --error-color: var(--atlas-bad);
+        --warning-color: var(--atlas-warn);
+        --text-color: var(--atlas-ink);
+        --text-muted: var(--atlas-muted);
+        --card-bg: var(--atlas-paper-2);
+        --border-color: var(--atlas-rule-soft);
+        --hover-bg: color-mix(in oklab, var(--atlas-ink) 4%, transparent);
+        --success-bg: color-mix(in oklab, var(--atlas-good) 12%, transparent);
+        --error-bg: color-mix(in oklab, var(--atlas-bad) 12%, transparent);
+        --warning-bg: color-mix(in oklab, var(--atlas-warn) 12%, transparent);
+      }
+
+      body {
+        background: var(--atlas-paper);
+        color: var(--atlas-ink);
+        font-family: var(--sans);
+      }
+
+      .results-header {
+        background: var(--atlas-paper-2);
+      }
+
+      .nav-actions { display: flex; gap: 8px; align-items: center; }
+      .theme-toggle {
+        width: 32px; height: 32px;
+        display: inline-flex; align-items: center; justify-content: center;
+        background: transparent; color: var(--atlas-ink);
+        border: 1px solid var(--atlas-rule-soft);
+        border-radius: var(--r-sm);
+        cursor: pointer;
+      }
+      .theme-toggle:hover { border-color: var(--atlas-ink); }
+      .theme-toggle svg { width: 16px; height: 16px; }
+    </style>
 </head>
 <body>
+
+<nav class="site-nav">
+  <a href="index.html" class="brand"><span class="mark"></span> Atlas</a>
+  <div class="links">
+    <a href="index.html">Providers</a>
+    <a href="#" id="nav-provider-link">Results</a>
+  </div>
+  <div class="nav-actions">
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme" title="Toggle theme">
+      <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+    </button>
+  </div>
+</nav>
+
     <header class="results-header">
         <div class="header-left">
             <a href="index.html" class="back-link" id="back-link">&#8592; Back</a>
@@ -148,6 +204,17 @@
         </div>
     </main>
 
-    <script type="module" src="js/results-app.js"></script>
+<script>
+  const THEME_KEY = 'atlas:theme';
+  const savedTheme = localStorage.getItem(THEME_KEY);
+  if (savedTheme) document.documentElement.setAttribute('data-theme', savedTheme);
+  document.getElementById('theme-toggle').addEventListener('click', () => {
+    const cur = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+    const next = cur === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem(THEME_KEY, next);
+  });
+</script>
+<script type="module" src="js/results-app.js"></script>
 </body>
 </html>

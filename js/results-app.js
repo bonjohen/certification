@@ -91,7 +91,7 @@ class ResultsApp {
         }
 
         this.provider = getProviderFromExam(this.examId, null);
-        document.documentElement.style.setProperty('--provider-color', providerColors[this.provider] || '#0078d4');
+        document.documentElement.style.setProperty('--p-current', providerColors[this.provider] || '#0078d4');
 
         // Set back links
         const backUrl = providerPages[this.provider] || 'index.html';

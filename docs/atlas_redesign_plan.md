@@ -97,7 +97,7 @@ Open  ──>  Started  ──>  Completed
 | 3.5 | Completed | 2026-05-06 04:20 PM | 2026-05-06 04:24 PM | Rebuild `nvidia.html`: 1 exam (NV-GenAI), Associate level |
 | 3.6 | Completed | 2026-05-06 04:20 PM | 2026-05-06 04:24 PM | Rebuild `cisco.html`: 1 exam (810-110 AITECH), Practitioner level |
 | 3.7 | Completed | 2026-05-06 04:24 PM | 2026-05-06 04:25 PM | Verify: all links, filters, dark mode, responsive for all 6 pages |
-| 3.8 | Started | 2026-05-06 04:25 PM | | Stage and commit Phase 3 |
+| 3.8 | Completed | 2026-05-06 04:25 PM | 2026-05-06 04:26 PM | Stage and commit Phase 3 |
 
 ### Phase 3 Summary
 
@@ -114,14 +114,14 @@ Open  ──>  Started  ──>  Completed
 
 | # | Status | Started (PST) | Completed (PST) | Description |
 |---|--------|---------------|------------------|-------------|
-| 4.1 | Open | | | Rebuild `results.html`: replace CSS links with system imports, add site-nav, restyle banner/cards/table/details with Atlas tokens, update `js/results-app.js` to set `--p-current` instead of `--provider-color` |
-| 4.2 | Open | | | Verify: results page renders correctly for a completed exam, dark mode works, print mode works, export/import still functions |
-| 4.3 | Open | | | Stage and commit Phase 4 |
+| 4.1 | Completed | 2026-05-06 04:28 PM | 2026-05-06 04:32 PM | Rebuild `results.html`: replace CSS links with system imports, add site-nav, restyle banner/cards/table/details with Atlas tokens, update `js/results-app.js` to set `--p-current` instead of `--provider-color` |
+| 4.2 | Completed | 2026-05-06 04:32 PM | 2026-05-06 04:33 PM | Verify: results page renders correctly for a completed exam, dark mode works, print mode works, export/import still functions |
+| 4.3 | Started | 2026-05-06 04:33 PM | | Stage and commit Phase 4 |
 
 ### Phase 4 Summary
 
-- **Changes:** TBD
-- **Changes hosted at:** TBD
+- **Changes:** Rebuilt `results.html` with Atlas system imports (tokens.css + system.css), site-nav with theme toggle, and a CSS variable bridge mapping legacy vars to Atlas tokens. Updated `js/results-app.js` to set `--p-current` instead of `--provider-color`. All 195 tests pass.
+- **Changes hosted at:** `results.html`, `js/results-app.js`
 - **Commit:** `Port results page to Atlas design system`
 
 ---
