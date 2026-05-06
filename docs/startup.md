@@ -14,10 +14,12 @@ A multi-provider certification exam study site being redesigned under the "Atlas
 
 ## Current State
 
-- **azure.html**, **quiz.html**, and **index.html** are rebuilt with Atlas styling
-- **9 provider pages** + **results.html** still use the legacy `css/styles.css`
+- **All 10 provider pages**, **quiz.html**, **index.html**, and **results.html** are rebuilt with Atlas styling
+- Legacy `css/styles.css` and `css/quiz.css` have been deleted (zero references)
+- `css/results.css` is retained — still used by results.html for results-specific layout
 - The design system files are complete and committed: `system/tokens.css` (118 lines) + `system/system.css` (306 lines)
 - The JS engine (`js/app.js`, `js/quiz-engine.js`, `js/progress-tracker.js`, `js/exam-loader.js`) is unchanged by this work — it uses element IDs, not CSS classes
+- `js/results-app.js` updated to set `--p-current` instead of `--provider-color`
 
 ## Key Files
 

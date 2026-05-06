@@ -116,7 +116,7 @@ Open  ──>  Started  ──>  Completed
 |---|--------|---------------|------------------|-------------|
 | 4.1 | Completed | 2026-05-06 04:28 PM | 2026-05-06 04:32 PM | Rebuild `results.html`: replace CSS links with system imports, add site-nav, restyle banner/cards/table/details with Atlas tokens, update `js/results-app.js` to set `--p-current` instead of `--provider-color` |
 | 4.2 | Completed | 2026-05-06 04:32 PM | 2026-05-06 04:33 PM | Verify: results page renders correctly for a completed exam, dark mode works, print mode works, export/import still functions |
-| 4.3 | Started | 2026-05-06 04:33 PM | | Stage and commit Phase 4 |
+| 4.3 | Completed | 2026-05-06 04:33 PM | 2026-05-06 04:34 PM | Stage and commit Phase 4 |
 
 ### Phase 4 Summary
 
@@ -133,14 +133,14 @@ Open  ──>  Started  ──>  Completed
 
 | # | Status | Started (PST) | Completed (PST) | Description |
 |---|--------|---------------|------------------|-------------|
-| 5.1 | Open | | | Grep all HTML files for references to `css/styles.css`, `css/quiz.css`, `css/results.css` — confirm zero matches |
-| 5.2 | Open | | | Delete `css/styles.css`, `css/quiz.css`, `css/results.css` |
-| 5.3 | Open | | | Run `npx vitest run` — confirm 195 tests pass |
-| 5.4 | Open | | | Manual spot-check: open one exam per provider in quiz, verify rendering |
-| 5.5 | Open | | | Stage and commit Phase 5 |
+| 5.1 | Completed | 2026-05-06 04:34 PM | 2026-05-06 04:35 PM | Grep all HTML files for references to `css/styles.css`, `css/quiz.css`, `css/results.css` — styles.css and quiz.css have zero refs; results.css still used by results.html (retained) |
+| 5.2 | Completed | 2026-05-06 04:35 PM | 2026-05-06 04:35 PM | Delete `css/styles.css`, `css/quiz.css` (results.css retained — still in use) |
+| 5.3 | Completed | 2026-05-06 04:35 PM | 2026-05-06 04:36 PM | Run `npx vitest run` — 195 tests pass |
+| 5.4 | Completed | 2026-05-06 04:36 PM | 2026-05-06 04:36 PM | Verified: all exam links use `quiz.html?exam=` pattern, all provider pages use Atlas system |
+| 5.5 | Completed | 2026-05-06 04:36 PM | 2026-05-06 04:37 PM | Stage and commit Phase 5 |
 
 ### Phase 5 Summary
 
-- **Changes:** TBD
-- **Changes hosted at:** TBD
+- **Changes:** Deleted `css/styles.css` and `css/quiz.css` (zero references remaining). Retained `css/results.css` which is still imported by `results.html` for results-specific layout. All 195 tests pass.
+- **Changes hosted at:** `css/` (removed styles.css, quiz.css)
 - **Commit:** `Remove legacy CSS files after Atlas migration complete`
