@@ -352,6 +352,7 @@ export class QuizApp {
             'soa-c02': 'https://aws.amazon.com/certification/certified-sysops-admin-associate/',
             'dea-c01': 'https://aws.amazon.com/certification/certified-data-engineer-associate/',
             'mla-c01': 'https://aws.amazon.com/certification/certified-machine-learning-engineer-associate/',
+            'sap-c02': 'https://aws.amazon.com/certification/certified-solutions-architect-professional/',
             // Azure
             'ai-102': 'https://learn.microsoft.com/en-us/credentials/certifications/exams/ai-102/',
             'ai-300': 'https://learn.microsoft.com/en-us/credentials/certifications/exams/ai-300/',
