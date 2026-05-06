@@ -24,11 +24,11 @@
       <question-text>Which workflow trigger configuration satisfies all four requirements?</question-text>
       <choices>
         <choice letter="A">on: [push, pull_request, workflow_dispatch, schedule]</choice>
-        <choice letter="B">on: push (branches: ['**']), pull_request (branches: ['main']), workflow_dispatch, schedule (cron: '0 2 * * *')</choice>
-        <choice letter="C">on: push (branches: ['main']), pull_request, workflow_dispatch</choice>
+        <choice letter="B">on: push (branches: ['main']), pull_request, workflow_dispatch</choice>
+        <choice letter="C">on: push (branches: ['**']), pull_request (branches: ['main']), workflow_dispatch, schedule (cron: '0 2 * * *')</choice>
         <choice letter="D">on: push, pull_request (branches: ['**']), schedule (cron: '* 2 * * *')</choice>
       </choices>
-      <correct-answer>B</correct-answer>
+      <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Each trigger type can have filters — push on all branches, pull_request targeting main only, plus workflow_dispatch and schedule.</content>
@@ -59,12 +59,12 @@
       <scenario>A library maintainer needs to test their code on Node.js 18, 20, and 22 across Ubuntu, Windows, and macOS. However, they want to exclude the combination of Node.js 18 on Windows (known incompatibility) and add an experimental test on Node.js 23 on Ubuntu that should not fail the entire build if it fails.</scenario>
       <question-text>Which matrix strategy configuration handles includes, excludes, and experimental combinations?</question-text>
       <choices>
-        <choice letter="A">strategy: matrix with os: [ubuntu, windows, macos], node: [18, 20, 22], exclude node 18 + windows, include node 23 + ubuntu with continue-on-error: true</choice>
+        <choice letter="A">strategy: matrix with os: [ubuntu, windows, macos], node: [18, 20, 22, 23] and if conditions on each step</choice>
         <choice letter="B">Run three separate jobs — one per OS — each testing all Node versions sequentially</choice>
         <choice letter="C">Use a single job with a shell script that loops through all combinations</choice>
-        <choice letter="D">strategy: matrix with os: [ubuntu, windows, macos], node: [18, 20, 22, 23] and if conditions on each step</choice>
+        <choice letter="D">strategy: matrix with os: [ubuntu, windows, macos], node: [18, 20, 22], exclude node 18 + windows, include node 23 + ubuntu with continue-on-error: true</choice>
       </choices>
-      <correct-answer>A</correct-answer>
+      <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Matrix strategy supports exclude (remove specific combinations) and include (add combinations with extra properties like continue-on-error).</content>
@@ -96,11 +96,11 @@
       <question-text>Which approach creates a reusable, versionable set of shared steps?</question-text>
       <choices>
         <choice letter="A">Copy-paste the YAML steps across all 20 repositories and synchronize manually</choice>
-        <choice letter="B">Create a composite action in a shared repository with all four steps defined in action.yml, with inputs for customization (node version, test command), versioned via tags — repositories call it with uses: org/shared-build@v1</choice>
+        <choice letter="B">Use a GitHub App that modifies workflows in all repositories simultaneously</choice>
         <choice letter="C">Create a reusable workflow that each repository calls with workflow_call</choice>
-        <choice letter="D">Use a GitHub App that modifies workflows in all repositories simultaneously</choice>
+        <choice letter="D">Create a composite action in a shared repository with all four steps defined in action.yml, with inputs for customization (node version, test command), versioned via tags — repositories call it with uses: org/shared-build@v1</choice>
       </choices>
-      <correct-answer>B</correct-answer>
+      <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Composite actions bundle multiple steps into a single action that can be called with uses: — like a function for workflow steps.</content>
@@ -132,11 +132,11 @@
       <question-text>Which secrets management approach provides environment isolation with approval gates?</question-text>
       <choices>
         <choice letter="A">Store all secrets as repository secrets with prefixed names (PROD_DB_PASSWORD, STAGING_DB_PASSWORD)</choice>
-        <choice letter="B">GitHub Environments with environment-specific secrets, protection rules requiring reviewer approval for production, and workflow conditions that skip secret-dependent steps for dependabot/fork PRs</choice>
+        <choice letter="B">Use a single set of secrets and parameterize the environment at runtime</choice>
         <choice letter="C">Store secrets in a .env file committed to the repository with branch protection</choice>
-        <choice letter="D">Use a single set of secrets and parameterize the environment at runtime</choice>
+        <choice letter="D">GitHub Environments with environment-specific secrets, protection rules requiring reviewer approval for production, and workflow conditions that skip secret-dependent steps for dependabot/fork PRs</choice>
       </choices>
-      <correct-answer>B</correct-answer>
+      <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>GitHub Environments provide: environment-scoped secrets, protection rules (required reviewers, wait timers), and deployment gates — purpose-built for this pattern.</content>
@@ -168,11 +168,11 @@
       <question-text>Which self-hosted runner architecture provides auto-scaling, access control, and low maintenance?</question-text>
       <choices>
         <choice letter="A">Manually provisioned VMs running the runner application permanently</choice>
-        <choice letter="B">Actions Runner Controller (ARC) on Kubernetes with autoscaling (scale from zero to max based on queued jobs), runner groups at the organization level restricting access to specific repository sets, and automatic runner version updates via ARC's managed lifecycle</choice>
+        <choice letter="B">A single shared self-hosted runner with all jobs queued sequentially</choice>
         <choice letter="C">GitHub-hosted larger runners with VPN connectivity to internal resources</choice>
-        <choice letter="D">A single shared self-hosted runner with all jobs queued sequentially</choice>
+        <choice letter="D">Actions Runner Controller (ARC) on Kubernetes with autoscaling (scale from zero to max based on queued jobs), runner groups at the organization level restricting access to specific repository sets, and automatic runner version updates via ARC's managed lifecycle</choice>
       </choices>
-      <correct-answer>B</correct-answer>
+      <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Actions Runner Controller (ARC) on Kubernetes provides autoscaling from zero, ephemeral runners (clean environment per job), and managed lifecycle.</content>
@@ -240,11 +240,11 @@
       <question-text>Which CI pipeline implements all container lifecycle steps with proper tagging and signing?</question-text>
       <choices>
         <choice letter="A">Build locally and push pre-built images from developer machines</choice>
-        <choice letter="B">Docker build with cache, test via docker run, Trivy/Grype scan, docker/build-push-action for multi-tag push to ghcr.io (SHA + semver tags), and sigstore/cosign-installer for keyless image signing</choice>
-        <choice letter="C">Build without scanning and push to Docker Hub with latest tag only</choice>
+        <choice letter="B">Build without scanning and push to Docker Hub with latest tag only</choice>
+        <choice letter="C">Docker build with cache, test via docker run, Trivy/Grype scan, docker/build-push-action for multi-tag push to ghcr.io (SHA + semver tags), and sigstore/cosign-installer for keyless image signing</choice>
         <choice letter="D">Use GitHub Packages Maven registry for container storage</choice>
       </choices>
-      <correct-answer>B</correct-answer>
+      <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>The full container CI lifecycle: build with cache, test in container, scan for CVEs, multi-tag push to registry, and sign for supply chain security.</content>
@@ -276,11 +276,11 @@
       <question-text>Which approach eliminates long-lived credentials for AWS deployments from GitHub Actions?</question-text>
       <choices>
         <choice letter="A">Rotate AWS access keys every 24 hours via a scheduled workflow</choice>
-        <choice letter="B">GitHub OIDC (OpenID Connect) with AWS IAM Identity Provider — workflows request short-lived credentials from AWS STS by presenting a GitHub-issued JWT token, which AWS validates against the configured trust policy</choice>
-        <choice letter="C">Store keys in an external vault and fetch them at the start of each workflow</choice>
+        <choice letter="B">Store keys in an external vault and fetch them at the start of each workflow</choice>
+        <choice letter="C">GitHub OIDC (OpenID Connect) with AWS IAM Identity Provider — workflows request short-lived credentials from AWS STS by presenting a GitHub-issued JWT token, which AWS validates against the configured trust policy</choice>
         <choice letter="D">Use GitHub-hosted runners with IAM instance profiles</choice>
       </choices>
-      <correct-answer>B</correct-answer>
+      <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>OIDC federation: GitHub issues a JWT token to the workflow, AWS validates it and issues temporary credentials — no stored secrets needed.</content>
@@ -311,12 +311,12 @@
       <scenario>A Node.js project's CI workflow takes 8 minutes. Analysis shows: 3 minutes installing node_modules (same dependencies for most runs), 2 minutes building TypeScript (only source files changed, not all files), 2 minutes running tests, and 1 minute for setup/checkout. The team wants to reduce this to under 3 minutes for typical runs where only source code changes.</scenario>
       <question-text>Which optimization techniques reduce CI time to under 3 minutes for typical source-only changes?</question-text>
       <choices>
-        <choice letter="A">Use a faster runner with more CPU cores for all steps</choice>
-        <choice letter="B">Cache node_modules with actions/cache keyed on package-lock.json hash, use TypeScript incremental compilation with .tsbuildinfo cached, and run tests in parallel (jest --shard) across matrix jobs</choice>
+        <choice letter="A">Cache node_modules with actions/cache keyed on package-lock.json hash, use TypeScript incremental compilation with .tsbuildinfo cached, and run tests in parallel (jest --shard) across matrix jobs</choice>
+        <choice letter="B">Use a faster runner with more CPU cores for all steps</choice>
         <choice letter="C">Skip CI on commits that only change source files</choice>
         <choice letter="D">Move to a monorepo to reduce checkout time</choice>
       </choices>
-      <correct-answer>B</correct-answer>
+      <correct-answer>A</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Cache dependencies (eliminates 3 min install), cache build artifacts (reduces 2 min build), and parallelize tests — together bringing typical runs under 3 minutes.</content>
@@ -348,11 +348,11 @@
       <question-text>Which pattern provides centrally-maintained deployment logic with per-repository customization?</question-text>
       <choices>
         <choice letter="A">A GitHub App that pushes workflow files to all 50 repositories automatically</choice>
-        <choice letter="B">A reusable workflow (workflow_call trigger) in a central .github repository with inputs for build command, deployment target, and environment name — repositories call it with uses: org/.github/.github/workflows/deploy.yml@main passing their specific values</choice>
-        <choice letter="C">A single workflow in a monorepo that detects which service changed and deploys accordingly</choice>
+        <choice letter="B">A single workflow in a monorepo that detects which service changed and deploys accordingly</choice>
+        <choice letter="C">A reusable workflow (workflow_call trigger) in a central .github repository with inputs for build command, deployment target, and environment name — repositories call it with uses: org/.github/.github/workflows/deploy.yml@main passing their specific values</choice>
         <choice letter="D">Template repositories that teams fork — manual synchronization of updates</choice>
       </choices>
-      <correct-answer>B</correct-answer>
+      <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Reusable workflows (workflow_call) define jobs that other workflows invoke — like function calls between workflows, with inputs for customization.</content>
@@ -420,11 +420,11 @@
       <question-text>Which action type and implementation approach meets these requirements?</question-text>
       <choices>
         <choice letter="A">Docker container action with a shell script making curl calls</choice>
-        <choice letter="B">JavaScript action using @actions/core for outputs and failure handling, @actions/http-client for API calls, compiled with ncc for zero-dependency distribution — runs natively on any OS without Docker</choice>
+        <choice letter="B">A separate repository with a CLI tool that workflows install and execute</choice>
         <choice letter="C">Composite action with multiple run: steps using bash and curl</choice>
-        <choice letter="D">A separate repository with a CLI tool that workflows install and execute</choice>
+        <choice letter="D">JavaScript action using @actions/core for outputs and failure handling, @actions/http-client for API calls, compiled with ncc for zero-dependency distribution — runs natively on any OS without Docker</choice>
       </choices>
-      <correct-answer>B</correct-answer>
+      <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>JavaScript actions run natively on all runner OS types without Docker overhead and provide rich integration via the @actions toolkit packages.</content>
@@ -455,12 +455,12 @@
       <scenario>A security-conscious organization wants to prevent supply chain attacks via GitHub Actions. Risks include: compromised third-party actions injecting malicious code, actions exfiltrating secrets to external servers, and typosquatting attacks (using a misspelled action name that contains malware). They need a defense-in-depth approach without blocking all external actions.</scenario>
       <question-text>Which combination of controls mitigates supply chain risks from third-party actions?</question-text>
       <choices>
-        <choice letter="A">Only use actions from the GitHub Marketplace which are all verified</choice>
-        <choice letter="B">Pin actions to full commit SHA (not tags), use organization-level allowed actions list, restrict GITHUB_TOKEN permissions with permissions: key, and use network egress rules on self-hosted runners to prevent secret exfiltration</choice>
+        <choice letter="A">Pin actions to full commit SHA (not tags), use organization-level allowed actions list, restrict GITHUB_TOKEN permissions with permissions: key, and use network egress rules on self-hosted runners to prevent secret exfiltration</choice>
+        <choice letter="B">Only use actions from the GitHub Marketplace which are all verified</choice>
         <choice letter="C">Fork all third-party actions into the organization and use internal copies only</choice>
         <choice letter="D">Disable all third-party actions and only use run: steps with inline scripts</choice>
       </choices>
-      <correct-answer>B</correct-answer>
+      <correct-answer>A</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Defense-in-depth: pin to SHA (prevent tag hijacking), allow-list (prevent typosquatting), minimal permissions (limit blast radius), and network controls (prevent exfiltration).</content>
@@ -491,12 +491,12 @@
       <scenario>A deployment workflow should only run one instance at a time per environment — if a new deployment is triggered while one is running, the new one should wait (not cancel the running deployment). However, for CI (build/test) workflows, if a new push arrives while CI is running on the same branch, the old run should be cancelled (superseded by the newer code). These are two different concurrency behaviors needed in the same repository.</scenario>
       <question-text>Which concurrency configuration provides the correct behavior for each workflow type?</question-text>
       <choices>
-        <choice letter="A">concurrency: group with cancel-in-progress: true for all workflows</choice>
-        <choice letter="B">Deployment workflow: concurrency group keyed on environment name with cancel-in-progress: false (queue, don't cancel). CI workflow: concurrency group keyed on branch name with cancel-in-progress: true (cancel old runs when new push arrives)</choice>
+        <choice letter="A">Deployment workflow: concurrency group keyed on environment name with cancel-in-progress: false (queue, don't cancel). CI workflow: concurrency group keyed on branch name with cancel-in-progress: true (cancel old runs when new push arrives)</choice>
+        <choice letter="B">concurrency: group with cancel-in-progress: true for all workflows</choice>
         <choice letter="C">No concurrency controls — let all runs execute simultaneously</choice>
         <choice letter="D">Use workflow_dispatch to manually prevent overlapping runs</choice>
       </choices>
-      <correct-answer>B</correct-answer>
+      <correct-answer>A</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>concurrency group + cancel-in-progress controls the behavior: false = queue (deployments), true = cancel previous (CI on same branch).</content>
@@ -528,11 +528,11 @@
       <question-text>Which approach provides path-based conditional job execution in a monorepo?</question-text>
       <choices>
         <choice letter="A">Two separate workflows with path filters in the on: trigger (paths: ['frontend/**'] and paths: ['backend/**'])</choice>
-        <choice letter="B">Single workflow using dorny/paths-filter action to detect changed paths, with job-level if: conditions based on filter outputs, paths-ignore for docs-only changes on the trigger, and an integration-test job with no conditions (always runs)</choice>
+        <choice letter="B">Use git diff in a script step to determine what changed and skip steps with exit codes</choice>
         <choice letter="C">Always run all tests regardless of changes for simplicity</choice>
-        <choice letter="D">Use git diff in a script step to determine what changed and skip steps with exit codes</choice>
+        <choice letter="D">Single workflow using dorny/paths-filter action to detect changed paths, with job-level if: conditions based on filter outputs, paths-ignore for docs-only changes on the trigger, and an integration-test job with no conditions (always runs)</choice>
       </choices>
-      <correct-answer>B</correct-answer>
+      <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>paths-filter action detects which directories changed, outputting booleans that jobs reference in if: conditions for selective execution.</content>
@@ -600,11 +600,11 @@
       <question-text>What are the requirements and best practices for publishing an action to the GitHub Marketplace?</question-text>
       <choices>
         <choice letter="A">Push the action repository to GitHub — it automatically appears in the Marketplace</choice>
-        <choice letter="B">action.yml with complete metadata (name, description, inputs, outputs, branding), README with usage examples and permissions documentation, CI testing across OS versions, tagged releases for version pinning, and the repository must be public with the action.yml in the root directory</choice>
-        <choice letter="C">Only Docker actions can be published to the Marketplace</choice>
+        <choice letter="B">Only Docker actions can be published to the Marketplace</choice>
+        <choice letter="C">action.yml with complete metadata (name, description, inputs, outputs, branding), README with usage examples and permissions documentation, CI testing across OS versions, tagged releases for version pinning, and the repository must be public with the action.yml in the root directory</choice>
         <choice letter="D">Contact GitHub support to request Marketplace listing approval</choice>
       </choices>
-      <correct-answer>B</correct-answer>
+      <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Marketplace publishing requires: complete action.yml metadata, public repository, tagged releases, and clear documentation in README.</content>
@@ -635,12 +635,12 @@
       <scenario>A workflow needs to: read repository code (checkout), create a pull request with auto-generated changes, add a comment to the PR, and push a Docker image to ghcr.io. The organization has set the default GITHUB_TOKEN permission to read-only for security. The workflow currently fails with 403 errors on the PR creation and package push steps.</scenario>
       <question-text>Which permissions configuration grants exactly the minimum required access for all four operations?</question-text>
       <choices>
-        <choice letter="A">Set the organization default back to read-write for all workflows</choice>
-        <choice letter="B">Workflow-level permissions: contents: write (for push), pull-requests: write (for creating PR and commenting), and packages: write (for ghcr.io push) — contents: read is implied by write</choice>
+        <choice letter="A">Workflow-level permissions: contents: write (for push), pull-requests: write (for creating PR and commenting), and packages: write (for ghcr.io push) — contents: read is implied by write</choice>
+        <choice letter="B">Set the organization default back to read-write for all workflows</choice>
         <choice letter="C">Use a Personal Access Token (PAT) stored as a secret for all operations</choice>
         <choice letter="D">permissions: write-all to grant all permissions at once</choice>
       </choices>
-      <correct-answer>B</correct-answer>
+      <correct-answer>A</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Declare exactly the permissions needed: contents for code operations, pull-requests for PR operations, and packages for registry operations.</content>
@@ -707,12 +707,12 @@
       <scenario>A workflow needs to use different configuration values based on the trigger event: for push to main, use the production API URL; for pull requests, use the staging API URL; for manual dispatch, allow the user to specify the URL as an input. The API URL is used in multiple steps across two jobs. Additionally, a step needs to conditionally set a variable based on the output of a previous step.</scenario>
       <question-text>Which approach correctly manages environment variables across events, jobs, and steps?</question-text>
       <choices>
-        <choice letter="A">Hardcode the URL in each step that needs it with if conditions</choice>
-        <choice letter="B">Workflow-level env: for defaults, job-level env: overrides based on github.event_name context, step-level dynamic variables via $GITHUB_ENV for cross-step sharing, and workflow_dispatch inputs accessed via github.event.inputs.api_url</choice>
+        <choice letter="A">Workflow-level env: for defaults, job-level env: overrides based on github.event_name context, step-level dynamic variables via $GITHUB_ENV for cross-step sharing, and workflow_dispatch inputs accessed via github.event.inputs.api_url</choice>
+        <choice letter="B">Hardcode the URL in each step that needs it with if conditions</choice>
         <choice letter="C">Use repository secrets for all three URLs and select with if conditions</choice>
         <choice letter="D">Set all variables in the first step and pass via artifacts to subsequent jobs</choice>
       </choices>
-      <correct-answer>B</correct-answer>
+      <correct-answer>A</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Environment variables cascade: workflow &gt; job &gt; step level, with dynamic setting via $GITHUB_ENV for conditional values.</content>
@@ -744,11 +744,11 @@
       <question-text>Which CI/CD architecture handles independent microservice lifecycles in a monorepo?</question-text>
       <choices>
         <choice letter="A">Separate repositories per microservice with their own CI workflows</choice>
-        <choice letter="B">Single workflow with path-based change detection (dorny/paths-filter), matrix strategy generating jobs only for changed services, shared docker build step producing base images cached across services, and a final required status check job that aggregates all service results</choice>
+        <choice letter="B">Five separate workflow files — one per service — each with path filters in the on: trigger</choice>
         <choice letter="C">A single workflow that builds and deploys all 5 services on every change</choice>
-        <choice letter="D">Five separate workflow files — one per service — each with path filters in the on: trigger</choice>
+        <choice letter="D">Single workflow with path-based change detection (dorny/paths-filter), matrix strategy generating jobs only for changed services, shared docker build step producing base images cached across services, and a final required status check job that aggregates all service results</choice>
       </choices>
-      <correct-answer>D</correct-answer>
+      <correct-answer>B</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Separate workflow files per service with path filters provides: independent triggers, independent deployments, and independent status checks per service.</content>
@@ -780,11 +780,11 @@
       <question-text>Which secrets passing approach balances convenience with security for reusable workflows?</question-text>
       <choices>
         <choice letter="A">Hardcode secrets in the reusable workflow repository as environment variables</choice>
-        <choice letter="B">Use secrets: inherit in the calling workflow to pass all secrets, with the reusable workflow using GitHub Environments to scope production secrets to only the production deployment job (environment protection rules restrict access)</choice>
-        <choice letter="C">Pass each of the 15 secrets individually in the calling workflow's uses: with: section</choice>
+        <choice letter="B">Pass each of the 15 secrets individually in the calling workflow's uses: with: section</choice>
+        <choice letter="C">Use secrets: inherit in the calling workflow to pass all secrets, with the reusable workflow using GitHub Environments to scope production secrets to only the production deployment job (environment protection rules restrict access)</choice>
         <choice letter="D">Store all secrets in a vault and have each job fetch them independently</choice>
       </choices>
-      <correct-answer>B</correct-answer>
+      <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>secrets: inherit passes all caller secrets without listing them; environment-scoped secrets restrict sensitive credentials to the appropriate job.</content>
@@ -815,12 +815,12 @@
       <scenario>A security policy requires: blocking PRs that introduce dependencies with known critical vulnerabilities, generating alerts for moderate vulnerabilities (but not blocking), creating a license compliance check (no GPL-3.0 licensed dependencies allowed in this proprietary project), and providing developers with clear information about what dependency introduced the vulnerability so they can fix it quickly.</scenario>
       <question-text>Which GitHub Actions security features implement this dependency governance policy?</question-text>
       <choices>
-        <choice letter="A">Manual security review of all pull requests by the security team</choice>
-        <choice letter="B">dependency-review-action in PR workflows (fail on critical CVEs, warn on moderate, block disallowed licenses), combined with Dependabot alerts for ongoing monitoring and Dependabot security updates for automated fix PRs</choice>
+        <choice letter="A">dependency-review-action in PR workflows (fail on critical CVEs, warn on moderate, block disallowed licenses), combined with Dependabot alerts for ongoing monitoring and Dependabot security updates for automated fix PRs</choice>
+        <choice letter="B">Manual security review of all pull requests by the security team</choice>
         <choice letter="C">npm audit run in CI with --production flag only</choice>
         <choice letter="D">GitHub Advanced Security code scanning for dependency vulnerabilities</choice>
       </choices>
-      <correct-answer>B</correct-answer>
+      <correct-answer>A</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>dependency-review-action checks PRs for new vulnerabilities and license violations; Dependabot handles ongoing alerting and automated fix PRs.</content>
@@ -852,11 +852,11 @@
       <question-text>Which debugging techniques address intermittent workflow failures?</question-text>
       <choices>
         <choice letter="A">Add echo statements to every step and re-run the entire workflow</choice>
-        <choice letter="B">Enable ACTIONS_RUNNER_DEBUG and ACTIONS_STEP_DEBUG secrets for verbose logging, download runner diagnostic logs from the failed run, use "Re-run failed jobs" to retry only failing jobs, and add a diagnostic step with if: failure() that captures system state (env, df, curl health endpoints) on failure only</choice>
+        <choice letter="B">Contact GitHub support for each failure</choice>
         <choice letter="C">Delete the workflow and recreate it from scratch</choice>
-        <choice letter="D">Contact GitHub support for each failure</choice>
+        <choice letter="D">Enable ACTIONS_RUNNER_DEBUG and ACTIONS_STEP_DEBUG secrets for verbose logging, download runner diagnostic logs from the failed run, use "Re-run failed jobs" to retry only failing jobs, and add a diagnostic step with if: failure() that captures system state (env, df, curl health endpoints) on failure only</choice>
       </choices>
-      <correct-answer>B</correct-answer>
+      <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Debug secrets enable verbose logging, re-run failed jobs saves time, and if: failure() steps capture diagnostics only when things go wrong.</content>
@@ -888,11 +888,11 @@
       <question-text>Which workflow_dispatch configuration provides typed inputs with validation?</question-text>
       <choices>
         <choice letter="A">Free-text inputs with validation logic in shell scripts</choice>
-        <choice letter="B">workflow_dispatch with typed inputs: environment (type: choice, options: [dev, staging, prod]), instance_count (type: number), region (type: choice, options: [us-east-1, eu-west-1, ap-southeast-1]), config_json (type: string, required: false) — with a validation job that checks instance_count range and JSON syntax before provisioning</choice>
+        <choice letter="B">Multiple workflow files — one per environment — with hardcoded values</choice>
         <choice letter="C">A separate web application that calls the workflow via API with validated parameters</choice>
-        <choice letter="D">Multiple workflow files — one per environment — with hardcoded values</choice>
+        <choice letter="D">workflow_dispatch with typed inputs: environment (type: choice, options: [dev, staging, prod]), instance_count (type: number), region (type: choice, options: [us-east-1, eu-west-1, ap-southeast-1]), config_json (type: string, required: false) — with a validation job that checks instance_count range and JSON syntax before provisioning</choice>
       </choices>
-      <correct-answer>B</correct-answer>
+      <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>workflow_dispatch inputs support types: choice (dropdown), string, boolean, number — providing structured input collection in the GitHub UI.</content>
@@ -923,12 +923,12 @@
       <scenario>A SaaS application deploys to three environments in sequence: staging (automatic on merge to main), production-canary (5% traffic, automatic after staging passes), and production-full (95% traffic, requires manual approval). Each environment has different Kubernetes clusters, different secrets, and different deployment configurations. Rollback must be possible at any stage.</scenario>
       <question-text>Which workflow design implements sequential multi-environment deployment with gates?</question-text>
       <choices>
-        <choice letter="A">Three separate workflows triggered by different events</choice>
-        <choice letter="B">Single workflow with three jobs (staging → canary → full), each using a GitHub Environment with appropriate protection rules: staging (no protection, auto-deploy), canary (wait timer: 10 minutes for metrics observation), full (required reviewers for manual approval) — with environment-specific secrets and deployment configurations per job</choice>
+        <choice letter="A">Single workflow with three jobs (staging → canary → full), each using a GitHub Environment with appropriate protection rules: staging (no protection, auto-deploy), canary (wait timer: 10 minutes for metrics observation), full (required reviewers for manual approval) — with environment-specific secrets and deployment configurations per job</choice>
+        <choice letter="B">Three separate workflows triggered by different events</choice>
         <choice letter="C">Manual deployment by running scripts from a developer's machine per environment</choice>
         <choice letter="D">All three environments deploy simultaneously with feature flags controlling traffic</choice>
       </choices>
-      <correct-answer>B</correct-answer>
+      <correct-answer>A</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>GitHub Environments with protection rules provide: automatic deployment (no rules), wait timers (observation periods), and required reviewers (manual gates) — all in one workflow.</content>
@@ -959,12 +959,12 @@
       <scenario>A team needs an action that runs a complex static analysis tool requiring specific OS packages (libclang, LLVM 15), Python 3.11, and custom C++ binaries that take 5 minutes to compile. The action must produce consistent results regardless of the runner's pre-installed tools. Build time for the Docker image is acceptable once but the action must start quickly on subsequent uses.</scenario>
       <question-text>Which action design ensures consistent environment with fast startup after initial build?</question-text>
       <choices>
-        <choice letter="A">JavaScript action with runtime dependency installation via apt-get in a setup step</choice>
-        <choice letter="B">Docker container action with a pre-built image published to ghcr.io — action.yml references the pre-built image (image: 'docker://ghcr.io/org/analysis-tool:v1') instead of building from Dockerfile each run, providing consistent environment with fast pull-based startup</choice>
+        <choice letter="A">Docker container action with a pre-built image published to ghcr.io — action.yml references the pre-built image (image: 'docker://ghcr.io/org/analysis-tool:v1') instead of building from Dockerfile each run, providing consistent environment with fast pull-based startup</choice>
+        <choice letter="B">JavaScript action with runtime dependency installation via apt-get in a setup step</choice>
         <choice letter="C">Composite action with run: steps installing all dependencies inline</choice>
         <choice letter="D">Docker action with Dockerfile that builds from scratch on every workflow run</choice>
       </choices>
-      <correct-answer>B</correct-answer>
+      <correct-answer>A</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Pre-built Docker images on ghcr.io provide consistent environments with fast startup (just pull, no build) — reference via docker:// URI in action.yml.</content>
@@ -995,12 +995,12 @@
       <scenario>A repository's main branch must be protected: no direct pushes (all changes via PR), CI must pass before merge, at least 2 reviewers must approve, conversation threads must be resolved, the branch must be up-to-date with main before merging (no stale PRs), and force pushes and deletions must be blocked. Admins should not be able to bypass these rules.</scenario>
       <question-text>Which branch protection configuration enforces all these requirements without exceptions?</question-text>
       <choices>
-        <choice letter="A">Branch protection rule with: require PR (minimum 2 approvals, dismiss stale reviews), require status checks (CI workflow, require branches to be up to date), require conversation resolution, restrict force push and deletion, and "Do not allow bypassing" enabled to include administrators</choice>
+        <choice letter="A">Repository ruleset with the same requirements applied at organization level</choice>
         <choice letter="B">CODEOWNERS file requiring 2 approvers for all files</choice>
-        <choice letter="C">Repository ruleset with the same requirements applied at organization level</choice>
+        <choice letter="C">Branch protection rule with: require PR (minimum 2 approvals, dismiss stale reviews), require status checks (CI workflow, require branches to be up to date), require conversation resolution, restrict force push and deletion, and "Do not allow bypassing" enabled to include administrators</choice>
         <choice letter="D">Branch protection with admin bypass enabled for emergency situations</choice>
       </choices>
-      <correct-answer>A</correct-answer>
+      <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Branch protection rules combine all the listed requirements — the key is "Do not allow bypassing" which makes rules apply to admins too.</content>
@@ -1032,11 +1032,11 @@
       <question-text>Which governance model provides organization-wide workflow standardization and enforcement?</question-text>
       <choices>
         <choice letter="A">Email all developers asking them to add security scanning to their workflows</choice>
-        <choice letter="B">Required workflows (organization rulesets) that automatically inject mandatory jobs into all repository workflows, combined with reusable workflows in the .github repository for standardized patterns, and audit log monitoring for workflow file changes via organization audit events</choice>
+        <choice letter="B">Block all workflow modifications and have a central team manage all 200 repositories' workflows</choice>
         <choice letter="C">A bot that opens PRs in each repository when workflows need updating</choice>
-        <choice letter="D">Block all workflow modifications and have a central team manage all 200 repositories' workflows</choice>
+        <choice letter="D">Required workflows (organization rulesets) that automatically inject mandatory jobs into all repository workflows, combined with reusable workflows in the .github repository for standardized patterns, and audit log monitoring for workflow file changes via organization audit events</choice>
       </choices>
-      <correct-answer>B</correct-answer>
+      <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Required workflows (via rulesets) inject mandatory jobs that repositories cannot skip — combined with reusable workflows for voluntary standardization.</content>
@@ -1068,11 +1068,11 @@
       <question-text>Which error handling pattern provides retry, fallback, and graceful failure handling?</question-text>
       <choices>
         <choice letter="A">No error handling — let the workflow fail and re-run manually</choice>
-        <choice letter="B">Step with retry logic (bash loop with curl retries and sleep intervals), a subsequent step with if: failure() for the Slack fallback notification, and continue-on-error: true on the non-critical job to prevent overall workflow failure</choice>
-        <choice letter="C">Use the nick-invision/retry action for automatic retry and handle fallback in a separate workflow</choice>
+        <choice letter="B">Use the nick-invision/retry action for automatic retry and handle fallback in a separate workflow</choice>
+        <choice letter="C">Step with retry logic (bash loop with curl retries and sleep intervals), a subsequent step with if: failure() for the Slack fallback notification, and continue-on-error: true on the non-critical job to prevent overall workflow failure</choice>
         <choice letter="D">Add try-catch in the shell script and always exit 0 regardless of result</choice>
       </choices>
-      <correct-answer>B</correct-answer>
+      <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Bash retry loops handle transient errors, if: failure() triggers fallback actions, and continue-on-error prevents non-critical failures from blocking the workflow.</content>
@@ -1103,12 +1103,12 @@
       <scenario>A team manages cloud infrastructure with Terraform. Their CI/CD needs: terraform plan on every PR (showing the proposed changes as a PR comment), terraform apply only on merge to main with manual approval for production, state locking to prevent concurrent applies, and drift detection (scheduled workflow comparing actual infrastructure to Terraform state).</scenario>
       <question-text>Which GitHub Actions workflow architecture implements safe Terraform CI/CD?</question-text>
       <choices>
-        <choice letter="A">Run terraform apply on every push to any branch for fast feedback</choice>
-        <choice letter="B">PR workflow: terraform plan with output posted as PR comment (using github-script or terraform-pr-commenter). Main branch workflow: terraform apply within a production environment (required reviewer approval), with concurrency group preventing parallel applies. Scheduled workflow: terraform plan with -detailed-exitcode detecting drift and creating issues on changes.</choice>
+        <choice letter="A">PR workflow: terraform plan with output posted as PR comment (using github-script or terraform-pr-commenter). Main branch workflow: terraform apply within a production environment (required reviewer approval), with concurrency group preventing parallel applies. Scheduled workflow: terraform plan with -detailed-exitcode detecting drift and creating issues on changes.</choice>
+        <choice letter="B">Run terraform apply on every push to any branch for fast feedback</choice>
         <choice letter="C">Manual terraform apply from developer machines with state in local files</choice>
         <choice letter="D">Terraform Cloud for all operations with GitHub Actions only for triggers</choice>
       </choices>
-      <correct-answer>B</correct-answer>
+      <correct-answer>A</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Plan on PR (visibility), apply on main with approval (safety), concurrency group (prevent parallel applies), and scheduled drift detection (compliance).</content>
@@ -1140,11 +1140,11 @@
       <question-text>Which versioning strategy provides safe breaking change rollout for a widely-used action?</question-text>
       <choices>
         <choice letter="A">Push the breaking change to the existing v1 tag — all consumers get it immediately</choice>
-        <choice letter="B">Create a v2 major release (new tag v2 and v2.0.0), maintain v1 branch for security patches, update README with migration guide, and use GitHub Releases with "breaking" label to notify consumers via Dependabot PRs that suggest the v1→v2 upgrade</choice>
-        <choice letter="C">Create a new repository for v2 and archive the v1 repository</choice>
+        <choice letter="B">Create a new repository for v2 and archive the v1 repository</choice>
+        <choice letter="C">Create a v2 major release (new tag v2 and v2.0.0), maintain v1 branch for security patches, update README with migration guide, and use GitHub Releases with "breaking" label to notify consumers via Dependabot PRs that suggest the v1→v2 upgrade</choice>
         <choice letter="D">Add the new parameters alongside old ones with deprecation warnings — never remove old parameters</choice>
       </choices>
-      <correct-answer>B</correct-answer>
+      <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Major version (v1 → v2) signals breaking changes; maintain both versions; migration guide helps consumers transition at their own pace.</content>
@@ -1248,11 +1248,11 @@
       <question-text>Which artifact strategy balances retention, visibility, and cost?</question-text>
       <choices>
         <choice letter="A">Upload all artifacts with default 90-day retention regardless of type</choice>
-        <choice letter="B">Build artifacts: upload with retention-days: 90 for compliance. Test reports: upload with retention-days: 7 and use dorny/test-reporter for PR check annotation. Debug logs: upload with if: failure() and retention-days: 3 (only needed for failure investigation). Total: only necessary artifacts stored for minimum required durations.</choice>
+        <choice letter="B">Store all artifacts in an external S3 bucket instead of GitHub Artifacts</choice>
         <choice letter="C">Don't upload any artifacts — rebuild from source when needed</choice>
-        <choice letter="D">Store all artifacts in an external S3 bucket instead of GitHub Artifacts</choice>
+        <choice letter="D">Build artifacts: upload with retention-days: 90 for compliance. Test reports: upload with retention-days: 7 and use dorny/test-reporter for PR check annotation. Debug logs: upload with if: failure() and retention-days: 3 (only needed for failure investigation). Total: only necessary artifacts stored for minimum required durations.</choice>
       </choices>
-      <correct-answer>B</correct-answer>
+      <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Different artifacts have different retention needs — use retention-days to minimize storage, if: failure() for conditional upload, and test reporters for PR integration.</content>
@@ -1320,11 +1320,11 @@
       <question-text>Which approach provides rich GitHub API interaction within a workflow step?</question-text>
       <choices>
         <choice letter="A">Multiple curl commands with GITHUB_TOKEN in Authorization headers and jq for JSON parsing</choice>
-        <choice letter="B">actions/github-script with inline JavaScript — provides an authenticated octokit client (github.rest.*), access to context (context.repo, context.payload), and full Node.js for logic, error handling, and iteration over API results</choice>
-        <choice letter="C">A separate GitHub App with a webhook server processing events</choice>
+        <choice letter="B">A separate GitHub App with a webhook server processing events</choice>
+        <choice letter="C">actions/github-script with inline JavaScript — provides an authenticated octokit client (github.rest.*), access to context (context.repo, context.payload), and full Node.js for logic, error handling, and iteration over API results</choice>
         <choice letter="D">GitHub CLI (gh) commands in a shell script step for each operation</choice>
       </choices>
-      <correct-answer>B</correct-answer>
+      <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>actions/github-script provides an authenticated Octokit client with full JavaScript — ideal for complex multi-step API interactions within a workflow.</content>
@@ -1356,11 +1356,11 @@
       <question-text>Which GitHub features provide comprehensive secret leak detection, prevention, and response?</question-text>
       <choices>
         <choice letter="A">Manual code review focused on credential patterns in every PR</choice>
-        <choice letter="B">GitHub Secret Scanning (detects 200+ credential patterns in pushed code and alerts repo admins), Push Protection (blocks pushes containing detected secrets before they reach the repository), partner program (auto-revokes exposed tokens via provider notification to AWS/Azure/etc.), and security alerts routed to the security team via organization audit log streaming</choice>
-        <choice letter="C">Pre-commit hooks on developer machines scanning for patterns before commit</choice>
+        <choice letter="B">Pre-commit hooks on developer machines scanning for patterns before commit</choice>
+        <choice letter="C">GitHub Secret Scanning (detects 200+ credential patterns in pushed code and alerts repo admins), Push Protection (blocks pushes containing detected secrets before they reach the repository), partner program (auto-revokes exposed tokens via provider notification to AWS/Azure/etc.), and security alerts routed to the security team via organization audit log streaming</choice>
         <choice letter="D">Repository settings preventing pushes to main — secrets can still be pushed to feature branches</choice>
       </choices>
-      <correct-answer>B</correct-answer>
+      <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Secret scanning detects after push, push protection blocks before landing, partner program auto-revokes exposed tokens — comprehensive leak lifecycle management.</content>
@@ -1428,11 +1428,11 @@
       <question-text>Which technique enables dynamic, discovery-based workflow execution?</question-text>
       <choices>
         <choice letter="A">Hardcode all 12 services in the matrix and update manually when new services are added</choice>
-        <choice letter="B">A discover job that scans the repository for service.yml files, outputs a JSON array of service configurations, followed by a test job with matrix: ${{ fromJSON(needs.discover.outputs.services) }} — dynamically creating one matrix job per discovered service with service-specific parameters</choice>
-        <choice letter="C">A separate workflow file per service maintained by each service team</choice>
+        <choice letter="B">A separate workflow file per service maintained by each service team</choice>
+        <choice letter="C">A discover job that scans the repository for service.yml files, outputs a JSON array of service configurations, followed by a test job with matrix: ${{ fromJSON(needs.discover.outputs.services) }} — dynamically creating one matrix job per discovered service with service-specific parameters</choice>
         <choice letter="D">A script that generates workflow YAML files and commits them to .github/workflows/</choice>
       </choices>
-      <correct-answer>B</correct-answer>
+      <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>fromJSON() in matrix expressions enables dynamic matrices — a discovery job outputs a JSON array that becomes the matrix at runtime.</content>
@@ -1464,11 +1464,11 @@
       <question-text>Which combination of GitHub features and actions implements comprehensive PR automation?</question-text>
       <choices>
         <choice letter="A">Manual PR management by a designated team lead</choice>
-        <choice letter="B">CODEOWNERS file for reviewer assignment, actions/labeler for path-based labeling, a size-check step using github-script for line count warning, dependabot auto-merge configuration with auto-merge enabled on passing checks, and actions/stale for inactive PR management with 14-day warning and 30-day close</choice>
-        <choice letter="C">A single custom GitHub App handling all PR events</choice>
+        <choice letter="B">A single custom GitHub App handling all PR events</choice>
+        <choice letter="C">CODEOWNERS file for reviewer assignment, actions/labeler for path-based labeling, a size-check step using github-script for line count warning, dependabot auto-merge configuration with auto-merge enabled on passing checks, and actions/stale for inactive PR management with 14-day warning and 30-day close</choice>
         <choice letter="D">Branch protection rules with required reviewers for all automation needs</choice>
       </choices>
-      <correct-answer>B</correct-answer>
+      <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Each requirement maps to a specific GitHub feature or action: CODEOWNERS, labeler, github-script, auto-merge, and stale — combine for comprehensive PR automation.</content>
@@ -1500,11 +1500,11 @@
       <question-text>Which testing strategy provides comprehensive quality assurance for a GitHub Action?</question-text>
       <choices>
         <choice letter="A">Test the action manually by running it in a test repository before each release</choice>
-        <choice letter="B">CI workflow in the action's repository: unit tests (Jest for JS actions, or script-based for composite), integration test workflow that calls the action locally (uses: ./) with known inputs and asserts expected outputs, matrix strategy testing on [ubuntu-latest, windows-latest, macos-latest], and automated release workflow triggered on main branch push after all tests pass</choice>
-        <choice letter="C">Only test in consumer repositories after release — fix issues in patch releases</choice>
+        <choice letter="B">Only test in consumer repositories after release — fix issues in patch releases</choice>
+        <choice letter="C">CI workflow in the action's repository: unit tests (Jest for JS actions, or script-based for composite), integration test workflow that calls the action locally (uses: ./) with known inputs and asserts expected outputs, matrix strategy testing on [ubuntu-latest, windows-latest, macos-latest], and automated release workflow triggered on main branch push after all tests pass</choice>
         <choice letter="D">Code review only without automated testing</choice>
       </choices>
-      <correct-answer>B</correct-answer>
+      <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Actions need CI too: unit tests for logic, integration tests using uses: ./ (self-referencing), cross-OS matrix, and automated release on green.</content>
@@ -1572,11 +1572,11 @@
       <question-text>Which configuration enables GitHub Actions in an air-gapped GHES environment?</question-text>
       <choices>
         <choice letter="A">Connect GHES to github.com via a proxy for action downloads</choice>
-        <choice letter="B">Self-hosted runners on internal infrastructure, actions-sync tool to mirror actions from github.com to the internal GHES instance, internal action repositories for custom actions, and pre-cached tool versions on runners (since setup-* actions cannot download from internet)</choice>
+        <choice letter="B">Disable Actions entirely and use Jenkins for CI/CD</choice>
         <choice letter="C">Use GitHub.com hosted runners that VPN back to the enterprise network</choice>
-        <choice letter="D">Disable Actions entirely and use Jenkins for CI/CD</choice>
+        <choice letter="D">Self-hosted runners on internal infrastructure, actions-sync tool to mirror actions from github.com to the internal GHES instance, internal action repositories for custom actions, and pre-cached tool versions on runners (since setup-* actions cannot download from internet)</choice>
       </choices>
-      <correct-answer>B</correct-answer>
+      <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Air-gapped GHES: self-hosted runners (no hosted runners available), mirrored actions (no github.com access), and pre-cached tools (no internet downloads).</content>
@@ -1608,11 +1608,11 @@
       <question-text>Which pattern coordinates multiple dependent workflows into a pipeline?</question-text>
       <choices>
         <choice letter="A">All logic in a single massive workflow file</choice>
-        <choice letter="B">workflow_run trigger chaining: build triggers on push, security-scan triggers on workflow_run (workflow: build, types: completed, conclusion: success), deploy triggers on workflow_run (workflow: security-scan, conclusion: success) with environment approval gate, and notify triggers on workflow_run (workflow: deploy) for both success and failure outcomes — passing artifacts between workflows via the triggering workflow's artifacts</choice>
-        <choice letter="C">Cron schedules aligned so workflows run in the correct order by timing</choice>
+        <choice letter="B">Cron schedules aligned so workflows run in the correct order by timing</choice>
+        <choice letter="C">workflow_run trigger chaining: build triggers on push, security-scan triggers on workflow_run (workflow: build, types: completed, conclusion: success), deploy triggers on workflow_run (workflow: security-scan, conclusion: success) with environment approval gate, and notify triggers on workflow_run (workflow: deploy) for both success and failure outcomes — passing artifacts between workflows via the triggering workflow's artifacts</choice>
         <choice letter="D">Manual triggering of each workflow in sequence by a release manager</choice>
       </choices>
-      <correct-answer>B</correct-answer>
+      <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>workflow_run trigger creates event-driven chains between workflows — each workflow runs when its predecessor completes with the expected conclusion.</content>
@@ -1644,11 +1644,11 @@
       <question-text>Which workflow architecture deploys to both clouds with OIDC authentication?</question-text>
       <choices>
         <choice letter="A">Two completely separate workflows — one per cloud — triggered independently</choice>
-        <choice letter="B">Single workflow: build job (produces image), parallel deploy jobs (deploy-aws and deploy-gcp) each with OIDC authentication to their respective cloud (separate IAM role/workload identity configurations), push image to both registries, apply Kubernetes manifests to both clusters, and a final health-check job that verifies both deployments (needs: [deploy-aws, deploy-gcp])</choice>
-        <choice letter="C">Deploy to AWS first, then replicate the entire deployment to GCP using a migration tool</choice>
+        <choice letter="B">Deploy to AWS first, then replicate the entire deployment to GCP using a migration tool</choice>
+        <choice letter="C">Single workflow: build job (produces image), parallel deploy jobs (deploy-aws and deploy-gcp) each with OIDC authentication to their respective cloud (separate IAM role/workload identity configurations), push image to both registries, apply Kubernetes manifests to both clusters, and a final health-check job that verifies both deployments (needs: [deploy-aws, deploy-gcp])</choice>
         <choice letter="D">Use a multi-cloud deployment platform (Spinnaker) triggered by the workflow</choice>
       </choices>
-      <correct-answer>B</correct-answer>
+      <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Build once, deploy to both clouds in parallel with separate OIDC credentials, then verify both — single workflow with cloud-specific jobs.</content>
@@ -1680,11 +1680,11 @@
       <question-text>Which workflow handles independent package versioning and publishing from a monorepo?</question-text>
       <choices>
         <choice letter="A">Publish all packages on every merge regardless of changes</choice>
-        <choice letter="B">Changesets or Lerna-based workflow: detect changed packages, determine version bumps per-package from commit messages, publish only changed packages to GitHub Packages npm registry (registry-url: https://npm.pkg.github.com) using GITHUB_TOKEN, with package.json publishConfig pointing to GitHub Packages scope</choice>
-        <choice letter="C">Manual version bumping in each package.json before merge</choice>
+        <choice letter="B">Manual version bumping in each package.json before merge</choice>
+        <choice letter="C">Changesets or Lerna-based workflow: detect changed packages, determine version bumps per-package from commit messages, publish only changed packages to GitHub Packages npm registry (registry-url: https://npm.pkg.github.com) using GITHUB_TOKEN, with package.json publishConfig pointing to GitHub Packages scope</choice>
         <choice letter="D">Publish to npmjs.com only — GitHub Packages not used</choice>
       </choices>
-      <correct-answer>B</correct-answer>
+      <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Changesets/Lerna handle per-package versioning in monorepos; GitHub Packages npm registry provides scoped package hosting authenticated via GITHUB_TOKEN.</content>
@@ -1715,12 +1715,12 @@
       <scenario>A compliance-regulated company needs deployment gates beyond simple reviewer approval: deployments to production must only occur during business hours (9 AM - 5 PM weekdays), a third-party change management system (ServiceNow) must have an approved change request, and the deployment must pass an external security validation API before proceeding. Standard GitHub environment protection rules (reviewers, wait timer) are insufficient.</scenario>
       <question-text>Which feature extends environment protection beyond built-in rules?</question-text>
       <choices>
-        <choice letter="A">Branch protection rules with additional checks</choice>
-        <choice letter="B">Custom deployment protection rules — GitHub Apps that implement the deployment protection rule API, receiving callbacks before deployments proceed and responding with approve/reject based on external validation (business hours check, ServiceNow approval status, security API result)</choice>
+        <choice letter="A">Custom deployment protection rules — GitHub Apps that implement the deployment protection rule API, receiving callbacks before deployments proceed and responding with approve/reject based on external validation (business hours check, ServiceNow approval status, security API result)</choice>
+        <choice letter="B">Branch protection rules with additional checks</choice>
         <choice letter="C">A manual checklist in the PR description that reviewers must verify</choice>
         <choice letter="D">A pre-deployment workflow that checks conditions and fails if not met</choice>
       </choices>
-      <correct-answer>B</correct-answer>
+      <correct-answer>A</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Custom deployment protection rules allow GitHub Apps to gate deployments based on arbitrary external conditions — extending beyond built-in reviewers and timers.</content>
@@ -1752,11 +1752,11 @@
       <question-text>Which mechanism provides organization-level workflow templates discoverable by all repositories?</question-text>
       <choices>
         <choice letter="A">A wiki page with copy-paste workflow snippets</choice>
-        <choice letter="B">Starter workflows in the organization's .github repository: workflow templates in .github/workflow-templates/ with companion properties.json files defining name, description, icon, categories, and file patterns for auto-suggestion — visible to all repos in the "Actions" tab "New workflow" page</choice>
-        <choice letter="C">Template repositories that developers fork when starting new projects</choice>
+        <choice letter="B">Template repositories that developers fork when starting new projects</choice>
+        <choice letter="C">Starter workflows in the organization's .github repository: workflow templates in .github/workflow-templates/ with companion properties.json files defining name, description, icon, categories, and file patterns for auto-suggestion — visible to all repos in the "Actions" tab "New workflow" page</choice>
         <choice letter="D">Required workflows that enforce a single workflow on all repositories regardless of type</choice>
       </choices>
-      <correct-answer>B</correct-answer>
+      <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Starter workflows in .github/workflow-templates/ appear as templates when any org repository creates a new workflow — discoverable and customizable.</content>
@@ -1788,11 +1788,11 @@
       <question-text>Which API capabilities enable programmatic workflow management for the developer portal?</question-text>
       <choices>
         <choice letter="A">SSH into runners and manage processes directly</choice>
-        <choice letter="B">GitHub REST API with a GitHub App (installation token) for authentication: POST /repos/.../actions/workflows/.../dispatches to trigger, GET /repos/.../actions/runs for status monitoring, POST /repos/.../actions/runs/.../cancel to abort, and GET /repos/.../actions/artifacts/.../zip for downloads — all auditable via the app's installation log</choice>
-        <choice letter="C">GitHub CLI (gh) running on a shared server with a stored PAT</choice>
+        <choice letter="B">GitHub CLI (gh) running on a shared server with a stored PAT</choice>
+        <choice letter="C">GitHub REST API with a GitHub App (installation token) for authentication: POST /repos/.../actions/workflows/.../dispatches to trigger, GET /repos/.../actions/runs for status monitoring, POST /repos/.../actions/runs/.../cancel to abort, and GET /repos/.../actions/artifacts/.../zip for downloads — all auditable via the app's installation log</choice>
         <choice letter="D">Webhooks only — no programmatic triggering or management possible</choice>
       </choices>
-      <correct-answer>B</correct-answer>
+      <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>The GitHub REST API provides full programmatic control over workflows — GitHub Apps provide secure, auditable, scoped authentication for automation platforms.</content>

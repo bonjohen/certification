@@ -146,15 +146,15 @@ Open  -->  Started  -->  Completed
 
 | Task | Status | Started (PST) | Completed (PST) | Description |
 |------|--------|---------------|------------------|-------------|
-| 5.1 | Open | | | `index.html` — Verify study guide counts are correct for AWS, Azure, GCP, GitHub |
-| 5.2 | Open | | | Run `node scripts/validate-xml.js` — all files pass |
-| 5.3 | Open | | | Run `npx vitest run` — all tests pass |
-| 5.4 | Open | | | Run `python scripts/randomize_answers.py --show-current` — verify answer distributions |
-| 5.5 | Open | | | Stage and commit |
+| 5.1 | Completed | 2026-05-05 09:48 AM | 2026-05-05 09:48 AM | `index.html` — Verify study guide counts are correct for AWS, Azure, GCP, GitHub |
+| 5.2 | Completed | 2026-05-05 09:48 AM | 2026-05-05 09:49 AM | Run `node scripts/validate-xml.js` — all files pass |
+| 5.3 | Completed | 2026-05-05 09:49 AM | 2026-05-05 09:49 AM | Run `npx vitest run` — all tests pass |
+| 5.4 | Completed | 2026-05-05 09:49 AM | 2026-05-05 09:50 AM | Run `python scripts/randomize_answers.py --show-current` — verify answer distributions |
+| 5.5 | Completed | 2026-05-05 09:50 AM | 2026-05-05 09:50 AM | Stage and commit |
 
 ### Phase 5 Summary
 
-- **Changes:** TBD
+- **Changes:** Verified index.html counts (all correct), ran randomize_answers.py on all files, all 50 XML files pass validation, all 172 tests pass
 - **Commit:** `Final validation: verify counts, tests, answer distributions for 4 new exams`
 
 ---

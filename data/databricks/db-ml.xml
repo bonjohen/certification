@@ -24,12 +24,12 @@
       <scenario>A data scientist has loaded a large customer transactions dataset into a Spark DataFrame on Databricks. Before building any models, they need to understand the distribution of numerical columns like transaction_amount and customer_age.</scenario>
       <question-text>Which Spark DataFrame method provides summary statistics including count, mean, standard deviation, min, and max for numerical columns?</question-text>
       <choices>
-        <choice letter="A">df.describe()</choice>
+        <choice letter="A">df.printSchema()</choice>
         <choice letter="B">df.schema()</choice>
-        <choice letter="C">df.printSchema()</choice>
+        <choice letter="C">df.describe()</choice>
         <choice letter="D">df.dtypes()</choice>
       </choices>
-      <correct-answer>A</correct-answer>
+      <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Think about which method computes aggregate statistics rather than just showing structural metadata about the DataFrame.</content>
@@ -60,11 +60,11 @@
       <question-text>Which approach correctly fills missing numerical values with the column mean while filling missing categorical values with the mode in Spark?</question-text>
       <choices>
         <choice letter="A">Use df.na.drop() to remove all rows with any null values</choice>
-        <choice letter="B">Use df.fillna() with a dictionary mapping column names to their respective computed mean or mode values</choice>
-        <choice letter="C">Use df.replace() to swap null values with zeros across all columns</choice>
+        <choice letter="B">Use df.replace() to swap null values with zeros across all columns</choice>
+        <choice letter="C">Use df.fillna() with a dictionary mapping column names to their respective computed mean or mode values</choice>
         <choice letter="D">Use df.filter() to select only rows where all columns are non-null</choice>
       </choices>
-      <correct-answer>B</correct-answer>
+      <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Consider which method allows you to specify different fill values for different columns based on their data type.</content>
@@ -131,10 +131,10 @@
       <choices>
         <choice letter="A">The display() function with the profile=True parameter</choice>
         <choice letter="B">The ANALYZE TABLE command with COMPUTE STATISTICS</choice>
-        <choice letter="C">The df.summary() method with extended statistics</choice>
-        <choice letter="D">The dbutils.data.summarize() function</choice>
+        <choice letter="C">The dbutils.data.summarize() function</choice>
+        <choice letter="D">The df.summary() method with extended statistics</choice>
       </choices>
-      <correct-answer>D</correct-answer>
+      <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Consider which option is specifically designed to produce visual profiling output with histograms and data quality indicators in Databricks notebooks.</content>
@@ -164,12 +164,12 @@
       <scenario>A data scientist is preparing features for a regression model predicting housing prices. They have 50 numerical features and suspect many are highly correlated. They want to identify and remove redundant features to reduce multicollinearity before training.</scenario>
       <question-text>Which approach is most appropriate for identifying and handling highly correlated features in a large Spark DataFrame?</question-text>
       <choices>
-        <choice letter="A">Use Spark MLlib's Correlation.corr() to compute a correlation matrix and drop one feature from each pair exceeding a threshold</choice>
+        <choice letter="A">Remove all features with a standard deviation below 0.1</choice>
         <choice letter="B">Use VectorAssembler to combine all features and let the model handle collinearity automatically</choice>
-        <choice letter="C">Remove all features with a standard deviation below 0.1</choice>
+        <choice letter="C">Use Spark MLlib's Correlation.corr() to compute a correlation matrix and drop one feature from each pair exceeding a threshold</choice>
         <choice letter="D">Apply PCA to all features and use only the first principal component</choice>
       </choices>
-      <correct-answer>A</correct-answer>
+      <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Think about which approach directly measures the linear relationship between pairs of features and gives you control over which to remove.</content>
@@ -199,12 +199,12 @@
       <scenario>A fraud detection team discovers that only 0.2% of transactions in their 10-million-row dataset are fraudulent. Standard model training yields 99.8% accuracy but near-zero recall on fraud cases. They need to address this severe class imbalance during data preparation.</scenario>
       <question-text>Which combination of techniques is most effective for handling severe class imbalance in a Spark-based ML pipeline?</question-text>
       <choices>
-        <choice letter="A">Use stratified sampling to maintain class proportions in train/test splits, and apply SMOTE or class weights during training</choice>
+        <choice letter="A">Remove all majority class samples until classes are balanced, then train normally</choice>
         <choice letter="B">Increase the decision threshold to 0.99 to reduce false positives</choice>
-        <choice letter="C">Remove all majority class samples until classes are balanced, then train normally</choice>
+        <choice letter="C">Use stratified sampling to maintain class proportions in train/test splits, and apply SMOTE or class weights during training</choice>
         <choice letter="D">Convert the problem to unsupervised anomaly detection and ignore labels entirely</choice>
       </choices>
-      <correct-answer>A</correct-answer>
+      <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Think about which approach preserves representative data in evaluation sets while compensating for imbalance during the learning process.</content>
@@ -235,11 +235,11 @@
       <question-text>Which code correctly reads a Delta table into a Spark DataFrame for ML exploration?</question-text>
       <choices>
         <choice letter="A">df = spark.read.csv("/mnt/data/customers_delta")</choice>
-        <choice letter="B">df = spark.read.parquet("/mnt/data/customers_delta")</choice>
-        <choice letter="C">df = spark.read.format("delta").load("/mnt/data/customers_delta")</choice>
+        <choice letter="B">df = spark.read.format("delta").load("/mnt/data/customers_delta")</choice>
+        <choice letter="C">df = spark.read.parquet("/mnt/data/customers_delta")</choice>
         <choice letter="D">df = spark.read.json("/mnt/data/customers_delta")</choice>
       </choices>
-      <correct-answer>C</correct-answer>
+      <correct-answer>B</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Consider which format specification matches the storage format that supports ACID transactions and time travel on Databricks.</content>
@@ -270,11 +270,11 @@
       <question-text>Which approach is most suitable for detecting multivariate outliers in a large Spark DataFrame?</question-text>
       <choices>
         <choice letter="A">Compute z-scores for each column independently and flag rows where any column exceeds 3 standard deviations</choice>
-        <choice letter="B">Apply Isolation Forest from scikit-learn by collecting all data to the driver with toPandas()</choice>
+        <choice letter="B">Use Spark MLlib to train a clustering model (e.g., KMeans) and flag points far from their nearest cluster centroid</choice>
         <choice letter="C">Remove all rows where any numerical value falls outside the interquartile range</choice>
-        <choice letter="D">Use Spark MLlib to train a clustering model (e.g., KMeans) and flag points far from their nearest cluster centroid</choice>
+        <choice letter="D">Apply Isolation Forest from scikit-learn by collecting all data to the driver with toPandas()</choice>
       </choices>
-      <correct-answer>D</correct-answer>
+      <correct-answer>B</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Think about which method can capture interactions between multiple features while remaining scalable on distributed data.</content>
@@ -304,12 +304,12 @@
       <scenario>A data scientist is building a logistic regression model in Spark MLlib to predict customer churn. The dataset contains a categorical column called subscription_plan with values "basic", "standard", and "premium". Logistic regression requires numerical input features.</scenario>
       <question-text>What is the correct sequence of Spark MLlib transformers to convert the subscription_plan string column into a numerical representation suitable for logistic regression?</question-text>
       <choices>
-        <choice letter="A">Apply OneHotEncoder directly to the string column</choice>
+        <choice letter="A">Apply StringIndexer to convert strings to indices, then OneHotEncoder to create binary vectors</choice>
         <choice letter="B">Apply VectorAssembler to combine subscription_plan with other features directly</choice>
-        <choice letter="C">Apply StringIndexer to convert strings to indices, then OneHotEncoder to create binary vectors</choice>
+        <choice letter="C">Apply OneHotEncoder directly to the string column</choice>
         <choice letter="D">Apply Tokenizer to split subscription_plan into tokens, then HashingTF</choice>
       </choices>
-      <correct-answer>C</correct-answer>
+      <correct-answer>A</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Consider which transformer first maps categorical string values to numeric indices, which is required before binary vector encoding in Spark MLlib.</content>
@@ -374,12 +374,12 @@
       <scenario>A team of data scientists frequently recomputes the same customer features (recency, frequency, monetary value) for different ML projects. Each project has slightly different feature definitions, leading to inconsistencies. The team wants to establish a single source of truth for shared features.</scenario>
       <question-text>What is the primary benefit of using the Databricks Feature Store with Unity Catalog for managing ML features?</question-text>
       <choices>
-        <choice letter="A">It automatically selects the best features for each model using built-in feature importance</choice>
-        <choice letter="B">It provides a centralized, governed repository where features are defined once, versioned, and reused across ML projects with consistent definitions</choice>
+        <choice letter="A">It provides a centralized, governed repository where features are defined once, versioned, and reused across ML projects with consistent definitions</choice>
+        <choice letter="B">It automatically selects the best features for each model using built-in feature importance</choice>
         <choice letter="C">It replaces the need for feature engineering by generating features automatically from raw data</choice>
         <choice letter="D">It stores only the feature computation code, not the actual feature values</choice>
       </choices>
-      <correct-answer>B</correct-answer>
+      <correct-answer>A</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Think about which answer addresses the core problem of inconsistent feature definitions across multiple projects.</content>
@@ -409,12 +409,12 @@
       <scenario>A data scientist has prepared several numerical feature columns (age, income, credit_score, account_tenure) in a Spark DataFrame. They need to combine these into a single feature vector column that Spark MLlib models can accept as input.</scenario>
       <question-text>Which Spark MLlib transformer combines multiple numerical columns into a single vector column for model training?</question-text>
       <choices>
-        <choice letter="A">VectorAssembler</choice>
-        <choice letter="B">VectorIndexer</choice>
+        <choice letter="A">VectorIndexer</choice>
+        <choice letter="B">VectorAssembler</choice>
         <choice letter="C">FeatureHasher</choice>
         <choice letter="D">SQLTransformer</choice>
       </choices>
-      <correct-answer>A</correct-answer>
+      <correct-answer>B</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Consider which transformer is specifically designed to merge multiple individual columns into a single dense or sparse vector column.</content>
@@ -479,12 +479,12 @@
       <scenario>A data scientist is building features for a customer lifetime value model. They need to create rolling aggregates such as the average transaction amount over the last 30 days and the total number of transactions in the last 90 days for each customer.</scenario>
       <question-text>Which Spark feature is most appropriate for computing rolling window aggregates partitioned by customer and ordered by transaction date?</question-text>
       <choices>
-        <choice letter="A">Window functions with partitionBy() and rangeBetween() to define time-based rolling windows</choice>
+        <choice letter="A">CrossJoin between the transactions table and a calendar table</choice>
         <choice letter="B">GroupBy with agg() to compute aggregates per customer</choice>
-        <choice letter="C">CrossJoin between the transactions table and a calendar table</choice>
+        <choice letter="C">Window functions with partitionBy() and rangeBetween() to define time-based rolling windows</choice>
         <choice letter="D">UDF (User Defined Function) that iterates through each customer's transactions in a loop</choice>
       </choices>
-      <correct-answer>A</correct-answer>
+      <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Consider which Spark feature allows you to define a sliding window over ordered rows within each group.</content>
@@ -551,10 +551,10 @@
       <choices>
         <choice letter="A">By reading directly from the Delta table on each prediction request</choice>
         <choice letter="B">By caching all features in the serving endpoint's memory at deployment time</choice>
-        <choice letter="C">By pre-computing all possible feature combinations and storing them as a lookup table</choice>
-        <choice letter="D">By publishing features to an online store (e.g., Cosmos DB or DynamoDB) that the serving endpoint queries at prediction time</choice>
+        <choice letter="C">By publishing features to an online store (e.g., Cosmos DB or DynamoDB) that the serving endpoint queries at prediction time</choice>
+        <choice letter="D">By pre-computing all possible feature combinations and storing them as a lookup table</choice>
       </choices>
-      <correct-answer>D</correct-answer>
+      <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Think about which architecture separates the offline feature computation store from a low-latency online store optimized for real-time key-value lookups.</content>
@@ -584,12 +584,12 @@
       <scenario>A business analyst with limited ML experience needs to quickly build a baseline model for predicting customer churn. They have a clean labeled dataset in a Delta table but are unsure which algorithm to choose or how to tune hyperparameters.</scenario>
       <question-text>What does Databricks AutoML provide when given a labeled dataset and a prediction target column?</question-text>
       <choices>
-        <choice letter="A">Automated trial runs across multiple algorithms and hyperparameters, producing ranked models with editable source notebooks</choice>
+        <choice letter="A">An automated data collection pipeline that gathers additional training data from external sources</choice>
         <choice letter="B">A single pre-trained deep learning model ready for production deployment</choice>
-        <choice letter="C">An automated data collection pipeline that gathers additional training data from external sources</choice>
+        <choice letter="C">Automated trial runs across multiple algorithms and hyperparameters, producing ranked models with editable source notebooks</choice>
         <choice letter="D">A pre-built REST API endpoint that immediately serves predictions without any model training</choice>
       </choices>
-      <correct-answer>A</correct-answer>
+      <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Consider which option describes an automated experimentation process that tries different approaches and gives you transparent, reproducible results.</content>
@@ -620,11 +620,11 @@
       <question-text>Which Spark MLlib construct ensures that all preprocessing and model training steps are executed as a single, reproducible unit?</question-text>
       <choices>
         <choice letter="A">Chaining each transformer's transform() method manually in sequence</choice>
-        <choice letter="B">Using a Spark MLlib Pipeline that encapsulates all stages and is fit/transformed as one object</choice>
+        <choice letter="B">Writing a custom Python function that calls each step and returns the final prediction</choice>
         <choice letter="C">Saving each transformer separately and loading them individually at inference time</choice>
-        <choice letter="D">Writing a custom Python function that calls each step and returns the final prediction</choice>
+        <choice letter="D">Using a Spark MLlib Pipeline that encapsulates all stages and is fit/transformed as one object</choice>
       </choices>
-      <correct-answer>B</correct-answer>
+      <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Think about which construct provides a single object that manages the entire sequence of transformations and model training.</content>
@@ -654,12 +654,12 @@
       <scenario>A data scientist is training an XGBoost model and needs to tune hyperparameters including max_depth (3-10), learning_rate (0.01-0.3), and n_estimators (100-1000). Grid search over all combinations would require thousands of trials and take too long.</scenario>
       <question-text>Why is Hyperopt with Tree-structured Parzen Estimator (TPE) more efficient than grid search for hyperparameter tuning on Databricks?</question-text>
       <choices>
-        <choice letter="A">TPE evaluates every possible combination of hyperparameters in parallel</choice>
+        <choice letter="A">TPE uses results from previous trials to focus the search on promising regions of the hyperparameter space</choice>
         <choice letter="B">TPE only evaluates the boundary values of each hyperparameter range</choice>
         <choice letter="C">TPE uses a fixed set of pre-optimized hyperparameters for each model type</choice>
-        <choice letter="D">TPE uses results from previous trials to focus the search on promising regions of the hyperparameter space</choice>
+        <choice letter="D">TPE evaluates every possible combination of hyperparameters in parallel</choice>
       </choices>
-      <correct-answer>D</correct-answer>
+      <correct-answer>A</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Consider which strategy uses information from completed evaluations to make intelligent decisions about which hyperparameters to try next.</content>
@@ -724,12 +724,12 @@
       <scenario>A data scientist wants to evaluate a Gradient Boosted Tree classifier using cross-validation to get a reliable estimate of model performance. They have a Spark MLlib Pipeline with preprocessing stages and the GBTClassifier as the final stage.</scenario>
       <question-text>Which Spark MLlib class performs k-fold cross-validation with hyperparameter tuning on a Pipeline?</question-text>
       <choices>
-        <choice letter="A">TrainValidationSplit, which uses a single random train/validation split</choice>
-        <choice letter="B">CrossValidator, which splits data into k folds, trains on k-1 folds, and validates on the remaining fold</choice>
+        <choice letter="A">CrossValidator, which splits data into k folds, trains on k-1 folds, and validates on the remaining fold</choice>
+        <choice letter="B">TrainValidationSplit, which uses a single random train/validation split</choice>
         <choice letter="C">RegressionEvaluator, which computes regression metrics on a holdout set</choice>
         <choice letter="D">ParamGridBuilder, which defines the hyperparameter search space</choice>
       </choices>
-      <correct-answer>B</correct-answer>
+      <correct-answer>A</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Think about which class implements the standard k-fold cross-validation procedure where every data point serves as both training and validation data across different folds.</content>
@@ -760,11 +760,11 @@
       <question-text>Which Databricks approach enables parallel training of multiple independent models across a Spark cluster?</question-text>
       <choices>
         <choice letter="A">Train a single global model on all stores' data combined</choice>
-        <choice letter="B">Use a pandas UDF with applyInPandas() to train a separate model for each store partition in parallel across workers</choice>
-        <choice letter="C">Submit 500 separate Databricks jobs, one per store, through the Jobs API</choice>
+        <choice letter="B">Submit 500 separate Databricks jobs, one per store, through the Jobs API</choice>
+        <choice letter="C">Use a pandas UDF with applyInPandas() to train a separate model for each store partition in parallel across workers</choice>
         <choice letter="D">Use Spark MLlib's built-in multi-model training API</choice>
       </choices>
-      <correct-answer>B</correct-answer>
+      <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Consider which approach uses Spark's partitioning to distribute grouped data to workers where each worker trains an independent model on its partition.</content>
@@ -794,12 +794,12 @@
       <scenario>A data scientist is training a Random Forest model for binary classification using Spark MLlib. They have assembled features into a vector column called "features" and the label column is "churn". They want to configure the model with 100 trees and a maximum depth of 10.</scenario>
       <question-text>Which code correctly configures and trains a Random Forest classifier in Spark MLlib?</question-text>
       <choices>
-        <choice letter="A">RandomForestClassifier(featuresCol="features", labelCol="churn", numTrees=100, maxDepth=10).fit(train_df)</choice>
+        <choice letter="A">DecisionTreeClassifier(featuresCol="features", labelCol="churn", maxDepth=10).fit(train_df)</choice>
         <choice letter="B">RandomForestClassifier(featuresCol="features", labelCol="churn", numTrees=100, maxDepth=10).transform(train_df)</choice>
         <choice letter="C">RandomForestRegressor(featuresCol="features", labelCol="churn", numTrees=100, maxDepth=10).fit(train_df)</choice>
-        <choice letter="D">DecisionTreeClassifier(featuresCol="features", labelCol="churn", maxDepth=10).fit(train_df)</choice>
+        <choice letter="D">RandomForestClassifier(featuresCol="features", labelCol="churn", numTrees=100, maxDepth=10).fit(train_df)</choice>
       </choices>
-      <correct-answer>A</correct-answer>
+      <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Think about which option uses the correct classifier class for binary classification with the fit() method for training, not transform().</content>
@@ -830,11 +830,11 @@
       <question-text>Which technique best addresses data skew to improve distributed training performance in Spark?</question-text>
       <choices>
         <choice letter="A">Increase the driver memory to handle the large partition</choice>
-        <choice letter="B">Use salting — add a random prefix to the skewed key to distribute data more evenly across partitions before training</choice>
-        <choice letter="C">Reduce the number of worker nodes to minimize coordination overhead</choice>
+        <choice letter="B">Reduce the number of worker nodes to minimize coordination overhead</choice>
+        <choice letter="C">Use salting — add a random prefix to the skewed key to distribute data more evenly across partitions before training</choice>
         <choice letter="D">Switch from Spark MLlib to scikit-learn to avoid distributed training entirely</choice>
       </choices>
-      <correct-answer>B</correct-answer>
+      <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Think about which technique artificially breaks up a dominant partition into smaller, more evenly sized chunks across workers.</content>
@@ -864,12 +864,12 @@
       <scenario>A data scientist has a labeled Spark DataFrame and needs to split it into training and test sets before model training. They want 80% of the data for training and 20% for testing, with a reproducible split.</scenario>
       <question-text>Which Spark DataFrame method splits data into training and test sets with a specified ratio and random seed?</question-text>
       <choices>
-        <choice letter="A">df.sample(fraction=0.8, seed=42)</choice>
+        <choice letter="A">df.randomSplit([0.8, 0.2], seed=42)</choice>
         <choice letter="B">df.limit(int(df.count() * 0.8))</choice>
-        <choice letter="C">df.randomSplit([0.8, 0.2], seed=42)</choice>
+        <choice letter="C">df.sample(fraction=0.8, seed=42)</choice>
         <choice letter="D">df.filter(col("row_number") &lt;= df.count() * 0.8)</choice>
       </choices>
-      <correct-answer>C</correct-answer>
+      <correct-answer>A</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Consider which method returns multiple DataFrames with the specified proportions in a single call, ensuring no overlap between splits.</content>
@@ -900,11 +900,11 @@
       <question-text>Which evaluation metric should be prioritized when the cost of false negatives is much higher than the cost of false positives?</question-text>
       <choices>
         <choice letter="A">Precision, which measures the proportion of predicted positives that are actually positive</choice>
-        <choice letter="B">Accuracy, which measures the proportion of all correct predictions</choice>
-        <choice letter="C">Recall, which measures the proportion of actual positives that are correctly identified</choice>
+        <choice letter="B">Recall, which measures the proportion of actual positives that are correctly identified</choice>
+        <choice letter="C">Accuracy, which measures the proportion of all correct predictions</choice>
         <choice letter="D">Specificity, which measures the proportion of actual negatives that are correctly identified</choice>
       </choices>
-      <correct-answer>C</correct-answer>
+      <correct-answer>B</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Think about which metric directly measures how well the model catches all actual positive cases, minimizing missed positives.</content>
@@ -934,12 +934,12 @@
       <scenario>A data scientist has trained three different binary classification models (Logistic Regression, Random Forest, Gradient Boosted Trees) and needs to compare their overall discrimination ability across all possible classification thresholds.</scenario>
       <question-text>Which metric provides a threshold-independent measure of a binary classifier's ability to distinguish between positive and negative classes?</question-text>
       <choices>
-        <choice letter="A">F1 score at the default 0.5 threshold</choice>
+        <choice letter="A">Area Under the ROC Curve (AUC-ROC), which measures discrimination across all thresholds</choice>
         <choice letter="B">Accuracy computed on the test set with default predictions</choice>
         <choice letter="C">Log loss computed on the training set</choice>
-        <choice letter="D">Area Under the ROC Curve (AUC-ROC), which measures discrimination across all thresholds</choice>
+        <choice letter="D">F1 score at the default 0.5 threshold</choice>
       </choices>
-      <correct-answer>D</correct-answer>
+      <correct-answer>A</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Consider which metric evaluates model performance across the entire range of classification thresholds rather than at a single fixed threshold.</content>
@@ -1039,12 +1039,12 @@
       <scenario>A data scientist notices that their Gradient Boosted Tree model achieves 99.5% accuracy on the training set but only 72% accuracy on the test set. They suspect the model has memorized the training data rather than learning generalizable patterns.</scenario>
       <question-text>Which approach is most effective for reducing overfitting in a gradient boosted tree model?</question-text>
       <choices>
-        <choice letter="A">Increase maxDepth and numTrees to make the model more complex</choice>
+        <choice letter="A">Reduce maxDepth, increase minInstancesPerNode, and apply early stopping based on validation loss</choice>
         <choice letter="B">Remove the test set and train on all available data</choice>
         <choice letter="C">Add more features to give the model more information to learn from</choice>
-        <choice letter="D">Reduce maxDepth, increase minInstancesPerNode, and apply early stopping based on validation loss</choice>
+        <choice letter="D">Increase maxDepth and numTrees to make the model more complex</choice>
       </choices>
-      <correct-answer>D</correct-answer>
+      <correct-answer>A</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Think about which techniques constrain model complexity and stop training before the model begins memorizing noise in the training data.</content>
@@ -1076,10 +1076,10 @@
       <choices>
         <choice letter="A">Micro-averaged F1, which computes F1 from global TP, FP, and FN counts</choice>
         <choice letter="B">Weighted-averaged F1, which weights each class's F1 by its support (sample count)</choice>
-        <choice letter="C">Binary F1, which only evaluates the positive class in binary classification</choice>
-        <choice letter="D">Macro-averaged F1, which computes F1 for each class independently and then takes the unweighted mean</choice>
+        <choice letter="C">Macro-averaged F1, which computes F1 for each class independently and then takes the unweighted mean</choice>
+        <choice letter="D">Binary F1, which only evaluates the positive class in binary classification</choice>
       </choices>
-      <correct-answer>D</correct-answer>
+      <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Think about which averaging method treats all classes equally, so poor performance on a small class affects the overall score as much as poor performance on a large class.</content>
@@ -1111,10 +1111,10 @@
       <choices>
         <choice letter="A">The model is overfitting — it needs more regularization or less complexity</choice>
         <choice letter="B">The training data has too many outliers that need to be removed</choice>
-        <choice letter="C">The model needs more training time to converge to a lower error</choice>
-        <choice letter="D">The model has high bias (underfitting) — it cannot capture the underlying pattern regardless of training set size, and needs more complexity or better features</choice>
+        <choice letter="C">The model has high bias (underfitting) — it cannot capture the underlying pattern regardless of training set size, and needs more complexity or better features</choice>
+        <choice letter="D">The model needs more training time to converge to a lower error</choice>
       </choices>
-      <correct-answer>D</correct-answer>
+      <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>When both curves plateau at a high error, adding more data will not help. Think about what structural limitation prevents the model from learning the pattern.</content>
@@ -1146,10 +1146,10 @@
       <choices>
         <choice letter="A">The model makes correct predictions 85% of the time</choice>
         <choice letter="B">The model's predictions are within 85% of the actual values</choice>
-        <choice letter="C">The model explains 85% of the variance in the target variable, with 15% remaining unexplained</choice>
-        <choice letter="D">The model has an 85% probability of being the best model for this dataset</choice>
+        <choice letter="C">The model has an 85% probability of being the best model for this dataset</choice>
+        <choice letter="D">The model explains 85% of the variance in the target variable, with 15% remaining unexplained</choice>
       </choices>
-      <correct-answer>C</correct-answer>
+      <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>R-squared measures how much of the variability in the target variable is captured by the model versus how much is left unexplained.</content>
@@ -1179,12 +1179,12 @@
       <scenario>A retail company needs to generate product recommendations for all 10 million customers every Sunday night. The trained model is stored in MLflow Model Registry. Predictions need to be written to a Delta table for downstream consumption by the marketing team.</scenario>
       <question-text>Which approach is most appropriate for generating predictions for all 10 million customers on a weekly schedule?</question-text>
       <choices>
-        <choice letter="A">Load the model from MLflow and use Spark's distributed transform() to score all customers in a batch job scheduled with Databricks Workflows</choice>
+        <choice letter="A">Export the data to a local machine and run predictions using a desktop application</choice>
         <choice letter="B">Deploy a real-time serving endpoint and send 10 million individual API requests</choice>
-        <choice letter="C">Export the data to a local machine and run predictions using a desktop application</choice>
+        <choice letter="C">Load the model from MLflow and use Spark's distributed transform() to score all customers in a batch job scheduled with Databricks Workflows</choice>
         <choice letter="D">Manually trigger predictions from a notebook each Sunday evening</choice>
       </choices>
-      <correct-answer>A</correct-answer>
+      <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Think about which approach leverages distributed compute for high-volume scoring and supports automated scheduling.</content>
@@ -1216,10 +1216,10 @@
       <choices>
         <choice letter="A">Databricks SQL warehouse for running prediction queries</choice>
         <choice letter="B">A scheduled Databricks Workflow job that processes transactions in micro-batches</choice>
-        <choice letter="C">Databricks Model Serving, which deploys the MLflow model behind a REST API endpoint with auto-scaling</choice>
-        <choice letter="D">A Spark Structured Streaming job that applies the model to each incoming record</choice>
+        <choice letter="C">A Spark Structured Streaming job that applies the model to each incoming record</choice>
+        <choice letter="D">Databricks Model Serving, which deploys the MLflow model behind a REST API endpoint with auto-scaling</choice>
       </choices>
-      <correct-answer>C</correct-answer>
+      <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Consider which option provides a managed REST API with guaranteed low latency for individual prediction requests.</content>
@@ -1249,12 +1249,12 @@
       <scenario>A data scientist has trained a new version of a churn prediction model and wants to promote it through the standard lifecycle stages before it replaces the current production model. The team follows a process where models are first validated by QA before going live.</scenario>
       <question-text>What are the standard stages in the MLflow Model Registry lifecycle that a model version progresses through?</question-text>
       <choices>
-        <choice letter="A">Draft, Review, Approved, Deployed</choice>
+        <choice letter="A">None, Staging, Production, Archived</choice>
         <choice letter="B">Development, Testing, UAT, Release</choice>
-        <choice letter="C">None, Staging, Production, Archived</choice>
+        <choice letter="C">Draft, Review, Approved, Deployed</choice>
         <choice letter="D">Created, Trained, Validated, Serving</choice>
       </choices>
-      <correct-answer>C</correct-answer>
+      <correct-answer>A</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Think about the MLflow Model Registry's built-in stage labels that represent a model's lifecycle from registration to retirement.</content>
@@ -1284,12 +1284,12 @@
       <scenario>A data scientist has finished training a scikit-learn Random Forest model and wants to save it to MLflow so it can be loaded later for inference or registered in the Model Registry. They want to ensure the model can be loaded with a single function call.</scenario>
       <question-text>Which MLflow function saves a trained scikit-learn model as an artifact in an MLflow run, making it loadable as a generic Python function?</question-text>
       <choices>
-        <choice letter="A">mlflow.sklearn.log_model(model, "model")</choice>
-        <choice letter="B">model.save("model.pkl")</choice>
+        <choice letter="A">model.save("model.pkl")</choice>
+        <choice letter="B">mlflow.sklearn.log_model(model, "model")</choice>
         <choice letter="C">mlflow.log_artifact("model.pkl")</choice>
         <choice letter="D">mlflow.register_model(model, "model_name")</choice>
       </choices>
-      <correct-answer>A</correct-answer>
+      <correct-answer>B</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Consider which function is specifically designed to log a trained model with its flavor metadata so it can be loaded using MLflow's model loading functions.</content>
@@ -1356,10 +1356,10 @@
       <choices>
         <choice letter="A">The model automatically queries the raw data tables and computes features on the fly for each prediction request</choice>
         <choice letter="B">The Feature Store embeds all feature values directly into the serialized model artifact</choice>
-        <choice letter="C">The model's feature specifications define which Feature Store tables to query, and the serving infrastructure automatically performs feature lookups using the provided primary key</choice>
-        <choice letter="D">The client application must manually query all feature tables and pass complete feature vectors to the serving endpoint</choice>
+        <choice letter="C">The client application must manually query all feature tables and pass complete feature vectors to the serving endpoint</choice>
+        <choice letter="D">The model's feature specifications define which Feature Store tables to query, and the serving infrastructure automatically performs feature lookups using the provided primary key</choice>
       </choices>
-      <correct-answer>C</correct-answer>
+      <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Think about which approach allows the serving endpoint to automatically retrieve features when given only a lookup key, based on metadata stored with the model.</content>
@@ -1389,12 +1389,12 @@
       <scenario>A production fraud detection model has been serving predictions for six months. The data science team notices that the model's precision has gradually declined from 0.92 to 0.78 over the last two months, even though the model has not been retrained.</scenario>
       <question-text>What is the most likely cause of this gradual performance degradation, and what is the recommended Databricks approach to detect it?</question-text>
       <choices>
-        <choice letter="A">The model weights have decayed over time and need to be refreshed by restarting the serving endpoint</choice>
+        <choice letter="A">Data drift — the input feature distributions have shifted from what the model was trained on, detectable using Databricks Lakehouse Monitoring with drift metrics</choice>
         <choice letter="B">The serving endpoint hardware has degraded, causing numerical precision errors in predictions</choice>
         <choice letter="C">The MLflow model artifact has been corrupted and needs to be re-logged from the original training run</choice>
-        <choice letter="D">Data drift — the input feature distributions have shifted from what the model was trained on, detectable using Databricks Lakehouse Monitoring with drift metrics</choice>
+        <choice letter="D">The model weights have decayed over time and need to be refreshed by restarting the serving endpoint</choice>
       </choices>
-      <correct-answer>D</correct-answer>
+      <correct-answer>A</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Think about what changes in the real world over time that could cause a static model to become less accurate, even though the model itself has not changed.</content>
@@ -1424,12 +1424,12 @@
       <scenario>A data engineer needs to load a trained model from MLflow to generate batch predictions in a Spark job. The model was trained with XGBoost and logged to MLflow. They want to use it as a generic Python function without importing XGBoost directly.</scenario>
       <question-text>Which MLflow function loads a logged model as a generic Python callable, regardless of the original training framework?</question-text>
       <choices>
-        <choice letter="A">mlflow.xgboost.load_model(model_uri)</choice>
-        <choice letter="B">mlflow.pyfunc.load_model(model_uri)</choice>
+        <choice letter="A">mlflow.pyfunc.load_model(model_uri)</choice>
+        <choice letter="B">mlflow.xgboost.load_model(model_uri)</choice>
         <choice letter="C">mlflow.load_artifact(model_uri)</choice>
         <choice letter="D">mlflow.get_run(run_id).data.model</choice>
       </choices>
-      <correct-answer>B</correct-answer>
+      <correct-answer>A</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Consider which MLflow module provides a framework-agnostic interface for loading any logged model as a standard Python function with a predict() method.</content>
@@ -1461,10 +1461,10 @@
       <choices>
         <choice letter="A">MLflow Model Registry, which manages model deployment stages</choice>
         <choice letter="B">MLflow Projects, which package code for reproducible runs</choice>
-        <choice letter="C">MLflow Tracking, which records parameters, metrics, and artifacts for each experiment run</choice>
-        <choice letter="D">MLflow Models, which define standard model packaging formats</choice>
+        <choice letter="C">MLflow Models, which define standard model packaging formats</choice>
+        <choice letter="D">MLflow Tracking, which records parameters, metrics, and artifacts for each experiment run</choice>
       </choices>
-      <correct-answer>C</correct-answer>
+      <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Think about which MLflow component is specifically designed for recording and comparing the results of multiple experiment runs.</content>
@@ -1494,12 +1494,12 @@
       <scenario>A data scientist wants to automatically capture all relevant training parameters, metrics, and model artifacts without manually adding mlflow.log_param() and mlflow.log_metric() calls throughout their training code. They use scikit-learn for model training.</scenario>
       <question-text>Which MLflow feature automatically captures training parameters, metrics, and model artifacts for supported ML frameworks without requiring explicit logging calls?</question-text>
       <choices>
-        <choice letter="A">MLflow autologging, enabled with mlflow.autolog() or mlflow.sklearn.autolog()</choice>
-        <choice letter="B">MLflow Projects with an MLproject configuration file</choice>
+        <choice letter="A">MLflow Projects with an MLproject configuration file</choice>
+        <choice letter="B">MLflow autologging, enabled with mlflow.autolog() or mlflow.sklearn.autolog()</choice>
         <choice letter="C">MLflow Model Signatures that define input/output schemas</choice>
         <choice letter="D">MLflow Recipes that provide pre-built training templates</choice>
       </choices>
-      <correct-answer>A</correct-answer>
+      <correct-answer>B</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Consider which feature intercepts framework training calls and logs parameters, metrics, and models automatically.</content>
@@ -1564,12 +1564,12 @@
       <scenario>A regulatory team asks a data scientist to reproduce a model that was trained six months ago and explain exactly how it was built. The data scientist needs to retrieve the exact code version, data version, hyperparameters, and environment that produced the production model.</scenario>
       <question-text>Which combination of MLflow and Databricks features enables full reproducibility of a training run?</question-text>
       <choices>
-        <choice letter="A">MLflow run metadata (parameters, code version, data version via Delta time travel) and the logged conda environment together enable full reproducibility</choice>
+        <choice letter="A">The notebook revision history alone provides full reproducibility</choice>
         <choice letter="B">Only the saved model artifact is needed to reproduce a training run</choice>
-        <choice letter="C">The notebook revision history alone provides full reproducibility</choice>
+        <choice letter="C">MLflow run metadata (parameters, code version, data version via Delta time travel) and the logged conda environment together enable full reproducibility</choice>
         <choice letter="D">Databricks cluster configuration logs are sufficient to reproduce any model</choice>
       </choices>
-      <correct-answer>A</correct-answer>
+      <correct-answer>C</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Think about what you need to reproduce a training run: the exact data, the exact code, the exact parameters, and the exact software environment.</content>
@@ -1670,11 +1670,11 @@
       <question-text>Which Databricks feature automatically captures model serving request and response payloads for analysis and monitoring?</question-text>
       <choices>
         <choice letter="A">Application logs from the cluster running the serving endpoint</choice>
-        <choice letter="B">Inference tables, which automatically log all serving endpoint requests and responses to a Delta table</choice>
+        <choice letter="B">Databricks SQL dashboards that query the model directly</choice>
         <choice letter="C">MLflow Tracking, which records metrics from training runs</choice>
-        <choice letter="D">Databricks SQL dashboards that query the model directly</choice>
+        <choice letter="D">Inference tables, which automatically log all serving endpoint requests and responses to a Delta table</choice>
       </choices>
-      <correct-answer>B</correct-answer>
+      <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Think about which feature provides an automatic, persistent record of every prediction served by a model endpoint.</content>
@@ -1705,11 +1705,11 @@
       <question-text>Which MLflow UI feature allows side-by-side comparison of parameters and metrics across multiple experiment runs?</question-text>
       <choices>
         <choice letter="A">The model registry page, which shows model versions and stages</choice>
-        <choice letter="B">The experiment runs table with sorting, filtering, and the compare runs view with parallel coordinate plots</choice>
+        <choice letter="B">The run detail page, which shows metrics for a single run only</choice>
         <choice letter="C">The artifact browser, which shows files saved with each run</choice>
-        <choice letter="D">The run detail page, which shows metrics for a single run only</choice>
+        <choice letter="D">The experiment runs table with sorting, filtering, and the compare runs view with parallel coordinate plots</choice>
       </choices>
-      <correct-answer>B</correct-answer>
+      <correct-answer>D</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Consider which view in the MLflow UI is designed for comparing multiple runs and visualizing parameter-metric relationships across experiments.</content>
@@ -1740,11 +1740,11 @@
       <question-text>Which Unity Catalog feature allows assigning semantic labels to model versions for easy reference by downstream systems?</question-text>
       <choices>
         <choice letter="A">Model tags, which store arbitrary key-value pairs on model versions</choice>
-        <choice letter="B">Model comments, which attach text descriptions to model versions</choice>
-        <choice letter="C">Model aliases, which assign mutable named references (like "champion" or "challenger") to specific model versions</choice>
+        <choice letter="B">Model aliases, which assign mutable named references (like "champion" or "challenger") to specific model versions</choice>
+        <choice letter="C">Model comments, which attach text descriptions to model versions</choice>
         <choice letter="D">Model schemas, which define the input/output format of model versions</choice>
       </choices>
-      <correct-answer>C</correct-answer>
+      <correct-answer>B</correct-answer>
       <hints>
         <hint level="1" label="Brief Hint">
           <content>Think about which feature provides named pointers that can be reassigned from one model version to another, enabling semantic references like "champion."</content>
