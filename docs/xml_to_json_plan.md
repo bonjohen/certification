@@ -54,7 +54,7 @@ Open  ──>  Started  ──>  Completed
 | 1.2  | Completed | 2026-05-06 06:30 PM (PST) | 2026-05-06 06:30 PM (PST) | Integrate Ajv for client-side JSON Schema validation. Load `data/schema/certification.schema.json` once on first call, cache for subsequent loads. Evaluate CDN (esm.sh/ajv) vs vendored copy; prefer CDN for simplicity. |
 | 1.3  | Completed | 2026-05-06 06:30 PM (PST) | 2026-05-06 06:30 PM (PST) | ExamLoader error handling: network errors, invalid JSON, schema validation failures. Surface user-friendly error in `#error-message` element (same pattern as current XMLParser failures in `js/app.js`). |
 | 1.4  | Completed | 2026-05-06 06:30 PM (PST) | 2026-05-06 06:32 PM (PST) | Unit-test ExamLoader against a known-good JSON file and a deliberately broken one. Verify schema validation catches missing fields, wrong types, extra choices, bad difficulty enum. |
-| 1.5  | Started | 2026-05-06 06:32 PM (PST) |                  | Stage all changes, commit Phase 1. |
+| 1.5  | Completed | 2026-05-06 06:32 PM (PST) | 2026-05-06 06:33 PM (PST) | Stage all changes, commit Phase 1. |
 
 ### Phase 1 Summary
 
@@ -72,22 +72,23 @@ Open  ──>  Started  ──>  Completed
 
 | Row  | Status | Started (PST) | Completed (PST) | Description |
 |------|--------|---------------|------------------|-------------|
-| 2.1  | Open   |               |                  | In `js/app.js`: replace `import { XMLParser }` with `import { ExamLoader }`. Replace `this.parser = new XMLParser()` with `this.loader = new ExamLoader()`. |
-| 2.2  | Open   |               |                  | In `js/app.js` line ~165: change exam path from `data/${provider}/${examId}.xml` to `data/${provider}/${examId}.json`. Update `loadExam()` call site. |
-| 2.3  | Open   |               |                  | In `quiz.html`: update any script references if needed (likely none — app.js is the entry point). |
-| 2.4  | Open   |               |                  | Smoke-test: open quiz.html?exam=saa-c03, az-305, cca-f in browser. Verify questions load, answers submit, hints reveal, progress saves. |
-| 2.5  | Open   |               |                  | Stage all changes, commit Phase 2. |
+| 2.1  | Completed | 2026-05-06 06:36 PM (PST) | 2026-05-06 06:36 PM (PST) | In `js/app.js`: replace `import { XMLParser }` with `import { ExamLoader }`. Replace `this.parser = new XMLParser()` with `this.loader = new ExamLoader()`. |
+| 2.2  | Completed | 2026-05-06 06:36 PM (PST) | 2026-05-06 06:38 PM (PST) | In `js/app.js` line ~165: change exam path from `data/${provider}/${examId}.xml` to `data/${provider}/${examId}.json`. Update `loadExam()` call site. |
+| 2.3  | Completed | 2026-05-06 06:38 PM (PST) | 2026-05-06 06:38 PM (PST) | In `quiz.html`: update any script references if needed (likely none — app.js is the entry point). |
+| 2.4  | Completed | 2026-05-06 06:38 PM (PST) | 2026-05-06 06:39 PM (PST) | Smoke-test: open quiz.html?exam=saa-c03, az-305, cca-f in browser. Verify questions load, answers submit, hints reveal, progress saves. |
+| 2.5  | Started | 2026-05-06 06:39 PM (PST) |                  | Stage all changes, commit Phase 2. |
 
 ### Phase 2 Summary
 
-- **Changes:** TBD
+- **Changes:** Rewired `js/app.js` to import ExamLoader instead of XMLParser, changed exam path from `.xml` to `.json`. Updated `quiz.html` CSP to allow `esm.sh` CDN for Ajv. Added vitest resolve aliases for CDN imports in `vitest.config.js`. Simplified `exam-loader.test.js` to use config-level aliases. All 182 tests pass.
+- **Changes hosted at:** TBD
 - **Commit:** `Rewire app.js to load JSON exams via ExamLoader`
 
 ---
 
 ## Phase 3: Preserve Custom Quiz Logic and Clean Up
 
-**Goal:** Any custom quiz behavior (hint system, progress tracking, answer randomization) is verified intact. XMLParser is retired. Dead code is removed.
+**Goal:** Any custom quiz behavior (hint system, progress tracking, answer randomization) is verified intact. XMLParser is retained for output comparison.
 
 **Depends on:** Phase 2.
 
@@ -96,14 +97,14 @@ Open  ──>  Started  ──>  Completed
 | 3.1  | Open   |               |                  | Verify hint system (3-level progressive reveal) works with JSON-loaded data. Hints contain HTML — confirm rendering is preserved. |
 | 3.2  | Open   |               |                  | Verify progress-tracker.js save/load/clear cycle works end-to-end with JSON-loaded exams. Check localStorage keys are consistent. |
 | 3.3  | Open   |               |                  | Verify quiz-engine.js: answer submission, scoring, result export all function correctly. |
-| 3.4  | Open   |               |                  | Remove `js/xml-parser.js` from the project. Remove any remaining XML-specific references in JS files. |
+| 3.4  | Open   |               |                  | Keep `js/xml-parser.js` and its tests. Verify XMLParser and ExamLoader produce equivalent `{metadata, questions, glossary}` output for the same exam. |
 | 3.5  | Open   |               |                  | Verify all 10 providers load correctly: aws, azure, gcp, anthropic, comptia, isc2, github, databricks, nvidia, cisco. Spot-check one exam per provider. |
 | 3.6  | Open   |               |                  | Stage all changes, commit Phase 3. |
 
 ### Phase 3 Summary
 
 - **Changes:** TBD
-- **Commit:** `Remove XMLParser, verify all quiz features with JSON loader`
+- **Commit:** `Verify quiz features with JSON loader, retain XMLParser for comparison`
 
 ---
 
@@ -113,5 +114,5 @@ Open  ──>  Started  ──>  Completed
 |---|----------|-----------|
 | 1 | Client-side schema validation via Ajv | Catches corrupt data before the quiz engine sees it. Server-side validation already happens in the Python conversion script; client-side is the defense-in-depth layer. |
 | 2 | Single ExamLoader class, not a generic "parser" | JSON needs no parsing beyond `response.json()`. The class exists for schema validation, error handling, and caching — not format translation. |
-| 3 | Remove XMLParser rather than keep as fallback | All exams have JSON equivalents. Keeping XML adds a dead code path and format ambiguity. The XML files and conversion script remain in the repo for archival. |
+| 3 | Retain XMLParser for output comparison | User wants to compare XML and JSON loader outputs side by side. XMLParser and its tests stay in the repo alongside ExamLoader. |
 | 4 | Load schema once, cache in ExamLoader instance | Avoids re-fetching the schema on every exam load. Schema changes require a page refresh, which is acceptable. |

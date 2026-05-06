@@ -3,7 +3,7 @@
  * Certification Exam Quiz Application
  */
 
-import { XMLParser } from './xml-parser.js';
+import { ExamLoader } from './exam-loader.js';
 import { QuizEngine } from './quiz-engine.js';
 import { ProgressTracker } from './progress-tracker.js';
 
@@ -94,11 +94,11 @@ export class QuizApp {
     /**
      * @param {object} [options]
      * @param {object} [options.elements] - Pre-built DOM element map (for testing)
-     * @param {XMLParser} [options.parser] - Custom XML parser instance
+     * @param {ExamLoader} [options.loader] - Custom exam loader instance
      * @param {boolean} [options.autoInit=true] - Whether to call init() automatically
      */
     constructor(options = {}) {
-        this.parser = options.parser || new XMLParser();
+        this.loader = options.loader || new ExamLoader();
         this.engine = null;
         this.tracker = null;
         this.categories = {};
@@ -162,8 +162,8 @@ export class QuizApp {
 
         try {
             const provider = this.getProviderFromExam(examId, null);
-            const examPath = `data/${provider}/${examId}.xml`;
-            const examData = await this.parser.loadExam(examPath);
+            const examPath = `data/${provider}/${examId}.json`;
+            const examData = await this.loader.loadExam(examPath);
 
             this.categories = examData.metadata.categories || {};
             this.engine = new QuizEngine(examData);

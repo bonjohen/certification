@@ -5,19 +5,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { readFileSync } from 'fs';
 import { join } from 'path';
-
-// ExamLoader imports Ajv from CDN via bare URL — mock the CDN imports
-// so tests run without network access.
-vi.mock('https://esm.sh/ajv@8.17.1/dist/2020.js', () => {
-    const Ajv = require('ajv/dist/2020');
-    return { default: Ajv };
-});
-vi.mock('https://esm.sh/ajv-formats@3.0.1', () => {
-    const addFormats = require('ajv-formats');
-    return { default: addFormats };
-});
-
-const { ExamLoader } = await import('../../js/exam-loader.js');
+import { ExamLoader } from '../../js/exam-loader.js';
 
 describe('ExamLoader', () => {
     let loader;
