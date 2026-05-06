@@ -370,6 +370,7 @@ export class QuizApp {
             'cloud-data-engineer': 'https://cloud.google.com/learn/certification/data-engineer',
             'pro-ml-eng': 'https://cloud.google.com/learn/certification/machine-learning-engineer',
             'gcp-pca': 'https://cloud.google.com/learn/certification/cloud-architect',
+            'gcp-data-eng': 'https://cloud.google.com/learn/certification/data-engineer',
             // CompTIA
             'sy0-701': 'https://www.comptia.org/certifications/security',
             // ISC2

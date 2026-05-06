@@ -106,15 +106,15 @@ Open  -->  Started  -->  Completed
 
 | Task | Status | Started (PST) | Completed (PST) | Description |
 |------|--------|---------------|------------------|-------------|
-| 3.1 | Open | | | Create `data/gcp/gcp-data-eng.xml` — 50 questions covering BigQuery, Dataflow, Dataproc, Pub/Sub, Cloud Composer, data pipeline design, data warehousing, ML integration, data governance, streaming/batch processing |
-| 3.2 | Open | | | `gcp.html` — Convert GCP-Data-Eng coming-soon `<div>` to active `<a href="quiz.html?exam=gcp-data-eng" class="exam-card new-exam">`, update meta to "50 Questions / Professional" |
-| 3.3 | Open | | | `js/app.js` — Add `'gcp-data-eng'` to `examUrls` map (URL: `https://cloud.google.com/learn/certification/data-engineer`) |
-| 3.4 | Open | | | Run `node scripts/validate-xml.js` on new file |
-| 3.5 | Open | | | Stage and commit |
+| 3.1 | Completed | 2026-05-05 09:18 AM | 2026-05-05 09:30 AM | Create `data/gcp/gcp-data-eng.xml` — 50 questions covering BigQuery, Dataflow, Dataproc, Pub/Sub, Cloud Composer, data pipeline design, data warehousing, ML integration, data governance, streaming/batch processing |
+| 3.2 | Completed | 2026-05-05 09:30 AM | 2026-05-05 09:31 AM | `gcp.html` — Convert GCP-Data-Eng coming-soon `<div>` to active `<a href="quiz.html?exam=gcp-data-eng" class="exam-card new-exam">`, update meta to "50 Questions / Professional" |
+| 3.3 | Completed | 2026-05-05 09:31 AM | 2026-05-05 09:31 AM | `js/app.js` — Add `'gcp-data-eng'` to `examUrls` map (URL: `https://cloud.google.com/learn/certification/data-engineer`) |
+| 3.4 | Completed | 2026-05-05 09:31 AM | 2026-05-05 09:32 AM | Run `node scripts/validate-xml.js` on new file |
+| 3.5 | Completed | 2026-05-05 09:32 AM | 2026-05-05 09:32 AM | Stage and commit |
 
 ### Phase 3 Summary
 
-- **Changes:** TBD
+- **Changes:** Created `data/gcp/gcp-data-eng.xml` (50 questions), activated card in `gcp.html`, added exam URL to `js/app.js`
 - **Commit:** `Add GCP Professional Data Engineer exam (50 questions)`
 
 ---
