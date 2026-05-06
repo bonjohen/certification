@@ -1,160 +1,507 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📝</text></svg>">
-    <title>AWS Study Guides</title>
-    <link rel="stylesheet" href="css/styles.css">
-    <style>
-        /* AWS Orange branding override */
-        .main-header {
-            background: linear-gradient(135deg, #FF9900 0%, #FF6600 100%);
-        }
-        .exam-card:hover {
-            border-color: #FF9900;
-            box-shadow: 0 4px 12px rgba(255, 153, 0, 0.3);
-        }
-        .exam-code {
-            color: #FF9900;
-        }
-    </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Amazon Web Services — Atlas</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='18' fill='%23FF9900'/><text x='50' y='70' font-size='62' font-family='Georgia' fill='white' text-anchor='middle' font-style='italic'>A</text></svg>" />
+<link rel="stylesheet" href="system/tokens.css" />
+<link rel="stylesheet" href="system/system.css" />
+<style>
+  :root { --p-current: var(--p-aws); }
+
+  .hero {
+    padding: var(--s-9) 0 var(--s-7);
+    border-bottom: 1px solid var(--atlas-rule-soft);
+  }
+  .hero-grid {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: var(--s-6);
+    align-items: end;
+  }
+  .hero .pchip-lg {
+    width: 64px; height: 64px;
+    border-radius: var(--r-md);
+    background: var(--p-current);
+    display: inline-flex; align-items: center; justify-content: center;
+    color: #fff;
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 500;
+    font-size: 38px;
+  }
+  .hero h1 {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: clamp(40px, 5vw, 64px);
+    letter-spacing: -.02em;
+    line-height: 1;
+    margin: 0;
+  }
+  .hero h1 em {
+    font-style: italic;
+    font-weight: 300;
+    color: var(--atlas-ink-2);
+  }
+  .hero .lede {
+    margin-top: var(--s-4);
+    font-family: var(--serif);
+    font-size: 20px;
+    line-height: 1.5;
+    color: var(--atlas-ink-2);
+    max-width: 56ch;
+  }
+  .hero-meta {
+    text-align: right;
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--atlas-muted);
+  }
+  .hero-meta b {
+    display: block;
+    font-family: var(--sans);
+    font-size: 32px;
+    font-weight: 500;
+    color: var(--atlas-ink);
+    letter-spacing: -.01em;
+    text-transform: none;
+  }
+
+  .filters {
+    display: flex; align-items: center; gap: var(--s-3);
+    padding: var(--s-5) 0;
+    flex-wrap: wrap;
+    border-bottom: 1px solid var(--atlas-rule-soft);
+  }
+  .filters .label {
+    font-family: var(--mono); font-size: 11px;
+    letter-spacing: .14em; text-transform: uppercase;
+    color: var(--atlas-muted);
+    margin-right: var(--s-2);
+  }
+  .filter-chip {
+    font-family: var(--mono); font-size: 11px;
+    letter-spacing: .1em; text-transform: uppercase;
+    padding: 6px 12px;
+    border-radius: var(--r-pill);
+    background: transparent;
+    border: 1px solid var(--atlas-rule-soft);
+    color: var(--atlas-ink-2);
+    cursor: pointer;
+    transition: all var(--t-fast) var(--ease);
+  }
+  .filter-chip:hover { border-color: var(--atlas-ink); color: var(--atlas-ink); }
+  .filter-chip[aria-pressed="true"] {
+    background: var(--atlas-ink); color: var(--atlas-paper); border-color: var(--atlas-ink);
+  }
+
+  .exam-list {
+    padding: var(--s-6) 0 var(--s-9);
+  }
+  .level-section + .level-section { margin-top: var(--s-7); }
+  .level-head {
+    display: flex; align-items: baseline; justify-content: space-between;
+    margin-bottom: var(--s-2);
+  }
+  .level-head h2 {
+    font-family: var(--serif); font-style: italic; font-weight: 400;
+    font-size: 28px; letter-spacing: -.01em;
+    margin: 0;
+    color: var(--atlas-ink);
+  }
+  .level-head .count {
+    font-family: var(--mono); font-size: 11px;
+    letter-spacing: .14em; text-transform: uppercase;
+    color: var(--atlas-muted);
+  }
+
+  .exam-row {
+    display: grid;
+    grid-template-columns: 88px 1fr 140px 90px 24px;
+    gap: var(--s-5);
+    align-items: center;
+    padding: var(--s-5) var(--s-4);
+    border-top: 1px solid var(--atlas-rule-soft);
+    cursor: pointer;
+    transition: background var(--t-fast) var(--ease);
+    text-decoration: none;
+    color: inherit;
+    position: relative;
+  }
+  .exam-row:hover {
+    background: color-mix(in oklab, var(--atlas-ink) 3%, transparent);
+  }
+  .exam-row:hover::before {
+    content: "";
+    position: absolute;
+    left: 0; top: 12px; bottom: 12px;
+    width: 3px;
+    background: var(--p-current);
+    border-radius: 0 2px 2px 0;
+  }
+  .exam-row:last-child { border-bottom: 1px solid var(--atlas-rule-soft); }
+
+  .exam-row .code {
+    font-family: var(--mono); font-size: 13px;
+    letter-spacing: .04em;
+    color: var(--atlas-ink-2);
+  }
+  .exam-row .name {
+    font-family: var(--serif); font-size: 22px; font-weight: 500;
+    line-height: 1.2; letter-spacing: -.005em;
+    color: var(--atlas-ink);
+  }
+  .exam-row .desc {
+    font-size: 13px; color: var(--atlas-ink-2);
+    margin-top: 6px; max-width: 60ch; line-height: 1.5;
+  }
+  .exam-row .badges {
+    margin-top: 8px;
+    display: flex; gap: 6px; flex-wrap: wrap;
+  }
+  .badge-state {
+    font-family: var(--mono); font-size: 10px;
+    letter-spacing: .14em; text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: var(--r-sm);
+    border: 1px solid;
+  }
+  .badge-state.new {
+    color: var(--atlas-good);
+    border-color: color-mix(in oklab, var(--atlas-good) 35%, transparent);
+    background: color-mix(in oklab, var(--atlas-good) 10%, transparent);
+  }
+  .badge-state.ending {
+    color: var(--atlas-warn);
+    border-color: color-mix(in oklab, var(--atlas-warn) 35%, transparent);
+    background: color-mix(in oklab, var(--atlas-warn) 10%, transparent);
+  }
+  .badge-state.replaced {
+    color: var(--atlas-muted);
+    border-color: var(--atlas-rule-soft);
+    background: transparent;
+  }
+  .retire-note {
+    margin-top: 6px;
+    font-family: var(--sans);
+    font-size: 12px;
+    color: var(--atlas-muted);
+    font-style: italic;
+  }
+  .retire-note b { color: var(--atlas-ink-2); font-weight: 500; font-style: normal; }
+
+  .exam-row .level {
+    font-family: var(--mono); font-size: 11px;
+    letter-spacing: .12em; text-transform: uppercase;
+    color: var(--atlas-muted);
+  }
+  .exam-row .level b {
+    display: block;
+    font-family: var(--sans); font-size: 14px; font-weight: 500;
+    color: var(--atlas-ink); letter-spacing: 0; text-transform: none;
+    margin-top: 2px;
+  }
+  .exam-row .qcount {
+    font-family: var(--mono); font-size: 13px;
+    color: var(--atlas-muted); text-align: right;
+  }
+  .exam-row .arrow {
+    color: var(--atlas-muted);
+    text-align: right;
+    transition: transform var(--t-base) var(--ease), color var(--t-base) var(--ease);
+  }
+  .exam-row:hover .arrow { transform: translateX(4px); color: var(--atlas-ink); }
+
+  .empty {
+    padding: var(--s-7) 0;
+    text-align: center;
+    color: var(--atlas-muted);
+    font-family: var(--serif); font-style: italic; font-size: 18px;
+  }
+
+  .nav-actions { display: flex; gap: 8px; align-items: center; }
+  .theme-toggle {
+    width: 32px; height: 32px;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: transparent; color: var(--atlas-ink);
+    border: 1px solid var(--atlas-rule-soft);
+    border-radius: var(--r-sm);
+    cursor: pointer;
+  }
+  .theme-toggle:hover { border-color: var(--atlas-ink); }
+  .theme-toggle svg { width: 16px; height: 16px; }
+
+  .official-link {
+    font-family: var(--mono); font-size: 11px;
+    letter-spacing: .12em; text-transform: uppercase;
+    color: var(--atlas-muted);
+    text-decoration: none;
+    border-bottom: 1px solid var(--atlas-rule-soft);
+    padding-bottom: 2px;
+  }
+  .official-link:hover { color: var(--atlas-ink); border-color: var(--atlas-ink); }
+
+  @media (max-width: 760px) {
+    .hero-grid { grid-template-columns: auto 1fr; }
+    .hero-meta { display: none; }
+    .exam-row {
+      grid-template-columns: 64px 1fr 24px;
+      gap: var(--s-4);
+    }
+    .exam-row .level, .exam-row .qcount { display: none; }
+    .hero h1 { font-size: 38px; }
+  }
+</style>
 </head>
 <body>
-    <header class="main-header">
-        <a href="index.html" class="back-link">&#8592; All Providers</a>
-        <h1>AWS Study Guides</h1>
-        <p>Practice quizzes for Amazon Web Services certifications and training</p>
-        <a href="https://aws.amazon.com/certification/" target="_blank" rel="noopener" class="cert-site-link">Official AWS Certifications &#8599;</a>
-    </header>
 
-    <main class="exam-selector">
-        <h2>Select a Study Guide</h2>
-        <div class="exam-cards">
+<nav class="site-nav">
+  <a href="index.html" class="brand"><span class="mark"></span> Atlas</a>
+  <div class="links">
+    <a href="index.html">Providers</a>
+    <a href="aws.html" aria-current="page">AWS</a>
+    <a href="#about">About</a>
+  </div>
+  <div class="nav-actions">
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme" title="Toggle theme">
+      <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+    </button>
+  </div>
+</nav>
 
-            <a href="quiz.html?exam=aif-c01" class="exam-card">
-                <div class="exam-code">AIF-C01</div>
-                <div class="exam-title">AWS Certified AI Practitioner</div>
-                <div class="exam-description">
-                    Validate foundational knowledge of AI/ML concepts, AWS AI services, responsible AI, and the ML lifecycle.
-                </div>
-                <div class="exam-meta">
-                    <span>50 Questions</span>
-                    <span>Foundational</span>
-                </div>
-            </a>
-            <a href="quiz.html?exam=aip-c01" class="exam-card new-exam">
-                <div class="exam-code">AIP-C01</div>
-                <div class="exam-title">AWS Certified Generative AI Developer - Professional</div>
-                <div class="exam-description">
-                    Validate ability to develop generative AI applications using AWS services including Amazon Bedrock, SageMaker, and related AI/ML tools.
-                </div>
-                <div class="exam-meta">
-                    <span>50 Questions</span>
-                    <span>Professional</span>
-                </div>
-            </a>
+<main class="shell">
+  <header class="hero">
+    <div class="hero-grid">
+      <div class="pchip-lg" aria-hidden="true">A</div>
+      <div>
+        <p class="eyebrow"><a href="index.html" style="color:inherit;text-decoration:none;">← All providers</a></p>
+        <h1>Amazon <em>Web Services</em></h1>
+        <p class="lede">Practice quizzes for AWS certifications covering cloud fundamentals, architecture, development, operations, data engineering, machine learning, and generative AI.</p>
+        <p style="margin-top:var(--s-4);">
+          <a class="official-link" href="https://aws.amazon.com/certification/" target="_blank" rel="noopener">Official AWS certifications ↗</a>
+        </p>
+      </div>
+      <div class="hero-meta">
+        <b>10</b>
+        Study guides
+      </div>
+    </div>
+  </header>
 
-            <a href="quiz.html?exam=clf-c02" class="exam-card">
-                <div class="exam-code">CLF-C02</div>
-                <div class="exam-title">AWS Certified Cloud Practitioner</div>
-                <div class="exam-description">
-                    Validate foundational knowledge of AWS Cloud concepts, services, security, architecture, pricing, and support.
-                </div>
-                <div class="exam-meta">
-                    <span>50 Questions</span>
-                    <span>Foundational</span>
-                </div>
-            </a>
+  <div class="filters" role="group" aria-label="Filter exams">
+    <span class="label">View</span>
+    <button class="filter-chip" data-filter="all" aria-pressed="true">All</button>
+    <button class="filter-chip" data-filter="active" aria-pressed="false">Active</button>
+    <button class="filter-chip" data-filter="new" aria-pressed="false">New</button>
+    <button class="filter-chip" data-filter="retired" aria-pressed="false">Retired</button>
+    <span style="flex:1"></span>
+    <span class="label">Level</span>
+    <button class="filter-chip" data-level="all" aria-pressed="true">All</button>
+    <button class="filter-chip" data-level="Foundational" aria-pressed="false">Foundational</button>
+    <button class="filter-chip" data-level="Associate" aria-pressed="false">Associate</button>
+    <button class="filter-chip" data-level="Professional" aria-pressed="false">Professional</button>
+  </div>
 
-            <a href="quiz.html?exam=dea-c01" class="exam-card">
-                <div class="exam-code">DEA-C01</div>
-                <div class="exam-title">AWS Certified Data Engineer - Associate</div>
-                <div class="exam-description">
-                    Design and implement data pipelines, data ingestion, transformation, and orchestration on AWS.
-                </div>
-                <div class="exam-meta">
-                    <span>50 Questions</span>
-                    <span>Associate</span>
-                </div>
-            </a>
+  <div class="exam-list">
 
-            <a href="quiz.html?exam=dva-c02" class="exam-card">
-                <div class="exam-code">DVA-C02</div>
-                <div class="exam-title">AWS Certified Developer - Associate</div>
-                <div class="exam-description">
-                    Develop, deploy, and debug cloud-based applications using AWS services and best practices.
-                </div>
-                <div class="exam-meta">
-                    <span>50 Questions</span>
-                    <span>Associate</span>
-                </div>
-            </a>
+    <section class="level-section" data-level-section="Foundational">
+      <div class="level-head">
+        <h2>Foundational</h2>
+        <span class="count">2 exams</span>
+      </div>
 
-            <a href="quiz.html?exam=mla-c01" class="exam-card">
-                <div class="exam-code">MLA-C01</div>
-                <div class="exam-title">AWS Certified Machine Learning Engineer - Associate</div>
-                <div class="exam-description">
-                    Build, train, deploy, and maintain machine learning solutions using AWS services like SageMaker.
-                </div>
-                <div class="exam-meta">
-                    <span>50 Questions</span>
-                    <span>Associate</span>
-                </div>
-            </a>
-
-            <a href="quiz.html?exam=saa-c03" class="exam-card">
-                <div class="exam-code">SAA-C03</div>
-                <div class="exam-title">AWS Certified Solutions Architect - Associate</div>
-                <div class="exam-description">
-                    Design resilient, high-performing, secure, and cost-optimized architectures on AWS.
-                </div>
-                <div class="exam-meta">
-                    <span>50 Questions</span>
-                    <span>Associate</span>
-                </div>
-            </a>
-
-            <a href="quiz.html?exam=sap-c02" class="exam-card new-exam">
-                <div class="exam-code">SAP-C02</div>
-                <div class="exam-title">AWS Certified Solutions Architect - Professional</div>
-                <div class="exam-description">
-                    Design distributed systems and architectures on AWS, covering advanced networking, security, cost optimization, and migration strategies.
-                </div>
-                <div class="exam-meta">
-                    <span>50 Questions</span>
-                    <span>Professional</span>
-                </div>
-            </a>
-
-            <a href="quiz.html?exam=soa-c02" class="exam-card retired-exam">
-                <div class="exam-code">SOA-C02</div>
-                <div class="exam-title">AWS Certified SysOps Administrator - Associate</div>
-                <div class="exam-description">
-                    Deploy, manage, and operate scalable, highly available, and fault-tolerant systems on AWS.
-                </div>
-                <div class="retirement-info">Retired Sep 29, 2025. Replaced by SOA-C03 AWS Certified CloudOps Engineer - Associate.</div>
-                <div class="exam-meta">
-                    <span>50 Questions</span>
-                    <span>Associate</span>
-                </div>
-            </a>
-            <a href="quiz.html?exam=soa-c03" class="exam-card new-exam">
-                <div class="exam-code">SOA-C03</div>
-                <div class="exam-title">AWS Certified CloudOps Engineer - Associate</div>
-                <div class="exam-description">
-                    AWS operations covering deployment, monitoring, reliability, automation, security, networking, and workload operations.
-                </div>
-                <div class="exam-meta">
-                    <span>50 Questions</span>
-                    <span>Associate</span>
-                </div>
-            </a>
+      <a class="exam-row" href="quiz.html?exam=aif-c01" data-state="active" data-level="Foundational">
+        <div class="code">AIF-C01</div>
+        <div>
+          <div class="name">AWS Certified AI Practitioner</div>
+          <div class="desc">Validate foundational knowledge of AI/ML concepts, AWS AI services, responsible AI, and the ML lifecycle.</div>
         </div>
-    </main>
+        <div class="level">Level<b>Foundational</b></div>
+        <div class="qcount">50 Q</div>
+        <div class="arrow">→</div>
+      </a>
 
-    <footer class="main-footer">
-        <p>Study guides are for educational purposes. Always refer to official AWS documentation.</p>
-    </footer>
+      <a class="exam-row" href="quiz.html?exam=clf-c02" data-state="active" data-level="Foundational">
+        <div class="code">CLF-C02</div>
+        <div>
+          <div class="name">AWS Certified Cloud Practitioner</div>
+          <div class="desc">Validate foundational knowledge of AWS Cloud concepts, services, security, architecture, pricing, and support.</div>
+        </div>
+        <div class="level">Level<b>Foundational</b></div>
+        <div class="qcount">50 Q</div>
+        <div class="arrow">→</div>
+      </a>
+    </section>
+
+    <section class="level-section" data-level-section="Associate">
+      <div class="level-head">
+        <h2>Associate</h2>
+        <span class="count">6 exams</span>
+      </div>
+
+      <a class="exam-row" href="quiz.html?exam=dea-c01" data-state="active" data-level="Associate">
+        <div class="code">DEA-C01</div>
+        <div>
+          <div class="name">AWS Certified Data Engineer</div>
+          <div class="desc">Design and implement data pipelines, data ingestion, transformation, and orchestration on AWS.</div>
+        </div>
+        <div class="level">Level<b>Associate</b></div>
+        <div class="qcount">50 Q</div>
+        <div class="arrow">→</div>
+      </a>
+
+      <a class="exam-row" href="quiz.html?exam=dva-c02" data-state="active" data-level="Associate">
+        <div class="code">DVA-C02</div>
+        <div>
+          <div class="name">AWS Certified Developer</div>
+          <div class="desc">Develop, deploy, and debug cloud-based applications using AWS services and best practices.</div>
+        </div>
+        <div class="level">Level<b>Associate</b></div>
+        <div class="qcount">50 Q</div>
+        <div class="arrow">→</div>
+      </a>
+
+      <a class="exam-row" href="quiz.html?exam=mla-c01" data-state="active" data-level="Associate">
+        <div class="code">MLA-C01</div>
+        <div>
+          <div class="name">AWS Certified Machine Learning Engineer</div>
+          <div class="desc">Build, train, deploy, and maintain machine learning solutions using AWS services like SageMaker.</div>
+        </div>
+        <div class="level">Level<b>Associate</b></div>
+        <div class="qcount">50 Q</div>
+        <div class="arrow">→</div>
+      </a>
+
+      <a class="exam-row" href="quiz.html?exam=saa-c03" data-state="active" data-level="Associate">
+        <div class="code">SAA-C03</div>
+        <div>
+          <div class="name">AWS Certified Solutions Architect</div>
+          <div class="desc">Design resilient, high-performing, secure, and cost-optimized architectures on AWS.</div>
+        </div>
+        <div class="level">Level<b>Associate</b></div>
+        <div class="qcount">50 Q</div>
+        <div class="arrow">→</div>
+      </a>
+
+      <a class="exam-row" href="quiz.html?exam=soa-c02" data-state="retired" data-level="Associate">
+        <div class="code">SOA-C02</div>
+        <div>
+          <div class="name">AWS Certified SysOps Administrator</div>
+          <div class="desc">Deploy, manage, and operate scalable, highly available, and fault-tolerant systems on AWS.</div>
+          <div class="badges"><span class="badge-state replaced">Retired</span></div>
+          <div class="retire-note">Retired Sep 29, 2025. Replaced by <b>SOA-C03</b> CloudOps Engineer.</div>
+        </div>
+        <div class="level">Level<b>Associate</b></div>
+        <div class="qcount">50 Q</div>
+        <div class="arrow">→</div>
+      </a>
+
+      <a class="exam-row" href="quiz.html?exam=soa-c03" data-state="new" data-level="Associate">
+        <div class="code">SOA-C03</div>
+        <div>
+          <div class="name">AWS Certified CloudOps Engineer</div>
+          <div class="desc">AWS operations covering deployment, monitoring, reliability, automation, security, networking, and workload operations.</div>
+          <div class="badges"><span class="badge-state new">New</span></div>
+        </div>
+        <div class="level">Level<b>Associate</b></div>
+        <div class="qcount">50 Q</div>
+        <div class="arrow">→</div>
+      </a>
+    </section>
+
+    <section class="level-section" data-level-section="Professional">
+      <div class="level-head">
+        <h2>Professional</h2>
+        <span class="count">2 exams</span>
+      </div>
+
+      <a class="exam-row" href="quiz.html?exam=aip-c01" data-state="new" data-level="Professional">
+        <div class="code">AIP-C01</div>
+        <div>
+          <div class="name">AWS Certified Generative AI Developer</div>
+          <div class="desc">Validate ability to develop generative AI applications using AWS services including Amazon Bedrock, SageMaker, and related AI/ML tools.</div>
+          <div class="badges"><span class="badge-state new">New</span></div>
+        </div>
+        <div class="level">Level<b>Professional</b></div>
+        <div class="qcount">50 Q</div>
+        <div class="arrow">→</div>
+      </a>
+
+      <a class="exam-row" href="quiz.html?exam=sap-c02" data-state="new" data-level="Professional">
+        <div class="code">SAP-C02</div>
+        <div>
+          <div class="name">AWS Certified Solutions Architect — Professional</div>
+          <div class="desc">Design distributed systems and architectures on AWS, covering advanced networking, security, cost optimization, and migration strategies.</div>
+          <div class="badges"><span class="badge-state new">New</span></div>
+        </div>
+        <div class="level">Level<b>Professional</b></div>
+        <div class="qcount">50 Q</div>
+        <div class="arrow">→</div>
+      </a>
+    </section>
+
+  </div>
+</main>
+
+<footer style="border-top:1px solid var(--atlas-rule-soft);padding:var(--s-6) var(--s-7);text-align:center;color:var(--atlas-muted);font-size:13px;">
+  Atlas · Local study tool · Always refer to official AWS documentation.
+</footer>
+
+<script>
+  // Theme
+  const THEME_KEY = 'atlas:theme';
+  const savedTheme = localStorage.getItem(THEME_KEY);
+  if (savedTheme) document.documentElement.setAttribute('data-theme', savedTheme);
+  document.getElementById('theme-toggle').addEventListener('click', () => {
+    const cur = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+    const next = cur === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem(THEME_KEY, next);
+  });
+
+  // Filters
+  let stateFilter = 'all';
+  let levelFilter = 'all';
+
+  function applyFilters() {
+    const rows = document.querySelectorAll('.exam-row');
+    rows.forEach(row => {
+      const state = row.dataset.state;
+      const level = row.dataset.level;
+      let show = true;
+      if (stateFilter === 'active' && state !== 'active' && state !== 'new') show = false;
+      if (stateFilter === 'new' && state !== 'new') show = false;
+      if (stateFilter === 'retired' && state !== 'retired') show = false;
+      if (levelFilter !== 'all' && level !== levelFilter) show = false;
+      row.hidden = !show;
+    });
+    // Hide empty sections
+    document.querySelectorAll('.level-section').forEach(sec => {
+      const visible = sec.querySelectorAll('.exam-row:not([hidden])');
+      sec.hidden = visible.length === 0;
+    });
+  }
+
+  document.querySelectorAll('.filter-chip[data-filter]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-chip[data-filter]').forEach(b => b.setAttribute('aria-pressed', 'false'));
+      btn.setAttribute('aria-pressed', 'true');
+      stateFilter = btn.dataset.filter;
+      applyFilters();
+    });
+  });
+  document.querySelectorAll('.filter-chip[data-level]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-chip[data-level]').forEach(b => b.setAttribute('aria-pressed', 'false'));
+      btn.setAttribute('aria-pressed', 'true');
+      levelFilter = btn.dataset.level;
+      applyFilters();
+    });
+  });
+</script>
 </body>
 </html>

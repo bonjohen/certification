@@ -1,222 +1,591 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📝</text></svg>">
-    <title>Google Cloud Study Guides</title>
-    <link rel="stylesheet" href="css/styles.css">
-    <style>
-        /* Google Cloud branding override */
-        .main-header {
-            background: linear-gradient(135deg, #4285F4 0%, #34A853 50%, #FBBC05 75%, #EA4335 100%);
-        }
-        .exam-card:hover {
-            border-color: #4285F4;
-            box-shadow: 0 4px 12px rgba(66, 133, 244, 0.3);
-        }
-        .exam-code {
-            background: #4285F4;
-            color: white;
-        }
-    </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Google Cloud — Atlas</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='18' fill='%234285F4'/><text x='50' y='70' font-size='62' font-family='Georgia' fill='white' text-anchor='middle' font-style='italic'>G</text></svg>" />
+<link rel="stylesheet" href="system/tokens.css" />
+<link rel="stylesheet" href="system/system.css" />
+<style>
+  :root { --p-current: var(--p-gcp); }
+
+  .hero {
+    padding: var(--s-9) 0 var(--s-7);
+    border-bottom: 1px solid var(--atlas-rule-soft);
+  }
+  .hero-grid {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: var(--s-6);
+    align-items: end;
+  }
+  .hero .pchip-lg {
+    width: 64px; height: 64px;
+    border-radius: var(--r-md);
+    background: var(--p-current);
+    display: inline-flex; align-items: center; justify-content: center;
+    color: #fff;
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 500;
+    font-size: 38px;
+  }
+  .hero h1 {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: clamp(40px, 5vw, 64px);
+    letter-spacing: -.02em;
+    line-height: 1;
+    margin: 0;
+  }
+  .hero h1 em {
+    font-style: italic;
+    font-weight: 300;
+    color: var(--atlas-ink-2);
+  }
+  .hero .lede {
+    margin-top: var(--s-4);
+    font-family: var(--serif);
+    font-size: 20px;
+    line-height: 1.5;
+    color: var(--atlas-ink-2);
+    max-width: 56ch;
+  }
+  .hero-meta {
+    text-align: right;
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--atlas-muted);
+  }
+  .hero-meta b {
+    display: block;
+    font-family: var(--sans);
+    font-size: 32px;
+    font-weight: 500;
+    color: var(--atlas-ink);
+    letter-spacing: -.01em;
+    text-transform: none;
+  }
+
+  .filters {
+    display: flex; align-items: center; gap: var(--s-3);
+    padding: var(--s-5) 0;
+    flex-wrap: wrap;
+    border-bottom: 1px solid var(--atlas-rule-soft);
+  }
+  .filters .label {
+    font-family: var(--mono); font-size: 11px;
+    letter-spacing: .14em; text-transform: uppercase;
+    color: var(--atlas-muted);
+    margin-right: var(--s-2);
+  }
+  .filter-chip {
+    font-family: var(--mono); font-size: 11px;
+    letter-spacing: .1em; text-transform: uppercase;
+    padding: 6px 12px;
+    border-radius: var(--r-pill);
+    background: transparent;
+    border: 1px solid var(--atlas-rule-soft);
+    color: var(--atlas-ink-2);
+    cursor: pointer;
+    transition: all var(--t-fast) var(--ease);
+  }
+  .filter-chip:hover { border-color: var(--atlas-ink); color: var(--atlas-ink); }
+  .filter-chip[aria-pressed="true"] {
+    background: var(--atlas-ink); color: var(--atlas-paper); border-color: var(--atlas-ink);
+  }
+
+  .exam-list {
+    padding: var(--s-6) 0 var(--s-9);
+  }
+  .level-section + .level-section { margin-top: var(--s-7); }
+  .level-head {
+    display: flex; align-items: baseline; justify-content: space-between;
+    margin-bottom: var(--s-2);
+  }
+  .level-head h2 {
+    font-family: var(--serif); font-style: italic; font-weight: 400;
+    font-size: 28px; letter-spacing: -.01em;
+    margin: 0;
+    color: var(--atlas-ink);
+  }
+  .level-head .count {
+    font-family: var(--mono); font-size: 11px;
+    letter-spacing: .14em; text-transform: uppercase;
+    color: var(--atlas-muted);
+  }
+
+  .exam-row {
+    display: grid;
+    grid-template-columns: 88px 1fr 140px 90px 24px;
+    gap: var(--s-5);
+    align-items: center;
+    padding: var(--s-5) var(--s-4);
+    border-top: 1px solid var(--atlas-rule-soft);
+    cursor: pointer;
+    transition: background var(--t-fast) var(--ease);
+    text-decoration: none;
+    color: inherit;
+    position: relative;
+  }
+  .exam-row:hover {
+    background: color-mix(in oklab, var(--atlas-ink) 3%, transparent);
+  }
+  .exam-row:hover::before {
+    content: "";
+    position: absolute;
+    left: 0; top: 12px; bottom: 12px;
+    width: 3px;
+    background: var(--p-current);
+    border-radius: 0 2px 2px 0;
+  }
+  .exam-row:last-child { border-bottom: 1px solid var(--atlas-rule-soft); }
+
+  .exam-row .code {
+    font-family: var(--mono); font-size: 13px;
+    letter-spacing: .04em;
+    color: var(--atlas-ink-2);
+  }
+  .exam-row .name {
+    font-family: var(--serif); font-size: 22px; font-weight: 500;
+    line-height: 1.2; letter-spacing: -.005em;
+    color: var(--atlas-ink);
+  }
+  .exam-row .desc {
+    font-size: 13px; color: var(--atlas-ink-2);
+    margin-top: 6px; max-width: 60ch; line-height: 1.5;
+  }
+  .exam-row .badges {
+    margin-top: 8px;
+    display: flex; gap: 6px; flex-wrap: wrap;
+  }
+  .badge-state {
+    font-family: var(--mono); font-size: 10px;
+    letter-spacing: .14em; text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: var(--r-sm);
+    border: 1px solid;
+  }
+  .badge-state.new {
+    color: var(--atlas-good);
+    border-color: color-mix(in oklab, var(--atlas-good) 35%, transparent);
+    background: color-mix(in oklab, var(--atlas-good) 10%, transparent);
+  }
+  .badge-state.prep {
+    color: var(--atlas-accent);
+    border-color: color-mix(in oklab, var(--atlas-accent) 35%, transparent);
+    background: color-mix(in oklab, var(--atlas-accent) 10%, transparent);
+  }
+  .badge-state.training {
+    color: var(--atlas-muted);
+    border-color: var(--atlas-rule-soft);
+    background: transparent;
+    font-style: italic;
+  }
+  .retire-note {
+    margin-top: 6px;
+    font-family: var(--sans);
+    font-size: 12px;
+    color: var(--atlas-muted);
+    font-style: italic;
+  }
+  .retire-note b { color: var(--atlas-ink-2); font-weight: 500; font-style: normal; }
+
+  .exam-row .level {
+    font-family: var(--mono); font-size: 11px;
+    letter-spacing: .12em; text-transform: uppercase;
+    color: var(--atlas-muted);
+  }
+  .exam-row .level b {
+    display: block;
+    font-family: var(--sans); font-size: 14px; font-weight: 500;
+    color: var(--atlas-ink); letter-spacing: 0; text-transform: none;
+    margin-top: 2px;
+  }
+  .exam-row .qcount {
+    font-family: var(--mono); font-size: 13px;
+    color: var(--atlas-muted); text-align: right;
+  }
+  .exam-row .arrow {
+    color: var(--atlas-muted);
+    text-align: right;
+    transition: transform var(--t-base) var(--ease), color var(--t-base) var(--ease);
+  }
+  .exam-row:hover .arrow { transform: translateX(4px); color: var(--atlas-ink); }
+
+  .empty {
+    padding: var(--s-7) 0;
+    text-align: center;
+    color: var(--atlas-muted);
+    font-family: var(--serif); font-style: italic; font-size: 18px;
+  }
+
+  .nav-actions { display: flex; gap: 8px; align-items: center; }
+  .theme-toggle {
+    width: 32px; height: 32px;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: transparent; color: var(--atlas-ink);
+    border: 1px solid var(--atlas-rule-soft);
+    border-radius: var(--r-sm);
+    cursor: pointer;
+  }
+  .theme-toggle:hover { border-color: var(--atlas-ink); }
+  .theme-toggle svg { width: 16px; height: 16px; }
+
+  .official-link {
+    font-family: var(--mono); font-size: 11px;
+    letter-spacing: .12em; text-transform: uppercase;
+    color: var(--atlas-muted);
+    text-decoration: none;
+    border-bottom: 1px solid var(--atlas-rule-soft);
+    padding-bottom: 2px;
+  }
+  .official-link:hover { color: var(--atlas-ink); border-color: var(--atlas-ink); }
+
+  @media (max-width: 760px) {
+    .hero-grid { grid-template-columns: auto 1fr; }
+    .hero-meta { display: none; }
+    .exam-row {
+      grid-template-columns: 64px 1fr 24px;
+      gap: var(--s-4);
+    }
+    .exam-row .level, .exam-row .qcount { display: none; }
+    .hero h1 { font-size: 38px; }
+  }
+</style>
 </head>
 <body>
-    <header class="main-header">
-        <a href="index.html" class="back-link">&#8592; All Providers</a>
-        <h1>Google Cloud Study Guides</h1>
-        <p>Practice quizzes for Google Cloud certifications and training</p>
-        <a href="https://cloud.google.com/learn/certification" target="_blank" rel="noopener" class="cert-site-link">Official Google Cloud Certifications &#8599;</a>
-    </header>
 
-    <main class="exam-selector">
-        <h2>Select a Study Guide</h2>
-        <div class="exam-cards">
-            <a href="quiz.html?exam=cloud-data-engineer" class="exam-card new-exam">
-                <div class="exam-code">Cloud Data Engineer</div>
-                <div class="exam-title">Professional Cloud Database Engineer</div>
-                <div class="exam-description">
-                    Design, manage, and troubleshoot Google Cloud database solutions including BigQuery, Spanner, and Firestore.
-                </div>
-                <div class="exam-meta">
-                    <span>50 Questions</span>
-                    <span>Professional</span>
-                </div>
-            </a>
+<nav class="site-nav">
+  <a href="index.html" class="brand"><span class="mark"></span> Atlas</a>
+  <div class="links">
+    <a href="index.html">Providers</a>
+    <a href="gcp.html" aria-current="page">GCP</a>
+    <a href="#about">About</a>
+  </div>
+  <div class="nav-actions">
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme" title="Toggle theme">
+      <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+    </button>
+  </div>
+</nav>
 
-            <a href="quiz.html?exam=gcp-cloud-arch" class="exam-card exam-prep">
-                <div class="exam-code">GCP-CLOUD-ARCH</div>
-                <div class="exam-title">Professional Cloud Architect Preparation</div>
-                <div class="exam-description">
-                    Design and plan cloud solution architecture, manage implementation, and ensure security and compliance.
-                </div>
-                <div class="exam-meta">
-                    <span>50 Questions</span>
-                    <span>Professional</span>
-                </div>
-            </a>
+<main class="shell">
+  <header class="hero">
+    <div class="hero-grid">
+      <div class="pchip-lg" aria-hidden="true">G</div>
+      <div>
+        <p class="eyebrow"><a href="index.html" style="color:inherit;text-decoration:none;">← All providers</a></p>
+        <h1>Google <em>Cloud</em></h1>
+        <p class="lede">Practice quizzes for Google Cloud certifications and training covering fundamentals, cloud engineering, architecture, networking, databases, data engineering, machine learning, and generative AI.</p>
+        <p style="margin-top:var(--s-4);">
+          <a class="official-link" href="https://cloud.google.com/learn/certification" target="_blank" rel="noopener">Official Google Cloud certifications ↗</a>
+        </p>
+      </div>
+      <div class="hero-meta">
+        <b>15</b>
+        Study guides
+      </div>
+    </div>
+  </header>
 
-            <a href="quiz.html?exam=gcp-cloud-eng" class="exam-card exam-prep">
-                <div class="exam-code">GCP-CLOUD-ENG</div>
-                <div class="exam-title">Associate Cloud Engineer Preparation</div>
-                <div class="exam-description">
-                    Prepare for deploying applications, monitoring operations, and managing enterprise solutions on Google Cloud.
-                </div>
-                <div class="exam-meta">
-                    <span>50 Questions</span>
-                    <span>Associate</span>
-                </div>
-            </a>
+  <div class="filters" role="group" aria-label="Filter exams">
+    <span class="label">View</span>
+    <button class="filter-chip" data-filter="all" aria-pressed="true">All</button>
+    <button class="filter-chip" data-filter="active" aria-pressed="false">Active</button>
+    <button class="filter-chip" data-filter="new" aria-pressed="false">New</button>
+    <button class="filter-chip" data-filter="training" aria-pressed="false">Training</button>
+    <button class="filter-chip" data-filter="prep" aria-pressed="false">Exam Prep</button>
+    <span style="flex:1"></span>
+    <span class="label">Level</span>
+    <button class="filter-chip" data-level="all" aria-pressed="true">All</button>
+    <button class="filter-chip" data-level="Beginner" aria-pressed="false">Beginner</button>
+    <button class="filter-chip" data-level="Intermediate" aria-pressed="false">Intermediate</button>
+    <button class="filter-chip" data-level="Associate" aria-pressed="false">Associate</button>
+    <button class="filter-chip" data-level="Advanced" aria-pressed="false">Advanced</button>
+    <button class="filter-chip" data-level="Professional" aria-pressed="false">Professional</button>
+  </div>
 
-            <a href="quiz.html?exam=gcp-cloud-fnd" class="exam-card training-only">
-                <div class="exam-code">GCP-CLOUD-FND</div>
-                <div class="exam-title">Cloud Computing and GCP Fundamentals</div>
-                <div class="exam-description">
-                    Broad introduction to cloud computing concepts and Google Cloud Platform basics.
-                </div>
-                <div class="exam-meta">
-                    <span>50 Questions</span>
-                    <span>Beginner</span>
-                </div>
-            </a>
+  <div class="exam-list">
 
-            <a href="quiz.html?exam=gcp-data-eng" class="exam-card new-exam">
-                <div class="exam-code">GCP-Data-Eng</div>
-                <div class="exam-title">Professional Data Engineer</div>
-                <div class="exam-description">
-                    Design data processing systems, build and operationalize data pipelines, and derive business insights on Google Cloud.
-                </div>
-                <div class="exam-meta">
-                    <span>50 Questions</span>
-                    <span>Professional</span>
-                </div>
-            </a>
+    <section class="level-section" data-level-section="Beginner">
+      <div class="level-head">
+        <h2>Beginner</h2>
+        <span class="count">2 exams</span>
+      </div>
 
-            <a href="quiz.html?exam=gcp-data-eng-ml" class="exam-card training-only">
-                <div class="exam-code">GCP-DATA-ENG-ML</div>
-                <div class="exam-title">Data Engineering, Big Data, and Machine Learning</div>
-                <div class="exam-description">
-                    Data-focused training covering BigQuery, Dataflow, Dataproc, Pub/Sub, and Vertex AI for ML.
-                </div>
-                <div class="exam-meta">
-                    <span>50 Questions</span>
-                    <span>Advanced</span>
-                </div>
-            </a>
-
-            <a href="quiz.html?exam=gcp-db-devops" class="exam-card training-only">
-                <div class="exam-code">GCP-DB-DEVOPS</div>
-                <div class="exam-title">Database, Big Data, and DevOps Services</div>
-                <div class="exam-description">
-                    DevOps and data platform services including Cloud Build, Cloud Deploy, BigQuery, and Cloud Composer.
-                </div>
-                <div class="exam-meta">
-                    <span>50 Questions</span>
-                    <span>Advanced</span>
-                </div>
-            </a>
-
-            <a href="quiz.html?exam=gcp-db-stor" class="exam-card training-only">
-                <div class="exam-code">GCP-DB-STOR</div>
-                <div class="exam-title">GCP: Database and Storage</div>
-                <div class="exam-description">
-                    Database and storage services including Cloud SQL, Spanner, Firestore, Bigtable, and Cloud Storage.
-                </div>
-                <div class="exam-meta">
-                    <span>50 Questions</span>
-                    <span>Intermediate</span>
-                </div>
-            </a>
-
-            <a href="quiz.html?exam=gcp-exam-prep-ace" class="exam-card exam-prep">
-                <div class="exam-code">GCP-EXAM-PREP-ACE</div>
-                <div class="exam-title">Exam Prep: Associate Cloud Engineer</div>
-                <div class="exam-description">
-                    Focused exam preparation for the Google Cloud Certified Associate Cloud Engineer certification.
-                </div>
-                <div class="exam-meta">
-                    <span>50 Questions</span>
-                    <span>Associate</span>
-                </div>
-            </a>
-
-            <a href="quiz.html?exam=gcp-fund-core" class="exam-card training-only">
-                <div class="exam-code">GCP-FUND-CORE</div>
-                <div class="exam-title">Google Cloud Fundamentals: Core Infrastructure</div>
-                <div class="exam-description">
-                    Introductory overview of Google Cloud services, resource hierarchy, and core infrastructure concepts.
-                </div>
-                <div class="exam-meta">
-                    <span>50 Questions</span>
-                    <span>Beginner</span>
-                </div>
-            </a>
-
-            <a href="quiz.html?exam=gcp-gk-compute" class="exam-card training-only">
-                <div class="exam-code">GCP-GK-COMPUTE</div>
-                <div class="exam-title">GCP: Compute Services</div>
-                <div class="exam-description">
-                    Master compute resources including Compute Engine, App Engine, Cloud Functions, Cloud Run, and GKE.
-                </div>
-                <div class="exam-meta">
-                    <span>50 Questions</span>
-                    <span>Intermediate</span>
-                </div>
-            </a>
-
-            <a href="quiz.html?exam=gcp-networks" class="exam-card training-only">
-                <div class="exam-code">GCP-NETWORKS</div>
-                <div class="exam-title">Networking in Google Cloud: Fundamentals</div>
-                <div class="exam-description">
-                    Core networking concepts including VPC, load balancing, Cloud VPN, Interconnect, and network security.
-                </div>
-                <div class="exam-meta">
-                    <span>50 Questions</span>
-                    <span>Intermediate</span>
-                </div>
-            </a>
-
-            <a href="quiz.html?exam=gcp-pca" class="exam-card new-exam">
-                <div class="exam-code">GCP-PCA</div>
-                <div class="exam-title">Professional Cloud Architect</div>
-                <div class="exam-description">
-                    Design, develop, and manage secure, scalable, highly available, cost-effective Google Cloud solutions.
-                </div>
-                <div class="exam-meta">
-                    <span>50 Questions</span>
-                    <span>Professional</span>
-                </div>
-            </a>
-
-            <a href="quiz.html?exam=gen-ai-leader" class="exam-card new-exam">
-                <div class="exam-code">Gen AI Leader</div>
-                <div class="exam-title">Google Cloud Generative AI Leader</div>
-                <div class="exam-description">
-                    Understand generative AI concepts, Vertex AI, embeddings, RAG, and enterprise AI strategy on Google Cloud.
-                </div>
-                <div class="exam-meta">
-                    <span>50 Questions</span>
-                    <span>Professional</span>
-                </div>
-            </a>
-
-            <a href="quiz.html?exam=pro-ml-eng" class="exam-card new-exam">
-                <div class="exam-code">Pro ML Engineer</div>
-                <div class="exam-title">Professional Machine Learning Engineer</div>
-                <div class="exam-description">
-                    Design, build, and productionize ML models using Vertex AI, feature engineering, and ML pipelines on Google Cloud.
-                </div>
-                <div class="refresh-note">New exam version expected Jun 1, 2026 -- content refresh planned.</div>
-                <div class="exam-meta">
-                    <span>50 Questions</span>
-                    <span>Professional</span>
-                </div>
-            </a>
+      <a class="exam-row" href="quiz.html?exam=gcp-cloud-fnd" data-state="training" data-level="Beginner">
+        <div class="code">GCP-CLOUD-FND</div>
+        <div>
+          <div class="name">Cloud Computing and GCP Fundamentals</div>
+          <div class="desc">Broad introduction to cloud computing concepts and Google Cloud Platform basics.</div>
+          <div class="badges"><span class="badge-state training">Training</span></div>
         </div>
-    </main>
+        <div class="level">Level<b>Beginner</b></div>
+        <div class="qcount">50 Q</div>
+        <div class="arrow">→</div>
+      </a>
 
-    <footer class="main-footer">
-        <p>Study guides are for educational purposes. Always refer to official Google Cloud documentation.</p>
-    </footer>
+      <a class="exam-row" href="quiz.html?exam=gcp-fund-core" data-state="training" data-level="Beginner">
+        <div class="code">GCP-FUND-CORE</div>
+        <div>
+          <div class="name">Google Cloud Fundamentals: Core Infrastructure</div>
+          <div class="desc">Introductory overview of Google Cloud services, resource hierarchy, and core infrastructure concepts.</div>
+          <div class="badges"><span class="badge-state training">Training</span></div>
+        </div>
+        <div class="level">Level<b>Beginner</b></div>
+        <div class="qcount">50 Q</div>
+        <div class="arrow">→</div>
+      </a>
+    </section>
+
+    <section class="level-section" data-level-section="Intermediate">
+      <div class="level-head">
+        <h2>Intermediate</h2>
+        <span class="count">3 exams</span>
+      </div>
+
+      <a class="exam-row" href="quiz.html?exam=gcp-db-stor" data-state="training" data-level="Intermediate">
+        <div class="code">GCP-DB-STOR</div>
+        <div>
+          <div class="name">GCP: Database and Storage</div>
+          <div class="desc">Database and storage services including Cloud SQL, Spanner, Firestore, Bigtable, and Cloud Storage.</div>
+          <div class="badges"><span class="badge-state training">Training</span></div>
+        </div>
+        <div class="level">Level<b>Intermediate</b></div>
+        <div class="qcount">50 Q</div>
+        <div class="arrow">→</div>
+      </a>
+
+      <a class="exam-row" href="quiz.html?exam=gcp-gk-compute" data-state="training" data-level="Intermediate">
+        <div class="code">GCP-GK-COMPUTE</div>
+        <div>
+          <div class="name">GCP: Compute Services</div>
+          <div class="desc">Master compute resources including Compute Engine, App Engine, Cloud Functions, Cloud Run, and GKE.</div>
+          <div class="badges"><span class="badge-state training">Training</span></div>
+        </div>
+        <div class="level">Level<b>Intermediate</b></div>
+        <div class="qcount">50 Q</div>
+        <div class="arrow">→</div>
+      </a>
+
+      <a class="exam-row" href="quiz.html?exam=gcp-networks" data-state="training" data-level="Intermediate">
+        <div class="code">GCP-NETWORKS</div>
+        <div>
+          <div class="name">Networking in Google Cloud: Fundamentals</div>
+          <div class="desc">Core networking concepts including VPC, load balancing, Cloud VPN, Interconnect, and network security.</div>
+          <div class="badges"><span class="badge-state training">Training</span></div>
+        </div>
+        <div class="level">Level<b>Intermediate</b></div>
+        <div class="qcount">50 Q</div>
+        <div class="arrow">→</div>
+      </a>
+    </section>
+
+    <section class="level-section" data-level-section="Associate">
+      <div class="level-head">
+        <h2>Associate</h2>
+        <span class="count">2 exams</span>
+      </div>
+
+      <a class="exam-row" href="quiz.html?exam=gcp-cloud-eng" data-state="prep" data-level="Associate">
+        <div class="code">GCP-CLOUD-ENG</div>
+        <div>
+          <div class="name">Associate Cloud Engineer Preparation</div>
+          <div class="desc">Prepare for deploying applications, monitoring operations, and managing enterprise solutions on Google Cloud.</div>
+          <div class="badges"><span class="badge-state prep">Exam Prep</span></div>
+        </div>
+        <div class="level">Level<b>Associate</b></div>
+        <div class="qcount">50 Q</div>
+        <div class="arrow">→</div>
+      </a>
+
+      <a class="exam-row" href="quiz.html?exam=gcp-exam-prep-ace" data-state="prep" data-level="Associate">
+        <div class="code">GCP-EXAM-PREP-ACE</div>
+        <div>
+          <div class="name">Exam Prep: Associate Cloud Engineer</div>
+          <div class="desc">Focused exam preparation for the Google Cloud Certified Associate Cloud Engineer certification.</div>
+          <div class="badges"><span class="badge-state prep">Exam Prep</span></div>
+        </div>
+        <div class="level">Level<b>Associate</b></div>
+        <div class="qcount">50 Q</div>
+        <div class="arrow">→</div>
+      </a>
+    </section>
+
+    <section class="level-section" data-level-section="Advanced">
+      <div class="level-head">
+        <h2>Advanced</h2>
+        <span class="count">2 exams</span>
+      </div>
+
+      <a class="exam-row" href="quiz.html?exam=gcp-data-eng-ml" data-state="training" data-level="Advanced">
+        <div class="code">GCP-DATA-ENG-ML</div>
+        <div>
+          <div class="name">Data Engineering, Big Data, and Machine Learning</div>
+          <div class="desc">Data-focused training covering BigQuery, Dataflow, Dataproc, Pub/Sub, and Vertex AI for ML.</div>
+          <div class="badges"><span class="badge-state training">Training</span></div>
+        </div>
+        <div class="level">Level<b>Advanced</b></div>
+        <div class="qcount">50 Q</div>
+        <div class="arrow">→</div>
+      </a>
+
+      <a class="exam-row" href="quiz.html?exam=gcp-db-devops" data-state="training" data-level="Advanced">
+        <div class="code">GCP-DB-DEVOPS</div>
+        <div>
+          <div class="name">Database, Big Data, and DevOps Services</div>
+          <div class="desc">DevOps and data platform services including Cloud Build, Cloud Deploy, BigQuery, and Cloud Composer.</div>
+          <div class="badges"><span class="badge-state training">Training</span></div>
+        </div>
+        <div class="level">Level<b>Advanced</b></div>
+        <div class="qcount">50 Q</div>
+        <div class="arrow">→</div>
+      </a>
+    </section>
+
+    <section class="level-section" data-level-section="Professional">
+      <div class="level-head">
+        <h2>Professional</h2>
+        <span class="count">6 exams</span>
+      </div>
+
+      <a class="exam-row" href="quiz.html?exam=cloud-data-engineer" data-state="new" data-level="Professional">
+        <div class="code">Cloud Data Eng</div>
+        <div>
+          <div class="name">Professional Cloud Database Engineer</div>
+          <div class="desc">Design, manage, and troubleshoot Google Cloud database solutions including BigQuery, Spanner, and Firestore.</div>
+          <div class="badges"><span class="badge-state new">New</span></div>
+        </div>
+        <div class="level">Level<b>Professional</b></div>
+        <div class="qcount">50 Q</div>
+        <div class="arrow">→</div>
+      </a>
+
+      <a class="exam-row" href="quiz.html?exam=gcp-cloud-arch" data-state="prep" data-level="Professional">
+        <div class="code">GCP-CLOUD-ARCH</div>
+        <div>
+          <div class="name">Professional Cloud Architect Preparation</div>
+          <div class="desc">Design and plan cloud solution architecture, manage implementation, and ensure security and compliance.</div>
+          <div class="badges"><span class="badge-state prep">Exam Prep</span></div>
+        </div>
+        <div class="level">Level<b>Professional</b></div>
+        <div class="qcount">50 Q</div>
+        <div class="arrow">→</div>
+      </a>
+
+      <a class="exam-row" href="quiz.html?exam=gcp-data-eng" data-state="new" data-level="Professional">
+        <div class="code">GCP-Data-Eng</div>
+        <div>
+          <div class="name">Professional Data Engineer</div>
+          <div class="desc">Design data processing systems, build and operationalize data pipelines, and derive business insights on Google Cloud.</div>
+          <div class="badges"><span class="badge-state new">New</span></div>
+        </div>
+        <div class="level">Level<b>Professional</b></div>
+        <div class="qcount">50 Q</div>
+        <div class="arrow">→</div>
+      </a>
+
+      <a class="exam-row" href="quiz.html?exam=gcp-pca" data-state="new" data-level="Professional">
+        <div class="code">GCP-PCA</div>
+        <div>
+          <div class="name">Professional Cloud Architect</div>
+          <div class="desc">Design, develop, and manage secure, scalable, highly available, cost-effective Google Cloud solutions.</div>
+          <div class="badges"><span class="badge-state new">New</span></div>
+        </div>
+        <div class="level">Level<b>Professional</b></div>
+        <div class="qcount">50 Q</div>
+        <div class="arrow">→</div>
+      </a>
+
+      <a class="exam-row" href="quiz.html?exam=gen-ai-leader" data-state="new" data-level="Professional">
+        <div class="code">Gen AI Leader</div>
+        <div>
+          <div class="name">Google Cloud Generative AI Leader</div>
+          <div class="desc">Understand generative AI concepts, Vertex AI, embeddings, RAG, and enterprise AI strategy on Google Cloud.</div>
+          <div class="badges"><span class="badge-state new">New</span></div>
+        </div>
+        <div class="level">Level<b>Professional</b></div>
+        <div class="qcount">50 Q</div>
+        <div class="arrow">→</div>
+      </a>
+
+      <a class="exam-row" href="quiz.html?exam=pro-ml-eng" data-state="new" data-level="Professional">
+        <div class="code">Pro ML Eng</div>
+        <div>
+          <div class="name">Professional Machine Learning Engineer</div>
+          <div class="desc">Design, build, and productionize ML models using Vertex AI, feature engineering, and ML pipelines on Google Cloud.</div>
+          <div class="badges"><span class="badge-state new">New</span></div>
+          <div class="retire-note">New exam version expected Jun 1, 2026 — content refresh planned.</div>
+        </div>
+        <div class="level">Level<b>Professional</b></div>
+        <div class="qcount">50 Q</div>
+        <div class="arrow">→</div>
+      </a>
+    </section>
+
+  </div>
+</main>
+
+<footer style="border-top:1px solid var(--atlas-rule-soft);padding:var(--s-6) var(--s-7);text-align:center;color:var(--atlas-muted);font-size:13px;">
+  Atlas · Local study tool · Always refer to official Google Cloud documentation.
+</footer>
+
+<script>
+  // Theme
+  const THEME_KEY = 'atlas:theme';
+  const savedTheme = localStorage.getItem(THEME_KEY);
+  if (savedTheme) document.documentElement.setAttribute('data-theme', savedTheme);
+  document.getElementById('theme-toggle').addEventListener('click', () => {
+    const cur = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+    const next = cur === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem(THEME_KEY, next);
+  });
+
+  // Filters
+  let stateFilter = 'all';
+  let levelFilter = 'all';
+
+  function applyFilters() {
+    const rows = document.querySelectorAll('.exam-row');
+    rows.forEach(row => {
+      const state = row.dataset.state;
+      const level = row.dataset.level;
+      let show = true;
+      if (stateFilter === 'active' && state !== 'active' && state !== 'new') show = false;
+      if (stateFilter === 'new' && state !== 'new') show = false;
+      if (stateFilter === 'training' && state !== 'training') show = false;
+      if (stateFilter === 'prep' && state !== 'prep') show = false;
+      if (levelFilter !== 'all' && level !== levelFilter) show = false;
+      row.hidden = !show;
+    });
+    document.querySelectorAll('.level-section').forEach(sec => {
+      const visible = sec.querySelectorAll('.exam-row:not([hidden])');
+      sec.hidden = visible.length === 0;
+    });
+  }
+
+  document.querySelectorAll('.filter-chip[data-filter]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-chip[data-filter]').forEach(b => b.setAttribute('aria-pressed', 'false'));
+      btn.setAttribute('aria-pressed', 'true');
+      stateFilter = btn.dataset.filter;
+      applyFilters();
+    });
+  });
+  document.querySelectorAll('.filter-chip[data-level]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-chip[data-level]').forEach(b => b.setAttribute('aria-pressed', 'false'));
+      btn.setAttribute('aria-pressed', 'true');
+      levelFilter = btn.dataset.level;
+      applyFilters();
+    });
+  });
+</script>
 </body>
 </html>

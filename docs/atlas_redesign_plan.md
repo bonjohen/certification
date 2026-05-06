@@ -52,7 +52,7 @@ Open  ──>  Started  ──>  Completed
 | 1.1 | Completed | 2026-05-06 03:45 PM | 2026-05-06 03:47 PM | Add missing provider colors to `system/tokens.css`: `--p-github: #1F2328`, `--p-databricks: #FF3621`, `--p-nvidia: #76B900`, `--p-isc2: #003366` |
 | 1.2 | Completed | 2026-05-06 03:47 PM | 2026-05-06 03:52 PM | Rebuild `index.html` using Atlas system: site-nav, hero with display title + stats, 5-column provider grid (.pcard pattern from redesign deck), theme toggle, responsive breakpoints |
 | 1.3 | Completed | 2026-05-06 03:52 PM | 2026-05-06 03:54 PM | Verify: all 10 provider cards link correctly, dark mode works, responsive at 768px/480px |
-| 1.4 | Started | 2026-05-06 03:54 PM | | Stage and commit Phase 1 |
+| 1.4 | Completed | 2026-05-06 03:54 PM | 2026-05-06 03:56 PM | Stage and commit Phase 1 |
 
 ### Phase 1 Summary
 
@@ -69,16 +69,16 @@ Open  ──>  Started  ──>  Completed
 
 | # | Status | Started (PST) | Completed (PST) | Description |
 |---|--------|---------------|------------------|-------------|
-| 2.1 | Open | | | Rebuild `aws.html` from azure.html template: 10 exams, 3 level sections (Foundational, Associate, Professional), badge states (new, retired), retirement note on SOA-C02 |
-| 2.2 | Open | | | Rebuild `gcp.html` from azure.html template: 15 exams, multiple level sections, badge states (new, training-only, exam-prep), refresh note on pro-ml-eng |
-| 2.3 | Open | | | Rebuild `anthropic.html` from azure.html template: 1 exam, single section, source-needed badge |
-| 2.4 | Open | | | Verify: all exam links work (`quiz.html?exam=`), filters toggle correctly, dark mode, responsive |
-| 2.5 | Open | | | Stage and commit Phase 2 |
+| 2.1 | Completed | 2026-05-06 03:58 PM | 2026-05-06 04:05 PM | Rebuild `aws.html` from azure.html template: 10 exams, 3 level sections (Foundational, Associate, Professional), badge states (new, retired), retirement note on SOA-C02 |
+| 2.2 | Completed | 2026-05-06 04:05 PM | 2026-05-06 04:12 PM | Rebuild `gcp.html` from azure.html template: 15 exams, multiple level sections, badge states (new, training-only, exam-prep), refresh note on pro-ml-eng |
+| 2.3 | Completed | 2026-05-06 04:05 PM | 2026-05-06 04:12 PM | Rebuild `anthropic.html` from azure.html template: 1 exam, single section, source-needed badge |
+| 2.4 | Completed | 2026-05-06 04:12 PM | 2026-05-06 04:14 PM | Verify: all exam links work (`quiz.html?exam=`), filters toggle correctly, dark mode, responsive |
+| 2.5 | Started | 2026-05-06 04:14 PM | | Stage and commit Phase 2 |
 
 ### Phase 2 Summary
 
-- **Changes:** TBD
-- **Changes hosted at:** TBD
+- **Changes:** Rebuilt `aws.html` (10 exams, 3 level sections, retired/new badges, filter chips), `gcp.html` (15 exams, 5 level sections, training/exam-prep/new badges, refresh note), and `anthropic.html` (1 exam, source-needed badge). All use static HTML exam rows with Atlas layout, theme toggle, and responsive breakpoints.
+- **Changes hosted at:** `aws.html`, `gcp.html`, `anthropic.html`
 - **Commit:** `Port AWS, GCP, Anthropic provider pages to Atlas`
 
 ---
