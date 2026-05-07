@@ -1,6 +1,6 @@
 /**
  * QuizApp Integration Tests
- * Full flow: load XML → render question → select answer → submit → verify feedback
+ * Full flow: load JSON → render question → select answer → submit → verify feedback
  * Also covers keyboard navigation (arrow keys).
  */
 
@@ -8,17 +8,16 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import { QuizApp, sanitizeHTML } from '../../js/app.js';
-import { XMLParser } from '../../js/xml-parser.js';
 import { QuizEngine } from '../../js/quiz-engine.js';
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
-const SAMPLE_XML_PATH = join(process.cwd(), 'tests', 'fixtures', 'sample-exam.xml');
+const SAMPLE_JSON_PATH = join(process.cwd(), 'tests', 'fixtures', 'sample-exam.json');
 
-function getSampleXML() {
-    return readFileSync(SAMPLE_XML_PATH, 'utf-8');
+function getSampleExamData() {
+    return JSON.parse(readFileSync(SAMPLE_JSON_PATH, 'utf-8'));
 }
 
 /** Build a minimal quiz-page DOM and return an elements map matching QuizApp. */
@@ -103,10 +102,9 @@ function buildQuizDOM() {
 /** Create a QuizApp wired up with parsed sample exam data (no fetch). */
 function createWiredApp() {
     const elements = buildQuizDOM();
-    const parser = new XMLParser();
-    const examData = parser.parseExam(getSampleXML());
+    const examData = getSampleExamData();
 
-    const app = new QuizApp({ elements, parser, autoInit: false });
+    const app = new QuizApp({ elements, autoInit: false });
 
     // Wire engine + tracker manually (mirrors what init() does after fetch)
     app.engine = new QuizEngine(examData);
