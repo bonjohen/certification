@@ -24,10 +24,8 @@ The certification quiz had 10 new exam files (7 files in one batch) where each q
 - **Batch sizes should match review capacity.** Doing all 10 files in one commit makes review impossible. Batching 2-3 files per commit keeps diffs reviewable while maintaining efficiency.
 - **The script is a one-time tool but the pattern recurs.** `patch_metadata.py` was used once for this specific enrichment. But the pattern (manifest + transformation script + validation) was reused for hint enrichment, answer randomization, and schema conversion.
 
-## Information Needed to Complete This Document
+## Related Lessons
 
-- [ ] Include the manifest JSON structure (what fields, what format)
-- [ ] Show the core loop of the patch script (read manifest → find question → insert elements)
-- [ ] Document the validation steps that ran after patching
-- [ ] Discuss alternatives: bulk editing in a spreadsheet, using XSLT transformations, manual editing
-- [ ] Quantify: time to write the script + manifests vs estimated time for manual editing
+- [Content Quality Auditing at Scale](03-content-quality-auditing.md) — the audit that identified which files needed enrichment, driving the bulk script's work queue
+- [Answer Position Bias](04-answer-position-bias.md) — randomization used the same pattern: script + validation + batch execution across all files
+- [Schema Variant Consolidation](22-schema-variant-consolidation.md) — another bulk transformation script that converted incompatible schemas to canonical form

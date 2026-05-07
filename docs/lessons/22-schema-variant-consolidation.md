@@ -30,10 +30,12 @@ These files loaded in the browser (the XML parser was lenient) but failed XSD va
 - **Conversion scripts must be mechanical, not manual.** With 50 questions × multiple elements per question × 4 files, manual editing is error-prone. A script that handles element renaming, attribute mapping, and nesting restructuring is both safer and faster.
 - **After consolidation, delete the conversion script or archive it.** It's a one-time tool. Leaving it in the active scripts directory implies it might be needed again, which suggests the schema drift problem hasn't been solved.
 
-## Information Needed to Complete This Document
+## Applicability
 
-- [ ] Show a side-by-side comparison of canonical vs variant schema for the same question
-- [ ] Document the specific element/attribute mappings the conversion script handled
-- [ ] Discuss how to prevent schema drift in the future (pre-commit validation, authoring templates)
-- [ ] Quantify: how many validation errors were produced by each variant file?
-- [ ] Consider the generalized lesson for any multi-author data pipeline
+Schema variant consolidation applies to any multi-author data pipeline: API response formats from different vendors, ETL pipelines with multiple data sources, configuration files maintained by different teams, and document formats that evolved independently. The pattern is always the same: detect variants via schema validation, write a mechanical conversion script, run it, validate the output. Prevention is better than cure — establish the canonical schema early and validate on every commit.
+
+## Related Lessons
+
+- [Schema Enforcement at the Data Layer](02-schema-enforcement.md) — runtime schema validation is what detects variant files; without it, lenient parsers hide the drift
+- [Bulk Metadata Enrichment Scripts](23-bulk-metadata-enrichment.md) — the consolidation script follows the same manifest-driven bulk transformation pattern
+- [XML to JSON Migration](01-xml-to-json-migration.md) — variant schemas had to be consolidated before the JSON migration could produce consistent output

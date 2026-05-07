@@ -24,10 +24,11 @@ The `getProviderFromExam()` function was originally a method inside the `QuizApp
 - **Code review caught what tests couldn't.** The test suite was green. Coverage reports showed the test file had high line coverage. Only a human reading the test file and the source file side-by-side could see that they were testing different code.
 - **This is a general anti-pattern.** Anywhere you see test code that reimplements production logic ("I'll just copy the regex here"), the test is fragile. The test should import the real thing or mock its dependencies, never reimplement it.
 
-## Information Needed to Complete This Document
+## Applicability
 
-- [ ] Show the before/after: copied logic in test vs imported function
-- [ ] Include the extraction diff (moving function out of class)
-- [ ] Discuss how test coverage reports failed to flag this problem
-- [ ] Reference the code review finding ID and severity
-- [ ] Generalize to other examples of "testing the mock, not the code"
+This anti-pattern appears anywhere tests reimplement production logic rather than importing it: regex patterns copied into test files, calculation formulas duplicated for assertion, routing rules recreated in test helpers. The fix is always the same — extract the logic into an importable, testable unit, then test the real thing. This applies to any language or framework.
+
+## Related Lessons
+
+- [Integration Testing a DOM Application with jsdom](19-jsdom-integration-testing.md) — dependency injection (the refactoring technique used here) is what makes DOM-coupled code testable
+- [Code Review Driven Remediation](13-code-review-remediation.md) — this was finding F-02 in the code review; test-code drift was invisible to coverage reports

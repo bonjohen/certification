@@ -24,10 +24,11 @@ The quiz application's `QuizApp` class in `app.js` had 0% test coverage because 
 - **The test HTML structure must match production.** jsdom tests create a minimal HTML document with the IDs and structure that the application expects. If production HTML changes (new IDs, new structure), the test fixtures must be updated. This is a maintenance cost but also a safety net.
 - **vitest + jsdom is the simplest setup for ES module DOM testing.** No browser binaries, no WebSocket connections, no headless Chrome configuration. Just `test: { environment: 'jsdom' }` in the vitest config.
 
-## Information Needed to Complete This Document
+## Applicability
 
-- [ ] Show the before/after refactoring of QuizApp constructor (DOM query vs DI)
-- [ ] Include a complete integration test example
-- [ ] Document the jsdom limitations encountered (what couldn't be tested)
-- [ ] Compare jsdom testing to Playwright/Cypress for this use case
-- [ ] Discuss the test HTML fixture maintenance problem
+jsdom integration testing works well for applications whose complexity is in DOM manipulation, event handling, and data flow — not in visual rendering, animations, or cross-browser layout differences. If your tests need to verify visual appearance, use Playwright or Cypress. If they need to verify logic and data flow through the DOM, jsdom is faster and simpler.
+
+## Related Lessons
+
+- [Testing Provider Detection Logic](20-testing-provider-detection.md) — extracting pure functions from DOM-coupled classes is the prerequisite for both unit testing and jsdom integration testing
+- [Code Review Driven Remediation](13-code-review-remediation.md) — the 0% coverage gap on the UI controller was identified in the code review; jsdom testing was the fix

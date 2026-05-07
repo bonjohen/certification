@@ -38,10 +38,12 @@ State transitions: `Open → Started → Completed` (or `Open → Started → Bl
 - **The plan document is a living artifact.** It's updated as work proceeds (status changes, timestamps added, blockers noted) and checked in alongside the code. After completion, it serves as a historical record of how the feature was built.
 - **Numbering is sequential within phases, not global.** Task 3.2 is the second task in phase 3, not the 32nd task overall. This makes phases independently reorderable.
 
-## Information Needed to Complete This Document
+## Applicability
 
-- [ ] Include a real plan excerpt showing the progression from Open to Completed
-- [ ] Compare this approach to Agile sprints, Kanban boards, and GitHub Issues
-- [ ] Discuss when this formality is overkill (small changes, single-file fixes)
-- [ ] Document the commit protocol: what goes in the commit message
-- [ ] Show how blocked tasks are handled (what information to record, when to escalate)
+Phased planning works for any work that spans more than 2-3 commits and benefits from explicit progress tracking. It is overkill for single-file fixes, typo corrections, and config changes. A good heuristic: if the work would take more than one session or involves more than one logical unit of change, write a phase plan. If it's a single atomic change, just do it.
+
+## Related Lessons
+
+- [Design-First Development](15-design-first-development.md) — phased plans are Stage 3 of the five-stage workflow; they translate PDR decisions into ordered work
+- [Code Review Driven Remediation](13-code-review-remediation.md) — the remediation plan is a phased plan driven by severity rather than dependency order
+- [Lessons Learned as a Practice](24-lessons-learned-as-a-practice.md) — the phased plan structure inspired the lesson template's numbered "What Happened" steps

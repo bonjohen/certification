@@ -24,10 +24,8 @@ A certification quiz application had 33 exam files containing 1,650 questions, e
 - **Enrichment at scale requires batch tooling.** Manual editing of 1,650 questions × 3 hints each is impractical. Scripts that can patch metadata, measure quality, and report progress are essential.
 - **Quality auditing should be repeatable.** Running the audit after fixes ensures no regressions and measures progress. The audit script becomes a permanent quality gate.
 
-## Information Needed to Complete This Document
+## Related Lessons
 
-- [ ] Include the audit script or its core logic
-- [ ] Show a before/after example of a thin hint vs enriched hint
-- [ ] Document the tier classification criteria in detail
-- [ ] Discuss how the reference file was chosen and validated
-- [ ] Quantify the total enrichment effort (hours, commits, files touched)
+- [Hint Quality as a Spectrum](05-hint-quality-spectrum.md) — the three-tier hint system whose quality this audit measured
+- [Verbatim Answer Leakage in Hints](07-verbatim-answer-leakage.md) — a different content defect class found by a similar audit-then-fix pattern
+- [Bulk Metadata Enrichment Scripts](23-bulk-metadata-enrichment.md) — the batch tooling that made fixing 1,650 questions practical

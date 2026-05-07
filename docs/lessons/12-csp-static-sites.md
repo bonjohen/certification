@@ -28,10 +28,8 @@ A CSP meta tag was added to `quiz.html` and `results.html`:
 - **`'unsafe-inline'` for styles is a pragmatic concession.** Many CSS-in-JS patterns and inline `style` attributes require it. The alternative (`nonce` or `hash`) doesn't work with `<meta>` CSP. This is acceptable because style injection is not an XSS vector in most threat models.
 - **CSP and sanitization are complementary, not redundant.** Sanitization prevents the injection. CSP prevents execution if sanitization fails. Both are needed for defense in depth.
 
-## Information Needed to Complete This Document
+## Related Lessons
 
-- [ ] Document the full CSP directive and what each part allows/blocks
-- [ ] Show what happens when CSP blocks a violation (browser console error)
-- [ ] Discuss CSP reporting: can static sites use report-to or report-uri?
-- [ ] Address the `'unsafe-inline'` tradeoff in more detail
-- [ ] Test and document which browsers support `<meta>` CSP fully
+- [XSS in Trusted-Data Applications](17-xss-trusted-data.md) — CSP is the defense-in-depth layer; sanitization is the primary defense; both are needed
+- [Static Site as Application Platform](10-static-site-as-platform.md) — CSP via meta tags works precisely because there's no server to set headers
+- [Code Review Driven Remediation](13-code-review-remediation.md) — the CSP addition was part of the Phase 1 security remediation from the code review

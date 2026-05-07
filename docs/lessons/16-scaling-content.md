@@ -37,10 +37,11 @@ The project grew from:
 - **The bottleneck shifts from code to content.** Once the architecture supports N providers, the work is in authoring questions, enriching hints, and validating answers — not in writing code. This is the right kind of bottleneck for an educational application.
 - **Each scaling event validates the architecture.** Going from 1→3 providers proved the provider abstraction worked. Going from 3→10 proved it scaled. If the architecture had been wrong, the pain would have surfaced at 3, not at 10.
 
-## Information Needed to Complete This Document
+## Applicability
 
-- [ ] Quantify the exact number of lines changed per provider addition
-- [ ] Show the commit history: which commits touched engine code vs content-only
-- [ ] Discuss the limits: at what provider count does this approach need templating?
-- [ ] Compare to CMS-based approaches (WordPress, headless CMS)
-- [ ] Address quality control: how to maintain content standards as volume grows
+This pattern works for any content-heavy application where the "engine" and the "content" are cleanly separated: documentation sites with multiple product lines, multi-language learning apps, multi-vendor comparison tools. It stops working when content items need fundamentally different rendering or behavior — at that point, the engine needs extension points, not just more data.
+
+## Related Lessons
+
+- [Provider-Agnostic Plugin Architecture](08-provider-agnostic-architecture.md) — the architectural pattern that makes content scaling possible without engine changes
+- [Content Quality Auditing at Scale](03-content-quality-auditing.md) — as content volume grows, quality can only be maintained through automated auditing

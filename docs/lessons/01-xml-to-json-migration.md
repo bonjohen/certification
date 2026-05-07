@@ -24,10 +24,8 @@ A certification quiz application served 50+ exam files as XML, parsed client-sid
 - **Keep the old path alive until equivalence is proven.** Running both parsers in parallel and comparing their output was the only reliable way to prove the migration was correct. Unit tests alone wouldn't have caught subtle differences in how whitespace, entities, or nested HTML were handled.
 - **The conversion script is a one-time tool but needs to be correct.** Bugs in the converter silently propagate to every exam file. The script should be tested against known-good reference files before running on the full corpus.
 
-## Information Needed to Complete This Document
+## Related Lessons
 
-- [ ] Include the actual JSON Schema structure (key fields, enums, required properties)
-- [ ] Document the specific differences between XML and JSON representations (e.g., how hints, categories, tags mapped)
-- [ ] Show a before/after example of one question in XML vs JSON
-- [ ] Detail the Ajv CDN import approach and the vitest alias workaround for ESM imports
-- [ ] Quantify: how many bugs did schema validation catch that XML parsing had missed?
+- [Schema Enforcement at the Data Layer](02-schema-enforcement.md) — the migration enabled runtime JSON Schema validation that XML never had
+- [Equivalence Testing During Format Migration](18-equivalence-testing.md) — the 5,101 equivalence tests that proved the migration was correct
+- [XML Entity Encoding Pitfalls](21-xml-entity-encoding.md) — entity encoding bugs were one motivation for leaving XML behind

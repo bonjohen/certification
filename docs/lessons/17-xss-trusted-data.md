@@ -23,10 +23,8 @@ The quiz application rendered question text, scenarios, and hints using `innerHT
 - **CSP is defense-in-depth, not a replacement for sanitization.** CSP blocks script execution but doesn't prevent other HTML injection (e.g., phishing-style UI manipulation with injected `<form>` elements). Both layers are needed.
 - **The regression test is the most important artifact.** It proves the vulnerability is covered and prevents future developers from accidentally removing the sanitization.
 
-## Information Needed to Complete This Document
+## Related Lessons
 
-- [ ] Include the full `sanitizeHTML()` implementation
-- [ ] Document the specific innerHTML call sites that were remediated
-- [ ] Show the CSP meta tag and explain each directive
-- [ ] Discuss the DOMPurify library as an alternative to hand-rolled sanitization
-- [ ] Address the broader OWASP innerHTML guidance
+- [Content Security Policy for Static Sites](12-csp-static-sites.md) — CSP is the defense-in-depth layer that catches XSS if sanitization fails
+- [Code Review Driven Remediation](13-code-review-remediation.md) — the XSS finding (F-01) was the highest-severity issue from the whole-codebase review
+- [Schema Enforcement at the Data Layer](02-schema-enforcement.md) — schema validation catches structural errors in data; sanitization catches dangerous content in otherwise-valid data

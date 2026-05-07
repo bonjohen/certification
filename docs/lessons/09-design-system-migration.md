@@ -27,10 +27,8 @@ The "Atlas" design system was created: `system/tokens.css` (design tokens) and `
 - **The old CSS deletion is the victory condition.** If you can `git rm css/styles.css css/quiz.css` and every page still renders correctly, the migration is complete. If you can't, you missed something.
 - **Dark mode comes "free" from tokens.** Once all pages use tokens, dark mode is a single `[data-theme="dark"]` block in `tokens.css` that redefines the palette. No per-page dark mode code needed.
 
-## Information Needed to Complete This Document
+## Related Lessons
 
-- [ ] Include the Atlas token inventory (key variables and their light/dark values)
-- [ ] Show a before/after of one provider page (raw CSS vs Atlas tokens)
-- [ ] Document the bridge variable pattern with code examples
-- [ ] Discuss how to handle provider brand colors within a design system
-- [ ] Quantify: total lines of CSS before vs after the migration
+- [Static Site as Application Platform](10-static-site-as-platform.md) — Atlas proves a design system doesn't require a CSS preprocessor or build step
+- [Provider-Agnostic Plugin Architecture](08-provider-agnostic-architecture.md) — provider brand colors as CSS variables complement the JS-level provider detection
+- [Design-First Development](15-design-first-development.md) — the Atlas rollout followed the full design-doc → PDR → plan → execute workflow

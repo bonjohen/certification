@@ -23,10 +23,11 @@ The quiz application migrated from XML exam files (parsed by `XMLParser`) to JSO
 - **Run equivalence tests on the full corpus, not just fixtures.** A test fixture with 5 questions might pass while the real corpus has edge cases in question 1,247. The whole point of equivalence testing is exhaustive comparison.
 - **The old parser stays alive during migration.** You can't delete `XMLParser` until the equivalence tests have passed. The old code is the reference implementation that the tests compare against.
 
-## Information Needed to Complete This Document
+## Applicability
 
-- [ ] Include the equivalence test structure (how it iterates over exams and questions)
-- [ ] Show examples of fields that diverged during initial testing and how they were fixed
-- [ ] Document the specific whitespace and encoding issues that were caught
-- [ ] Discuss performance: how long did 5,101 tests take to run?
-- [ ] Compare to other migration verification strategies (snapshot testing, golden file testing)
+Equivalence testing applies to any format migration, parser rewrite, or rendering engine swap where the output must match exactly. It also works for database schema migrations (compare query results before/after), API version upgrades (compare response payloads), and compiler/transpiler changes. It is NOT useful when the new system intentionally produces different output — in that case, you need acceptance tests, not equivalence tests.
+
+## Related Lessons
+
+- [XML to JSON Migration](01-xml-to-json-migration.md) — the migration that this testing strategy was built to verify
+- [XML Entity Encoding Pitfalls](21-xml-entity-encoding.md) — whitespace and entity differences between XML and JSON were the most common equivalence failures

@@ -25,10 +25,9 @@ Each phase was committed independently. Test count grew from 118 → 129 → 172
 - **The review document is the requirements spec.** Each finding has a finding ID (F-01), a severity, and a specific description. The remediation plan references these IDs, creating traceability from finding → task → commit.
 - **A code review that doesn't produce a remediation plan is just opinions.** The review document alone changes nothing. The phased plan with tracked tasks is what drives actual improvement.
 
-## Information Needed to Complete This Document
+## Related Lessons
 
-- [ ] Include the full findings list (F-01 through F-11) with severities
-- [ ] Show how finding IDs map to remediation tasks
-- [ ] Discuss how the review scope was defined (what was in scope, what was out)
-- [ ] Document the review execution method (manual reading, automated tools, test runs)
-- [ ] Compare to other code review approaches (PR-based review, audit firms, static analysis)
+- [Phased Release Planning](14-phased-release-planning.md) — the remediation plan used the same phased structure as feature delivery
+- [XSS in Trusted-Data Applications](17-xss-trusted-data.md) — F-01 (the highest-severity finding) was the innerHTML XSS vulnerability
+- [Testing Provider Detection Logic](20-testing-provider-detection.md) — F-02 (test-code drift) showed tests passing against copied logic, not the real function
+- [Content Security Policy for Static Sites](12-csp-static-sites.md) — CSP was added as part of Phase 1 remediation

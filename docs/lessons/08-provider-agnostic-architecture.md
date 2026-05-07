@@ -23,10 +23,11 @@ A certification quiz site started with a single provider (Azure) and grew to 10 
 - **Each provider page is a static HTML file, not a template.** This seems like duplication but is actually an advantage: each page can be independently edited, deployed, and cached. The shared behavior comes from the JS modules, not from server-side templating.
 - **The invariant that protects this architecture:** "New providers must not introduce provider-specific rendering, storage, or navigation logic." This invariant has held across all 10 providers.
 
-## Information Needed to Complete This Document
+## Applicability
 
-- [ ] Include the full `getProviderFromExam()` function with commentary
-- [ ] Show the exact changes needed to add provider #11 (a checklist)
-- [ ] Document the provider maps (backLink, displayName) and where they live
-- [ ] Discuss when this pattern breaks: what if a provider needs fundamentally different question types?
-- [ ] Compare to other plugin architectures (WordPress plugins, VS Code extensions, etc.)
+This pattern works for any system where multiple "brands" or "vendors" share the same behavior but differ in branding and content: multi-tenant SaaS dashboards, multi-publisher content platforms, multi-vendor comparison tools. It breaks down when providers need fundamentally different behavior (different question types, different scoring rules, different UI layouts) — at that point you need a strategy pattern or plugin interface, not just prefix-based routing.
+
+## Related Lessons
+
+- [Scaling Content Without Scaling Complexity](16-scaling-content.md) — the same architecture that enables 10 providers also enables 50+ exams with zero engine changes
+- [Design System Migration](09-design-system-migration.md) — Atlas tokens provide provider brand colors as CSS variables, complementing the JS-level provider abstraction

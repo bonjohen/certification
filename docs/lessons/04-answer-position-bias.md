@@ -22,10 +22,11 @@ A certification quiz application had 1,650+ questions authored by multiple contr
 - **Post-randomization validation is non-negotiable.** After shuffling, verify that (a) every question still has exactly one correct answer, (b) the correct-answer letter matches the shuffled choice, (c) the distribution is approximately uniform.
 - **Run randomization once at authoring time, not at quiz runtime.** Runtime randomization creates a different experience on each load, which complicates progress tracking and makes bug reports unreproducible.
 
-## Information Needed to Complete This Document
+## Applicability
 
-- [ ] Include pre-randomization distribution data (e.g., "42% of correct answers were B")
-- [ ] Show the randomization algorithm (Fisher-Yates on choices + remap answer key)
-- [ ] Document the verification checks that ran post-randomization
-- [ ] Discuss whether re-randomization should happen when new questions are added
-- [ ] Reference academic literature on answer position bias in standardized testing
+This applies to any multiple-choice content: educational quizzes, surveys with "correct" answers, certification practice tests, and trivia games. It does NOT apply to questions where position is semantically meaningful (e.g., "which of these is in ascending order?") or to free-response questions.
+
+## Related Lessons
+
+- [Content Quality Auditing at Scale](03-content-quality-auditing.md) — answer position bias is one dimension of content quality that only shows up in aggregate analysis
+- [Bulk Metadata Enrichment Scripts](23-bulk-metadata-enrichment.md) — the randomization script follows the same pattern: manifest-driven bulk transformation with validation

@@ -25,10 +25,11 @@ Large question banks authored by multiple sources (human or AI) accumulate factu
 - **This catches a different class of errors than schema validation.** Schema validation ensures the data is well-formed. AI validation ensures the content is factually correct. Both are needed.
 - **The output is a review queue, not an auto-fix.** The LLM identifies candidates; humans verify. False positives (LLM wrong, stored answer right) are acceptable. False negatives (both agree on a wrong answer) are the blind spot.
 
-## Information Needed to Complete This Document
+## Applicability
 
-- [ ] Include results from actual validation runs (match rates, disagreement rates)
-- [ ] Show example disagreements: cases where the stored answer was wrong vs where the LLM was wrong
-- [ ] Document the prompt template used for blind attempts
-- [ ] Discuss cost and time for validating 1,650 questions
-- [ ] Address the false-negative problem: what if both the LLM and the stored answer are wrong?
+This technique works for any large corpus of factual Q&A content: exam prep tools, trivia databases, FAQ systems, documentation with embedded quizzes. It is less useful for subjective or opinion-based questions where "correctness" depends on context. It also has diminishing returns on content that was written by a single expert who has already verified answers manually.
+
+## Related Lessons
+
+- [Content Quality Auditing at Scale](03-content-quality-auditing.md) — structural quality auditing (character counts, schema) is necessary but insufficient; AI validation catches factual errors that structural checks miss
+- [Schema Enforcement at the Data Layer](02-schema-enforcement.md) — schema validation ensures well-formed data; AI validation ensures factually correct data; both are needed

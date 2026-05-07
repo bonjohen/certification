@@ -24,10 +24,17 @@ The certification quiz had a three-level progressive hint system. Level 1 hints 
 - **Automated detection should run as a quality gate.** New questions should be checked for leakage before they're merged. The audit script is cheap to run and catches a high-value defect class.
 - **This applies to any hint/clue system, not just quiz apps.** Educational software, help systems, guided tutorials — anywhere a "hint" exists alongside a "correct answer," leakage is possible.
 
-## Information Needed to Complete This Document
+## Examples
 
-- [ ] Include examples of leaked hints vs their fixed replacements
-- [ ] Show the core detection algorithm (substring match logic)
-- [ ] Discuss edge cases: partial matches, paraphrased answers, synonym leakage
-- [ ] Quantify the distribution of leaks by provider/exam
-- [ ] Consider whether H2 and H3 hints can also leak (they explain the answer, so some verbatim overlap is expected)
+**Leaked H1:** "Consider Azure Functions for this scenario."
+**Correct answer choice B:** "Azure Functions"
+**Problem:** The hint names the correct answer verbatim.
+
+**Fixed H1:** "Think about which Azure service is designed for event-driven, serverless execution."
+**Same correct answer:** "Azure Functions"
+**Why better:** Points to the concept (event-driven, serverless) without naming the specific service.
+
+## Related Lessons
+
+- [Hint Quality as a Spectrum](05-hint-quality-spectrum.md) — leakage undermines H1's purpose as a conceptual nudge; the fix must preserve that pedagogical role
+- [Content Quality Auditing at Scale](03-content-quality-auditing.md) — leakage detection is one type of automated quality audit that runs across the full corpus

@@ -30,6 +30,7 @@ Standalone learning documents extracted from the certification study site projec
 16. [Scaling Content Without Scaling Complexity](16-scaling-content.md) — Adding 50+ exams across 10 providers while keeping the codebase stable
 17. [XSS in Trusted-Data Applications](17-xss-trusted-data.md) — Why innerHTML from "your own" XML/JSON data is still a vulnerability
 24. [Lessons Learned as a Practice](24-lessons-learned-as-a-practice.md) — Turning project experience into a durable, reusable knowledge base via a `/lessons` skill
+25. [Legacy Artifact Removal](25-legacy-artifact-removal.md) — Safely deleting dead code after a migration: dependency mapping, bulk deletion, and verification
 
 ### Testing
 
