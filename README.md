@@ -103,20 +103,23 @@ certification/
 ├── anthropic.html      # Anthropic exam selection
 ├── quiz.html           # Quiz interface
 ├── css/
-│   ├── styles.css      # Application styles
-│   └── quiz.css        # Quiz page styles
+│   └── results.css     # Results page styles
 ├── js/
 │   ├── app.js          # Main application logic
+│   ├── exam-loader.js  # JSON exam loading with schema validation
 │   ├── quiz-engine.js  # Quiz state management
 │   ├── progress-tracker.js  # localStorage persistence
-│   └── xml-parser.js   # Exam XML parsing
+│   └── results-app.js  # Results page logic
 ├── data/
-│   ├── azure/          # Azure exam XML files
-│   ├── aws/            # AWS exam XML files
-│   ├── gcp/            # GCP exam XML files
-│   ├── anthropic/      # Anthropic exam XML files
-│   └── schema/         # XML schema definitions
-└── tests/              # Unit tests
+│   ├── azure/          # Azure exam JSON files
+│   ├── aws/            # AWS exam JSON files
+│   ├── gcp/            # GCP exam JSON files
+│   ├── anthropic/      # Anthropic exam JSON files
+│   └── schema/         # JSON Schema definitions
+├── system/
+│   ├── tokens.css      # Atlas design system tokens
+│   └── system.css      # Atlas component styles
+└── tests/              # Unit and integration tests
 ```
 
 ## Development
@@ -139,44 +142,41 @@ npm run test:coverage
 
 ### Adding New Exams
 
-1. Create a new XML file in the appropriate provider folder (`data/azure/`, `data/aws/`, `data/gcp/`, or `data/anthropic/`)
-2. Follow the existing XML schema (see `data/schema/certification.xsd`)
+1. Create a new JSON file in the appropriate provider folder (`data/{provider}/`)
+2. Follow the JSON Schema at `data/schema/certification.schema.json`
 3. Add an exam card to the corresponding provider HTML file
 4. The quiz will automatically load based on the `?exam=` URL parameter
 
-### XML Question Format
+### JSON Question Format
 
-```xml
-<question id="1" category-ref="cat-id" difficulty="basic">
-    <title>Question Title</title>
-    <scenario>Real-world scenario description...</scenario>
-    <question-text>What should you do?</question-text>
-    <choices>
-        <choice letter="A">First option</choice>
-        <choice letter="B">Correct option</choice>
-        <choice letter="C">Third option</choice>
-        <choice letter="D">Fourth option</choice>
-    </choices>
-    <correct-answer>B</correct-answer>
-    <hints>
-        <hint level="1" label="Brief Hint">
-            <content>A small nudge in the right direction.</content>
-        </hint>
-        <hint level="2" label="Detailed Hint">
-            <content>More detailed explanation.</content>
-        </hint>
-        <hint level="3" label="Answer Explanation">
-            <content>Complete explanation of why B is correct.</content>
-        </hint>
-    </hints>
-</question>
+```json
+{
+  "id": 1,
+  "categoryRef": "cat-id",
+  "difficulty": "basic",
+  "title": "Question Title",
+  "scenario": "Real-world scenario description...",
+  "questionText": "What should you do?",
+  "choices": [
+    { "letter": "A", "text": "First option" },
+    { "letter": "B", "text": "Correct option" },
+    { "letter": "C", "text": "Third option" },
+    { "letter": "D", "text": "Fourth option" }
+  ],
+  "correctAnswer": "B",
+  "hints": [
+    { "level": 1, "label": "Brief Hint", "content": "A small nudge in the right direction." },
+    { "level": 2, "label": "Detailed Hint", "content": "More detailed explanation." },
+    { "level": 3, "label": "Answer Explanation", "content": "Complete explanation of why B is correct." }
+  ]
+}
 ```
 
 ## Tech Stack
 
 - **Frontend**: Vanilla HTML, CSS, JavaScript (ES6 modules)
 - **Testing**: Vitest with jsdom
-- **Data Format**: XML with custom schema
+- **Data Format**: JSON with JSON Schema validation
 
 ## License
 

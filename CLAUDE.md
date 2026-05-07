@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Multi-provider certification exam study site. Browser-based practice quizzes backed by JSON question banks (legacy XML still present but JSON is the active format). The shared quiz engine, loader, navigation, persistence, and hint system are provider-agnostic — new providers plug in by adding data and a provider page.
+Multi-provider certification exam study site. Browser-based practice quizzes backed by JSON question banks. The shared quiz engine, loader, navigation, persistence, and hint system are provider-agnostic — new providers plug in by adding data and a provider page.
 
 ## Commands
 
@@ -13,7 +13,6 @@ npm start                    # http-server on port 8080, opens browser
 npm test                     # vitest run (all tests)
 npm run test:watch           # vitest in watch mode
 npm run test:coverage        # vitest with v8 coverage
-npm run validate:xml         # node scripts/validate-xml.js
 npx vitest run tests/unit/quiz-engine.test.js  # single test file
 ```
 
@@ -42,7 +41,6 @@ No build step — pure static site. Tests use vitest + jsdom (configured in `vit
 - **`exam-loader.js`** — Fetches JSON exam files, validates against `data/schema/certification.schema.json` using Ajv 2020-12 (loaded from esm.sh in browser, aliased in vitest). Caches schema after first load.
 - **`quiz-engine.js`** — Stateless quiz logic: scoring, answer checking, hint progression, question navigation. No DOM dependency.
 - **`progress-tracker.js`** — localStorage persistence. Saves/restores quiz state keyed by exam code. Handles migration of old storage formats.
-- **`xml-parser.js`** — Legacy XML parser. Still present but JSON is the primary format.
 - **`results-app.js`** — Results page controller (`results.html`). Shows score, category/difficulty breakdowns, timeline, and per-question detail.
 
 ### Design system: Atlas (`system/`)
@@ -53,7 +51,7 @@ No build step — pure static site. Tests use vitest + jsdom (configured in `vit
 
 ### Data format
 
-Exam data is JSON at `data/{provider}/{exam-code}.json`, validated against `data/schema/certification.schema.json`. XML files coexist but JSON is authoritative.
+Exam data is JSON at `data/{provider}/{exam-code}.json`, validated against `data/schema/certification.schema.json`.
 
 ### Key pages
 
@@ -68,14 +66,9 @@ Exam data is JSON at `data/{provider}/{exam-code}.json`, validated against `data
 2. Add provider card to `index.html`
 3. Register in `js/app.js`: add prefix matching to `getProviderFromExam()`, add entries to `setBackLinks()` and `updateExamInfo()`
 4. Create `data/{provider}/` with JSON exam files matching `data/schema/certification.schema.json`
-5. Optionally run `scripts/randomize_answers.py` on source XML before converting
 
 ### Scripts (`scripts/`)
 
-- `randomize_answers.py` — Shuffles answer order in XML files
-- `validate-xml.js` — Node script to validate XML exam files
-- `xml_to_json_exam.py` — Converts XML exams to JSON format
-- `convert_xml_schema.py` / `convert_variant_schema.py` — Schema conversion utilities
 - `accessibility-audit.js` — Runs axe-core accessibility checks
 
 ## Decision-Making
