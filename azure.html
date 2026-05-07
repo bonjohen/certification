@@ -296,7 +296,7 @@
         </p>
       </div>
       <div class="hero-meta">
-        <b>17</b>
+        <b id="hero-count">16 / 16</b>
         Study guides
       </div>
     </div>
@@ -306,7 +306,6 @@
   <div class="filters" role="group" aria-label="Filter exams">
     <span class="label">View</span>
     <button class="filter-chip" data-filter="all" aria-pressed="true">All</button>
-    <button class="filter-chip" data-filter="active" aria-pressed="false">Active</button>
     <button class="filter-chip" data-filter="new" aria-pressed="false">New</button>
     <button class="filter-chip" data-filter="ending-soon" aria-pressed="false">Retiring</button>
     <span style="flex:1"></span>
@@ -370,8 +369,8 @@
     }));
     EXAMS = results.filter(Boolean);
     // Update hero count
-    const countEl = document.querySelector('.hero-meta b');
-    if (countEl) countEl.textContent = EXAMS.length;
+    const countEl = document.getElementById('hero-count');
+    if (countEl) countEl.textContent = EXAMS.length + ' / ' + EXAMS.length;
     render();
   }
 
@@ -382,13 +381,15 @@
   function render() {
     const filtered = EXAMS.filter(e => {
       if (stateFilter !== 'all') {
-        if (stateFilter === 'active' && !(e.state === 'active' || e.state === 'new')) return false;
         if (stateFilter === 'new' && e.state !== 'new') return false;
         if (stateFilter === 'ending-soon' && e.state !== 'ending-soon') return false;
       }
       if (levelFilter !== 'all' && e.level !== levelFilter) return false;
       return true;
     });
+
+    const countEl = document.getElementById('hero-count');
+    if (countEl) countEl.textContent = filtered.length + ' / ' + EXAMS.length;
 
     const container = document.getElementById('exam-list');
     if (filtered.length === 0) {

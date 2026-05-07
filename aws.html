@@ -144,6 +144,8 @@
     border-radius: 0 2px 2px 0;
   }
   .exam-row:last-child { border-bottom: 1px solid var(--atlas-rule-soft); }
+  .exam-row[hidden] { display: none; }
+  .level-section[hidden] { display: none; }
 
   .exam-row .code {
     font-family: var(--mono); font-size: 13px;
@@ -287,7 +289,7 @@
         </p>
       </div>
       <div class="hero-meta">
-        <b>10</b>
+        <b id="hero-count">10 / 10</b>
         Study guides
       </div>
     </div>
@@ -296,7 +298,6 @@
   <div class="filters" role="group" aria-label="Filter exams">
     <span class="label">View</span>
     <button class="filter-chip" data-filter="all" aria-pressed="true">All</button>
-    <button class="filter-chip" data-filter="active" aria-pressed="false">Active</button>
     <button class="filter-chip" data-filter="new" aria-pressed="false">New</button>
     <button class="filter-chip" data-filter="retired" aria-pressed="false">Retired</button>
     <span style="flex:1"></span>
@@ -468,23 +469,27 @@
   let stateFilter = 'all';
   let levelFilter = 'all';
 
+  const totalExams = document.querySelectorAll('.exam-row').length;
+
   function applyFilters() {
     const rows = document.querySelectorAll('.exam-row');
+    let visibleCount = 0;
     rows.forEach(row => {
       const state = row.dataset.state;
       const level = row.dataset.level;
       let show = true;
-      if (stateFilter === 'active' && state !== 'active' && state !== 'new') show = false;
       if (stateFilter === 'new' && state !== 'new') show = false;
       if (stateFilter === 'retired' && state !== 'retired') show = false;
       if (levelFilter !== 'all' && level !== levelFilter) show = false;
       row.hidden = !show;
+      if (show) visibleCount++;
     });
     // Hide empty sections
     document.querySelectorAll('.level-section').forEach(sec => {
       const visible = sec.querySelectorAll('.exam-row:not([hidden])');
       sec.hidden = visible.length === 0;
     });
+    document.getElementById('hero-count').textContent = visibleCount + ' / ' + totalExams;
   }
 
   document.querySelectorAll('.filter-chip[data-filter]').forEach(btn => {
