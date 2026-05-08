@@ -55,6 +55,38 @@ A scenario-based quiz application for studying technology certification exams. S
 |------|-------|-------|
 | CCA-F | Claude Certified Architect, Foundations | Foundational |
 
+### CompTIA (1 exam)
+| Code | Title | Level |
+|------|-------|-------|
+| SY0-701 | CompTIA Security+ | Intermediate |
+
+### ISC2 (1 exam)
+| Code | Title | Level |
+|------|-------|-------|
+| CISSP | Certified Information Systems Security Professional | Advanced |
+
+### GitHub (2 exams)
+| Code | Title | Level |
+|------|-------|-------|
+| GH-200 | GitHub Actions Certification | Intermediate |
+| GH-300 | GitHub Copilot Certification | Intermediate |
+
+### Databricks (2 exams)
+| Code | Title | Level |
+|------|-------|-------|
+| DB-GenAI | Databricks Generative AI Engineer | Intermediate |
+| DB-ML | Databricks Machine Learning | Intermediate |
+
+### NVIDIA (1 exam)
+| Code | Title | Level |
+|------|-------|-------|
+| NV-GenAI | NVIDIA Generative AI | Intermediate |
+
+### Cisco (1 exam)
+| Code | Title | Level |
+|------|-------|-------|
+| 810-110 | Cisco AI Fundamentals | Foundational |
+
 ## Getting Started
 
 ### Prerequisites
