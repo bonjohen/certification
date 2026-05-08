@@ -9,7 +9,7 @@ Multi-provider certification exam study site. Browser-based practice quizzes bac
 ## Commands
 
 ```bash
-npm start                    # http-server on port 8080, opens browser
+npm start                    # http-server on port 8090, opens browser
 npm test                     # vitest run (all tests)
 npm run test:watch           # vitest in watch mode
 npm run test:coverage        # vitest with v8 coverage

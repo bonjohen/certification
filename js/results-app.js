@@ -72,7 +72,7 @@ const providerPages = {
     cisco: 'cisco.html'
 };
 
-class ResultsApp {
+export class ResultsApp {
     constructor() {
         this.results = null;
         this.provider = null;
