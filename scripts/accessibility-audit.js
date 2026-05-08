@@ -50,7 +50,11 @@ function severityEmoji(impact) {
 }
 
 async function main() {
-  const pages = ['index.html', 'quiz.html', 'azure.html', 'aws.html', 'gcp.html', 'anthropic.html'];
+  const pages = [
+    'index.html', 'quiz.html', 'results.html', 'lessons.html', 'lesson.html',
+    'azure.html', 'aws.html', 'gcp.html', 'anthropic.html',
+    'comptia.html', 'isc2.html', 'github.html', 'databricks.html', 'nvidia.html', 'cisco.html',
+  ];
   const timestamp = new Date().toISOString().slice(0, 10);
   const lines = [
     `# Accessibility Audit`,
