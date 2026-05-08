@@ -31,6 +31,7 @@ Standalone learning documents extracted from the certification study site projec
 17. [XSS in Trusted-Data Applications](17-xss-trusted-data.md) — Why innerHTML from "your own" XML/JSON data is still a vulnerability
 24. [Lessons Learned as a Practice](24-lessons-learned-as-a-practice.md) — Turning project experience into a durable, reusable knowledge base via a `/lessons` skill
 25. [Legacy Artifact Removal](25-legacy-artifact-removal.md) — Safely deleting dead code after a migration: dependency mapping, bulk deletion, and verification
+26. [Building a Lessons Skill](26-building-a-lessons-skill.md) — Anatomy of a Claude Code skill file: frontmatter, mode dispatch, quality contracts, and hard rules
 
 ### Testing
 
