@@ -4,18 +4,7 @@ Review date: 2026-05-07
 
 ## Important
 
-### 1. Update deployment-guide.md
-References deleted files (`css/styles.css`, `css/quiz.css`, `js/xml-parser.js`). The file structure section is stale after the Atlas migration and XML removal. Update to reflect current state.
-- **File:** `docs/deployment-guide.md`
-
-### 2. Add Lessons link to results.html nav
-The results page nav has Providers but not Lessons. All other non-quiz pages link to both.
-- **File:** `results.html`
-
-### 3. Clean up stale git-tracked artifacts
-`log/` and `output/` directories contain old artifacts from January 2026 that are committed to git but serve no purpose.
-- Add `log/` and `output/` to `.gitignore`
-- Remove tracked files: `git rm -r --cached log/ output/`
+All important items resolved (2026-05-08).
 
 ## Nice-to-have
 

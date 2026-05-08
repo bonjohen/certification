@@ -157,23 +157,32 @@ dig www.yourdomain.com +short
 ## File Structure for GitHub Pages
 
 ```
-certification-study/
+certification/
 ├── index.html          ← Entry point (required)
 ├── quiz.html
+├── results.html
+├── lessons.html
+├── lesson.html         ← Markdown viewer for lessons
 ├── CNAME               ← Custom domain file
+├── system/
+│   ├── tokens.css      ← Atlas design system tokens
+│   └── system.css      ← Atlas component styles
 ├── css/
-│   ├── styles.css
-│   └── quiz.css
+│   └── results.css
 ├── js/
 │   ├── app.js
+│   ├── exam-loader.js  ← JSON exam loading with schema validation
 │   ├── quiz-engine.js
 │   ├── progress-tracker.js
-│   └── xml-parser.js
-└── data/
-    ├── az-104/
-    │   └── exam.xml
-    └── az-204/
-        └── exam.xml
+│   └── results-app.js
+├── data/
+│   ├── schema/
+│   │   └── certification.schema.json
+│   ├── aws/            ← JSON exam files per provider
+│   ├── azure/
+│   └── ...
+└── docs/
+    └── lessons/        ← Markdown lesson files
 ```
 
 ## Updating Your Site
